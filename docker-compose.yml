@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tutorlink
+      POSTGRES_USER: tutorlink
+      POSTGRES_PASSWORD: tutorlink_dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tutorlink -d tutorlink"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env.docker
+    volumes:
+      - ./backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+      - backend_storage:/var/www/html/storage
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+
+  frontend:
+    image: node:22-bookworm-slim
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    command: sh -c "npm ci && npm run dev -- --hostname 0.0.0.0"
+
+volumes:
+  postgres_data:
+  backend_vendor:
+  backend_storage:
+  frontend_node_modules:
