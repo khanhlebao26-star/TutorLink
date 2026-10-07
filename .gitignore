@@ -8,12 +8,28 @@
 **/node_modules/
 **/vendor/
 
+# Local AI/tooling configuration
+# Laravel Boost generates these for the local agent environment.
+/backend/.claude/
+/backend/.mcp.json
+/backend/boost.json
+
 # Build output
 **/.next/
+**/out/
+**/build/
 **/storage/logs/
 **/storage/framework/cache/
 **/storage/framework/sessions/
 **/storage/framework/views/
+
+# Local runtime/test artifacts
+**/.phpunit.result.cache
+**/.phpunit.cache/
+**/coverage/
+**/*.sqlite
+**/*.sqlite-*
+**/*.log
 
 # IDE
 .vscode/
