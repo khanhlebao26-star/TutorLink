@@ -79,12 +79,25 @@ The current API routes are:
   `/api/v1/catalog/specializations`.
 - Files: upload, complete, link, metadata, download, and delete under
   `/api/v1/files`.
-- Tutor profile: `/api/v1/tutor/profile` and `/submit`.
+- Tutor profile: `/api/v1/tutor/profile`, `/submit`, `/avatar`, and
+  `/verification-documents`.
 
 Business file uploads require a verified email. Uploaded files start with
 `scan_status=pending`; only completed files (`scan_status=clean`) can be
 attached or downloaded. Tutor profiles move from `draft` to `submitted`, and
 submitted profiles are locked by policy.
+
+Tutor onboarding uses this sequence:
+
+1. Read `GET /api/v1/catalog/specializations`.
+2. Create or update a draft profile with `specialization_id`.
+3. Upload a file with purpose `avatar` or `verification_document`.
+4. Complete the file with `POST /api/v1/files/{file}/complete`.
+5. Attach an avatar with `PUT /api/v1/tutor/profile/avatar` and payload
+   `{ "file_id": 123 }`.
+6. Attach a verification document with
+   `POST /api/v1/tutor/profile/verification-documents` and payload
+   `{ "file_id": 123, "document_type": "teaching_certificate" }`.
 
 After changing `backend/.env.docker`, recreate the backend so Laravel loads the
 new environment file:

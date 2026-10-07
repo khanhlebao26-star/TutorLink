@@ -12,6 +12,9 @@ class TutorProfileResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
+            'specialization_id' => $this->specializations->first()?->id,
+            'avatar_file_id' => $this->avatar_file_id,
+            'verification_document_file_id' => $this->verificationDocuments->first()?->file_id,
             'headline' => $this->headline,
             'bio' => $this->bio,
             'experience_years' => $this->experience_years,

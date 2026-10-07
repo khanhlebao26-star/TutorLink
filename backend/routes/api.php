@@ -62,6 +62,12 @@ Route::prefix('v1')->group(function () {
             ->name('tutor.profile.store');
         Route::post('/tutor/profile/submit', [TutorProfileController::class, 'submit'])
             ->name('tutor.profile.submit');
+        Route::put('/tutor/profile/avatar', [TutorProfileController::class, 'attachAvatar'])
+            ->name('tutor.profile.avatar');
+        Route::post('/tutor/profile/verification-documents', [
+            TutorProfileController::class,
+            'createVerificationDocument',
+        ])->name('tutor.profile.verification-documents');
     });
 
     Route::get('/catalog/categories', [CatalogController::class, 'categories'])
