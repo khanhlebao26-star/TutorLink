@@ -101,6 +101,11 @@ return [
         ],
     ],
 
+    'local_admin' => [
+        'email' => env('LOCAL_ADMIN_EMAIL', 'admin@tutorlink.local'),
+        'password' => env('LOCAL_ADMIN_PASSWORD'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Password Confirmation Timeout

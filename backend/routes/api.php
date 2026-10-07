@@ -23,7 +23,7 @@ Route::prefix('v1')->group(function () {
             ->name('auth.reset-password');
 
         Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-            ->middleware(['auth:sanctum', 'signed', 'throttle:6,1'])
+            ->middleware(['signed', 'throttle:6,1'])
             ->name('verification.verify');
 
         Route::middleware('auth:sanctum')->group(function () {

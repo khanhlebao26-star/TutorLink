@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Support\AdminPermissions;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -12,12 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             CatalogSeeder::class,
+            AdminSeeder::class,
         ]);
-
-        User::query()
-            ->where('role', 'admin')
-            ->each(function (User $admin): void {
-                $admin->forceFill(['permissions' => AdminPermissions::all()])->save();
-            });
     }
 }

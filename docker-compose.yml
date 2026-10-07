@@ -15,6 +15,12 @@ services:
       timeout: 5s
       retries: 10
 
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
   backend:
     build:
       context: ./backend
@@ -28,6 +34,10 @@ services:
       DB_DATABASE: tutorlink
       DB_USERNAME: tutorlink
       DB_PASSWORD: tutorlink_dev_password
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      FRONTEND_URL: http://localhost:3000
     volumes:
       - ./backend:/var/www/html
       - ./backend/.env.docker:/var/www/html/.env:ro

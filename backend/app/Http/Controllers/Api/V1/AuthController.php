@@ -134,7 +134,14 @@ class AuthController extends Controller
         $status = Password::sendResetLink($request->validated());
 
         if ($status === Password::RESET_THROTTLED) {
-            return response()->json(['message' => __($status)], 429);
+            $seconds = (int) config('auth.passwords.users.throttle', 60);
+
+            return response()
+                ->json([
+                    'message' => "Please wait {$seconds} seconds before requesting another password reset email.",
+                    'retry_after' => $seconds,
+                ], 429)
+                ->header('Retry-After', (string) $seconds);
         }
 
         return response()->json(['message' => 'If the email exists, a reset link has been sent.']);
@@ -155,7 +162,11 @@ class AuthController extends Controller
         );
 
         if ($status !== Password::PASSWORD_RESET) {
-            return response()->json(['message' => __($status)], 422);
+            return response()->json([
+                'message' => $status === Password::INVALID_TOKEN
+                    ? 'The password reset token is invalid or expired.'
+                    : __($status),
+            ], 422);
         }
 
         return response()->json(['message' => __($status)]);

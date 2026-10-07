@@ -4,10 +4,19 @@ namespace Tests\Feature;
 
 use App\Models\Specialization;
 use App\Models\User;
+use App\Support\AdminPermissions;
+use Database\Seeders\AdminSeeder;
 use Database\Seeders\CatalogSeeder;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -45,6 +54,30 @@ class AuthFileProfileTest extends TestCase
             'role' => 'tutor',
             'date_of_birth' => '1995-01-01',
         ])->assertCreated()->assertJsonPath('data.role', 'tutor');
+    }
+
+    public function test_registration_sends_a_frontend_email_verification_link(): void
+    {
+        Notification::fake();
+
+        $this->postJson('/api/v1/auth/register', [
+            'full_name' => 'Email Verification User',
+            'email' => 'verification@example.com',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+            'role' => 'customer',
+            'date_of_birth' => '2000-01-01',
+        ])->assertCreated();
+
+        $user = User::query()->where('email', 'verification@example.com')->firstOrFail();
+        Notification::assertSentTo($user, VerifyEmail::class);
+
+        $url = (new VerifyEmail)->toMail($user)->actionUrl;
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+
+        $this->assertStringStartsWith('http://localhost:3000/auth/verify-email?', $url);
+        $this->assertSame($user->id, (int) $query['id']);
+        $this->assertStringContainsString('signature=', $url);
     }
 
     public function test_user_under_eighteen_is_rejected(): void
@@ -108,10 +141,29 @@ class AuthFileProfileTest extends TestCase
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())],
         );
 
-        $this->actingAs($user)->getJson(parse_url($url, PHP_URL_PATH).'?'.parse_url($url, PHP_URL_QUERY))
+        $this->getJson(parse_url($url, PHP_URL_PATH).'?'.parse_url($url, PHP_URL_QUERY))
             ->assertOk();
 
         $this->assertNotNull($user->refresh()->email_verified_at);
+    }
+
+    public function test_password_reset_sends_a_frontend_link(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email' => 'reset-link@example.com']);
+
+        $this->postJson('/api/v1/auth/forgot-password', [
+            'email' => $user->email,
+        ])->assertOk();
+
+        Notification::assertSentTo($user, ResetPassword::class);
+        $notification = Notification::sent($user, ResetPassword::class)->first();
+        $url = $notification->toMail($user)->actionUrl;
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+
+        $this->assertSame('http://localhost:3000/auth/reset-password', explode('?', $url, 2)[0]);
+        $this->assertNotEmpty($query['token']);
+        $this->assertSame($user->email, $query['email']);
     }
 
     public function test_password_reset_updates_the_password(): void
@@ -127,6 +179,97 @@ class AuthFileProfileTest extends TestCase
         ])->assertOk();
 
         $this->assertTrue(Hash::check('NewPassword123!', $user->refresh()->password_hash));
+    }
+
+    public function test_expired_password_reset_token_is_rejected(): void
+    {
+        $user = User::factory()->create(['email' => 'expired-reset@example.com']);
+        $token = Password::broker()->createToken($user);
+        $now = now();
+
+        Carbon::setTestNow($now->copy()->addMinutes((int) config('auth.passwords.users.expire') + 1));
+
+        try {
+            $this->postJson('/api/v1/auth/reset-password', [
+                'token' => $token,
+                'email' => $user->email,
+                'password' => 'NewPassword123!',
+                'password_confirmation' => 'NewPassword123!',
+            ])->assertUnprocessable()
+                ->assertJsonPath('message', 'The password reset token is invalid or expired.');
+        } finally {
+            Carbon::setTestNow();
+        }
+    }
+
+    public function test_invalid_password_reset_token_is_rejected(): void
+    {
+        $user = User::factory()->create(['email' => 'invalid-reset@example.com']);
+
+        $this->postJson('/api/v1/auth/reset-password', [
+            'token' => 'invalid-token',
+            'email' => $user->email,
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ])->assertUnprocessable()
+            ->assertJsonPath('message', 'The password reset token is invalid or expired.');
+    }
+
+    public function test_password_reset_is_throttled_for_sixty_seconds(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create(['email' => 'throttled-reset@example.com']);
+
+        $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
+            ->assertOk();
+
+        $this->postJson('/api/v1/auth/forgot-password', ['email' => $user->email])
+            ->assertStatus(429)
+            ->assertJsonPath('message', 'Please wait 60 seconds before requesting another password reset email.')
+            ->assertJsonPath('retry_after', 60)
+            ->assertHeader('Retry-After', '60');
+    }
+
+    public function test_local_admin_seeder_is_idempotent_and_grants_all_permissions(): void
+    {
+        config()->set('auth.local_admin.email', 'local-admin@example.test');
+        config()->set('auth.local_admin.password', 'Password123!');
+
+        $this->seed(AdminSeeder::class);
+        $this->seed(AdminSeeder::class);
+
+        $this->assertDatabaseCount('users', 1);
+        $admin = User::query()->where('email', 'local-admin@example.test')->firstOrFail();
+
+        $this->assertSame('admin', $admin->role);
+        $this->assertSame(AdminPermissions::all(), $admin->permissions);
+        $this->assertTrue(Hash::check('Password123!', $admin->password_hash));
+    }
+
+    public function test_csrf_mismatch_returns_json_419_for_api_requests(): void
+    {
+        $request = Request::create(
+            '/api/v1/auth/login',
+            'POST',
+            server: ['HTTP_ACCEPT' => 'application/json'],
+        );
+        $response = app(ExceptionHandler::class)->render(
+            $request,
+            new TokenMismatchException('CSRF token mismatch.'),
+        );
+
+        $this->assertSame(419, $response->getStatusCode());
+        $this->assertSame(
+            ['message' => 'CSRF token mismatch.'],
+            $response->getData(true),
+        );
+    }
+
+    public function test_invalid_payload_returns_json_422_with_field_errors(): void
+    {
+        $this->postJson('/api/v1/auth/forgot-password', ['email' => 'not-an-email'])
+            ->assertUnprocessable()
+            ->assertJsonStructure(['message', 'errors' => ['email']]);
     }
 
     public function test_unverified_user_cannot_upload_business_file(): void
@@ -250,6 +393,11 @@ class AuthFileProfileTest extends TestCase
         ])->assertCreated();
 
         $fileId = $upload->json('data.id');
+        $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/verification-documents', [
+            'file_id' => $fileId,
+            'document_type' => 'teaching_certificate',
+        ])->assertConflict();
+
         $this->actingAs($tutor)->postJson("/api/v1/files/{$fileId}/complete")
             ->assertOk();
 
