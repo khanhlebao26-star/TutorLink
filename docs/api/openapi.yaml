@@ -1,0 +1,567 @@
+openapi: 3.0.3
+info:
+  title: TutorLink API
+  version: 0.1.0
+  description: Foundation contract for Auth, File, and Marketplace Listing flows.
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit/
+servers:
+  - url: http://127.0.0.1:8000
+    description: Local Docker development
+tags:
+  - name: Auth
+    description: Registration, login, logout, and current-user session operations.
+  - name: Files
+    description: Private file metadata and upload operations.
+  - name: Listings
+    description: Public marketplace search and tutor listing management.
+paths:
+  /sanctum/csrf-cookie:
+    get:
+      operationId: initializeCsrfCookie
+      tags: [Auth]
+      summary: Initialize the Sanctum SPA cookie flow
+      security: []
+      responses:
+        "204":
+          description: CSRF cookie issued.
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /api/v1/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a customer or tutor account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      operationId: register
+      security: []
+      responses:
+        "201":
+          description: Account created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Start an authenticated SPA session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      operationId: login
+      security: []
+      responses:
+        "200":
+          description: Authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+
+  /api/v1/auth/logout:
+    post:
+      operationId: logout
+      tags: [Auth]
+      summary: End the current SPA session
+      security: [{ sanctumCookie: [] }]
+      responses:
+        "204":
+          description: Session ended.
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+
+  /api/v1/me:
+    get:
+      operationId: getCurrentUser
+      tags: [Auth]
+      summary: Return the authenticated user
+      security: [{ sanctumCookie: [] }]
+      responses:
+        "200":
+          description: Authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+    patch:
+      operationId: updateCurrentUser
+      tags: [Auth]
+      summary: Update the authenticated user's editable profile fields
+      security: [{ sanctumCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMeRequest"
+      responses:
+        "200":
+          description: Updated user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/files:
+    post:
+      operationId: uploadFile
+      tags: [Files]
+      summary: Upload a private file and store its metadata
+      security: [{ sanctumCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/FileUploadRequest"
+      responses:
+        "201":
+          description: File metadata created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "413":
+          description: File is too large.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/files/{file}:
+    parameters:
+      - $ref: "#/components/parameters/FileId"
+    get:
+      operationId: getFile
+      tags: [Files]
+      summary: Return file metadata when the viewer is authorized
+      security: [{ sanctumCookie: [] }]
+      responses:
+        "200":
+          description: File metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deleteFile
+      tags: [Files]
+      summary: Remove an unlinked file owned by the current user
+      security: [{ sanctumCookie: [] }]
+      responses:
+        "204":
+          description: File removed.
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: File is linked to a business record.
+
+  /api/v1/listings:
+    get:
+      tags: [Listings]
+      summary: Search public service listings
+      parameters:
+        - { $ref: "#/components/parameters/Page" }
+        - { $ref: "#/components/parameters/PerPage" }
+        - name: q
+          in: query
+          schema: { type: string, maxLength: 120 }
+        - name: specialization_id
+          in: query
+          schema: { type: integer, minimum: 1 }
+        - name: delivery_mode
+          in: query
+          schema: { type: string, enum: [online, in_person, hybrid] }
+      operationId: searchListings
+      security: []
+      responses:
+        "200":
+          description: Public listing collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingCollection"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/listings/{slug}:
+    parameters:
+      - name: slug
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getListingBySlug
+      tags: [Listings]
+      summary: Return a public listing by slug
+      security: []
+      responses:
+        "200":
+          description: Public listing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/me/listings:
+    get:
+      operationId: listMyListings
+      tags: [Listings]
+      summary: List the current tutor's listings
+      security: [{ sanctumCookie: [] }]
+      responses:
+        "200":
+          description: Tutor listing collection.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingCollection"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+    post:
+      operationId: createListing
+      tags: [Listings]
+      summary: Create a draft service listing
+      security: [{ sanctumCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListingWriteRequest"
+      responses:
+        "201":
+          description: Draft created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/me/listings/{listing}:
+    parameters:
+      - name: listing
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
+    get:
+      operationId: getMyListing
+      tags: [Listings]
+      summary: Return one listing owned by the current tutor
+      security: [{ sanctumCookie: [] }]
+      responses:
+        "200":
+          description: Listing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      operationId: updateListing
+      tags: [Listings]
+      summary: Update a draft listing
+      security: [{ sanctumCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListingWriteRequest"
+      responses:
+        "200":
+          description: Updated listing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Listing is locked by its current state.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      operationId: deleteListing
+      tags: [Listings]
+      summary: Delete a draft listing
+      security: [{ sanctumCookie: [] }]
+      responses:
+        "204":
+          description: Listing deleted.
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Active or referenced listing cannot be deleted.
+
+components:
+  securitySchemes:
+    sanctumCookie:
+      type: apiKey
+      in: cookie
+      name: laravel_session
+  parameters:
+    FileId:
+      name: file
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PerPage:
+      name: per_page
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+  responses:
+    Unauthenticated:
+      description: Authentication is required.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: The authenticated user is not allowed to perform this action.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Resource was not found.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ValidationError:
+      description: Request validation failed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ValidationError" }
+    TooManyRequests:
+      description: Too many requests.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+  schemas:
+    User:
+      type: object
+      required: [id, role, status, full_name, email]
+      properties:
+        id: { type: integer, format: int64, minimum: 1 }
+        role: { type: string, enum: [customer, tutor, admin] }
+        status: { type: string, enum: [pending, active, suspended, cancelled] }
+        full_name: { type: string, maxLength: 255 }
+        email: { type: string, format: email }
+        date_of_birth: { type: string, format: date, nullable: true }
+        email_verified_at: { type: string, format: date-time, nullable: true }
+    UserResponse:
+      type: object
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/User" }
+    RegisterRequest:
+      type: object
+      required: [full_name, email, password, password_confirmation, role]
+      properties:
+        full_name: { type: string, minLength: 2, maxLength: 255 }
+        email: { type: string, format: email }
+        password: { type: string, format: password, minLength: 8 }
+        password_confirmation: { type: string, format: password }
+        role: { type: string, enum: [customer, tutor] }
+        date_of_birth: { type: string, format: date }
+        terms_version: { type: string, maxLength: 32 }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, format: password }
+        remember: { type: boolean, default: false }
+    UpdateMeRequest:
+      type: object
+      properties:
+        full_name: { type: string, minLength: 2, maxLength: 255 }
+        date_of_birth: { type: string, format: date }
+    File:
+      type: object
+      required:
+        [
+          id,
+          owner_id,
+          disk,
+          object_key,
+          mime_type,
+          size_bytes,
+          visibility,
+          scan_status,
+          created_at,
+        ]
+      properties:
+        id: { type: integer, format: int64, minimum: 1 }
+        owner_id: { type: integer, format: int64, minimum: 1 }
+        disk: { type: string, example: s3 }
+        object_key: { type: string }
+        original_name: { type: string, nullable: true }
+        mime_type: { type: string }
+        size_bytes: { type: integer, format: int64, minimum: 0 }
+        visibility: { type: string, enum: [private, program, public] }
+        checksum_sha256:
+          { type: string, nullable: true, minLength: 64, maxLength: 64 }
+        scan_status: { type: string, enum: [pending, clean, rejected] }
+        created_at: { type: string, format: date-time }
+    FileResponse:
+      type: object
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/File" }
+    FileUploadRequest:
+      type: object
+      required: [file]
+      properties:
+        file: { type: string, format: binary }
+        visibility:
+          { type: string, enum: [private, program, public], default: private }
+    Listing:
+      type: object
+      required:
+        [
+          id,
+          tutor_profile_id,
+          specialization_id,
+          slug,
+          title,
+          description,
+          delivery_mode,
+          price_from_minor,
+          currency,
+          price_unit,
+          status,
+          created_at,
+          updated_at,
+        ]
+      properties:
+        id: { type: integer, format: int64, minimum: 1 }
+        tutor_profile_id: { type: integer, format: int64, minimum: 1 }
+        specialization_id: { type: integer, format: int64, minimum: 1 }
+        slug: { type: string, maxLength: 180 }
+        title: { type: string, maxLength: 180 }
+        description: { type: string }
+        delivery_mode: { type: string, enum: [online, in_person, hybrid] }
+        city: { type: string, nullable: true }
+        district: { type: string, nullable: true }
+        price_from_minor: { type: integer, format: int64, minimum: 0 }
+        currency: { type: string, minLength: 3, maxLength: 3, example: VND }
+        price_unit: { type: string, example: session }
+        status: { type: string, enum: [draft, active, paused, archived] }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    ListingResponse:
+      type: object
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/Listing" }
+    ListingCollection:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/Listing" }
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+    ListingWriteRequest:
+      type: object
+      required:
+        [
+          specialization_id,
+          title,
+          description,
+          delivery_mode,
+          price_from_minor,
+          currency,
+          price_unit,
+        ]
+      properties:
+        specialization_id: { type: integer, minimum: 1 }
+        title: { type: string, minLength: 3, maxLength: 180 }
+        description: { type: string, minLength: 1 }
+        delivery_mode: { type: string, enum: [online, in_person, hybrid] }
+        city: { type: string, maxLength: 120 }
+        district: { type: string, maxLength: 120 }
+        price_from_minor: { type: integer, minimum: 0 }
+        currency: { type: string, minLength: 3, maxLength: 3, example: VND }
+        price_unit: { type: string, maxLength: 30 }
+    PaginationMeta:
+      type: object
+      required: [current_page, per_page, total]
+      properties:
+        current_page: { type: integer, minimum: 1 }
+        per_page: { type: integer, minimum: 1 }
+        total: { type: integer, minimum: 0 }
+    Error:
+      type: object
+      required: [message]
+      properties:
+        message: { type: string }
+        request_id: { type: string, format: uuid, nullable: true }
+    ValidationError:
+      allOf:
+        - $ref: "#/components/schemas/Error"
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties:
+                type: array
+                items: { type: string }
