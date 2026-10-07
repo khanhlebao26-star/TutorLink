@@ -1,0 +1,180 @@
+{
+  "contract_version": "W1-C1.2",
+  "generated_at": "2026-10-07T00:00:00Z",
+  "schema_alignment": {
+    "verified_on": "2026-10-07",
+    "implementation_status": "mock_only",
+    "identifier_type": "positive integer",
+    "http_session_table": "sessions",
+    "planned_session_resource": "program_sessions",
+    "business_session_resource": "lesson_sessions"
+  },
+  "wire_conventions": {
+    "id": "positive integer; opaque to UI",
+    "timestamps": "ISO-8601 UTC",
+    "status_values": "lowercase snake_case",
+    "currency_amount": "integer minor units",
+    "optimistic_lock": "version integer"
+  },
+  "status_catalog": {
+    "pending": {
+      "label": "Pending",
+      "terminal": false
+    },
+    "active": {
+      "label": "Active",
+      "terminal": false
+    },
+    "rejected": {
+      "label": "Rejected",
+      "terminal": true
+    },
+    "cancelled": {
+      "label": "Cancelled",
+      "terminal": true
+    },
+    "expired": {
+      "label": "Expired",
+      "terminal": true
+    }
+  },
+  "aggregate_status_overrides": {
+    "invitation.active": {
+      "label": "Accepted",
+      "terminal": true
+    }
+  },
+  "approval": {
+    "id": 101,
+    "resource_type": "tutor_profile",
+    "resource_id": 201,
+    "applicant_id": 301,
+    "status": "active",
+    "status_label": "Active",
+    "reason": "Tutor profile passed document and identity review.",
+    "submitted_at": "2026-10-06T08:00:00Z",
+    "reviewed_at": "2026-10-06T09:30:00Z",
+    "reviewed_by": {
+      "id": 901,
+      "display_name": "Admin reviewer"
+    },
+    "expires_at": null,
+    "status_changed_at": "2026-10-06T09:30:00Z",
+    "version": 2,
+    "created_at": "2026-10-06T08:00:00Z",
+    "updated_at": "2026-10-06T09:30:00Z",
+    "allowed_actions": ["revoke"]
+  },
+  "conversation": {
+    "id": 401,
+    "program_id": 501,
+    "status": "active",
+    "status_label": "Active",
+    "participants": [
+      {
+        "id": 301,
+        "role": "tutor",
+        "display_name": "Nguyen Minh Anh"
+      },
+      {
+        "id": 302,
+        "role": "customer",
+        "display_name": "Tran Gia Bao"
+      }
+    ],
+    "last_message_at": "2026-10-07T02:15:00Z",
+    "status_changed_at": "2026-10-06T10:15:00Z",
+    "version": 1,
+    "created_at": "2026-10-06T10:00:00Z",
+    "updated_at": "2026-10-07T02:15:00Z",
+    "allowed_actions": ["send_message", "cancel"]
+  },
+  "program": {
+    "id": 501,
+    "status": "active",
+    "status_label": "Active",
+    "title": "Conversational English for work",
+    "summary": "Eight guided sessions focused on workplace speaking.",
+    "tutor": {
+      "id": 301,
+      "display_name": "Nguyen Minh Anh"
+    },
+    "customer": {
+      "id": 302,
+      "display_name": "Tran Gia Bao",
+      "membership_status": "active"
+    },
+    "price": {
+      "amount_minor": 4800000,
+      "currency": "VND"
+    },
+    "session_plan": {
+      "planned_count": 8,
+      "program_sessions_count": 8,
+      "materialized_lesson_sessions_count": 1,
+      "completed_lesson_sessions_count": 0
+    },
+    "schedule": {
+      "timezone": "Asia/Ho_Chi_Minh",
+      "starts_on": "2026-10-10",
+      "ends_on": "2026-11-28",
+      "recurrence_label": "Weekly"
+    },
+    "snapshot": {
+      "version": 1,
+      "locked_at": "2026-10-06T10:00:00Z",
+      "captured_at": "2026-10-06T10:00:00Z"
+    },
+    "status_changed_at": "2026-10-06T10:15:00Z",
+    "version": 3,
+    "created_at": "2026-10-06T09:00:00Z",
+    "updated_at": "2026-10-06T10:15:00Z",
+    "allowed_actions": ["cancel", "view_lesson_sessions", "open_conversation"]
+  },
+  "invitation": {
+    "id": 601,
+    "program_id": 501,
+    "program_version": 1,
+    "inviter_id": 301,
+    "invitee_id": 302,
+    "status": "active",
+    "status_label": "Accepted",
+    "message": "Mình đề xuất lộ trình 8 buổi theo lịch hàng tuần.",
+    "sent_at": "2026-10-06T10:00:00Z",
+    "responded_at": "2026-10-06T10:15:00Z",
+    "expires_at": "2026-10-09T10:00:00Z",
+    "snapshot": {
+      "title": "Conversational English for work",
+      "summary": "Eight guided sessions focused on workplace speaking.",
+      "price": {
+        "amount_minor": 4800000,
+        "currency": "VND"
+      },
+      "planned_session_count": 8,
+      "timezone": "Asia/Ho_Chi_Minh",
+      "starts_on": "2026-10-10",
+      "ends_on": "2026-11-28",
+      "source_program_version": 1,
+      "locked_at": "2026-10-06T10:00:00Z"
+    },
+    "status_changed_at": "2026-10-06T10:15:00Z",
+    "version": 2,
+    "created_at": "2026-10-06T10:00:00Z",
+    "updated_at": "2026-10-06T10:15:00Z",
+    "allowed_actions": ["view_program"]
+  },
+  "invalid_transition_error": {
+    "error": {
+      "code": "INVALID_STATE_TRANSITION",
+      "message": "Accepted invitations cannot be cancelled. Cancel the linked program instead.",
+      "details": {
+        "resource": "invitation",
+        "resource_id": 601,
+        "current_status": "active",
+        "requested_action": "cancel",
+        "allowed_actions": ["view_program"]
+      },
+      "request_id": "req_20261007_example"
+    }
+  }
+}
