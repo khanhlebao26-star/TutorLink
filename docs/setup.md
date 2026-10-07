@@ -65,4 +65,31 @@ development PostgreSQL volume.
    header for later requests.
 
 The current repository contains the platform configuration and contract; Auth,
-File, and Listing endpoint implementations are separate feature work.
+File, Catalog, and Tutor Profile MVP endpoints are included in the current
+feature branch. Listing remains contract-only until its marketplace feature is
+implemented.
+
+## Auth/File/Profile smoke checks
+
+The current API routes are:
+
+- Auth: `/api/v1/auth/register`, `/login`, `/logout`, `/me`, email verification,
+  and password reset.
+- Catalog: `/api/v1/catalog/categories` and
+  `/api/v1/catalog/specializations`.
+- Files: upload, complete, link, metadata, download, and delete under
+  `/api/v1/files`.
+- Tutor profile: `/api/v1/tutor/profile` and `/submit`.
+
+Business file uploads require a verified email. Uploaded files start with
+`scan_status=pending`; only completed files (`scan_status=clean`) can be
+attached or downloaded. Tutor profiles move from `draft` to `submitted`, and
+submitted profiles are locked by policy.
+
+After changing `backend/.env.docker`, recreate the backend so Laravel loads the
+new environment file:
+
+```powershell
+docker compose up -d --force-recreate backend
+docker compose exec backend php artisan config:clear
+```
