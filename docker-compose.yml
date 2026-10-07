@@ -21,8 +21,16 @@ services:
       dockerfile: Dockerfile
     env_file:
       - ./backend/.env.docker
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: tutorlink
+      DB_USERNAME: tutorlink
+      DB_PASSWORD: tutorlink_dev_password
     volumes:
       - ./backend:/var/www/html
+      - ./backend/.env.docker:/var/www/html/.env:ro
       - backend_vendor:/var/www/html/vendor
       - backend_storage:/var/www/html/storage
     ports:
