@@ -54,7 +54,6 @@ export interface TutorProfile {
   review_reason: string | null;
   reviewed_by?: number | null;
   reviewed_at: string | null;
-  review_feedback?: string | null;
   suspended_at?: string | null;
   suspension_reason?: string | null;
 }

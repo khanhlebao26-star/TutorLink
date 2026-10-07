@@ -16,12 +16,7 @@ const labels: Record<TutorApprovalStatus, string> = {
   expired: "Hết hạn",
 };
 
-const filters = [
-  ["pending", "Đang chờ"],
-  ["changes_requested", "Yêu cầu chỉnh sửa"],
-  ["active", "Đã duyệt"],
-  ["rejected", "Từ chối"],
-] as const;
+const filters = ["pending", "changes_requested", "active", "rejected"] as const;
 
 function tone(status: TutorApprovalStatus): "neutral" | "success" | "warning" {
   return status === "active" ? "success" : status === "pending" || status === "changes_requested" ? "warning" : "neutral";
@@ -32,7 +27,7 @@ function date(value: string | null | undefined): string {
 }
 
 export default function AdminPage() {
-  const [status, setStatus] = useState<(typeof filters)[number][0]>("pending");
+  const [status, setStatus] = useState<(typeof filters)[number]>("pending");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<AdminTutorProfile | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -104,7 +99,7 @@ export default function AdminPage() {
               setDetail(null);
             }}
           >
-            {filters.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            {filters.map((value) => <option key={value} value={value}>{labels[value]}</option>)}
           </select>
         </Field>
 

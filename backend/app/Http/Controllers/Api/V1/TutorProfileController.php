@@ -31,10 +31,6 @@ class TutorProfileController extends Controller
 
     public function store(TutorProfileRequest $request): TutorProfileResource|JsonResponse
     {
-        if ($request->user()->status === 'suspended') {
-            return response()->json(['message' => 'Suspended accounts cannot edit profiles.'], 403);
-        }
-
         $profile = $request->user()->tutorProfile()->first();
 
         if ($profile?->suspended_at) {
@@ -63,10 +59,6 @@ class TutorProfileController extends Controller
 
     public function submit(Request $request): TutorProfileResource|JsonResponse
     {
-        if ($request->user()->status === 'suspended') {
-            return response()->json(['message' => 'Suspended accounts cannot submit profiles.'], 403);
-        }
-
         $profile = $request->user()->tutorProfile()->with([
             'specializations',
             'verificationDocuments',
@@ -106,7 +98,7 @@ class TutorProfileController extends Controller
             return response()->json(['message' => 'Create a draft profile first.'], 422);
         }
 
-        if ($request->user()->status === 'suspended' || $profile->suspended_at) {
+        if ($profile->suspended_at) {
             return response()->json(['message' => 'Suspended profiles cannot be edited.'], 403);
         }
 
@@ -145,7 +137,7 @@ class TutorProfileController extends Controller
             return response()->json(['message' => 'Create a draft profile first.'], 422);
         }
 
-        if ($request->user()->status === 'suspended' || $profile->suspended_at) {
+        if ($profile->suspended_at) {
             return response()->json(['message' => 'Suspended profiles cannot be edited.'], 403);
         }
 

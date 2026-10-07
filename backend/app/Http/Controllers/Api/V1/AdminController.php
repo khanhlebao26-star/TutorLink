@@ -31,8 +31,7 @@ class AdminController extends Controller
             ->where('approval_status', $status)
             ->orderByDesc('submitted_at')
             ->get()
-            ->map(fn (TutorProfile $profile): array => $this->profilePayload($profile))
-            ->values();
+            ->map(fn (TutorProfile $profile): array => $this->profilePayload($profile));
 
         return response()->json(['data' => $profiles]);
     }
@@ -66,58 +65,48 @@ class AdminController extends Controller
 
     public function suspendProfile(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
     {
-        $actor = $this->requirePermission($request, AdminPermissions::SUSPEND_TUTOR_PROFILES);
-        $data = $request->validated();
-
-        $profile = DB::transaction(function () use ($actor, $data, $tutorProfile): TutorProfile {
-            $profile = TutorProfile::query()
-                ->with('user')
-                ->lockForUpdate()
-                ->findOrFail($tutorProfile->id);
-
-            if ($profile->suspended_at) {
-                abort(409, 'Tutor profile is already suspended.');
-            }
-
-            $before = $this->profileState($profile);
-            $profile->forceFill([
-                'suspended_at' => now(),
-                'suspension_reason' => $data['reason'],
-            ])->save();
-            $this->writeAudit($actor, 'tutor_profile_suspended', 'tutor_profile', $profile->id, $before, $this->profileState($profile), $data['reason']);
-
-            return $profile->refresh()->load('user');
-        });
-
-        return response()->json([
-            'data' => $this->profilePayload(
-                $profile,
-                $actor->hasPermission(AdminPermissions::DOWNLOAD_VERIFICATION_DOCUMENTS),
-            ),
-        ]);
+        return $this->changeProfileSuspension($request, $tutorProfile, true);
     }
 
     public function restoreProfile(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
     {
+        return $this->changeProfileSuspension($request, $tutorProfile, false);
+    }
+
+    private function changeProfileSuspension(
+        AdminDecisionRequest $request,
+        TutorProfile $tutorProfile,
+        bool $suspend,
+    ): JsonResponse {
         $actor = $this->requirePermission($request, AdminPermissions::SUSPEND_TUTOR_PROFILES);
         $data = $request->validated();
 
-        $profile = DB::transaction(function () use ($actor, $data, $tutorProfile): TutorProfile {
+        $profile = DB::transaction(function () use ($actor, $data, $suspend, $tutorProfile): TutorProfile {
             $profile = TutorProfile::query()
                 ->with('user')
                 ->lockForUpdate()
                 ->findOrFail($tutorProfile->id);
 
-            if (! $profile->suspended_at) {
-                abort(409, 'Tutor profile is not suspended.');
+            if ($suspend === (bool) $profile->suspended_at) {
+                abort(409, $suspend
+                    ? 'Tutor profile is already suspended.'
+                    : 'Tutor profile is not suspended.');
             }
 
             $before = $this->profileState($profile);
             $profile->forceFill([
-                'suspended_at' => null,
-                'suspension_reason' => null,
+                'suspended_at' => $suspend ? now() : null,
+                'suspension_reason' => $suspend ? $data['reason'] : null,
             ])->save();
-            $this->writeAudit($actor, 'tutor_profile_restored', 'tutor_profile', $profile->id, $before, $this->profileState($profile), $data['reason']);
+            $this->writeAudit(
+                $actor,
+                $suspend ? 'tutor_profile_suspended' : 'tutor_profile_restored',
+                'tutor_profile',
+                $profile->id,
+                $before,
+                $this->profileState($profile),
+                $data['reason'],
+            );
 
             return $profile->refresh()->load('user');
         });
@@ -319,7 +308,6 @@ class AdminController extends Controller
             'before' => json_encode($before, JSON_THROW_ON_ERROR),
             'after' => json_encode($after, JSON_THROW_ON_ERROR),
             'reason' => $reason,
-            'created_at' => now(),
         ]);
     }
 }

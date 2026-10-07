@@ -221,7 +221,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         </div>
         <Badge tone={statusTone(profile)}>{statusLabel(profile)}</Badge>
       </div>
-      {(profile?.review_reason ?? profile?.review_feedback) ? <div className="card"><strong>Lý do xét duyệt</strong><p className="muted">{profile.review_reason ?? profile.review_feedback}</p></div> : null}
+      {profile?.review_reason ? <div className="card"><strong>Lý do xét duyệt</strong><p className="muted">{profile.review_reason}</p></div> : null}
       <form className="card form-stack" onSubmit={submit}>
         <Field label="Headline" htmlFor="tutor-headline" error={fieldError("headline")}>
           <input id="tutor-headline" value={headline} disabled={locked || saving} onChange={(event) => setHeadline(event.target.value)} required maxLength={160} />
