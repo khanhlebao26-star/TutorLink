@@ -165,11 +165,14 @@ class AuthFileProfileTest extends TestCase
     public function test_submitted_tutor_profile_cannot_be_edited(): void
     {
         $tutor = User::factory()->create(['role' => 'tutor']);
+        $this->seed(CatalogSeeder::class);
+        $specializationId = \App\Models\Specialization::query()->value('id');
 
         $this->actingAs($tutor)->putJson('/api/v1/tutor/profile', [
             'headline' => 'English tutor',
             'bio' => 'Experienced tutor.',
             'experience_years' => 5,
+            'specialization_id' => $specializationId,
         ])->assertCreated()->assertJsonPath('data.status', 'draft');
 
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/submit')
@@ -179,7 +182,79 @@ class AuthFileProfileTest extends TestCase
         $this->actingAs($tutor)->putJson('/api/v1/tutor/profile', [
             'headline' => 'Changed headline',
             'experience_years' => 6,
+            'specialization_id' => $specializationId,
         ])->assertStatus(409);
+    }
+
+    public function test_tutor_profile_stores_specialization_and_avatar(): void
+    {
+        Storage::fake('local');
+        $this->seed(CatalogSeeder::class);
+        $specializationId = \App\Models\Specialization::query()->value('id');
+        $tutor = User::factory()->create([
+            'role' => 'tutor',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($tutor)->putJson('/api/v1/tutor/profile', [
+            'headline' => 'English tutor',
+            'specialization_id' => $specializationId,
+        ])->assertCreated()
+            ->assertJsonPath('data.specialization_id', $specializationId);
+
+        $upload = $this->actingAs($tutor)->post('/api/v1/files', [
+            'file' => UploadedFile::fake()->create(
+                'avatar.jpg',
+                100,
+                'image/jpeg',
+            ),
+            'purpose' => 'avatar',
+        ])->assertCreated();
+
+        $fileId = $upload->json('data.id');
+        $this->actingAs($tutor)->postJson("/api/v1/files/{$fileId}/complete")
+            ->assertOk();
+
+        $this->actingAs($tutor)->putJson('/api/v1/tutor/profile/avatar', [
+            'file_id' => $fileId,
+        ])->assertOk()
+            ->assertJsonPath('data.avatar_file_id', $fileId);
+    }
+
+    public function test_completed_verification_document_can_be_attached_to_tutor_profile(): void
+    {
+        Storage::fake('local');
+        $this->seed(CatalogSeeder::class);
+        $specializationId = \App\Models\Specialization::query()->value('id');
+        $tutor = User::factory()->create([
+            'role' => 'tutor',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($tutor)->putJson('/api/v1/tutor/profile', [
+            'headline' => 'English tutor',
+            'specialization_id' => $specializationId,
+        ])->assertCreated();
+
+        $upload = $this->actingAs($tutor)->post('/api/v1/files', [
+            'file' => UploadedFile::fake()->create('certificate.pdf', 100, 'application/pdf'),
+            'purpose' => 'verification_document',
+        ])->assertCreated();
+
+        $fileId = $upload->json('data.id');
+        $this->actingAs($tutor)->postJson("/api/v1/files/{$fileId}/complete")
+            ->assertOk();
+
+        $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/verification-documents', [
+            'file_id' => $fileId,
+            'document_type' => 'teaching_certificate',
+        ])->assertCreated()
+            ->assertJsonPath('data.file_id', $fileId)
+            ->assertJsonPath('data.document_type', 'teaching_certificate');
+
+        $this->actingAs($tutor)->getJson('/api/v1/tutor/profile')
+            ->assertOk()
+            ->assertJsonPath('data.verification_document_file_id', $fileId);
     }
 
     public function test_catalog_can_be_seeded_and_read(): void
