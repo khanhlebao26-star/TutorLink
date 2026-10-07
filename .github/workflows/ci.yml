@@ -46,11 +46,20 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: "8.3"
           extensions: mbstring, pdo_pgsql
           coverage: none
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare Laravel runtime directories
+        run: |
+          mkdir -p storage/framework/cache \
+                  storage/framework/sessions \
+                  storage/framework/views \
+                  bootstrap/cache
+          chmod -R ug+rw storage bootstrap/cache
+
       - name: Prepare Laravel
         run: |
           cp .env.example .env
@@ -71,7 +80,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - name: Install dependencies
@@ -89,6 +98,6 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
       - name: Validate OpenAPI
         run: npx --yes @redocly/cli@latest lint docs/api/openapi.yaml
