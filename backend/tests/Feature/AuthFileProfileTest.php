@@ -74,6 +74,13 @@ class AuthFileProfileTest extends TestCase
         ]);
     }
 
+    public function test_unauthenticated_api_request_returns_json_401(): void
+    {
+        $this->getJson('/api/v1/me')
+            ->assertUnauthorized()
+            ->assertJsonPath('message', 'Unauthenticated.');
+    }
+
     public function test_login_and_current_user_work(): void
     {
         $user = User::factory()->create([

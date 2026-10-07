@@ -29,6 +29,7 @@ Create the schema and start the services:
 
 ```powershell
 docker compose run --rm backend php artisan migrate --force
+docker compose run --rm backend php artisan db:seed --class=CatalogSeeder --force
 docker compose up -d
 docker compose ps
 ```

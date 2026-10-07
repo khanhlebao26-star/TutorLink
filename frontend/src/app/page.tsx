@@ -2,5 +2,52 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 
 export default function Home() {
-  return <AppShell role="customer" title="TutorLink"><section className="hero-grid"><div><p className="kicker">Marketplace đa lĩnh vực</p><h1>Tìm đúng người đồng hành cho mục tiêu của bạn.</h1><p className="lead">Khám phá dịch vụ từ Tutor đã được duyệt, xem hồ sơ và bắt đầu trao đổi trong một giao diện rõ ràng.</p><div className="button-row"><Link className="button" href="/marketplace">Xem Marketplace</Link><Link className="button button-secondary" href="/auth/register">Tạo tài khoản</Link></div></div><aside className="card hero-note"><span className="eyebrow">Trải nghiệm TutorLink</span><h2>Khám phá và quản lý dễ dàng</h2><p>Đăng nhập, cập nhật hồ sơ, khám phá dịch vụ và quản lý phê duyệt trong cùng một không gian.</p><Link href="/admin">Mở khu vực quản trị →</Link></aside></section><section className="card-grid" aria-label="Các khu vực chính"><Link className="card link-card" href="/profile"><span className="eyebrow">Profile</span><h2>Hồ sơ theo role</h2><p>Form mẫu theo dữ liệu Customer/Tutor.</p></Link><Link className="card link-card" href="/marketplace"><span className="eyebrow">Marketplace</span><h2>Service Listing</h2><p>Danh sách và chi tiết Listing responsive.</p></Link><Link className="card link-card" href="/admin"><span className="eyebrow">Admin</span><h2>Duyệt Tutor</h2><p>Theo dõi và xử lý hồ sơ Tutor.</p></Link></section></AppShell>;
+  return (
+    <AppShell role="customer" title="TutorLink">
+      <section className="hero-grid">
+        <div>
+          <p className="kicker">Marketplace đa lĩnh vực</p>
+          <h1>Tìm đúng người đồng hành cho mục tiêu của bạn.</h1>
+          <p className="lead">
+            Khám phá dịch vụ từ Tutor đã được duyệt, xem hồ sơ và bắt đầu trao
+            đổi trong một giao diện rõ ràng.
+          </p>
+          <div className="button-row">
+            <Link className="button" href="/marketplace">
+              Xem Marketplace
+            </Link>
+            <Link className="button button-secondary" href="/auth/register">
+              Tạo tài khoản
+            </Link>
+          </div>
+        </div>
+        <aside className="card hero-note">
+          <span className="eyebrow">Trải nghiệm TutorLink</span>
+          <h2>Khám phá và quản lý dễ dàng</h2>
+          <p>
+            Đăng nhập, cập nhật hồ sơ, khám phá dịch vụ và quản lý phê duyệt
+            trong cùng một không gian.
+          </p>
+          <Link href="/admin">Mở khu vực quản trị →</Link>
+        </aside>
+      </section>
+      <section className="card-grid" aria-label="Các khu vực chính">
+        <Link className="card link-card" href="/profile">
+          <span className="eyebrow">Profile</span>
+          <h2>Hồ sơ theo role</h2>
+          <p>Form mẫu theo dữ liệu Customer/Tutor.</p>
+        </Link>
+        <Link className="card link-card" href="/marketplace">
+          <span className="eyebrow">Marketplace</span>
+          <h2>Service Listing</h2>
+          <p>Danh sách và chi tiết Listing responsive.</p>
+        </Link>
+        <Link className="card link-card" href="/admin">
+          <span className="eyebrow">Admin</span>
+          <h2>Duyệt Tutor</h2>
+          <p>Theo dõi và xử lý hồ sơ Tutor.</p>
+        </Link>
+      </section>
+    </AppShell>
+  );
 }

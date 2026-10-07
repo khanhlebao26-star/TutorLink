@@ -66,4 +66,7 @@ textarea { resize: vertical; }
 .detail-list div { border-top: 1px solid var(--line); display: flex; gap: 20px; justify-content: space-between; padding: 14px 0; }
 .detail-list dt { color: var(--muted); }
 .detail-list dd { font-weight: 700; margin: 0; text-align: right; }
+.status-card { align-items: center; display: flex; gap: 18px; justify-content: space-between; }
+.status-card h2 { margin-bottom: 0; }
+.upload-card { display: grid; gap: 8px; }
 @media (max-width: 780px) { .topbar { align-items: flex-start; flex-wrap: wrap; } .nav-links { order: 3; width: 100%; justify-content: flex-start; } .hero-grid, .card-grid, .listing-grid { grid-template-columns: 1fr; } .hero-grid { padding: 40px 0; } .topbar-meta { margin-left: auto; } }
