@@ -13,12 +13,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['full_name', 'email', 'password_hash', 'role', 'status', 'date_of_birth', 'terms_version'])]
-#[Hidden(['password_hash', 'remember_token'])]
+#[Fillable(['full_name', 'email', 'password_hash', 'role', 'status', 'permissions', 'date_of_birth', 'terms_version'])]
+#[Hidden(['password_hash', 'remember_token', 'permissions'])]
 class User extends Authenticatable implements MustVerifyEmailContract
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes, MustVerifyEmailTrait;
+    use HasFactory, MustVerifyEmailTrait, Notifiable, SoftDeletes;
 
     /**
      * Laravel authentication should read the renamed credential column.
@@ -39,8 +39,14 @@ class User extends Authenticatable implements MustVerifyEmailContract
             'email_verified_at' => 'datetime',
             'date_of_birth' => 'date',
             'suspended_at' => 'datetime',
+            'permissions' => 'array',
             'password_hash' => 'hashed',
         ];
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->role === 'admin' && in_array($permission, $this->permissions ?? [], true);
     }
 
     public function customerProfile(): HasOne

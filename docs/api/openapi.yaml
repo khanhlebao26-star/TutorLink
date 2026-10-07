@@ -440,6 +440,62 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
 
+  /api/v1/tutor/profile/avatar:
+    put:
+      operationId: attachTutorAvatar
+      tags: [Tutor Profile]
+      summary: Attach a completed avatar file to the current tutor profile
+      security: [{ sanctumCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttachTutorAvatarRequest"
+      responses:
+        "200":
+          description: Avatar attached.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TutorProfileResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Profile or file is not in an attachable state.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/tutor/profile/verification-documents:
+    post:
+      operationId: createTutorVerificationDocument
+      tags: [Tutor Profile]
+      summary: Attach a completed verification document to the current tutor profile
+      security: [{ sanctumCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerificationDocumentRequest"
+      responses:
+        "201":
+          description: Verification document attached.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationDocumentResponse"
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Profile or file is not in an attachable state.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
   /api/v1/listings:
     get:
       tags: [Listings]
@@ -656,6 +712,21 @@ components:
         email: { type: string, format: email }
         date_of_birth: { type: string, format: date, nullable: true }
         email_verified_at: { type: string, format: date-time, nullable: true }
+        profile:
+          nullable: true
+          oneOf:
+            - $ref: "#/components/schemas/CustomerProfile"
+            - $ref: "#/components/schemas/TutorProfile"
+    CustomerProfile:
+      type: object
+      required: [id, user_id]
+      properties:
+        id: { type: integer, format: int64, minimum: 1 }
+        user_id: { type: integer, format: int64, minimum: 1 }
+        avatar_file_id: { type: integer, format: int64, minimum: 1, nullable: true }
+        city: { type: string, nullable: true }
+        district: { type: string, nullable: true }
+        bio: { type: string, nullable: true }
     UserResponse:
       type: object
       required: [data]
@@ -663,7 +734,7 @@ components:
         data: { $ref: "#/components/schemas/User" }
     RegisterRequest:
       type: object
-      required: [full_name, email, password, password_confirmation, role]
+      required: [full_name, email, password, password_confirmation, role, date_of_birth]
       properties:
         full_name: { type: string, minLength: 2, maxLength: 255 }
         email: { type: string, format: email }
@@ -753,16 +824,31 @@ components:
         purpose: { type: string, maxLength: 50, nullable: true }
     TutorProfile:
       type: object
-      required: [id, user_id, headline, experience_years, status, approval_status]
+      required:
+        [
+          id,
+          user_id,
+          specialization_id,
+          avatar_file_id,
+          verification_document_file_id,
+          headline,
+          experience_years,
+          status,
+          approval_status,
+        ]
       properties:
         id: { type: integer, format: int64, minimum: 1 }
         user_id: { type: integer, format: int64, minimum: 1 }
+        specialization_id: { type: integer, format: int64, minimum: 1 }
+        avatar_file_id: { type: integer, format: int64, minimum: 1, nullable: true }
+        verification_document_file_id: { type: integer, format: int64, minimum: 1, nullable: true }
         headline: { type: string, maxLength: 160 }
         bio: { type: string, nullable: true }
         experience_years: { type: integer, minimum: 0, maximum: 80 }
         status: { type: string, enum: [draft, submitted] }
         approval_status: { type: string, enum: [pending, active, rejected, cancelled, expired] }
         submitted_at: { type: string, format: date-time, nullable: true }
+        reviewed_at: { type: string, format: date-time, nullable: true }
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     TutorProfileResponse:
@@ -772,11 +858,36 @@ components:
         data: { $ref: "#/components/schemas/TutorProfile" }
     TutorProfileWriteRequest:
       type: object
-      required: [headline]
+      required: [headline, specialization_id]
       properties:
         headline: { type: string, maxLength: 160 }
         bio: { type: string, nullable: true }
         experience_years: { type: integer, minimum: 0, maximum: 80 }
+        specialization_id: { type: integer, format: int64, minimum: 1 }
+    AttachTutorAvatarRequest:
+      type: object
+      required: [file_id]
+      properties:
+        file_id: { type: integer, format: int64, minimum: 1 }
+    VerificationDocumentRequest:
+      type: object
+      required: [file_id, document_type]
+      properties:
+        file_id: { type: integer, format: int64, minimum: 1 }
+        document_type: { type: string, maxLength: 50 }
+    VerificationDocumentResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, tutor_profile_id, file_id, document_type, status]
+          properties:
+            id: { type: integer, format: int64, minimum: 1 }
+            tutor_profile_id: { type: integer, format: int64, minimum: 1 }
+            file_id: { type: integer, format: int64, minimum: 1 }
+            document_type: { type: string }
+            status: { type: string, enum: [pending, active, rejected, expired] }
     Listing:
       type: object
       required:
