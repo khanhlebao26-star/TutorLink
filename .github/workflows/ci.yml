@@ -100,4 +100,4 @@ jobs:
         with:
           node-version: "22"
       - name: Validate OpenAPI
-        run: npx --yes @redocly/cli@latest lint docs/api/openapi.yaml
+        run: npx --yes @redocly/cli@2.60.0 lint docs/api/openapi.yaml
