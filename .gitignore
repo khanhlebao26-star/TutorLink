@@ -35,6 +35,13 @@
 .vscode/
 .idea/
 
+# Planning documents shared outside Git
+/outputs/planning-update-2026-10-07/Ke_hoach_xay_dung_TutorLink_v3_1.docx
+/outputs/planning-update-2026-10-07/TutorLink_issues_w1_a3_den_w4.docx
+/outputs/planning-update-2026-10-07/TutorLink_design_proposal_v3_1.docx
+/outputs/planning-update-2026-10-07/~$torLink_Issues_W1_A3_den_W4.docx
+/outputs/planning-update-2026-10-07/~$torLink_design_proposal_v3_1.docx
+
 # OS
 .DS_Store
 Thumbs.db

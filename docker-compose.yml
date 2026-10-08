@@ -15,6 +15,12 @@ services:
       timeout: 5s
       retries: 10
 
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
   backend:
     build:
       context: ./backend
@@ -28,6 +34,10 @@ services:
       DB_DATABASE: tutorlink
       DB_USERNAME: tutorlink
       DB_PASSWORD: tutorlink_dev_password
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      FRONTEND_URL: http://localhost:3000
     volumes:
       - ./backend:/var/www/html
       - ./backend/.env.docker:/var/www/html/.env:ro
@@ -38,7 +48,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000", "--no-reload"]
 
   frontend:
     image: node:22-bookworm-slim
@@ -47,6 +57,7 @@ services:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
     environment:
+      NEXT_PUBLIC_DATA_MODE: api
       NEXT_PUBLIC_API_URL: http://localhost:8000
     ports:
       - "3000:3000"

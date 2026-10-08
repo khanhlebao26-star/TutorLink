@@ -7,10 +7,11 @@ use App\Http\Requests\FileLinkRequest;
 use App\Http\Requests\FileUploadRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
+use App\Support\AdminPermissions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class FileController extends Controller
@@ -33,7 +34,7 @@ class FileController extends Controller
         }
 
         $uploaded = $request->file('file');
-        $objectKey = 'uploads/' . $request->user()->id . '/' . Str::uuid() . '.' . $uploaded->extension();
+        $objectKey = 'uploads/'.$request->user()->id.'/'.Str::uuid().'.'.$uploaded->extension();
         Storage::disk('local')->putFileAs(dirname($objectKey), $uploaded, basename($objectKey));
 
         $file = File::create([
@@ -93,7 +94,15 @@ class FileController extends Controller
 
     public function download(Request $request, File $file)
     {
-        if ($file->owner_id !== $request->user()->id) {
+        $isOwner = $file->owner_id === $request->user()->id;
+        $isVerificationDocument = DB::table('verification_documents')
+            ->where('file_id', $file->id)
+            ->exists();
+        $isAuthorizedReviewer = $request->user()->hasPermission(
+            AdminPermissions::DOWNLOAD_VERIFICATION_DOCUMENTS,
+        );
+
+        if (! $isOwner && ! ($isVerificationDocument && $isAuthorizedReviewer)) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 

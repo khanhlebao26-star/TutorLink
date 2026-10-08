@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AdminController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
+use App\Http\Middleware\EnsureActiveAccount;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -21,7 +23,7 @@ Route::prefix('v1')->group(function () {
             ->name('auth.reset-password');
 
         Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-            ->middleware(['auth:sanctum', 'signed', 'throttle:6,1'])
+            ->middleware(['signed', 'throttle:6,1'])
             ->name('verification.verify');
 
         Route::middleware('auth:sanctum')->group(function () {
@@ -36,7 +38,28 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', EnsureActiveAccount::class])->group(function () {
+        Route::prefix('admin')->group(function () {
+            Route::get('/tutor-profiles', [AdminController::class, 'index'])
+                ->name('admin.tutor-profiles.index');
+            Route::get('/tutor-profiles/{tutorProfile}', [AdminController::class, 'show'])
+                ->name('admin.tutor-profiles.show');
+            Route::post('/tutor-profiles/{tutorProfile}/approve', [AdminController::class, 'approve'])
+                ->name('admin.tutor-profiles.approve');
+            Route::post('/tutor-profiles/{tutorProfile}/request-changes', [AdminController::class, 'requestChanges'])
+                ->name('admin.tutor-profiles.request-changes');
+            Route::post('/tutor-profiles/{tutorProfile}/reject', [AdminController::class, 'reject'])
+                ->name('admin.tutor-profiles.reject');
+            Route::post('/tutor-profiles/{tutorProfile}/suspend', [AdminController::class, 'suspendProfile'])
+                ->name('admin.tutor-profiles.suspend');
+            Route::post('/tutor-profiles/{tutorProfile}/restore', [AdminController::class, 'restoreProfile'])
+                ->name('admin.tutor-profiles.restore');
+            Route::post('/users/{user}/suspend', [AdminController::class, 'suspendAccount'])
+                ->name('admin.users.suspend');
+            Route::post('/users/{user}/restore', [AdminController::class, 'restoreAccount'])
+                ->name('admin.users.restore');
+        });
+
         Route::get('/me', [AuthController::class, 'me'])
             ->name('auth.me');
 
@@ -62,6 +85,12 @@ Route::prefix('v1')->group(function () {
             ->name('tutor.profile.store');
         Route::post('/tutor/profile/submit', [TutorProfileController::class, 'submit'])
             ->name('tutor.profile.submit');
+        Route::put('/tutor/profile/avatar', [TutorProfileController::class, 'attachAvatar'])
+            ->name('tutor.profile.avatar');
+        Route::post('/tutor/profile/verification-documents', [
+            TutorProfileController::class,
+            'createVerificationDocument',
+        ])->name('tutor.profile.verification-documents');
     });
 
     Route::get('/catalog/categories', [CatalogController::class, 'categories'])
