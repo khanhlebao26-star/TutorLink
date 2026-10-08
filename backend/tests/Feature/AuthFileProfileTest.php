@@ -259,10 +259,8 @@ class AuthFileProfileTest extends TestCase
         );
 
         $this->assertSame(419, $response->getStatusCode());
-        $this->assertSame(
-            ['message' => 'CSRF token mismatch.'],
-            $response->getData(true),
-        );
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+        $this->assertSame('CSRF token mismatch.', $response->getData(true)['message']);
     }
 
     public function test_invalid_payload_returns_json_422_with_field_errors(): void

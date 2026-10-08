@@ -11,6 +11,12 @@ class DatabaseSchemaTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_suite_uses_isolated_sqlite_database(): void
+    {
+        $this->assertSame('sqlite', config('database.default'));
+        $this->assertSame(':memory:', config('database.connections.sqlite.database'));
+    }
+
     public function test_core_business_tables_are_created(): void
     {
         $tables = [
