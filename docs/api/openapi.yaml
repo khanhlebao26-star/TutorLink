@@ -713,13 +713,11 @@ components:
         date_of_birth: { type: string, format: date, nullable: true }
         email_verified_at: { type: string, format: date-time, nullable: true }
         profile:
+          type: object
           nullable: true
-          oneOf:
+          anyOf:
             - $ref: "#/components/schemas/CustomerProfile"
             - $ref: "#/components/schemas/TutorProfile"
-            - type: object
-              nullable: true
-              enum: [null]
     CustomerProfile:
       type: object
       required: [id, user_id]
