@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -11,10 +13,13 @@ class DatabaseSchemaTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_suite_uses_isolated_sqlite_database(): void
+    public function test_suite_uses_the_configured_database(): void
     {
-        $this->assertSame('sqlite', config('database.default'));
-        $this->assertSame(':memory:', config('database.connections.sqlite.database'));
+        $this->assertContains(DB::getDriverName(), ['sqlite', 'pgsql']);
+
+        if (DB::getDriverName() === 'sqlite') {
+            $this->assertSame(':memory:', config('database.connections.sqlite.database'));
+        }
     }
 
     public function test_core_business_tables_are_created(): void
@@ -74,6 +79,75 @@ class DatabaseSchemaTest extends TestCase
         $this->assertNotEmpty($user->getAuthPassword());
     }
 
+    public function test_postgres_accepts_current_user_statuses(): void
+    {
+        $this->requirePostgres();
+
+        foreach (['draft', 'active', 'inactive', 'cancelled'] as $status) {
+            $user = User::factory()->create([
+                'email' => "status-{$status}@example.test",
+                'status' => $status,
+            ]);
+
+            $this->assertSame($status, $user->status);
+        }
+    }
+
+    public function test_postgres_rejects_legacy_pending_user_status(): void
+    {
+        $this->requirePostgres();
+        $this->expectException(QueryException::class);
+
+        User::factory()->create(['status' => 'pending']);
+    }
+
+    public function test_postgres_rejects_legacy_suspended_user_status(): void
+    {
+        $this->requirePostgres();
+        $this->expectException(QueryException::class);
+
+        User::factory()->create(['status' => 'suspended']);
+    }
+
+    public function test_postgres_accepts_current_tutor_approval_statuses(): void
+    {
+        $this->requirePostgres();
+
+        foreach (['pending', 'changes_requested', 'active', 'rejected'] as $approvalStatus) {
+            $user = User::factory()->create(['role' => 'tutor']);
+            $profile = $user->tutorProfile()->create([
+                'headline' => "Approval {$approvalStatus}",
+                'approval_status' => $approvalStatus,
+            ]);
+
+            $this->assertSame($approvalStatus, $profile->approval_status);
+        }
+    }
+
+    public function test_postgres_rejects_cancelled_tutor_approval_status(): void
+    {
+        $this->requirePostgres();
+        $this->expectException(QueryException::class);
+
+        $user = User::factory()->create(['role' => 'tutor']);
+        $user->tutorProfile()->create([
+            'headline' => 'Invalid cancelled approval',
+            'approval_status' => 'cancelled',
+        ]);
+    }
+
+    public function test_postgres_rejects_expired_tutor_approval_status(): void
+    {
+        $this->requirePostgres();
+        $this->expectException(QueryException::class);
+
+        $user = User::factory()->create(['role' => 'tutor']);
+        $user->tutorProfile()->create([
+            'headline' => 'Invalid expired approval',
+            'approval_status' => 'expired',
+        ]);
+    }
+
     public function test_laravel_and_learning_sessions_use_distinct_tables(): void
     {
         $this->assertTrue(Schema::hasColumns('sessions', [
@@ -113,5 +187,12 @@ class DatabaseSchemaTest extends TestCase
             'idempotency_key',
             'expires_at',
         ]));
+    }
+
+    private function requirePostgres(): void
+    {
+        if (DB::getDriverName() !== 'pgsql') {
+            $this->markTestSkipped('PostgreSQL constraint tests require the pgsql test connection.');
+        }
     }
 }

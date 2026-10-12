@@ -7,26 +7,26 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * Keep the test suite isolated from Docker's runtime environment.
-     *
-     * PHPUnit's env entries do not replace variables already exported by
-     * Docker Compose, while Laravel reads both $_ENV and $_SERVER during
-     * bootstrap. Set all three sources before the application is created so
-     * RefreshDatabase can never target the local PostgreSQL database.
+     * Use an isolated SQLite database by default, while allowing CI and
+     * Docker to run the suite against an explicitly configured PostgreSQL.
      */
     public function createApplication()
     {
+        $databaseConnection = getenv('DB_CONNECTION') ?: 'sqlite';
         $environment = [
             'APP_ENV' => 'testing',
             'APP_DEBUG' => 'false',
             'CACHE_STORE' => 'array',
-            'DB_CONNECTION' => 'sqlite',
-            'DB_DATABASE' => ':memory:',
-            'DB_URL' => '',
+            'DB_CONNECTION' => $databaseConnection,
             'MAIL_MAILER' => 'array',
             'QUEUE_CONNECTION' => 'sync',
             'SESSION_DRIVER' => 'array',
         ];
+
+        if ($databaseConnection === 'sqlite') {
+            $environment['DB_DATABASE'] = ':memory:';
+            $environment['DB_URL'] = '';
+        }
 
         foreach ($environment as $key => $value) {
             putenv("{$key}={$value}");
