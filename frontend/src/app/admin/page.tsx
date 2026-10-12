@@ -1,19 +1,19 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Badge, Button, DataTable, ErrorActions, Field, StatePanel } from "@/components/ui";
 import { getAdminTutorProfile, getAdminTutorProfiles, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
-import { useAsyncData } from "@/lib/hooks/use-async-data";
 import type { AdminTutorProfile, TutorApprovalStatus } from "@/lib/data/types";
+import { useAsyncData } from "@/lib/hooks/use-async-data";
+import { useCallback, useState } from "react";
 
 const labels: Record<TutorApprovalStatus, string> = {
   pending: "Đang chờ",
   changes_requested: "Yêu cầu chỉnh sửa",
   active: "Đã duyệt",
   rejected: "Từ chối",
-  cancelled: "Đã huỷ",
-  expired: "Hết hạn",
+  // cancelled: "Đã huỷ",
+  // expired: "Hết hạn",
 };
 
 const filters = ["pending", "changes_requested", "active", "rejected"] as const;
@@ -154,7 +154,7 @@ export default function AdminPage() {
                   <div className="button-row">
                     {detail.profile.approval_status === "pending" ? <><Button disabled={saving} onClick={() => runAction("approve")}>Approve</Button><Button disabled={saving} onClick={() => runAction("request-changes")}>Request Changes</Button><Button disabled={saving} onClick={() => runAction("reject")}>Reject</Button></> : null}
                     {detail.profile.suspended_at ? <Button disabled={saving} onClick={() => runAction("restore")}>Restore profile</Button> : <Button disabled={saving} onClick={() => runAction("suspend")}>Suspend profile</Button>}
-                    {detail.user.status === "suspended" ? <Button disabled={saving} onClick={() => runAction("account-restore")}>Restore account</Button> : <Button disabled={saving} onClick={() => runAction("account-suspend")}>Suspend account</Button>}
+                    {detail.user.status === "inactive" ? <Button disabled={saving} onClick={() => runAction("account-restore")}>Restore account</Button> : <Button disabled={saving} onClick={() => runAction("account-suspend")}>Suspend account</Button>}
                   </div>
                 </form>
               </>

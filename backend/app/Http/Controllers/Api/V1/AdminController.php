@@ -20,7 +20,7 @@ class AdminController extends Controller
         $this->requirePermission($request, AdminPermissions::VIEW_TUTOR_PROFILES);
 
         $status = $request->query('status', 'pending');
-        $allowedStatuses = ['pending', 'changes_requested', 'active', 'rejected', 'cancelled', 'expired'];
+        $allowedStatuses = ['pending', 'changes_requested', 'active', 'rejected'];
 
         if (! in_array($status, $allowedStatuses, true)) {
             return response()->json(['message' => 'Invalid tutor profile status.'], 422);
@@ -121,7 +121,7 @@ class AdminController extends Controller
 
     public function suspendAccount(AdminDecisionRequest $request, User $user): JsonResponse
     {
-        return $this->changeAccountStatus($request, $user, 'suspended', 'account_suspended');
+        return $this->changeAccountStatus($request, $user, 'inactive', 'account_suspended');
     }
 
     public function restoreAccount(AdminDecisionRequest $request, User $user): JsonResponse
@@ -148,7 +148,7 @@ class AdminController extends Controller
                 abort(409, 'Only submitted pending profiles can be decided.');
             }
 
-            if ($profile->suspended_at || $profile->user->status === 'suspended') {
+            if ($profile->suspended_at || $profile->user->status === 'inactive') {
                 abort(409, 'Suspended profiles cannot be decided.');
             }
 
@@ -187,12 +187,12 @@ class AdminController extends Controller
 
         $target = DB::transaction(function () use ($actor, $data, $status, $action, $target): User {
             $target = User::query()->lockForUpdate()->findOrFail($target->id);
-            $alreadyInState = $status === 'suspended'
-                ? $target->status === 'suspended'
-                : $target->status !== 'suspended';
+            $alreadyInState = $status === 'inactive'
+                ? $target->status === 'inactive'
+                : $target->status !== 'inactive';
 
             if ($alreadyInState) {
-                abort(409, $status === 'suspended' ? 'Account is already suspended.' : 'Account is not suspended.');
+                abort(409, $status === 'inactive' ? 'Account is already suspended.' : 'Account is not suspended.');
             }
 
             $before = [
@@ -201,7 +201,7 @@ class AdminController extends Controller
             ];
             $target->forceFill([
                 'status' => $status,
-                'suspended_at' => $status === 'suspended' ? now() : null,
+                'suspended_at' => $status === 'inactive' ? now() : null,
             ])->save();
             $after = [
                 'status' => $target->status,

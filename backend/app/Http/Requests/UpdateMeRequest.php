@@ -24,7 +24,7 @@ class UpdateMeRequest extends FormRequest
             'date_of_birth' => [
                 'sometimes',
                 'date',
-                'before_or_equal:' . now()->subYears(18)->toDateString(),
+                'before_or_equal:'.now()->subYears(18)->toDateString(),
             ],
         ];
     }
