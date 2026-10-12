@@ -23,16 +23,16 @@ không dùng mock làm bằng chứng nghiệm thu.
 
 ## 2. Hiện trạng project đã kiểm tra
 
-| Khu vực | Hiện trạng | Ảnh hưởng tới W1-B2 |
-| --- | --- | --- |
-| Git/dependency | Nhánh hiện tại `feature/W1-B2-auth-tutor-onboarding` đang ở merge commit `532ee40`; W1-A2 contract bổ sung nằm ở `f1aad0c`. | W1-B1 và phần API đã bàn giao của W1-A2 đều có trong checkout. Các thay đổi W1-B2 hiện vẫn chưa commit. |
-| Frontend shell | Đã có route Auth/Profile, API client, kiểu dữ liệu, component nền và mode `mock/api`. | Mở rộng lớp service mỏng hiện có; không xây lại shell hoặc data architecture. |
-| Backend runtime | Đã có Auth register/login/logout/verify/resend/forgot/reset, `/me`, Catalog, File upload/complete/link/download/delete và Tutor profile get/save/submit. `User` đã bật email verification. | Có thể bắt đầu Auth và phần Tutor flow đã có contract; không cần endpoint tạm hoặc mock. |
-| Sanctum/CORS | `withCredentials`, XSRF, stateful API và CORS cho frontend `:3000` đã có nền cấu hình. | Dùng thống nhất `http://localhost:3000` và `http://localhost:8000` theo tài liệu setup; không trộn với `127.0.0.1`. |
-| OpenAPI hiện có | Đã mô tả các route trên và là hợp đồng API chính để frontend bám theo. Đã cập nhật `date_of_birth` bắt buộc và nested `profile` để khớp runtime `/me`. | Frontend bám OpenAPI đã cập nhật; nếu backend thay đổi wire shape phải cập nhật contract trước khi đổi UI. |
-| Tutor data | Contract W1-A2 hiện nhận/trả `specialization_id`, có target avatar và endpoint tạo verification document với `document_type`. Migration `000700` đã được áp dụng; Catalog đã seed trong Docker. | Frontend đã có thể hoàn tất specialization và `upload -> complete -> attach`; không cần tự đặt endpoint. |
-| Trạng thái | Runtime chỉ trả `status: draft|submitted` và `approval_status: pending|active|rejected|cancelled|expired`; profile đã submit luôn bị khóa. | Chưa có `changes_requested`, feedback, `allowed_actions` hoặc resubmit; frontend không tự suy đoán transition. |
-| File policy | `POST /files` nhận multipart trực tiếp, tối đa 10 MiB; frontend giới hạn avatar 2 MiB/JPG/PNG và document 10 MiB theo UX policy. | Upload/complete/attach đã có contract; backend vẫn là lớp kiểm tra cuối cùng. |
+| Khu vực         | Hiện trạng                                                                                                                                                                                      | Ảnh hưởng tới W1-B2                                                                                                 |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Git/dependency  | Nhánh hiện tại `feature/W1-B2-auth-tutor-onboarding` đang ở merge commit `532ee40`; W1-A2 contract bổ sung nằm ở `f1aad0c`.                                                                     | W1-B1 và phần API đã bàn giao của W1-A2 đều có trong checkout. Các thay đổi W1-B2 hiện vẫn chưa commit.             |
+| Frontend shell  | Đã có route Auth/Profile, API client, kiểu dữ liệu, component nền và mode `mock/api`.                                                                                                           | Mở rộng lớp service mỏng hiện có; không xây lại shell hoặc data architecture.                                       |
+| Backend runtime | Đã có Auth register/login/logout/verify/resend/forgot/reset, `/me`, Catalog, File upload/complete/link/download/delete và Tutor profile get/save/submit. `User` đã bật email verification.      | Có thể bắt đầu Auth và phần Tutor flow đã có contract; không cần endpoint tạm hoặc mock.                            |
+| Sanctum/CORS    | `withCredentials`, XSRF, stateful API và CORS cho frontend `:3000` đã có nền cấu hình.                                                                                                          | Dùng thống nhất `http://localhost:3000` và `http://localhost:8000` theo tài liệu setup; không trộn với `127.0.0.1`. |
+| OpenAPI hiện có | Đã mô tả các route trên và là hợp đồng API chính để frontend bám theo. Đã cập nhật `date_of_birth` bắt buộc và nested `profile` để khớp runtime `/me`.                                          | Frontend bám OpenAPI đã cập nhật; nếu backend thay đổi wire shape phải cập nhật contract trước khi đổi UI.          |
+| Tutor data      | Contract W1-A2 hiện nhận/trả `specialization_id`, có target avatar và endpoint tạo verification document với `document_type`. Migration `000700` đã được áp dụng; Catalog đã seed trong Docker. | Frontend đã có thể hoàn tất specialization và `upload -> complete -> attach`; không cần tự đặt endpoint.            |
+| Trạng thái      | Runtime trả `status` gồm draft, submitted, approved, changes_requested, rejected và `approval_status` gồm pending, changes_requested, active, rejected; profile đã submit bị khóa trừ khi được yêu cầu chỉnh sửa. | Frontend hiển thị trạng thái từ response backend; không tự suy đoán transition. |
+| File policy     | `POST /files` nhận multipart trực tiếp, tối đa 10 MiB; frontend giới hạn avatar 2 MiB/JPG/PNG và document 10 MiB theo UX policy.                                                                | Upload/complete/attach đã có contract; backend vẫn là lớp kiểm tra cuối cùng.                                       |
 
 ## 3. Understanding summary và giả định
 
@@ -52,12 +52,12 @@ không dùng mock làm bằng chứng nghiệm thu.
 
 ### Giả định phi chức năng
 
-| Nhóm | Giả định dùng cho W1-B2 |
-| --- | --- |
-| Hiệu năng/quy mô | Khoảng 5.000 tài khoản và 50 người dùng đồng thời theo tài liệu kế hoạch trước; không làm load test trong issue này. Form không tạo request theo từng phím gõ. Catalog tải một lần khi mở onboarding. |
-| Bảo mật và riêng tư | Sanctum first-party SPA cookie; không lưu access token trong `localStorage`; file validation phía client chỉ hỗ trợ UX, backend vẫn kiểm tra MIME/kích thước/quyền sở hữu. |
-| Độ tin cậy | Không tự động retry mutation, complete hoặc attach. Khi lỗi, giữ dữ liệu form và cho người dùng chủ động thử lại bước an toàn. |
-| Bảo trì | Tận dụng Axios, React state và component từ W1-B1; không thêm form library, query library hoặc global state library trong timebox. Dũng bàn giao flow submit cho Hoàng. |
+| Nhóm                | Giả định dùng cho W1-B2                                                                                                                                                                               |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hiệu năng/quy mô    | Khoảng 5.000 tài khoản và 50 người dùng đồng thời theo tài liệu kế hoạch trước; không làm load test trong issue này. Form không tạo request theo từng phím gõ. Catalog tải một lần khi mở onboarding. |
+| Bảo mật và riêng tư | Sanctum first-party SPA cookie; không lưu access token trong `localStorage`; file validation phía client chỉ hỗ trợ UX, backend vẫn kiểm tra MIME/kích thước/quyền sở hữu.                            |
+| Độ tin cậy          | Không tự động retry mutation, complete hoặc attach. Khi lỗi, giữ dữ liệu form và cho người dùng chủ động thử lại bước an toàn.                                                                        |
+| Bảo trì             | Tận dụng Axios, React state và component từ W1-B1; không thêm form library, query library hoặc global state library trong timebox. Dũng bàn giao flow submit cho Hoàng.                               |
 
 ## 4. Definition of Ready cho dependency
 
@@ -78,24 +78,23 @@ chạy được. Nếu thiếu, ghi blocker vào Issue thay vì tự tạo contr
 ### W1-A2 — audit sau merge
 
 - [x] Có endpoint và implementation cho register, login, logout, verify, resend
-  verification, forgot/reset password và `/me`.
+      verification, forgot/reset password và `/me`.
 - [x] Có Catalog endpoint trả category/specialization đang hoạt động.
 - [x] Có Tutor profile get/save draft/submit; profile đã submit bị backend khóa.
 - [x] Có upload multipart, complete, download/delete và generic file link.
 - [x] Backend feature test hiện có đạt `14 passed (47 assertions)` trong Docker.
 - [x] OpenAPI đã thêm `date_of_birth` vào danh sách bắt buộc của register và
-  mô tả nested `profile` trong User response.
+      mô tả nested `profile` trong User response.
 - [x] Tutor profile contract nhận và trả specialization đã chọn.
 - [x] Có contract gắn avatar vào Tutor profile bằng `PUT /tutor/profile/avatar`.
 - [x] Có endpoint/payload tạo verification document với `document_type` bằng
-  `POST /tutor/profile/verification-documents`.
-- [ ] Có state/transition cho `changes_requested`, `approved`, `rejected`,
-  feedback và resubmit. Hiện runtime chỉ hỗ trợ draft/submit và khóa vĩnh viễn
-  sau submit.
+      `POST /tutor/profile/verification-documents`.
+- [x] Có state/transition cho `changes_requested`, `approved`, `rejected`,
+      feedback và resubmit.
 - [ ] OpenAPI mô tả nested `profile` của `/me`, lỗi 419 và correlation/request ID
-  nếu đây là contract bắt buộc.
+      nếu đây là contract bắt buộc.
 - [ ] Có dữ liệu/cách chuyển đủ trạng thái review và xác nhận CORS, session,
-  CSRF, mail verification/reset bằng browser thật.
+      CSRF, mail verification/reset bằng browser thật.
 
 Quyết định thực thi: các capability Auth/Catalog/Profile/File/attach đã có
 contract và đã được tích hợp. Chỉ còn review transition/evidence là dependency;
@@ -139,11 +138,11 @@ không dùng endpoint giả hoặc mock để đánh dấu acceptance là Done.
 
 ## 6. Phương án triển khai
 
-| Phương án | Mô tả | Đánh giá |
-| --- | --- | --- |
-| **A — Chọn: mở rộng service/API layer mỏng của W1-B1** | Mỗi capability có hàm API rõ ràng; page/component giữ state cục bộ; thêm adapter lỗi và upload flow nhỏ. | Ít file và dependency nhất, phù hợp 12 giờ, dễ đối chiếu Network. |
-| B — Auth context và onboarding state machine toàn cục | Tập trung session và mọi transition vào provider/reducer. | Có ích khi nhiều route cùng ghi state, nhưng vượt nhu cầu hiện tại và tăng rủi ro hydration. |
-| C — Sinh client từ OpenAPI và dùng query/form library | Type an toàn và cache chuẩn hóa. | Chỉ hợp lý khi W1-A2 đã ổn định và team đã chọn toolchain; không phù hợp timebox. |
+| Phương án                                              | Mô tả                                                                                                    | Đánh giá                                                                                     |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **A — Chọn: mở rộng service/API layer mỏng của W1-B1** | Mỗi capability có hàm API rõ ràng; page/component giữ state cục bộ; thêm adapter lỗi và upload flow nhỏ. | Ít file và dependency nhất, phù hợp 12 giờ, dễ đối chiếu Network.                            |
+| B — Auth context và onboarding state machine toàn cục  | Tập trung session và mọi transition vào provider/reducer.                                                | Có ích khi nhiều route cùng ghi state, nhưng vượt nhu cầu hiện tại và tăng rủi ro hydration. |
+| C — Sinh client từ OpenAPI và dùng query/form library  | Type an toàn và cache chuẩn hóa.                                                                         | Chỉ hợp lý khi W1-A2 đã ổn định và team đã chọn toolchain; không phù hợp timebox.            |
 
 Chọn phương án A. Chỉ tách logic dùng chung thật sự: API error, session bootstrap,
 field error và upload step. Không tạo abstraction cho nhu cầu giả định.
@@ -182,13 +181,13 @@ profile; không tự gán trạng thái `submitted` trước khi server xác nh�
 
 ### 7.3 State matrix
 
-| Trạng thái UI | Có thể sửa | Có thể upload/attach | Primary action | Hành vi bắt buộc |
-| --- | :---: | :---: | --- | --- |
-| `Draft` | Có | Có | Submit | Cho lưu draft và hiển thị lỗi field. |
-| `Submitted` | Không | Không | Không có | Disable/read-only field, không chỉ ẩn nút submit. |
-| `Changes Requested` | Có | Có | Resubmit | Hiển thị feedback từ Admin nếu API trả về; giữ hồ sơ hiện tại để sửa. |
-| `Approved` | Không | Không | Không có trong issue | Chỉ hiển thị trạng thái thành công; không tự mở form sửa. |
-| `Rejected` | Không | Không | Không có trong issue | Chỉ hiển thị trạng thái; không tự coi là `Changes Requested`. |
+| Trạng thái UI       | Có thể sửa | Có thể upload/attach | Primary action       | Hành vi bắt buộc                                                      |
+| ------------------- | :--------: | :------------------: | -------------------- | --------------------------------------------------------------------- |
+| `Draft`             |     Có     |          Có          | Submit               | Cho lưu draft và hiển thị lỗi field.                                  |
+| `Submitted`         |   Không    |        Không         | Không có             | Disable/read-only field, không chỉ ẩn nút submit.                     |
+| `Changes Requested` |     Có     |          Có          | Resubmit             | Hiển thị feedback từ Admin nếu API trả về; giữ hồ sơ hiện tại để sửa. |
+| `Approved`          |   Không    |        Không         | Không có trong issue | Chỉ hiển thị trạng thái thành công; không tự mở form sửa.             |
+| `Rejected`          |   Không    |        Không         | Không có trong issue | Chỉ hiển thị trạng thái; không tự coi là `Changes Requested`.         |
 
 Nếu wire value khác nhãn trên, tạo một mapping duy nhất trong data layer sau khi
 W1-A2 xác nhận. Không rải phép so sánh trạng thái ở nhiều component.
@@ -228,12 +227,12 @@ Quy tắc:
 Endpoint dưới đây bám OpenAPI/backend đã merge. Capability chưa có contract vẫn
 được giữ dưới dạng blocker, không tự đặt path.
 
-| Nhóm | Capability |
-| --- | --- |
-| Auth | `register`, `login`, `logout`, `verifyEmail`, `resendVerification`, `requestPasswordReset`, `resetPassword`, `getMe` |
-| Catalog | `getSpecializations` |
-| Tutor profile | `getTutorProfile` (`GET /tutor/profile`), `saveTutorDraft` (`PUT /tutor/profile`), `submitTutorProfile` (`POST /tutor/profile/submit`); resubmit vẫn chờ backend `changes_requested` |
-| Files | `uploadFile` (`POST /files` multipart), `completeUpload` (`POST /files/{id}/complete`), `attachTutorAvatar` (`PUT /tutor/profile/avatar`) và `createVerificationDocument` (`POST /tutor/profile/verification-documents`) |
+| Nhóm          | Capability                                                                                                                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Auth          | `register`, `login`, `logout`, `verifyEmail`, `resendVerification`, `requestPasswordReset`, `resetPassword`, `getMe`                                                                                                     |
+| Catalog       | `getSpecializations`                                                                                                                                                                                                     |
+| Tutor profile | `getTutorProfile` (`GET /tutor/profile`), `saveTutorDraft` (`PUT /tutor/profile`), `submitTutorProfile` (`POST /tutor/profile/submit`); resubmit vẫn chờ backend `changes_requested`                                     |
+| Files         | `uploadFile` (`POST /files` multipart), `completeUpload` (`POST /files/{id}/complete`), `attachTutorAvatar` (`PUT /tutor/profile/avatar`) và `createVerificationDocument` (`POST /tutor/profile/verification-documents`) |
 
 ### Chuẩn hóa lỗi
 
@@ -248,12 +247,12 @@ type ApiError = {
 };
 ```
 
-| HTTP | UX |
-| --- | --- |
-| 401 | Báo phiên đăng nhập không còn hợp lệ và hiển thị action đi tới login; không tự redirect ngay làm mất dữ liệu form. |
-| 419 | Báo phiên bảo mật/CSRF đã hết hạn, cho nút thử lại. Lần thử lại lấy CSRF cookie mới trước mutation; không tự submit lại. |
-| 422 | Gắn `errors[field]` vào đúng input; lỗi không map được hiển thị ở form summary. Focus vào lỗi đầu tiên sau submit. |
-| Khác | Hiển thị thông điệp an toàn và `request_id` nếu có; không render raw stack/message nhạy cảm. |
+| HTTP | UX                                                                                                                       |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ |
+| 401  | Báo phiên đăng nhập không còn hợp lệ và hiển thị action đi tới login; không tự redirect ngay làm mất dữ liệu form.       |
+| 419  | Báo phiên bảo mật/CSRF đã hết hạn, cho nút thử lại. Lần thử lại lấy CSRF cookie mới trước mutation; không tự submit lại. |
+| 422  | Gắn `errors[field]` vào đúng input; lỗi không map được hiển thị ở form summary. Focus vào lỗi đầu tiên sau submit.       |
+| Khác | Hiển thị thông điệp an toàn và `request_id` nếu có; không render raw stack/message nhạy cảm.                             |
 
 Không dùng response interceptor để tự retry request ghi dữ liệu. Interceptor chỉ
 chuẩn hóa lỗi. Adapter phải bám response cuối cùng của W1-A2; contract hiện tại
@@ -264,14 +263,14 @@ dùng `message`/`errors` ở top-level trong khi client nền đang đọc
 
 Route cuối cùng phải bám convention W1-B1; danh sách dưới là thay đổi tối thiểu:
 
-| Route | Trách nhiệm |
-| --- | --- |
-| `/auth/register` | Chọn Customer/Tutor và register. |
-| `/auth/login` | Login và điều hướng theo `/me`. |
-| `/auth/verify-email` | Nhận kết quả verify hoặc hướng dẫn kiểm tra email; resend có cooldown theo response backend. |
-| `/auth/forgot-password` | Gửi yêu cầu reset. |
-| `/auth/reset-password` | Nhận token/email theo contract và đặt mật khẩu mới. |
-| `/profile` | Tutor draft, upload, submit và status view; tái sử dụng route đã có từ W1-B1. |
+| Route                   | Trách nhiệm                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `/auth/register`        | Chọn Customer/Tutor và register.                                                             |
+| `/auth/login`           | Login và điều hướng theo `/me`.                                                              |
+| `/auth/verify-email`    | Nhận kết quả verify hoặc hướng dẫn kiểm tra email; resend có cooldown theo response backend. |
+| `/auth/forgot-password` | Gửi yêu cầu reset.                                                                           |
+| `/auth/reset-password`  | Nhận token/email theo contract và đặt mật khẩu mới.                                          |
+| `/profile`              | Tutor draft, upload, submit và status view; tái sử dụng route đã có từ W1-B1.                |
 
 Component tối thiểu:
 
@@ -288,17 +287,17 @@ Không cần tạo component riêng nếu chỉ được dùng một lần và k
 
 ## 10. Trình tự triển khai trong 12 giờ
 
-| Thời lượng | Công việc | Kết quả kiểm tra được |
-| ---: | --- | --- |
-| 0,75 giờ | Preflight checkout, đọc W1-A2, lập mapping capability/DTO/status. | Build chạy được; không còn endpoint hoặc trạng thái bị đoán. |
-| 1,25 giờ | Củng cố API client, CSRF, session bootstrap và lỗi 401/419/422. | `/me` và error shape chạy bằng API thật. |
-| 2,25 giờ | Register, login, logout, verify/resend, forgot/reset password. | Customer/Tutor hoàn thành Auth flow trên browser. |
-| 0,75 giờ | Role routing và `/me` refresh/reload behavior. | Reload giữ session; role sai không vào Tutor form. |
-| 2,5 giờ | Tutor form, Catalog, state banner, edit lock và submit/resubmit. | Năm trạng thái render đúng; Submitted không sửa được. |
-| 2 giờ | Avatar/document upload, complete và attach. | Network thể hiện đúng thứ tự, profile refetch thấy attachment. |
-| 1,5 giờ | Browser test các happy/error path và thu evidence đã che dữ liệu. | Evidence đủ cho Issue/PR, không có mock. |
-| 1 giờ | Sửa lỗi, lint/build và handover Hoàng/Khanh. | Checklist nghiệm thu và request IDs được bàn giao. |
-| **12 giờ** |  |  |
+| Thời lượng | Công việc                                                         | Kết quả kiểm tra được                                          |
+| ---------: | ----------------------------------------------------------------- | -------------------------------------------------------------- |
+|   0,75 giờ | Preflight checkout, đọc W1-A2, lập mapping capability/DTO/status. | Build chạy được; không còn endpoint hoặc trạng thái bị đoán.   |
+|   1,25 giờ | Củng cố API client, CSRF, session bootstrap và lỗi 401/419/422.   | `/me` và error shape chạy bằng API thật.                       |
+|   2,25 giờ | Register, login, logout, verify/resend, forgot/reset password.    | Customer/Tutor hoàn thành Auth flow trên browser.              |
+|   0,75 giờ | Role routing và `/me` refresh/reload behavior.                    | Reload giữ session; role sai không vào Tutor form.             |
+|    2,5 giờ | Tutor form, Catalog, state banner, edit lock và submit/resubmit.  | Năm trạng thái render đúng; Submitted không sửa được.          |
+|      2 giờ | Avatar/document upload, complete và attach.                       | Network thể hiện đúng thứ tự, profile refetch thấy attachment. |
+|    1,5 giờ | Browser test các happy/error path và thu evidence đã che dữ liệu. | Evidence đủ cho Issue/PR, không có mock.                       |
+|      1 giờ | Sửa lỗi, lint/build và handover Hoàng/Khanh.                      | Checklist nghiệm thu và request IDs được bàn giao.             |
+| **12 giờ** |                                                                   |                                                                |
 
 Không bắt đầu tính timebox khi W1-A2 chưa đạt Definition of Ready. Khi đã bắt
 đầu, không cắt CSRF, validation, state lock, upload steps hoặc evidence API thật
@@ -317,21 +316,21 @@ npm run build
 
 ### Browser matrix
 
-| Ca kiểm thử | Kết quả mong đợi | Evidence tối thiểu |
-| --- | --- | --- |
-| Customer register | Request API thật thành công, role đúng, không vào Tutor onboarding. | UI kết quả + Network request/status đã che PII. |
-| Tutor register và verify | Nhận email/link test, verify thành công, resend hoạt động. | UI trước/sau verify + status API. |
-| Login, reload, `/me`, logout | Cookie session tồn tại qua reload; logout làm `/me` trả 401. | Network sequence, không chụp cookie value. |
-| Forgot/reset password | Request reset và đặt mật khẩu mới; login bằng mật khẩu mới. | Status và UI, che token/email. |
-| Draft | Catalog tải từ API; lưu/sửa và upload được. | UI + Catalog/profile requests. |
-| Upload avatar | `multipart upload -> complete -> attach` đúng thứ tự. | Network rows/status; che cookie/XSRF và PII. |
-| Upload verification document | Đúng file policy và attach vào Tutor profile. | Network rows/status; không đính kèm tài liệu thật. |
-| Submitted | Form read-only/disabled sau response server. | UI status + submit response. |
-| Changes Requested | Feedback hiển thị, form mở lại, resubmit chuyển về Submitted. | UI trước/sau + request/status. |
-| Approved/Rejected | Nhãn đúng response backend; không triển khai action Admin. | UI của từng trạng thái. |
-| 401 | Phiên hết hạn được giải thích rõ và có action về login. | UI + status 401. |
-| 419 | Hiển thị lỗi CSRF/session và cho retry chủ động. | UI + status 419, che token. |
-| 422 | Lỗi hiển thị tại đúng field và form summary. | UI + response đã che dữ liệu. |
+| Ca kiểm thử                  | Kết quả mong đợi                                                    | Evidence tối thiểu                                 |
+| ---------------------------- | ------------------------------------------------------------------- | -------------------------------------------------- |
+| Customer register            | Request API thật thành công, role đúng, không vào Tutor onboarding. | UI kết quả + Network request/status đã che PII.    |
+| Tutor register và verify     | Nhận email/link test, verify thành công, resend hoạt động.          | UI trước/sau verify + status API.                  |
+| Login, reload, `/me`, logout | Cookie session tồn tại qua reload; logout làm `/me` trả 401.        | Network sequence, không chụp cookie value.         |
+| Forgot/reset password        | Request reset và đặt mật khẩu mới; login bằng mật khẩu mới.         | Status và UI, che token/email.                     |
+| Draft                        | Catalog tải từ API; lưu/sửa và upload được.                         | UI + Catalog/profile requests.                     |
+| Upload avatar                | `multipart upload -> complete -> attach` đúng thứ tự.               | Network rows/status; che cookie/XSRF và PII.       |
+| Upload verification document | Đúng file policy và attach vào Tutor profile.                       | Network rows/status; không đính kèm tài liệu thật. |
+| Submitted                    | Form read-only/disabled sau response server.                        | UI status + submit response.                       |
+| Changes Requested            | Feedback hiển thị, form mở lại, resubmit chuyển về Submitted.       | UI trước/sau + request/status.                     |
+| Approved/Rejected            | Nhãn đúng response backend; không triển khai action Admin.          | UI của từng trạng thái.                            |
+| 401                          | Phiên hết hạn được giải thích rõ và có action về login.             | UI + status 401.                                   |
+| 419                          | Hiển thị lỗi CSRF/session và cho retry chủ động.                    | UI + status 419, che token.                        |
+| 422                          | Lỗi hiển thị tại đúng field và form summary.                        | UI + response đã che dữ liệu.                      |
 
 Evidence phải ghi rõ:
 
@@ -389,27 +388,27 @@ thật.
 
 ## 14. Rủi ro và cách xử lý
 
-| Rủi ro | Ảnh hưởng | Xử lý |
-| --- | --- | --- |
-| W1-A2 thiếu state/transition review | Không thể nghiệm thu Changes Requested/resubmit và đủ trạng thái trên browser. | Giữ blocker cho W1-C2/A2; frontend chỉ render khi backend trả wire value hợp lệ. |
-| Backend file policy khác UX policy | Upload có thể bị backend từ chối dù qua client validation. | Hiển thị lỗi 422; backend vẫn là nguồn sự thật, không nới validation ở frontend. |
-| Wire status không phân biệt đủ năm trạng thái | UI khóa sai hoặc cho phép transition sai. | Dùng contract W1-A2 làm nguồn thật; chỉ mapping tập trung khi wire values đã chốt. |
-| Review transition chưa có API/test data | Không kiểm chứng Submitted/Changes Requested/Approved/Rejected đầy đủ. | Hoàng/W1-A2 cung cấp seed, endpoint Admin hoặc test data; ghi rõ evidence nguồn trạng thái. |
-| PHP/proxy chặn file trên 2 MiB | Verification document thất bại trước controller. | Xác nhận giới hạn runtime trước test; backend/infra sửa, frontend chỉ hiển thị lỗi. |
-| Dùng lẫn `localhost` và `127.0.0.1` | Cookie/CSRF không đi cùng request. | Dùng một host thống nhất cho frontend, API và stateful-domain config. |
-| Không có cách tạo đủ trạng thái review | Không kiểm chứng Submitted/Changes Requested/Approved/Rejected. | Hoàng/W1-A2 cung cấp seed, endpoint Admin hoặc test data; ghi rõ evidence nguồn trạng thái. |
+| Rủi ro                                        | Ảnh hưởng                                                                      | Xử lý                                                                                       |
+| --------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| W1-A2 thiếu state/transition review           | Không thể nghiệm thu Changes Requested/resubmit và đủ trạng thái trên browser. | Giữ blocker cho W1-C2/A2; frontend chỉ render khi backend trả wire value hợp lệ.            |
+| Backend file policy khác UX policy            | Upload có thể bị backend từ chối dù qua client validation.                     | Hiển thị lỗi 422; backend vẫn là nguồn sự thật, không nới validation ở frontend.            |
+| Wire status không phân biệt đủ năm trạng thái | UI khóa sai hoặc cho phép transition sai.                                      | Dùng contract W1-A2 làm nguồn thật; chỉ mapping tập trung khi wire values đã chốt.          |
+| Review transition chưa có API/test data       | Không kiểm chứng Submitted/Changes Requested/Approved/Rejected đầy đủ.         | Hoàng/W1-A2 cung cấp seed, endpoint Admin hoặc test data; ghi rõ evidence nguồn trạng thái. |
+| PHP/proxy chặn file trên 2 MiB                | Verification document thất bại trước controller.                               | Xác nhận giới hạn runtime trước test; backend/infra sửa, frontend chỉ hiển thị lỗi.         |
+| Dùng lẫn `localhost` và `127.0.0.1`           | Cookie/CSRF không đi cùng request.                                             | Dùng một host thống nhất cho frontend, API và stateful-domain config.                       |
+| Không có cách tạo đủ trạng thái review        | Không kiểm chứng Submitted/Changes Requested/Approved/Rejected.                | Hoàng/W1-A2 cung cấp seed, endpoint Admin hoặc test data; ghi rõ evidence nguồn trạng thái. |
 
 ## 15. Nhật ký quyết định
 
-| Quyết định | Phương án khác | Lý do |
-| --- | --- | --- |
-| Mở rộng data/service layer mỏng của W1-B1. | Auth provider/state machine hoặc generated client. | Phù hợp timebox và codebase hiện tại, ít dependency. |
+| Quyết định                                                                   | Phương án khác                                       | Lý do                                                                                               |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Mở rộng data/service layer mỏng của W1-B1.                                   | Auth provider/state machine hoặc generated client.   | Phù hợp timebox và codebase hiện tại, ít dependency.                                                |
 | OpenAPI là hợp đồng API chính; runtime/test dùng để phát hiện lệch contract. | Suy ra chỉ từ migration hoặc chỉ tin implementation. | Frontend cần contract ổn định; chỗ lệch phải được sửa/ghi blocker thay vì âm thầm hỗ trợ hai shape. |
-| Không fallback từ API sang mock. | Dùng mock khi API lỗi để tiếp tục UI. | Acceptance criteria cấm đánh dấu Done bằng mock. |
-| Không tự retry mutation sau 419. | Refresh CSRF và replay request tự động. | Tránh register/submit/attach trùng và cho người dùng biết phiên đã hết hạn. |
-| Backend response quyết định trạng thái sau submit. | Frontend optimistic status. | Trạng thái review là invariant của backend. |
-| Chỉ giữ component dùng lại thực tế. | Tạo framework form/upload tổng quát. | YAGNI; avatar và document chỉ cần chung orchestration nhỏ. |
-| Evidence che toàn bộ secret/PII. | Đính HAR hoặc request đầy đủ. | Auth và verification document là dữ liệu nhạy cảm. |
+| Không fallback từ API sang mock.                                             | Dùng mock khi API lỗi để tiếp tục UI.                | Acceptance criteria cấm đánh dấu Done bằng mock.                                                    |
+| Không tự retry mutation sau 419.                                             | Refresh CSRF và replay request tự động.              | Tránh register/submit/attach trùng và cho người dùng biết phiên đã hết hạn.                         |
+| Backend response quyết định trạng thái sau submit.                           | Frontend optimistic status.                          | Trạng thái review là invariant của backend.                                                         |
+| Chỉ giữ component dùng lại thực tế.                                          | Tạo framework form/upload tổng quát.                 | YAGNI; avatar và document chỉ cần chung orchestration nhỏ.                                          |
+| Evidence che toàn bộ secret/PII.                                             | Đính HAR hoặc request đầy đủ.                        | Auth và verification document là dữ liệu nhạy cảm.                                                  |
 
 ## 16. Điều kiện hoàn tất
 

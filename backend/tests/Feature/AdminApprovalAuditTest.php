@@ -99,6 +99,18 @@ class AdminApprovalAuditTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_removed_tutor_approval_statuses_are_rejected(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        foreach (['cancelled', 'expired'] as $status) {
+            $this->actingAs($admin)
+                ->getJson('/api/v1/admin/tutor-profiles?status='.$status)
+                ->assertUnprocessable()
+                ->assertJsonPath('message', 'Invalid tutor profile status.');
+        }
+    }
+
     public function test_only_reviewer_with_permission_can_download_verification_document(): void
     {
         Storage::fake('local');
@@ -167,7 +179,7 @@ class AdminApprovalAuditTest extends TestCase
         $this->actingAs($admin)->postJson("/api/v1/admin/users/{$tutor->id}/suspend", [
             'reason' => 'Tạm dừng tài khoản theo chính sách.',
         ])->assertOk();
-        $this->assertDatabaseHas('users', ['id' => $tutor->id, 'status' => 'suspended']);
+        $this->assertDatabaseHas('users', ['id' => $tutor->id, 'status' => 'inactive']);
         $this->actingAs($tutor->refresh())->postJson('/api/v1/tutor/profile/submit')->assertForbidden();
 
         $this->assertDatabaseHas('audit_logs', [

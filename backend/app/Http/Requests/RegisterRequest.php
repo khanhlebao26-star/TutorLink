@@ -25,7 +25,7 @@ class RegisterRequest extends FormRequest
             'date_of_birth' => [
                 'required',
                 'date',
-                'before_or_equal:' . now()->subYears(18)->toDateString(),
+                'before_or_equal:'.now()->subYears(18)->toDateString(),
             ],
             'terms_version' => ['nullable', 'string', 'max:32'],
         ];

@@ -1,7 +1,7 @@
 export type Role = "customer" | "tutor" | "admin";
 export type RegisterRole = Exclude<Role, "admin">;
-export type UserStatus = "pending" | "active" | "suspended" | "cancelled";
-export type TutorApprovalStatus = "pending" | "changes_requested" | "active" | "rejected" | "cancelled" | "expired";
+export type UserStatus = "draft" | "active" | "inactive" | "cancelled";
+export type TutorApprovalStatus = "pending" | "changes_requested" | "active" | "rejected";
 export type TutorProfileStatus = "draft" | "submitted" | "changes_requested" | "approved" | "rejected";
 export type FilePurpose = "avatar" | "verification_document" | "task_attachment" | "profile_document";
 export type ListingStatus = "draft" | "active" | "inactive" | "cancelled";
@@ -14,7 +14,7 @@ export interface User {
   full_name: string;
   email: string;
   date_of_birth?: string | null;
-  email_verified_at: string | null;
+  email_verified_at?: string | null;
   profile?: CustomerProfile | TutorProfile | null;
 }
 
@@ -33,29 +33,31 @@ export interface FileRecord {
 export interface CustomerProfile {
   id: number;
   user_id: number;
-  avatar_file_id: number | null;
-  city: string | null;
-  district: string | null;
-  bio: string | null;
+  avatar_file_id?: number | null;
+  city?: string | null;
+  district?: string | null;
+  bio?: string | null;
 }
 
 export interface TutorProfile {
   id: number;
   user_id: number;
-  specialization_id: number | null;
+  specialization_id: number;
   avatar_file_id: number | null;
   verification_document_file_id: number | null;
   headline: string;
-  bio: string | null;
+  bio?: string | null;
   experience_years: number;
   status: TutorProfileStatus;
   approval_status: TutorApprovalStatus;
-  submitted_at: string | null;
-  review_reason: string | null;
+  submitted_at?: string | null;
+  review_reason?: string | null;
   reviewed_by?: number | null;
-  reviewed_at: string | null;
+  reviewed_at?: string | null;
   suspended_at?: string | null;
   suspension_reason?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface VerificationDocument {
@@ -68,7 +70,7 @@ export interface VerificationDocument {
   original_name?: string | null;
   mime_type?: string;
   size_bytes?: number;
-  scan_status?: string;
+  scan_status?: "pending" | "clean" | "rejected";
   download_url?: string;
 }
 
@@ -91,9 +93,10 @@ export interface TutorOnboardingData {
 
 export interface Specialization {
   id: number;
+  subcategory_id: number;
   name: string;
   slug: string;
-  status?: "active" | "inactive";
+  status: "active" | "inactive";
 }
 
 export interface Listing {
@@ -104,12 +107,14 @@ export interface Listing {
   title: string;
   description: string;
   delivery_mode: DeliveryMode;
-  city: string | null;
-  district: string | null;
+  city?: string | null;
+  district?: string | null;
   price_from_minor: number;
   currency: string;
   price_unit: string;
   status: ListingStatus;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ListingView extends Listing {
@@ -120,5 +125,60 @@ export interface ListingView extends Listing {
 export interface ApiEnvelope<T> {
   data: T;
   meta?: Record<string, unknown>;
-  request_id?: string;
+  request_id?: string | null;
+}
+
+export interface CatalogCategory {
+  id: number;
+  name: string;
+  slug: string;
+  status: "active" | "inactive";
+  sort_order: number;
+  subcategories: CatalogSubcategory[];
+}
+
+export interface CatalogSubcategory {
+  id: number;
+  category_id: number;
+  name: string;
+  slug: string;
+  status: "active" | "inactive";
+  specializations: Specialization[];
+}
+
+export interface CatalogCategoryCollection {
+  data: CatalogCategory[];
+}
+
+export interface SpecializationCollection {
+  data: Specialization[];
+}
+
+export type FileResourceType =
+  | "message"
+  | "task"
+  | "task_submission"
+  | "announcement"
+  | "verification_document";
+
+export interface FileLink {
+  file_id: number;
+  resource_type: FileResourceType;
+  resource_id: number;
+  purpose: string | null;
+}
+
+export interface FileLinkResponse {
+  data: FileLink;
+}
+
+export interface PaginationMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface ListingCollection {
+  data: Listing[];
+  meta: PaginationMeta;
 }

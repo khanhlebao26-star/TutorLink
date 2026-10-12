@@ -51,7 +51,8 @@ jobs:
           coverage: none
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
-
+      - name: Backend lint
+        run: vendor/bin/pint --test
       - name: Prepare Laravel runtime directories
         run: |
           mkdir -p storage/framework/cache \

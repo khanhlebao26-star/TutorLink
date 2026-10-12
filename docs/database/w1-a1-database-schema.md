@@ -4,7 +4,7 @@
 **Type:** Database / Architecture  
 **Database:** PostgreSQL 16  
 **Backend:** Laravel 13  
-**Status:** Implemented, pending team review  
+**Status:** Implemented, reviewed
 **Related contract:** [`W1-C1 — Business state policy and contracts`](../contracts/w1-c1-business-contracts.md)
 
 ## 1. Issue goal
@@ -100,14 +100,14 @@ erDiagram
 
 ### 4.1 Identity and files
 
-| Table | Purpose | Key constraints |
-| --- | --- | --- |
-| `users` | Login identity and fixed MVP role. | Unique email; role/status checks; soft delete; renamed `full_name` and `password_hash`. |
-| `customer_profiles` | Public/private customer profile data. | One row per user; optional avatar file. |
-| `tutor_profiles` | Tutor provider identity and approval state. | One row per user; approval state uses the W1-C1 vocabulary. |
-| `verification_documents` | Private tutor evidence. | Unique tutor/file pair; reviewer and decision timestamps retained. |
-| `files` | Object-storage metadata. | Unique `object_key`; non-binary metadata only; owner is required. |
-| `file_links` | Attachments for supported resources. | Unique file/resource link; resource type allow-list. |
+| Table                    | Purpose                                     | Key constraints                                                                         |
+| ------------------------ | ------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `users`                  | Login identity and fixed MVP role.          | Unique email; role/status checks; soft delete; renamed `full_name` and `password_hash`. |
+| `customer_profiles`      | Public/private customer profile data.       | One row per user; optional avatar file.                                                 |
+| `tutor_profiles`         | Tutor provider identity and approval state. | One row per user; approval state uses the W1-C1 vocabulary.                             |
+| `verification_documents` | Private tutor evidence.                     | Unique tutor/file pair; reviewer and decision timestamps retained.                      |
+| `files`                  | Object-storage metadata.                    | Unique `object_key`; non-binary metadata only; owner is required.                       |
+| `file_links`             | Attachments for supported resources.        | Unique file/resource link; resource type allow-list.                                    |
 
 `customer_profiles.user_id` must reference a `customer` user and
 `tutor_profiles.user_id` must reference a `tutor` user. PostgreSQL cannot express
@@ -118,42 +118,42 @@ business date); age is intentionally not stored as a derived column.
 
 ### 4.2 Catalog and marketplace
 
-| Table | Purpose | Key constraints |
-| --- | --- | --- |
-| `categories` | Top-level subject grouping. | Global unique slug; active/inactive state. |
-| `subcategories` | Category child. | Unique `(category_id, slug)`. |
-| `specializations` | Searchable tutor skill. | Unique `(subcategory_id, slug)`. |
-| `tutor_specializations` | Tutor-to-skill join. | Composite primary key prevents duplicates. |
-| `service_listings` | Public tutor service offer. | Unique slug; integer price; marketplace compound index. |
-| `availability_rules` | Informational recurring availability. | Weekday 0–6; `end_time > start_time`; does not reserve a slot. |
-| `favorites` | User-saved tutor. | Composite primary key `(user_id, tutor_profile_id)`. |
+| Table                   | Purpose                               | Key constraints                                                |
+| ----------------------- | ------------------------------------- | -------------------------------------------------------------- |
+| `categories`            | Top-level subject grouping.           | Global unique slug; active/inactive state.                     |
+| `subcategories`         | Category child.                       | Unique `(category_id, slug)`.                                  |
+| `specializations`       | Searchable tutor skill.               | Unique `(subcategory_id, slug)`.                               |
+| `tutor_specializations` | Tutor-to-skill join.                  | Composite primary key prevents duplicates.                     |
+| `service_listings`      | Public tutor service offer.           | Unique slug; integer price; marketplace compound index.        |
+| `availability_rules`    | Informational recurring availability. | Weekday 0–6; `end_time > start_time`; does not reserve a slot. |
+| `favorites`             | User-saved tutor.                     | Composite primary key `(user_id, tutor_profile_id)`.           |
 
 A listing may become `active` only if its tutor profile is `active` (approved).
 This is a transactional service rule because it depends on another row.
 
 ### 4.3 Messaging
 
-| Table | Purpose | Key constraints |
-| --- | --- | --- |
-| `conversations` | Direct or Program-scoped conversation. | Unique `direct_key`; direct rows require a key; no `rejected` state. |
-| `conversation_members` | Participant and read cursor. | Unique conversation/user pair; read message is a nullable FK. |
-| `messages` | Ordered message event. | Unique `(sender_id, client_message_id)` makes retries idempotent; conversation/time index. |
+| Table                  | Purpose                                | Key constraints                                                                            |
+| ---------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `conversations`        | Direct or Program-scoped conversation. | Unique `direct_key`; direct rows require a key; no `rejected` state.                       |
+| `conversation_members` | Participant and read cursor.           | Unique conversation/user pair; read message is a nullable FK.                              |
+| `messages`             | Ordered message event.                 | Unique `(sender_id, client_message_id)` makes retries idempotent; conversation/time index. |
 
 For direct messages, the backend must derive `direct_key` from sorted participant
 IDs and context instead of trusting client input.
 
 ### 4.4 Programs and learning
 
-| Table | Purpose | Key constraints |
-| --- | --- | --- |
-| `programs` | Private tutor/customer agreement. | Versioned offer snapshot; W1-C1 states; owner/status index. |
-| `program_invitations` | Immutable offer delivered to a customer. | Idempotency key; expiry; one pending invitation per program/version/invitee. |
-| `program_members` | Accepted Program membership. | Unique program/user; at most one active Customer member in MVP. |
-| `program_sessions` | Planned occurrence under a Program version. | Unique sequence within version; end after start. |
-| `lesson_sessions` | Actual occurrence and completion evidence. | Exactly zero or one actual occurrence per planned row. |
-| `tasks` | Program assignment. | Due/status index; overdue is calculated, not stored. |
-| `task_submissions` | Current Customer answer. | One current submission per Task/Customer in MVP. |
-| `progress_records` | Tutor-recorded metric history. | Indexed by Program, Customer, and record time. |
+| Table                 | Purpose                                     | Key constraints                                                              |
+| --------------------- | ------------------------------------------- | ---------------------------------------------------------------------------- |
+| `programs`            | Private tutor/customer agreement.           | Versioned offer snapshot; W1-C1 states; owner/status index.                  |
+| `program_invitations` | Immutable offer delivered to a customer.    | Idempotency key; expiry; one pending invitation per program/version/invitee. |
+| `program_members`     | Accepted Program membership.                | Unique program/user; at most one active Customer member in MVP.              |
+| `program_sessions`    | Planned occurrence under a Program version. | Unique sequence within version; end after start.                             |
+| `lesson_sessions`     | Actual occurrence and completion evidence.  | Exactly zero or one actual occurrence per planned row.                       |
+| `tasks`               | Program assignment.                         | Due/status index; overdue is calculated, not stored.                         |
+| `task_submissions`    | Current Customer answer.                    | One current submission per Task/Customer in MVP.                             |
+| `progress_records`    | Tutor-recorded metric history.              | Indexed by Program, Customer, and record time.                               |
 
 `program_sessions` are plans and must never be counted as delivered lessons.
 Attendance, completion, progress, and later billing calculations use
@@ -161,14 +161,14 @@ Attendance, completion, progress, and later billing calculations use
 
 ### 4.5 Operations and trust
 
-| Table | Purpose | Key constraints |
-| --- | --- | --- |
-| `announcements` | Program announcement. | Program/publish-time index. |
-| `fee_records` | Declared fee for a period. | Unique Program/period start; integer amount; valid date range. |
-| `reviews` | Customer review after Program completion. | Unique Program/reviewer; rating 1–5. |
-| `notifications` | Minimal in-app delivery payload. | UUID primary key; user/read/time index. |
-| `reports` | Moderation report for an allow-listed resource. | Status and resource lookup indexes. |
-| `audit_logs` | Append-only administrative/business event. | Actor/resource/time indexes; before/after JSON; request correlation ID. |
+| Table           | Purpose                                         | Key constraints                                                         |
+| --------------- | ----------------------------------------------- | ----------------------------------------------------------------------- |
+| `announcements` | Program announcement.                           | Program/publish-time index.                                             |
+| `fee_records`   | Declared fee for a period.                      | Unique Program/period start; integer amount; valid date range.          |
+| `reviews`       | Customer review after Program completion.       | Unique Program/reviewer; rating 1–5.                                    |
+| `notifications` | Minimal in-app delivery payload.                | UUID primary key; user/read/time index.                                 |
+| `reports`       | Moderation report for an allow-listed resource. | Status and resource lookup indexes.                                     |
+| `audit_logs`    | Append-only administrative/business event.      | Actor/resource/time indexes; before/after JSON; request correlation ID. |
 
 The application must not expose update/delete endpoints for `audit_logs`.
 Database retention/partitioning can be introduced after real volume is known.
@@ -210,13 +210,14 @@ transaction.
 
 ## 6. Migration layout
 
-| Migration | Scope |
-| --- | --- |
-| `2026_10_07_000100_extend_users_and_create_files_table.php` | User identity contract, soft delete, file metadata. |
-| `2026_10_07_000200_create_identity_and_catalog_tables.php` | Profiles, verification, taxonomy, listings, availability, favorites. |
-| `2026_10_07_000300_create_messaging_tables.php` | Conversations, members, messages, retry/read constraints. |
-| `2026_10_07_000400_create_program_and_learning_tables.php` | Program snapshot, invitation/member rules, planned/actual lessons, Tasks, progress. |
-| `2026_10_07_000500_create_operations_and_trust_tables.php` | Announcements, fee declarations, reviews, attachments, notifications, reports, audit. |
+| Migration                                                   | Scope                                                                                 |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `2026_10_07_000100_extend_users_and_create_files_table.php` | User identity contract, soft delete, file metadata.                                   |
+| `2026_10_07_000200_create_identity_and_catalog_tables.php`  | Profiles, verification, taxonomy, listings, availability, favorites.                  |
+| `2026_10_12_000800_align_identity_status_constraints.php`   | Align user and tutor approval status checks; backfill approved user mappings.          |
+| `2026_10_07_000300_create_messaging_tables.php`             | Conversations, members, messages, retry/read constraints.                             |
+| `2026_10_07_000400_create_program_and_learning_tables.php`  | Program snapshot, invitation/member rules, planned/actual lessons, Tasks, progress.   |
+| `2026_10_07_000500_create_operations_and_trust_tables.php`  | Announcements, fee declarations, reviews, attachments, notifications, reports, audit. |
 
 ## 7. Acceptance criteria
 

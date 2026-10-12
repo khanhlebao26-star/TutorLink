@@ -9,10 +9,11 @@ import type {
   ProfileResponse,
   RegisterRole,
   Specialization,
+  SpecializationCollection,
   TutorOnboardingData,
   TutorProfile,
   User,
-  VerificationDocument,
+  VerificationDocument
 } from "./types";
 
 const unwrap = <T>(value: ApiEnvelope<T> | T): T =>
@@ -113,7 +114,7 @@ export async function performAdminTutorAction(id: number, action: AdminAction, r
 }
 
 export async function performAdminAccountAction(id: number, action: "suspend" | "restore", reason: string): Promise<User> {
-  if (dataMode === "mock") { await delay(); return { ...mockCurrentUser("tutor"), id, status: action === "suspend" ? "suspended" : "active" }; }
+  if (dataMode === "mock") { await delay(); return { ...mockCurrentUser("tutor"), id, status: action === "suspend" ? "inactive" : "active" }; }
   const response = await request<ApiEnvelope<User>>({ method: "POST", url: `/admin/users/${id}/${action}`, data: { reason } }, true);
   return unwrap(response.data);
 }
@@ -185,7 +186,7 @@ export async function resetPassword(input: {
 
 export async function getSpecializations(): Promise<Specialization[]> {
   if (dataMode === "mock") { await delay(); return mockTutorOnboarding().specializations; }
-  const response = await request<ApiEnvelope<Specialization[]>>({ method: "GET", url: "/catalog/specializations" });
+  const response = await request<SpecializationCollection>({ method: "GET", url: "/catalog/specializations" });
   return unwrap(response.data);
 }
 
@@ -197,7 +198,7 @@ export async function getTutorProfile(): Promise<TutorProfile> {
 
 export async function saveTutorProfile(input: {
   headline: string;
-  bio: string;
+  bio?: string | null;
   experience_years: number;
   specialization_id: number;
 }): Promise<TutorProfile> {

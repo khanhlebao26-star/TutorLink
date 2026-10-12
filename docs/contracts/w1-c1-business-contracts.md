@@ -58,6 +58,11 @@ The wire contract uses:
 an explicit negative decision; cancellation is an intentional stop; expiry is a
 deadline or validity-window result without a successful completion.
 
+The generic approval vocabulary below does not override the TutorProfile API
+contract. TutorProfile uses `approval_status = pending | changes_requested |
+active | rejected`; `cancelled` and `expired` remain available only to
+aggregates whose own contract explicitly includes them.
+
 ## 3. Policy matrix
 
 | Aggregate | Allowed states | `pending` starts when | `active` means | Snapshot lock | Rejected valid? | Cancelled by | Expired when |

@@ -55,7 +55,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials.'], 401);
         }
 
-        if (in_array($user->status, ['suspended', 'cancelled'], true)) {
+        if (in_array($user->status, ['inactive', 'cancelled'], true)) {
             return response()->json(['message' => 'This account is not available.'], 403);
         }
 
