@@ -10,8 +10,8 @@ class EnsureActiveAccount
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()?->status === 'inactive') {
-            return response()->json(['message' => 'This account is suspended.'], 403);
+        if (in_array($request->user()?->status, ['inactive', 'cancelled'], true)) {
+            return response()->json(['message' => 'This account is not available.'], 403);
         }
 
         return $next($request);

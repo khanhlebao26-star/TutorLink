@@ -119,9 +119,9 @@ export async function performAdminAccountAction(id: number, action: "suspend" | 
   return unwrap(response.data);
 }
 
-export async function login(email: string, password: string): Promise<User> {
+export async function login(email: string, password: string, remember = false): Promise<User> {
   if (dataMode === "mock") { await delay(); return mockCurrentUser(); }
-  const response = await request<ApiEnvelope<User>>({ method: "POST", url: "/auth/login", data: { email, password } }, true);
+  const response = await request<ApiEnvelope<User>>({ method: "POST", url: "/auth/login", data: { email, password, remember } }, true);
   return unwrap(response.data);
 }
 

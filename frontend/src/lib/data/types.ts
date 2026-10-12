@@ -42,7 +42,7 @@ export interface CustomerProfile {
 export interface TutorProfile {
   id: number;
   user_id: number;
-  specialization_id: number;
+  specialization_id: number | null;
   avatar_file_id: number | null;
   verification_document_file_id: number | null;
   headline: string;
@@ -75,6 +75,7 @@ export interface VerificationDocument {
 }
 
 export interface AdminTutorProfile {
+  allowed_actions: Array<"approve" | "request-changes" | "reject" | "suspend" | "restore" | "account-suspend" | "account-restore">;
   user: User;
   profile: TutorProfile;
   verification_documents: VerificationDocument[] | null;

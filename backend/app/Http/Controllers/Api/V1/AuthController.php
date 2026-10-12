@@ -70,7 +70,7 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
 
         if ($request->hasSession()) {
             $request->session()->invalidate();

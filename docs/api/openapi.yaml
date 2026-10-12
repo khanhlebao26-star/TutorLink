@@ -10,6 +10,8 @@ servers:
   - url: http://127.0.0.1:8000
     description: Local Docker development
 tags:
+  - name: Admin
+    description: Permission-based tutor review and independent profile/account suspension with transactional audit.
   - name: Auth
     description: Registration, login, logout, and current-user session operations.
   - name: Files
@@ -121,8 +123,9 @@ paths:
     get:
       operationId: verifyEmail
       tags: [Auth]
-      summary: Verify the authenticated user's email address
-      security: [{ sanctumCookie: [] }]
+      summary: Verify an email address using a public signed link
+      description: Session authentication is not required; invalid or expired signed links return 403.
+      security: []
       parameters:
         - name: id
           in: path
@@ -147,8 +150,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserResponse"
-        "401":
-          $ref: "#/components/responses/Unauthenticated"
         "403":
           $ref: "#/components/responses/Forbidden"
 
@@ -161,6 +162,7 @@ paths:
       responses:
         "204":
           description: Session ended.
+
         "401":
           $ref: "#/components/responses/Unauthenticated"
 
@@ -237,6 +239,8 @@ paths:
                 $ref: "#/components/schemas/FileResponse"
         "401":
           $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "413":
           description: File is too large.
         "422":
@@ -284,7 +288,8 @@ paths:
     post:
       operationId: completeFile
       tags: [Files]
-      summary: Mark an uploaded file as complete
+      summary: Complete an upload after checking stored size MIME and SHA256
+      description: Missing, rejected, or metadata-mismatched files return 409; clean marks upload eligibility and does not imply antivirus scanning.
       security: [{ sanctumCookie: [] }]
       parameters:
         - $ref: "#/components/parameters/FileId"
@@ -302,11 +307,15 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+        "409":
+          description: Uploaded object is missing rejected or does not match its stored metadata.
+
   /api/v1/files/{file}/links:
     post:
       operationId: linkFile
       tags: [Files]
-      summary: Attach a completed file to a business resource
+      summary: Link a completed file to its authorized verification document
+      description: In phase 2 only verification_document is supported. The document must already reference this file and belong to an editable profile of the caller; other resource types return 409 until their authorization slices are implemented.
       security: [{ sanctumCookie: [] }]
       parameters:
         - $ref: "#/components/parameters/FileId"
@@ -328,7 +337,7 @@ paths:
         "403":
           $ref: "#/components/responses/Forbidden"
         "409":
-          description: File must be complete before attaching.
+          description: File is incomplete the profile is locked or the resource type is not implemented.
         "422":
           $ref: "#/components/responses/ValidationError"
 
@@ -336,7 +345,7 @@ paths:
     get:
       operationId: downloadFile
       tags: [Files]
-      summary: Download a completed file owned by the current user
+      summary: Download an owner file or an authorized reviewer verification document
       security: [{ sanctumCookie: [] }]
       parameters:
         - $ref: "#/components/parameters/FileId"
@@ -441,6 +450,7 @@ paths:
       operationId: submitTutorProfile
       tags: [Tutor Profile]
       summary: Submit the current tutor draft for review
+      description: Requires active verified Tutor, headline, bio, active specialization, completed owned avatar and at least one completed owned verification document with storage present. Draft remains editable after 422; retry of Submitted returns its persisted state.
       security: [{ sanctumCookie: [] }]
       responses:
         "200":
@@ -455,6 +465,7 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "422":
           $ref: "#/components/responses/ValidationError"
+
 
   /api/v1/tutor/profile/avatar:
     put:
@@ -522,6 +533,7 @@ paths:
     get:
       tags: [Listings]
       summary: Search public service listings
+      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
       parameters:
         - { $ref: "#/components/parameters/Page" }
         - { $ref: "#/components/parameters/PerPage" }
@@ -556,6 +568,7 @@ paths:
       operationId: getListingBySlug
       tags: [Listings]
       summary: Return a public listing by slug
+      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
       security: []
       responses:
         "200":
@@ -572,6 +585,7 @@ paths:
       operationId: listMyListings
       tags: [Listings]
       summary: List the current tutor's listings
+      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
       security: [{ sanctumCookie: [] }]
       responses:
         "200":
@@ -586,6 +600,7 @@ paths:
       operationId: createListing
       tags: [Listings]
       summary: Create a draft service listing
+      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
       security: [{ sanctumCookie: [] }]
       requestBody:
         required: true
@@ -617,6 +632,7 @@ paths:
       operationId: getMyListing
       tags: [Listings]
       summary: Return one listing owned by the current tutor
+      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
       security: [{ sanctumCookie: [] }]
       responses:
         "200":
@@ -635,6 +651,7 @@ paths:
       operationId: updateListing
       tags: [Listings]
       summary: Update a draft listing
+      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
       security: [{ sanctumCookie: [] }]
       requestBody:
         required: true
@@ -663,6 +680,7 @@ paths:
       operationId: deleteListing
       tags: [Listings]
       summary: Delete a draft listing
+      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
       security: [{ sanctumCookie: [] }]
       responses:
         "204":
@@ -676,6 +694,264 @@ paths:
         "409":
           description: Active or referenced listing cannot be deleted.
 
+  /api/v1/admin/tutor-profiles:
+    get:
+      operationId: listAdminTutorProfiles
+      tags: [Admin]
+      summary: List submitted tutor profiles for authorized reviewers
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [pending, changes_requested, active, rejected], default: pending }
+      responses:
+        "200":
+          description: Submitted profiles with per-actor allowed actions; drafts are excluded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/AdminTutorProfile" } }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/admin/tutor-profiles/{tutorProfile}:
+    get:
+      operationId: getAdminTutorProfile
+      tags: [Admin]
+      summary: Read a tutor profile with independently authorized verification documents
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/TutorProfileId"
+      responses:
+        "200":
+          description: Authorized profile detail; verification_documents is null without download permission.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminTutorProfileResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v1/admin/tutor-profiles/{tutorProfile}/approve:
+    post:
+      operationId: approveTutorProfile
+      tags: [Admin]
+      summary: Approve a submitted profile
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/TutorProfileId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminDecisionRequest" }
+      responses:
+        "200":
+          description: Decision and audit committed together.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminTutorProfileResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Resource state no longer permits this action.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/admin/tutor-profiles/{tutorProfile}/request-changes:
+    post:
+      operationId: requestTutorProfileChanges
+      tags: [Admin]
+      summary: Request profile changes
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/TutorProfileId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminDecisionRequest" }
+      responses:
+        "200":
+          description: Decision and audit committed together.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminTutorProfileResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Resource state no longer permits this action.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/admin/tutor-profiles/{tutorProfile}/reject:
+    post:
+      operationId: rejectTutorProfile
+      tags: [Admin]
+      summary: Reject a submitted profile
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/TutorProfileId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminDecisionRequest" }
+      responses:
+        "200":
+          description: Decision and audit committed together.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminTutorProfileResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Resource state no longer permits this action.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/admin/tutor-profiles/{tutorProfile}/suspend:
+    post:
+      operationId: suspendTutorProfile
+      tags: [Admin]
+      summary: Suspend a tutor profile independently of the account
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/TutorProfileId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminDecisionRequest" }
+      responses:
+        "200":
+          description: Decision and audit committed together.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminTutorProfileResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Resource state no longer permits this action.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/admin/tutor-profiles/{tutorProfile}/restore:
+    post:
+      operationId: restoreTutorProfile
+      tags: [Admin]
+      summary: Restore a suspended tutor profile
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/TutorProfileId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminDecisionRequest" }
+      responses:
+        "200":
+          description: Decision and audit committed together.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminTutorProfileResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Resource state no longer permits this action.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/admin/users/{user}/suspend:
+    post:
+      operationId: suspendAccount
+      tags: [Admin]
+      summary: Suspend an active account
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminDecisionRequest" }
+      responses:
+        "200":
+          description: Decision and audit committed together.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Resource state no longer permits this action.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /api/v1/admin/users/{user}/restore:
+    post:
+      operationId: restoreAccount
+      tags: [Admin]
+      summary: Restore an inactive account
+      security: [{ sanctumCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdminDecisionRequest" }
+      responses:
+        "200":
+          description: Decision and audit committed together.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserResponse" }
+        "401":
+          $ref: "#/components/responses/Unauthenticated"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Resource state no longer permits this action.
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
 components:
   securitySchemes:
     sanctumCookie:
@@ -683,6 +959,16 @@ components:
       in: cookie
       name: tutorlink-session
   parameters:
+    TutorProfileId:
+      name: tutorProfile
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+    UserId:
+      name: user
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
     FileId:
       name: file
       in: path
@@ -723,6 +1009,45 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
   schemas:
+    AdminDecisionRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason: { type: string, minLength: 2, maxLength: 2000 }
+    AdminTutorProfileResponse:
+      type: object
+      required: [data]
+      properties:
+        data: { $ref: "#/components/schemas/AdminTutorProfile" }
+    AdminTutorProfile:
+      type: object
+      required: [user, profile, allowed_actions, verification_documents]
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+        profile: { $ref: "#/components/schemas/TutorProfile" }
+        allowed_actions:
+          type: array
+          items:
+            type: string
+            enum: [approve, request-changes, reject, suspend, restore, account-suspend, account-restore]
+        verification_documents:
+          type: array
+          nullable: true
+          items:
+            type: object
+            required: [id, tutor_profile_id, file_id, document_type, status, download_url]
+            properties:
+              id: { type: integer, minimum: 1 }
+              tutor_profile_id: { type: integer, minimum: 1 }
+              file_id: { type: integer, minimum: 1 }
+              document_type: { type: string }
+              status: { type: string, enum: [pending, active, rejected, expired] }
+              reviewed_at: { type: string, nullable: true }
+              original_name: { type: string, nullable: true }
+              mime_type: { type: string }
+              size_bytes: { type: integer, minimum: 0 }
+              scan_status: { type: string, enum: [pending, clean, rejected] }
+              download_url: { type: string, format: uri }
     User:
       type: object
       required: [id, role, status, full_name, email]
@@ -740,6 +1065,9 @@ components:
           anyOf:
             - $ref: "#/components/schemas/CustomerProfile"
             - $ref: "#/components/schemas/TutorProfile"
+            - type: object
+              nullable: true
+              enum: [null]
     CustomerProfile:
       type: object
       required: [id, user_id]
@@ -833,6 +1161,7 @@ components:
       properties:
         data: { $ref: "#/components/schemas/File" }
     FileUploadRequest:
+      description: Avatar accepts JPG/PNG up to 2 MiB; other purposes accept PDF/JPG/PNG/DOC/DOCX up to 10 MiB. Non-avatar upload requires verified email.
       type: object
       required: [file, purpose]
       properties:
@@ -1002,7 +1331,7 @@ components:
       properties:
         id: { type: integer, format: int64, minimum: 1 }
         user_id: { type: integer, format: int64, minimum: 1 }
-        specialization_id: { type: integer, format: int64, minimum: 1 }
+        specialization_id: { type: integer, format: int64, minimum: 1, nullable: true }
         avatar_file_id:
           { type: integer, format: int64, minimum: 1, nullable: true }
         verification_document_file_id:

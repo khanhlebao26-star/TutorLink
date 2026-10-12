@@ -27,8 +27,9 @@ class AdminController extends Controller
         }
 
         $profiles = TutorProfile::query()
-            ->with('user')
+            ->with(['user', 'specializations', 'verificationDocuments'])
             ->where('approval_status', $status)
+            ->whereNotNull('submitted_at')
             ->orderByDesc('submitted_at')
             ->get()
             ->map(fn (TutorProfile $profile): array => $this->profilePayload($profile));
@@ -148,7 +149,7 @@ class AdminController extends Controller
                 abort(409, 'Only submitted pending profiles can be decided.');
             }
 
-            if ($profile->suspended_at || $profile->user->status === 'inactive') {
+            if ($profile->suspended_at || in_array($profile->user->status, ['inactive', 'cancelled'], true)) {
                 abort(409, 'Suspended profiles cannot be decided.');
             }
 
@@ -188,7 +189,7 @@ class AdminController extends Controller
         $target = DB::transaction(function () use ($actor, $data, $status, $action, $target): User {
             $target = User::query()->lockForUpdate()->findOrFail($target->id);
             $alreadyInState = $status === 'inactive'
-                ? $target->status === 'inactive'
+                ? $target->status !== 'active'
                 : $target->status !== 'inactive';
 
             if ($alreadyInState) {
@@ -231,6 +232,7 @@ class AdminController extends Controller
     {
         $payload = [
             'user' => (new UserResource($profile->user))->resolve(),
+            'allowed_actions' => $this->allowedActions($profile),
             'profile' => (new TutorProfileResource($profile))->resolve(),
         ];
 
@@ -270,6 +272,30 @@ class AdminController extends Controller
         }
 
         return $payload;
+    }
+
+    /** @return list<string> */
+    private function allowedActions(TutorProfile $profile): array
+    {
+        $actor = request()->user();
+        $actions = [];
+        if ($actor->hasPermission(AdminPermissions::DECIDE_TUTOR_PROFILES)
+            && $profile->approval_status === 'pending' && $profile->submitted_at
+            && ! $profile->suspended_at && $profile->user->status === 'active') {
+            $actions = ['approve', 'request-changes', 'reject'];
+        }
+        if ($actor->hasPermission(AdminPermissions::SUSPEND_TUTOR_PROFILES)) {
+            $actions[] = $profile->suspended_at ? 'restore' : 'suspend';
+        }
+        if ($actor->hasPermission(AdminPermissions::SUSPEND_ACCOUNTS) && $actor->id !== $profile->user_id) {
+            if ($profile->user->status === 'active') {
+                $actions[] = 'account-suspend';
+            } elseif ($profile->user->status === 'inactive') {
+                $actions[] = 'account-restore';
+            }
+        }
+
+        return $actions;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\File;
 use App\Models\Specialization;
 use App\Models\User;
 use App\Support\AdminPermissions;
@@ -276,7 +277,7 @@ class AuthFileProfileTest extends TestCase
         $user = User::factory()->unverified()->create();
 
         $this->actingAs($user)->post('/api/v1/files', [
-            'file' => UploadedFile::fake()->create('certificate.pdf', 100, 'application/pdf'),
+            'file' => UploadedFile::fake()->createWithContent('certificate.pdf', "%PDF-1.4\nSynthetic certificate.\n%%EOF"),
             'purpose' => 'verification_document',
         ])->assertForbidden();
     }
@@ -288,7 +289,7 @@ class AuthFileProfileTest extends TestCase
         $other = User::factory()->create(['email_verified_at' => now()]);
 
         $upload = $this->actingAs($owner)->post('/api/v1/files', [
-            'file' => UploadedFile::fake()->create('certificate.pdf', 100, 'application/pdf'),
+            'file' => UploadedFile::fake()->createWithContent('certificate.pdf', "%PDF-1.4\nSynthetic certificate.\n%%EOF"),
             'purpose' => 'verification_document',
         ])->assertCreated();
 
@@ -324,6 +325,22 @@ class AuthFileProfileTest extends TestCase
             'specialization_id' => $specializationId,
         ])->assertCreated()->assertJsonPath('data.status', 'draft');
 
+        Storage::fake('local');
+        $profile = $tutor->tutorProfile;
+        foreach (['avatar', 'verification_document'] as $purpose) {
+            $file = File::create([
+                'owner_id' => $tutor->id, 'disk' => 'local', 'object_key' => 'fixtures/'.$purpose,
+                'original_name' => 'fixture.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 5,
+                'visibility' => 'private', 'scan_status' => 'clean', 'purpose' => $purpose,
+            ]);
+            Storage::disk('local')->put($file->object_key, 'proof');
+            if ($purpose === 'avatar') {
+                $profile->update(['avatar_file_id' => $file->id]);
+            } else {
+                $profile->verificationDocuments()->create(['file_id' => $file->id, 'document_type' => 'certificate']);
+            }
+        }
+
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/submit')
             ->assertOk()
             ->assertJsonPath('data.status', 'submitted');
@@ -352,11 +369,7 @@ class AuthFileProfileTest extends TestCase
             ->assertJsonPath('data.specialization_id', $specializationId);
 
         $upload = $this->actingAs($tutor)->post('/api/v1/files', [
-            'file' => UploadedFile::fake()->create(
-                'avatar.jpg',
-                100,
-                'image/jpeg',
-            ),
+            'file' => UploadedFile::fake()->createWithContent('avatar.png', base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jAZkAAAAASUVORK5CYII=')),
             'purpose' => 'avatar',
         ])->assertCreated();
 
@@ -386,7 +399,7 @@ class AuthFileProfileTest extends TestCase
         ])->assertCreated();
 
         $upload = $this->actingAs($tutor)->post('/api/v1/files', [
-            'file' => UploadedFile::fake()->create('certificate.pdf', 100, 'application/pdf'),
+            'file' => UploadedFile::fake()->createWithContent('certificate.pdf', "%PDF-1.4\nSynthetic certificate.\n%%EOF"),
             'purpose' => 'verification_document',
         ])->assertCreated();
 

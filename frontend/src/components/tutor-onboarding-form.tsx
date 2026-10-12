@@ -14,7 +14,7 @@ import {
 import type { FileRecord, TutorOnboardingData, TutorProfile } from "@/lib/data/types";
 import { Badge, Button, Field } from "./ui";
 
-type UploadState = { file: FileRecord | null; message: string; error: string };
+type UploadState = { file: FileRecord | null; message: string; error: string; busy?: boolean };
 type UploadPurpose = "avatar" | "verification_document";
 
 const emptyUpload: UploadState = { file: null, message: "", error: "" };
@@ -56,7 +56,10 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
   }, [data]);
 
   const changesRequested = profile?.status === "changes_requested" || profile?.approval_status === "changes_requested";
-  const locked = Boolean(profile && !changesRequested && profile.status !== "draft");
+  const locked = Boolean(profile?.suspended_at || (profile && !changesRequested && profile.status !== "draft"));
+  const uploadBusy = Object.values(uploads).some((upload) => upload.busy);
+  const busy = saving || uploadBusy;
+  const verified = Boolean(data.user.email_verified_at);
 
   function fieldError(name: string) {
     return fieldErrors[name]?.[0];
@@ -82,6 +85,14 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     };
   }
 
+  async function handleProfileError(reason: unknown) {
+    if (reason instanceof ApiClientError && reason.fieldErrors) setFieldErrors(reason.fieldErrors);
+    setError(describeApiError(reason));
+    if (reason instanceof ApiClientError && [403, 409, undefined].includes(reason.status)) {
+      try { setProfile(await getTutorProfile()); } catch { /* Preserve the original error. */ }
+    }
+  }
+
   async function saveDraft() {
     setError("");
     setMessage("");
@@ -92,8 +103,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
       setProfile(saved);
       setMessage("Đã lưu bản nháp và specialization.");
     } catch (reason) {
-      if (reason instanceof ApiClientError && reason.fieldErrors) setFieldErrors(reason.fieldErrors);
-      setError(describeApiError(reason));
+      await handleProfileError(reason);
     } finally {
       setSaving(false);
     }
@@ -111,8 +121,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
       setProfile({ ...saved, ...submitted });
       setMessage("Hồ sơ đã được gửi để xét duyệt.");
     } catch (reason) {
-      if (reason instanceof ApiClientError && reason.fieldErrors) setFieldErrors(reason.fieldErrors);
-      setError(describeApiError(reason));
+      await handleProfileError(reason);
     } finally {
       setSaving(false);
     }
@@ -133,24 +142,25 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     }));
   }
 
-  async function retryAttach(purpose: UploadPurpose) {
-    const completed = uploads[purpose].file;
-    if (!completed) return;
-    setUploads((current) => ({
-      ...current,
-      [purpose]: { ...current[purpose], message: "Đang attach lại…", error: "" },
-    }));
+  async function retryUpload(purpose: UploadPurpose) {
+    let file = uploads[purpose].file;
+    if (!file || locked || busy) return;
+    setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], message: "Đang thử lại…", error: "", busy: true } }));
     try {
-      await attachCompleted(purpose, completed.id);
+      if (!file.complete) file = await completeFile(file.id);
+      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], file } }));
+      await attachCompleted(purpose, file.id);
     } catch (reason) {
-      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], error: describeApiError(reason) } }));
+      await handleProfileError(reason);
+      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], file, error: describeApiError(reason) } }));
+    } finally {
+      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], busy: false } }));
     }
   }
 
   async function handleUpload(event: ChangeEvent<HTMLInputElement>, purpose: UploadPurpose) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (purpose !== "avatar" && purpose !== "verification_document") return;
+    const selectedFile = event.target.files?.[0];
+    if (!selectedFile || locked || busy || !profile) return;
     if (purpose === "verification_document" && !documentType.trim()) {
       setUploads((current) => ({ ...current, [purpose]: { file: null, message: "", error: "Nhập loại verification document trước khi upload." } }));
       return;
@@ -159,27 +169,28 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     const allowed = purpose === "avatar"
       ? ["image/jpeg", "image/png"]
       : ["application/pdf", "image/jpeg", "image/png", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-    if (file.size > maxBytes || !allowed.includes(file.type)) {
+    if (selectedFile.size > maxBytes || !allowed.includes(selectedFile.type)) {
       setUploads((current) => ({ ...current, [purpose]: { file: null, message: "", error: purpose === "avatar" ? "Avatar phải là JPG/PNG và tối đa 2 MiB." : "Tài liệu phải là PDF/JPG/PNG/DOC/DOCX và tối đa 10 MiB." } }));
       return;
     }
 
-    setUploads((current) => ({ ...current, [purpose]: { file: null, message: "Đang upload…", error: "" } }));
-    let completed: FileRecord | null = null;
+    setUploads((current) => ({ ...current, [purpose]: { file: null, message: "Đang upload…", error: "", busy: true } }));
+    let uploaded: FileRecord | null = null;
     try {
-      const uploaded = await uploadFile(file, purpose);
-      completed = await completeFile(uploaded.id);
-      await attachCompleted(purpose, completed.id);
-      setUploads((current) => ({
-        ...current,
-        [purpose]: {
-          file: completed,
-          message: "Upload, complete và attach thành công.",
-          error: "",
-        },
-      }));
+      uploaded = await uploadFile(selectedFile, purpose);
+      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], file: uploaded, message: "Đang complete…" } }));
+      uploaded = await completeFile(uploaded.id);
+      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], file: uploaded, message: "Đang attach…" } }));
+      await attachCompleted(purpose, uploaded.id);
     } catch (reason) {
-      setUploads((current) => ({ ...current, [purpose]: { file: completed, message: completed ? "Upload và complete thành công nhưng attach chưa hoàn tất." : "", error: describeApiError(reason) } }));
+      await handleProfileError(reason);
+      setUploads((current) => ({ ...current, [purpose]: {
+        file: uploaded,
+        message: uploaded?.complete ? "Upload và complete thành công; cần xác nhận lại kết quả attach." : uploaded ? "Upload thành công; complete chưa được xác nhận." : "",
+        error: describeApiError(reason),
+      } }));
+    } finally {
+      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], busy: false } }));
     }
   }
 
@@ -194,20 +205,22 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
               id="verification-document-type"
               value={documentType}
               maxLength={50}
-              disabled={locked || saving}
+              disabled={locked || busy}
               onChange={(event) => setDocumentType(event.target.value)}
               required
             />
           </Field>
         ) : null}
         <Field label={label} htmlFor={`${purpose}-file`} hint={purpose === "avatar" ? "JPG/PNG, tối đa 2 MiB." : "PDF/JPG/PNG/DOC/DOCX, tối đa 10 MiB."}>
-          <input id={`${purpose}-file`} type="file" disabled={locked || saving} onChange={(event) => void handleUpload(event, purpose)} />
+          <input id={`${purpose}-file`} type="file" accept={purpose === "avatar" ? "image/jpeg,image/png" : ".pdf,.jpg,.jpeg,.png,.doc,.docx"} disabled={locked || busy || !profile || (purpose !== "avatar" && !verified)} onChange={(event) => void handleUpload(event, purpose)} />
         </Field>
+        {!profile ? <p className="muted">Lưu bản nháp trước khi tải file lên.</p> : null}
+        {fieldError(purpose === "avatar" ? "avatar_file_id" : "verification_document_file_id") ? <p className="inline-error" role="alert">{fieldError(purpose === "avatar" ? "avatar_file_id" : "verification_document_file_id")}</p> : null}
         {attachedFileId ? <p className="muted">Đã attach file #{attachedFileId}.</p> : null}
         {state.message ? <p className="inline-success" role="status">{state.message}</p> : null}
         {state.error ? <p className="inline-error" role="alert">{state.error}</p> : null}
-        {state.file ? <p className="muted">File #{state.file.id} · {state.file.original_name ?? "file"} · complete</p> : null}
-        {state.file && state.error ? <Button type="button" disabled={locked || saving} onClick={() => void retryAttach(purpose)}>Thử attach lại</Button> : null}
+        {state.file ? <p className="muted">File #{state.file.id} · {state.file.original_name ?? "file"} · {state.file.complete ? "complete" : "chưa complete"}</p> : null}
+        {state.file && state.error ? <Button type="button" disabled={locked || busy} onClick={() => void retryUpload(purpose)}>{state.file.complete ? "Thử attach lại" : "Thử complete và attach lại"}</Button> : null}
       </div>
     );
   }
@@ -221,19 +234,21 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         </div>
         <Badge tone={statusTone(profile)}>{statusLabel(profile)}</Badge>
       </div>
+      {profile?.suspended_at ? <p className="inline-error" role="alert">Hồ sơ đang tạm ngưng. {profile.suspension_reason}</p> : null}
+      {!verified ? <p className="muted">Xác minh email trước khi tải tài liệu hoặc gửi xét duyệt. <a className="text-button" href="/auth/verify-email">Xác minh email</a></p> : null}
       {profile?.review_reason ? <div className="card"><strong>Lý do xét duyệt</strong><p className="muted">{profile.review_reason}</p></div> : null}
       <form className="card form-stack" onSubmit={submit}>
         <Field label="Headline" htmlFor="tutor-headline" error={fieldError("headline")}>
-          <input id="tutor-headline" value={headline} disabled={locked || saving} onChange={(event) => setHeadline(event.target.value)} required maxLength={160} />
+          <input id="tutor-headline" value={headline} disabled={locked || busy} onChange={(event) => setHeadline(event.target.value)} required maxLength={160} />
         </Field>
         <Field label="Giới thiệu" htmlFor="tutor-bio" error={fieldError("bio")}>
-          <textarea id="tutor-bio" rows={6} value={bio} disabled={locked || saving} onChange={(event) => setBio(event.target.value)} />
+          <textarea id="tutor-bio" rows={6} value={bio} disabled={locked || busy} onChange={(event) => setBio(event.target.value)} />
         </Field>
         <Field label="Số năm kinh nghiệm" htmlFor="tutor-experience" error={fieldError("experience_years")}>
-          <input id="tutor-experience" type="number" min={0} max={80} value={experienceYears} disabled={locked || saving} onChange={(event) => setExperienceYears(event.target.value)} required />
+          <input id="tutor-experience" type="number" min={0} max={80} value={experienceYears} disabled={locked || busy} onChange={(event) => setExperienceYears(event.target.value)} required />
         </Field>
         <Field label="Specialization từ Catalog" htmlFor="tutor-specialization" error={fieldError("specialization_id")}>
-          <select id="tutor-specialization" value={specializationId} disabled={locked || saving} onChange={(event) => setSpecializationId(event.target.value)} required>
+          <select id="tutor-specialization" value={specializationId} disabled={locked || busy} onChange={(event) => setSpecializationId(event.target.value)} required>
             <option value="">Chọn specialization</option>
             {data.specializations.map((specialization) => <option key={specialization.id} value={specialization.id}>{specialization.name}</option>)}
           </select>
@@ -241,14 +256,14 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         {error ? <p className="inline-error" role="alert">{error}</p> : null}
         {message ? <p className="inline-success" role="status">{message}</p> : null}
         <div className="button-row">
-          <Button type="button" disabled={locked || saving} onClick={() => void saveDraft()}>Lưu Draft</Button>
-          <Button type="submit" disabled={locked || saving}>{saving ? "Đang xử lý…" : "Submit hồ sơ"}</Button>
+          <Button type="button" disabled={locked || busy} onClick={() => void saveDraft()}>Lưu Draft</Button>
+          <Button type="submit" disabled={locked || busy || !verified}>{saving ? "Đang xử lý…" : "Submit hồ sơ"}</Button>
         </div>
-        {locked ? <p className="muted">Hồ sơ đã Submitted nên form và upload đang bị khóa cho tới khi backend trả trạng thái Changes Requested.</p> : null}
+        {locked ? <p className="muted">Hồ sơ đang bị khóa theo trạng thái xét duyệt hoặc tạm ngưng hiện tại.</p> : null}
       </form>
       {renderUpload("avatar", "Avatar")}
       {renderUpload("verification_document", "Verification document")}
-      <button className="text-button" type="button" onClick={onReload}>Tải lại dữ liệu từ API</button>
+      <button className="text-button" type="button" disabled={busy} onClick={onReload}>Tải lại dữ liệu từ API</button>
     </div>
   );
 }

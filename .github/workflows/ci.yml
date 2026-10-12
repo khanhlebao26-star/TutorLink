@@ -16,13 +16,13 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: tutorlink
+          POSTGRES_DB: tutorlink_test
           POSTGRES_USER: tutorlink
           POSTGRES_PASSWORD: tutorlink_ci_password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U tutorlink -d tutorlink"
+          --health-cmd="pg_isready -U tutorlink -d tutorlink_test"
           --health-interval=5s
           --health-timeout=5s
           --health-retries=10
@@ -33,7 +33,7 @@ jobs:
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
-      DB_DATABASE: tutorlink
+      DB_DATABASE: tutorlink_test
       DB_USERNAME: tutorlink
       DB_PASSWORD: tutorlink_ci_password
       APP_ENV: testing

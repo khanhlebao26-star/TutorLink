@@ -22,7 +22,9 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at?->toISOString(),
             'profile' => $this->when(
                 $this->relationLoaded('customerProfile') || $this->relationLoaded('tutorProfile'),
-                fn () => $this->tutorProfile ?? $this->customerProfile,
+                fn () => $this->tutorProfile
+                    ? (new TutorProfileResource($this->tutorProfile))->resolve($request)
+                    : $this->customerProfile,
             ),
         ];
     }

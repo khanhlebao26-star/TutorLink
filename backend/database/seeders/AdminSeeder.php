@@ -22,6 +22,11 @@ class AdminSeeder extends Seeder
             throw new RuntimeException('Set LOCAL_ADMIN_EMAIL and LOCAL_ADMIN_PASSWORD before seeding a local admin.');
         }
 
+        $existingUser = User::query()->where('email', $email)->first();
+        if ($existingUser && $existingUser->role !== 'admin') {
+            throw new RuntimeException('The configured local admin email belongs to a non-admin account. Use a separate admin email.');
+        }
+
         User::query()->updateOrCreate(
             ['email' => $email],
             [
