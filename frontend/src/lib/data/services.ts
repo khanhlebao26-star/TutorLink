@@ -1,4 +1,4 @@
-import { ApiClientError, dataMode, request } from "../api/client";
+import { ApiClientError, dataMode, request, setAuthHint } from "../api/client";
 import { mockAdminProfiles, mockCurrentUser, mockListings, mockProfile, mockTutorOnboarding } from "./mock";
 import type {
   AdminTutorProfile,
@@ -120,9 +120,16 @@ export async function performAdminAccountAction(id: number, action: "suspend" | 
 }
 
 export async function login(email: string, password: string, remember = false): Promise<User> {
-  if (dataMode === "mock") { await delay(); return mockCurrentUser(); }
+  if (dataMode === "mock") {
+    await delay();
+    const user = mockCurrentUser();
+    setAuthHint(true);
+    return user;
+  }
   const response = await request<ApiEnvelope<User>>({ method: "POST", url: "/auth/login", data: { email, password, remember } }, true);
-  return unwrap(response.data);
+  const user = unwrap(response.data);
+  setAuthHint(true);
+  return user;
 }
 
 export async function getCurrentUser(): Promise<User> {
@@ -132,8 +139,9 @@ export async function getCurrentUser(): Promise<User> {
 }
 
 export async function logout(): Promise<void> {
-  if (dataMode === "mock") { await delay(); return; }
+  if (dataMode === "mock") { await delay(); setAuthHint(false); return; }
   await request<void>({ method: "POST", url: "/auth/logout" }, true);
+  setAuthHint(false);
 }
 
 export async function register(input: {

@@ -1,19 +1,23 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
+import { AuthLayout } from "@/components/auth-layout";
 import { AuthSupportForm } from "@/components/auth-support-form";
 
 export default function ResetPasswordPage() {
   return (
-    <AppShell title="Đặt lại mật khẩu">
-      <section className="narrow">
-        <h1>Đặt lại mật khẩu</h1>
-        <p className="lead">Dùng token trong email để tạo mật khẩu mới.</p>
-        <Suspense fallback={<div className="card">Đang tải…</div>}>
+    <AppShell title="Đặt lại mật khẩu" mode="auth">
+      <AuthLayout
+        title="Đặt lại mật khẩu"
+        description="Tạo mật khẩu mới cho tài khoản của bạn. Hãy chọn mật khẩu đủ mạnh để bảo vệ tài khoản."
+        variant="support"
+        illustration="reset"
+        footer={<Link className="auth-back-link" href="/auth/login">←&nbsp; Quay lại đăng nhập</Link>}
+      >
+        <Suspense fallback={<div className="auth-support-fallback" role="status">Đang tải biểu mẫu…</div>}>
           <AuthSupportForm mode="reset" />
         </Suspense>
-        <p className="muted"><Link href="/auth/login">Quay lại đăng nhập</Link></p>
-      </section>
+      </AuthLayout>
     </AppShell>
   );
 }

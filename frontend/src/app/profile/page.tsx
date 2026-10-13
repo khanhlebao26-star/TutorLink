@@ -1,5 +1,7 @@
 "use client";
 
+import "../onboarding.css";
+
 import { useCallback } from "react";
 import { AppShell } from "@/components/app-shell";
 import { TutorOnboardingForm } from "@/components/tutor-onboarding-form";
@@ -13,11 +15,11 @@ export default function ProfilePage() {
   const { data, error, loading, reload } = useAsyncData(loadProfile);
   return (
     <AppShell role="tutor" title="Hồ sơ">
-      <section className="content-stack">
+      <section className="content-stack onboarding-page">
         <div>
-          <h1>Hồ sơ Tutor</h1>
-          <p className="lead">
-            Cập nhật thông tin giới thiệu và theo dõi trạng thái hồ sơ của bạn.
+          <h1 className="onboarding-page-title">Hoàn thiện hồ sơ Tutor / Coach</h1>
+          <p className="onboarding-page-subtitle">
+            Cung cấp thông tin để học viên hiểu rõ hơn về bạn và chuyên môn của bạn.
           </p>
         </div>
         {loading ? (

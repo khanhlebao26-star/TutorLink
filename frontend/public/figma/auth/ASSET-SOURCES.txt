@@ -1,0 +1,13 @@
+Figma file: https://www.figma.com/design/RDb5CBbqPOxuwX4UQ26Kfz/TutorLink
+
+Local file                         Frame and layer     Original Figma asset
+student-man.png                    53:125 / 53:160     https://www.figma.com/api/mcp/asset/6254d827-d87d-49dd-83ad-576f72bf0294.png
+student-woman.png                  52:2 / 52:38        https://www.figma.com/api/mcp/asset/35fc2a0e-2bf6-419c-b4fe-efa2544db0c0.png
+verification-envelope.png          58:1086 / 58:1118  https://www.figma.com/api/mcp/asset/6c4e4037-2635-4085-91ff-73998dc51789.png
+email.svg                          53:125 / 53:175    https://www.figma.com/api/mcp/asset/8aea2347-4c46-4f28-97e7-e2f5b3796084.svg
+person.svg                         52:2 / 52:66       https://www.figma.com/api/mcp/asset/1e0bedc3-2c46-4218-8cc0-cd76b1667e37.svg
+calendar.svg                       52:2 / 52:80       https://www.figma.com/api/mcp/asset/ae16bd1c-acc4-49ca-893a-20513d966407.svg
+lock.svg                           53:125 / 53:182    https://www.figma.com/api/mcp/asset/2de7cd8b-5852-4403-9ae0-74929d9ce449.svg
+eye.svg                            53:125 / 53:188    https://www.figma.com/api/mcp/asset/4b80c3b7-ba2a-4688-ae5f-571971f9b1b5.svg
+verification-mail.svg             53:125 / 53:206    https://www.figma.com/api/mcp/asset/9bccdc5c-1c59-4725-b36b-c383c4e20e05.svg
+globe.svg                         53:125 / 53:141    https://www.figma.com/api/mcp/asset/b4493d68-8bad-4898-8ea8-471c40a6da4b.svg

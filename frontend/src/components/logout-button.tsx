@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { logout } from "@/lib/data/services";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
+import { Button } from "./ui";
 
 export function LogoutButton() {
   const pathname = usePathname();
@@ -31,11 +32,11 @@ export function LogoutButton() {
   }
 
   return (
-    <div>
-      <button className="button button-secondary" type="button" onClick={handleLogout} disabled={submitting}>
+    <div className="logout-area">
+      <Button variant="outline" type="button" onClick={handleLogout} disabled={submitting} aria-busy={submitting}>
         {submitting ? "Đang đăng xuất…" : "Đăng xuất"}
-      </button>
-      {error ? <p role="alert">{error}</p> : null}
+      </Button>
+      {error ? <p className="logout-error" role="alert">{error}</p> : null}
     </div>
   );
 }
