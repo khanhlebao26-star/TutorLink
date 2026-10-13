@@ -19,7 +19,7 @@ export default function ProfilePage() {
         <div>
           <h1 className="onboarding-page-title">Hoàn thiện hồ sơ Tutor / Coach</h1>
           <p className="onboarding-page-subtitle">
-            Cung cấp thông tin để học viên hiểu rõ hơn về bạn và chuyên môn của bạn.
+            Cung cấp thông tin chi tiết để học viên hiểu rõ về bạn và chuyên môn của bạn.
           </p>
         </div>
         {loading ? (

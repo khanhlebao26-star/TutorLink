@@ -3,8 +3,8 @@ import path from 'node:path';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
 
 const base = process.env.TUTORLINK_URL ?? 'http://localhost:3000';
-const out = path.resolve('outputs/issue-22-figma-layout');
-const original = path.resolve('docs/FE-figmaDesign');
+const out = path.resolve(process.env.ISSUE22_OUTPUT_DIR ?? 'outputs/issue-22-figma-layout');
+const original = path.resolve(process.env.ISSUE22_REFERENCE_DIR ?? 'docs/FE-figmaDesign');
 const routes = [
   ['/auth/login', 'Login page.png'],
   ['/auth/register', 'Register page.png'],
@@ -114,11 +114,13 @@ const report = {
 await fs.writeFile(path.join(out, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
 const authPairs = routes.map(([route, ref]) => {
   const shot = `${route.split('/').at(-1)}-desktop.png`;
-  return `<section class="pair"><h2>${route}</h2><div class="imgs"><div><div class="label">Figma reference</div><img src="../../docs/FE-figmaDesign/${encodeURIComponent(ref)}" alt="${ref}"></div><div><div class="label">Browser capture</div><img src="${shot}" alt="${route} screenshot"></div></div></section>`;
+  const reference = path.relative(out, path.join(original, ref)).split(path.sep).map(encodeURIComponent).join('/');
+  return `<section class="pair"><h2>${route}</h2><div class="imgs"><div><div class="label">Figma reference</div><img src="${reference}" alt="${ref}"></div><div><div class="label">Browser capture</div><img src="${shot}" alt="${route} screenshot"></div></div></section>`;
 });
 const onboardingPairs = onboardingReferences.map(([step, ref]) => {
   const shot = `tutor-step-${step}-desktop.png`;
-  return `<section class="pair"><h2>Onboarding step ${step}</h2><div class="imgs"><div><div class="label">Figma reference</div><img src="../../docs/FE-figmaDesign/${encodeURIComponent(ref)}" alt="${ref}"></div><div><div class="label">Browser capture</div><img src="${shot}" alt="Onboarding step ${step}"></div></div></section>`;
+  const reference = path.relative(out, path.join(original, ref)).split(path.sep).map(encodeURIComponent).join('/');
+  return `<section class="pair"><h2>Onboarding step ${step}</h2><div class="imgs"><div><div class="label">Figma reference</div><img src="${reference}" alt="${ref}"></div><div><div class="label">Browser capture</div><img src="${shot}" alt="Onboarding step ${step}"></div></div></section>`;
 });
 await fs.writeFile(path.join(out, 'comparison.html'), `<!doctype html><meta charset="utf-8"><title>Issue 22 visual comparison</title><style>body{font:14px system-ui;margin:24px;background:#f4f6f8;color:#17202a}h1{font-size:24px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.pair{background:white;padding:12px;border-radius:8px;box-shadow:0 1px 5px #0002}.pair h2{font-size:16px}.imgs{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}.imgs img{width:100%;height:auto;border:1px solid #ccd2d8}.label{font-weight:600;margin:8px 0}</style><h1>Issue #22 Figma / browser comparison</h1><p>Figma reference beside the browser capture. Mobile and tablet captures are also in the artifact directory.</p><h2>Authentication</h2><div class="grid">${authPairs.join('')}</div><h2>Tutor onboarding</h2><div class="grid">${onboardingPairs.join('')}</div>`);
 console.log(JSON.stringify({ checks: checks.length, failures: findings.length, output: out, findings }, null, 2));

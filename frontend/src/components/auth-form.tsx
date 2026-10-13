@@ -144,33 +144,16 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         <>
           <div className="auth-field">
             <Field label="Họ và tên" htmlFor="full-name" error={fieldError("full_name")}>
-            <div className="auth-input-icon auth-icon-person">
-              <input
-                id="full-name"
-                type="text"
-                placeholder="Họ và tên"
-                autoComplete="name"
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
-                aria-invalid={Boolean(fieldError("full_name"))}
-                aria-describedby={describedBy("full-name", undefined, fieldError("full_name"))}
-                required
-              />
-            </div>
-            </Field>
-          </div>
-          <div className="auth-field">
-            <Field label="Ngày sinh" htmlFor="date-of-birth" hint="Bạn phải từ 18 tuổi." error={fieldError("date_of_birth")}>
-              <div className="auth-input-icon auth-icon-calendar">
+              <div className="auth-input-icon auth-icon-person">
                 <input
-                  id="date-of-birth"
-                  type="date"
-                  autoComplete="bday"
-                  max={maxBirthDate()}
-                  value={dateOfBirth}
-                  onChange={(event) => setDateOfBirth(event.target.value)}
-                  aria-invalid={Boolean(fieldError("date_of_birth"))}
-                  aria-describedby={describedBy("date-of-birth", "Bạn phải từ 18 tuổi.", fieldError("date_of_birth"))}
+                  id="full-name"
+                  type="text"
+                  placeholder="Họ và tên"
+                  autoComplete="name"
+                  value={fullName}
+                  onChange={(event) => setFullName(event.target.value)}
+                  aria-invalid={Boolean(fieldError("full_name"))}
+                  aria-describedby={describedBy("full-name", undefined, fieldError("full_name"))}
                   required
                 />
               </div>
@@ -197,6 +180,26 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           </div>
         </Field>
       </div>
+
+      {mode === "register" ? (
+        <div className="auth-field">
+          <Field label="Ngày sinh" htmlFor="date-of-birth" hint="Bạn phải từ 18 tuổi." error={fieldError("date_of_birth")}>
+            <div>
+              <input
+                id="date-of-birth"
+                type="date"
+                autoComplete="bday"
+                max={maxBirthDate()}
+                value={dateOfBirth}
+                onChange={(event) => setDateOfBirth(event.target.value)}
+                aria-invalid={Boolean(fieldError("date_of_birth"))}
+                aria-describedby={describedBy("date-of-birth", "Bạn phải từ 18 tuổi.", fieldError("date_of_birth"))}
+                required
+              />
+            </div>
+          </Field>
+        </div>
+      ) : null}
 
       <PasswordField
         id="password"

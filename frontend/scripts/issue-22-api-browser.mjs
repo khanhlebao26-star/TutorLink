@@ -4,7 +4,7 @@ const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? 'playwright')
 
 const base = process.env.TUTORLINK_URL ?? 'http://localhost:3000';
 const mailpit = process.env.MAILPIT_URL ?? 'http://localhost:8025';
-const out = path.resolve('outputs/issue-22-figma-layout');
+const out = path.resolve(process.env.ISSUE22_OUTPUT_DIR ?? 'outputs/issue-22-figma-layout');
 await fs.mkdir(out, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.TUTORLINK_CHROME_PATH ? { executablePath: process.env.TUTORLINK_CHROME_PATH } : {}), args: ['--no-sandbox'] });
 const checks = [];

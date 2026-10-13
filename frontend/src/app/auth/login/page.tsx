@@ -16,13 +16,6 @@ export default function LoginPage() {
         <p className="auth-signup-prompt">
           Chưa có tài khoản? <Link href="/auth/register">Đăng ký ngay</Link>
         </p>
-        <div className="auth-verify-helper">
-          <span className="auth-verify-icon" aria-hidden="true" />
-          <div>
-            <strong>Vui lòng xác thực email</strong>
-            Sau khi đăng ký, chúng tôi sẽ gửi một email xác thực đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư và làm theo hướng dẫn để hoàn tất tài khoản.
-          </div>
-        </div>
       </AuthLayout>
     </AppShell>
   );
