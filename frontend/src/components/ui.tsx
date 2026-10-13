@@ -138,7 +138,7 @@ export function DataTable<T>({
         <tbody>
           {rows.map((row) => (
             <tr key={rowKey(row)}>
-              {columns.map((column) => <td key={column.key}>{column.render(row)}</td>)}
+              {columns.map((column) => <td key={column.key} data-label={column.label}>{column.render(row)}</td>)}
             </tr>
           ))}
         </tbody>

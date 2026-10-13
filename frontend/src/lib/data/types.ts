@@ -118,11 +118,6 @@ export interface Listing {
   updated_at: string;
 }
 
-export interface ListingView extends Listing {
-  tutor_name: string;
-  specialization_name: string;
-}
-
 export interface ApiEnvelope<T> {
   data: T;
   meta?: Record<string, unknown>;

@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  distDir: process.env.TUTORLINK_NEXT_DIST_DIR ?? ".next",
   redirects() {
     return [
       {

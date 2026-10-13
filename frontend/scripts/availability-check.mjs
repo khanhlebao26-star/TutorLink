@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+
+const source = readFileSync(new URL("../src/lib/data/availability-validation.ts", import.meta.url), "utf8");
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+const evaluated = { exports: {} };
+new Function("exports", "module", compiled)(evaluated.exports, evaluated);
+const { validateAvailability } = evaluated.exports;
+const slot = (weekday, start_time, end_time) => ({ weekday, start_time, end_time });
+const check = (rules, timezone = "Asia/Ho_Chi_Minh") => validateAvailability({ rules, timezone });
+assert.deepEqual(check([]), {});
+assert.deepEqual(check([slot(1, "09:00", "12:00"), slot(1, "12:00", "13:00"), slot(2, "09:00", "12:00")]), {});
+assert.ok(check([], "Bad/Zone").timezone);
+assert.ok(check([], "+07:00").timezone);
+assert.deepEqual(check([], "Etc/GMT-7"), {});
+assert.ok(check([], "").timezone);
+assert.ok(check([slot(8, "09:00", "12:00")])["rules.0.weekday"]);
+assert.ok(check([slot(1, "9:00", "12:00")])["rules.0.start_time"]);
+assert.ok(check([slot(1, "24:00", "25:00")])["rules.0.end_time"]);
+assert.ok(check([slot(1, "13:00", "12:00")])["rules.0.end_time"]);
+assert.ok(check([slot(1, "09:00", "12:00"), slot(1, "11:00", "14:00")])["rules.1.start_time"]);
+assert.ok(check([slot(1, "10:00", "11:00"), slot(1, "09:00", "12:00")])["rules.0.start_time"]);
+assert.ok(check([slot(1, "09:00", "12:00"), slot(1, "09:00", "12:00")])["rules.1.start_time"]);
+console.log("Availability validation checks passed.");
