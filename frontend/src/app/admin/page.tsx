@@ -3,9 +3,10 @@
 import { AppShell } from "@/components/app-shell";
 import { Badge, Button, DataTable, ErrorActions, Field, StatePanel } from "@/components/ui";
 import { getAdminTutorProfile, getAdminTutorProfiles, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
+import { describeApiError } from "@/lib/api/client";
 import type { AdminTutorProfile, TutorApprovalStatus } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 const labels: Record<TutorApprovalStatus, string> = {
   pending: "Đang chờ",
@@ -27,28 +28,35 @@ function date(value: string | null | undefined): string {
 }
 
 export default function AdminPage() {
+  const detailRequest = useRef(0);
   const [status, setStatus] = useState<(typeof filters)[number]>("pending");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<AdminTutorProfile | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [reason, setReason] = useState("");
+  const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const load = useCallback(() => getAdminTutorProfiles(status), [status]);
   const { data, error, loading, reload } = useAsyncData(load);
 
   const openProfile = async (id: number) => {
+    const version = ++detailRequest.current;
+    setReason("");
+    setActionError(null);
+    setActionMessage("");
     setSelectedId(id);
     setDetail(null);
     setDetailError(null);
     setDetailLoading(true);
     try {
-      setDetail(await getAdminTutorProfile(id));
+      const result = await getAdminTutorProfile(id);
+      if (version === detailRequest.current) setDetail(result);
     } catch (nextError) {
-      setDetailError(nextError instanceof Error ? nextError.message : "Không thể tải chi tiết hồ sơ.");
+      if (version === detailRequest.current) setDetailError(describeApiError(nextError));
     } finally {
-      setDetailLoading(false);
+      if (version === detailRequest.current) setDetailLoading(false);
     }
   };
 
@@ -58,19 +66,27 @@ export default function AdminPage() {
       return;
     }
 
+    if (!detail.allowed_actions.includes(action)) return;
     setSaving(true);
     setActionError(null);
+    setActionMessage("");
     try {
       if (action === "account-suspend" || action === "account-restore") {
         const user = await performAdminAccountAction(detail.user.id, action === "account-suspend" ? "suspend" : "restore", reason.trim());
-        setDetail({ ...detail, user });
+        setDetail({ ...detail, user, allowed_actions: [] });
+        try {
+          setDetail(await getAdminTutorProfile(detail.profile.id));
+        } catch {
+          setActionMessage("Đã cập nhật trạng thái tài khoản. Chưa tải được quyền thao tác mới; hãy tải lại hồ sơ.");
+        }
       } else {
         setDetail(await performAdminTutorAction(detail.profile.id, action, reason.trim()));
       }
       setReason("");
       reload();
     } catch (nextError) {
-      setActionError(nextError instanceof Error ? nextError.message : "Không thể thực hiện quyết định.");
+      setActionError(describeApiError(nextError));
+      try { setDetail(await getAdminTutorProfile(detail.profile.id)); } catch { /* Keep the existing detail with its error. */ }
     } finally {
       setSaving(false);
     }
@@ -91,9 +107,15 @@ export default function AdminPage() {
 
         <Field label="Lọc trạng thái" htmlFor="admin-status">
           <select
+            disabled={saving}
             id="admin-status"
             value={status}
             onChange={(event) => {
+              detailRequest.current++;
+              setDetailLoading(false);
+              setDetailError(null);
+              setReason("");
+              setActionError(null);
               setStatus(event.target.value as typeof status);
               setSelectedId(null);
               setDetail(null);
@@ -118,7 +140,7 @@ export default function AdminPage() {
               { key: "headline", label: "Chuyên môn", render: (row) => row.profile.headline },
               { key: "experience", label: "Kinh nghiệm", render: (row) => `${row.profile.experience_years} năm` },
               { key: "status", label: "Trạng thái", render: (row) => <Badge tone={tone(row.profile.approval_status)}>{labels[row.profile.approval_status]}</Badge> },
-              { key: "action", label: "Thao tác", render: (row) => <button className="text-button" type="button" onClick={() => openProfile(row.profile.id)}>Mở hồ sơ</button> },
+              { key: "action", label: "Thao tác", render: (row) => <button className="text-button" type="button" disabled={saving} onClick={() => openProfile(row.profile.id)}>Mở hồ sơ</button> },
             ]}
           />
         )}
@@ -151,10 +173,12 @@ export default function AdminPage() {
                     <textarea id="admin-reason" rows={3} value={reason} onChange={(event) => { setReason(event.target.value); setActionError(null); }} />
                   </Field>
                   {actionError ? <p className="inline-error" role="alert">{actionError}</p> : null}
+                  {actionMessage ? <div role="status"><p className="muted">{actionMessage}</p><Button disabled={saving} onClick={() => openProfile(detail.profile.id)}>Tải lại hồ sơ</Button></div> : null}
                   <div className="button-row">
-                    {detail.profile.approval_status === "pending" ? <><Button disabled={saving} onClick={() => runAction("approve")}>Approve</Button><Button disabled={saving} onClick={() => runAction("request-changes")}>Request Changes</Button><Button disabled={saving} onClick={() => runAction("reject")}>Reject</Button></> : null}
-                    {detail.profile.suspended_at ? <Button disabled={saving} onClick={() => runAction("restore")}>Restore profile</Button> : <Button disabled={saving} onClick={() => runAction("suspend")}>Suspend profile</Button>}
-                    {detail.user.status === "inactive" ? <Button disabled={saving} onClick={() => runAction("account-restore")}>Restore account</Button> : <Button disabled={saving} onClick={() => runAction("account-suspend")}>Suspend account</Button>}
+                    {detail.allowed_actions.map((action) => <Button key={action} disabled={saving} onClick={() => runAction(action)}>{{
+                      approve: "Approve", "request-changes": "Request Changes", reject: "Reject", suspend: "Suspend profile", restore: "Restore profile",
+                      "account-suspend": "Suspend account", "account-restore": "Restore account",
+                    }[action]}</Button>)}
                   </div>
                 </form>
               </>

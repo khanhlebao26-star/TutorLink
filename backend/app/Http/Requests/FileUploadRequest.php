@@ -16,7 +16,9 @@ class FileUploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png,doc,docx'],
+            'file' => $this->input('purpose') === 'avatar'
+                ? ['required', 'file', 'max:2048', 'mimes:jpg,jpeg,png']
+                : ['required', 'file', 'max:10240', 'mimes:pdf,jpg,jpeg,png,doc,docx'],
             'purpose' => [
                 'required',
                 'string',

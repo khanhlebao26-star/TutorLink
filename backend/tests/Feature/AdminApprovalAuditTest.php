@@ -22,6 +22,20 @@ class AdminApprovalAuditTest extends TestCase
         $admin = User::factory()->admin()->create();
         $tutor = User::factory()->create(['role' => 'tutor']);
         $profile = $this->createSubmittedProfile($tutor);
+        Storage::fake('local');
+        foreach (['avatar', 'verification_document'] as $purpose) {
+            $file = File::create([
+                'owner_id' => $tutor->id, 'disk' => 'local', 'object_key' => 'fixtures/'.$purpose,
+                'original_name' => 'fixture.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 5,
+                'visibility' => 'private', 'scan_status' => 'clean', 'purpose' => $purpose,
+            ]);
+            Storage::disk('local')->put($file->object_key, 'proof');
+            if ($purpose === 'avatar') {
+                $profile->update(['avatar_file_id' => $file->id]);
+            } else {
+                $profile->verificationDocuments()->create(['file_id' => $file->id, 'document_type' => 'certificate']);
+            }
+        }
         $this->seed(CatalogSeeder::class);
         $specializationId = Specialization::query()->value('id');
 

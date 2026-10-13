@@ -21,6 +21,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [role, setRole] = useState<RegisterRole>("customer");
+  const [remember, setRemember] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -38,9 +39,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     setSubmitting(true);
     try {
       if (mode === "login") {
-        await login(email, password);
+        await login(email, password, remember);
         const user = await getCurrentUser();
-        router.push(user.role === "tutor" ? "/profile" : "/marketplace");
+        router.push(user.role === "admin" ? "/admin" : user.role === "tutor" ? "/profile" : "/marketplace");
         return;
       }
 
@@ -52,7 +53,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         password_confirmation: passwordConfirmation,
         role,
       });
-      setMessage(`Đăng ký thành công cho ${user.full_name}. Hãy xác minh email trước khi đăng nhập.`);
+      setMessage(`Đăng ký thành công cho ${user.full_name}. Hãy kiểm tra email để xác minh tài khoản trước khi gửi hồ sơ hoặc tải tài liệu nghiệp vụ.`);
     } catch (reason) {
       if (reason instanceof ApiClientError && reason.fieldErrors) setFieldErrors(reason.fieldErrors);
       setError(describeApiError(reason));
@@ -92,6 +93,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           </Field>
         </>
       ) : null}
+      {mode === "login" ? <label className="checkbox-field"><input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} />Ghi nhớ đăng nhập</label> : null}
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
       {message ? <p className="inline-success" role="status">{message}</p> : null}
       <Button type="submit" disabled={submitting}>{submitting ? "Đang xử lý…" : mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}</Button>

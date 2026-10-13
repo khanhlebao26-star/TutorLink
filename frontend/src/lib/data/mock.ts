@@ -1,4 +1,4 @@
-import type { CustomerProfile, ListingView, ProfileResponse, TutorOnboardingData, TutorProfile, User } from "./types";
+import type { AdminTutorProfile, CustomerProfile, ListingView, ProfileResponse, TutorOnboardingData, TutorProfile, User } from "./types";
 
 const users: Record<string, User> = {
   customer: { id: 302, role: "customer", status: "active", full_name: "Trần Gia Bảo", email: "bao@example.test", date_of_birth: "1998-01-12", email_verified_at: "2026-10-06T08:00:00Z" },
@@ -53,4 +53,4 @@ export const mockListings: ListingView[] = [
 export function mockCurrentUser(role: "customer" | "tutor" = "tutor"): User { return users[role]; }
 export function mockProfile(role: "customer" | "tutor"): ProfileResponse { return role === "customer" ? { user: users.customer, profile: customerProfile } : { user: users.tutor, profile: tutorProfile }; }
 export function mockTutorOnboarding(): TutorOnboardingData { return { user: users.tutor, profile: tutorProfile, specializations: [{ id: 12, subcategory_id: 1, name: "Tiếng Anh giao tiếp", slug: "tieng-anh-giao-tiep", status: "active", }] }; }
-export function mockAdminProfiles() { return [{ user: users.pendingTutor, profile: pendingProfile, verification_documents: null }]; }
+export function mockAdminProfiles() { return [{ user: users.pendingTutor, profile: pendingProfile, allowed_actions: ["approve", "request-changes", "reject", "suspend", "account-suspend"] as AdminTutorProfile["allowed_actions"], verification_documents: null }]; }

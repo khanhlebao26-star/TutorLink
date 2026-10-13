@@ -73,3 +73,6 @@ textarea { resize: vertical; }
 .admin-documents li { display: flex; gap: 12px; justify-content: space-between; }
 .admin-actions { border-top: 1px solid var(--line); padding-top: 20px; }
 @media (max-width: 780px) { .topbar { align-items: flex-start; flex-wrap: wrap; } .nav-links { order: 3; width: 100%; justify-content: flex-start; } .hero-grid, .card-grid, .listing-grid { grid-template-columns: 1fr; } .hero-grid { padding: 40px 0; } .topbar-meta { margin-left: auto; } }
+
+.checkbox-field { display: flex; align-items: center; gap: 10px; }
+.checkbox-field input { width: auto; }
