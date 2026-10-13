@@ -45,6 +45,12 @@ services:
       - backend_storage:/var/www/html/storage
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/sanctum/csrf-cookie') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     depends_on:
       db:
         condition: service_healthy

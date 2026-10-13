@@ -45,6 +45,11 @@ Open:
 - Local email inbox: `http://localhost:8025` (Mailpit)
 - PostgreSQL from the host: `127.0.0.1:5433`
 
+Use `localhost` for both frontend and backend in the browser. `0.0.0.0` is
+the server's listen address; visiting it uses a different origin and breaks
+the localhost cookie/CSRF flow. The frontend redirects that host to
+`http://localhost:3000`, preserving the path and query string.
+
 Inside the backend container, PostgreSQL is addressed as `db:5432`, not
 `127.0.0.1:5433`.
 
@@ -132,3 +137,33 @@ new environment file:
 docker compose up -d --force-recreate backend mailpit
 docker compose exec backend php artisan config:clear
 ```
+
+## HTTP 500 and CORS troubleshooting
+
+A running container does not guarantee a working Laravel API. The backend
+healthcheck requests `/sanctum/csrf-cookie` so a missing encryption key also
+appears as an unhealthy backend in Docker/Portainer.
+
+If the browser reports missing CORS headers, inspect the backend response
+and Laravel log before changing the allowed origins:
+
+```powershell
+curl.exe -i -H "Origin: http://localhost:3000" -H "Accept: application/json" http://localhost:8000/sanctum/csrf-cookie
+docker compose exec backend tail -n 80 storage/logs/laravel.log
+docker compose exec backend php artisan migrate:status
+```
+
+- `No application encryption key has been specified`: generate the key using
+  the clean-checkout command above, save it as `APP_KEY` in `.env.docker`,
+  then recreate the backend and clear its config. The container mounts `.env`
+  read-only, so use `key:generate --show` and edit the host file.
+- `Migration table not found` or missing relations: run `php artisan migrate
+  --force` in the backend container, then seed after setting the local Admin
+  credentials.
+- Origin `http://0.0.0.0:3000`: reload through `http://localhost:3000` and log
+  in again. Allowing that origin alone does not fix cookies shared with
+  `localhost:8000`.
+
+Expected results: CSRF returns `204` with
+`Access-Control-Allow-Origin: http://localhost:3000`; the Admin API returns
+`401` before login and `200` after an authorized Admin logs in.

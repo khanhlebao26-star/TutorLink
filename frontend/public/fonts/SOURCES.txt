@@ -1,0 +1,10 @@
+Inter variable font, normal style, local weights 400-800.
+Source stylesheet: https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap
+Upstream: https://github.com/rsms/inter
+License: OFL-Inter.txt (SIL Open Font License 1.1).
+
+inter-vietnamese.woff2: https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2
+inter-latin-ext.woff2: https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2
+inter-latin.woff2: https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+
+Downloaded 2026-10-13. Fonts are served locally; no runtime/build Google Fonts request.

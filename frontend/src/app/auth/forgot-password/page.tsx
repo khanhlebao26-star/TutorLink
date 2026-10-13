@@ -1,19 +1,23 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
+import { AuthLayout } from "@/components/auth-layout";
 import { AuthSupportForm } from "@/components/auth-support-form";
 
 export default function ForgotPasswordPage() {
   return (
-    <AppShell title="Quên mật khẩu">
-      <section className="narrow">
-        <h1>Quên mật khẩu</h1>
-        <p className="lead">Nhập email để nhận liên kết đặt lại mật khẩu.</p>
-        <Suspense fallback={<div className="card">Đang tải…</div>}>
+    <AppShell title="Quên mật khẩu" mode="auth">
+      <AuthLayout
+        title="Quên mật khẩu?"
+        description="Nhập email của bạn để nhận liên kết đặt lại mật khẩu. Chúng tôi sẽ gửi hướng dẫn vào hộp thư."
+        variant="support"
+        illustration="forgot"
+        footer={<Link className="auth-back-link" href="/auth/login">←&nbsp; Quay lại đăng nhập</Link>}
+      >
+        <Suspense fallback={<div className="auth-support-fallback" role="status">Đang tải biểu mẫu…</div>}>
           <AuthSupportForm mode="forgot" />
         </Suspense>
-        <p className="muted"><Link href="/auth/login">Quay lại đăng nhập</Link></p>
-      </section>
+      </AuthLayout>
     </AppShell>
   );
 }
