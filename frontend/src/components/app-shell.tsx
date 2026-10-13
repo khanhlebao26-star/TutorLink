@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/data/services";
 import type { Role, User } from "@/lib/data/types";
 import { LogoutButton } from "./logout-button";
 import { useSessionHint } from "./session-hint";
-import { Badge, Button, StatePanel } from "./ui";
+import { Button, StatePanel } from "./ui";
 
 const roleLabels: Record<Role, string> = {
   customer: "Học viên",
@@ -36,6 +36,10 @@ function isActive(pathname: string, href: string) {
 
 function MenuIcon() {
   return <span className="menu-icon" aria-hidden="true"><span /><span /><span /></span>;
+}
+
+function initials(name: string) {
+  return name.trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase();
 }
 
 function LocaleDisplay() {
@@ -173,7 +177,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
       : [{ href: "/marketplace", label: "Tìm dịch vụ" }];
 
   return (
-    <div className="app-frame authenticated-frame">
+    <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}`}>
       <header className="topbar app-topbar">
         <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
           <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
@@ -194,8 +198,11 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
           <LocaleDisplay />
         </nav>
         <div className="topbar-meta">
-          <span className="user-name">{user?.full_name ?? "Đang xác minh…"}</span>
-          <Badge tone="brand">{roleLabels[activeRole]}</Badge>
+          {user ? (
+            <span className="account-avatar" role="img" aria-label={`Tài khoản ${user.full_name}`} title={user.full_name}>
+              {initials(user.full_name)}
+            </span>
+          ) : null}
         </div>
       </header>
       <div className="app-layout">
@@ -217,7 +224,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         </aside>
         <main className="app-main">
           <div className="page-content">
-            <div className="eyebrow">{roleLabels[activeRole]} · {title}</div>
+            {pathname !== "/profile" ? <div className="eyebrow">{roleLabels[activeRole]} · {title}</div> : null}
             {requiredRole ? needsRole || needsLogin || needsSessionError || needsLoading ? accessContent : children : children}
           </div>
         </main>

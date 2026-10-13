@@ -1,5 +1,5 @@
 import { ApiClientError, dataMode, request, setAuthHint } from "../api/client";
-import { mockAdminProfiles, mockCurrentUser, mockListings, mockProfile, mockTutorOnboarding } from "./mock";
+import { mockAdminProfiles, mockCurrentUser, mockListings, mockProfile, mockTutorOnboarding, setMockRole } from "./mock";
 import type {
   AdminTutorProfile,
   ApiEnvelope,
@@ -83,7 +83,7 @@ export async function getListing(slug: string): Promise<ListingView> {
 }
 
 export async function getAdminTutorProfiles(status = "pending"): Promise<AdminTutorProfile[]> {
-  if (dataMode === "mock") { await delay(); return mockAdminProfiles(); }
+  if (dataMode === "mock") { await delay(); return mockAdminProfiles(status); }
   const response = await request<ApiEnvelope<AdminTutorProfile[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}` });
   return unwrap(response.data);
 }
@@ -107,14 +107,21 @@ export async function performAdminTutorAction(id: number, action: AdminAction, r
         : action === "reject"
           ? { ...current.profile, status: "rejected" as const, approval_status: "rejected" as const, review_reason: reason }
           : { ...current.profile, suspended_at: action === "suspend" ? new Date().toISOString() : null, suspension_reason: action === "suspend" ? reason : null };
-    return { ...current, profile };
+    current.profile = profile;
+    return (await getAdminTutorProfile(id));
   }
   const response = await request<ApiEnvelope<AdminTutorProfile>>({ method: "POST", url: `/admin/tutor-profiles/${id}/${action}`, data: { reason } }, true);
   return unwrap(response.data);
 }
 
 export async function performAdminAccountAction(id: number, action: "suspend" | "restore", reason: string): Promise<User> {
-  if (dataMode === "mock") { await delay(); return { ...mockCurrentUser("tutor"), id, status: action === "suspend" ? "inactive" : "active" }; }
+  if (dataMode === "mock") {
+    await delay();
+    const entry = mockAdminProfiles().find((item) => item.user.id === id);
+    if (!entry) throw new ApiClientError("Không tìm thấy tài khoản.", { status: 404 });
+    entry.user = { ...entry.user, status: action === "suspend" ? "inactive" : "active" };
+    return entry.user;
+  }
   const response = await request<ApiEnvelope<User>>({ method: "POST", url: `/admin/users/${id}/${action}`, data: { reason } }, true);
   return unwrap(response.data);
 }
@@ -152,7 +159,7 @@ export async function register(input: {
   role: RegisterRole;
   date_of_birth: string;
 }): Promise<User> {
-  if (dataMode === "mock") { await delay(); return mockCurrentUser(input.role); }
+  if (dataMode === "mock") { await delay(); setMockRole(input.role); return mockCurrentUser(input.role); }
   const response = await request<ApiEnvelope<User>>({ method: "POST", url: "/auth/register", data: input }, true);
   return unwrap(response.data);
 }

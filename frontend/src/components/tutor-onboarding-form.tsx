@@ -208,12 +208,12 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
       if (purpose === "avatar") setQueuedAvatar(null);
       setUploads((current) => ({
         ...current,
-        [purpose]: { ...current[purpose], file: uploaded, message: "Đang xác nhận tệp…" },
+        [purpose]: { ...current[purpose], file: uploaded, message: "Đang kiểm tra tệp…" },
       }));
       uploaded = await completeFile(uploaded.id);
       setUploads((current) => ({
         ...current,
-        [purpose]: { ...current[purpose], file: uploaded, message: "Đang gắn tệp vào hồ sơ…" },
+        [purpose]: { ...current[purpose], file: uploaded, message: "Đang cập nhật hồ sơ…" },
       }));
       await attachCompleted(purpose, uploaded.id);
       return true;
@@ -289,7 +289,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     let file = state.file;
     try {
       if (!file.complete) file = await completeFile(file.id);
-      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], file, message: "Đang gắn tệp vào hồ sơ…" } }));
+      setUploads((current) => ({ ...current, [purpose]: { ...current[purpose], file, message: "Đang cập nhật hồ sơ…" } }));
       await attachCompleted(purpose, file.id);
     } catch (reason) {
       await handleProfileError(reason);
@@ -448,16 +448,6 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
   return (
     <div className="onboarding-layout">
-      <Card className="onboarding-status-row">
-        <div>
-          <p className="onboarding-eyebrow">Trạng thái hồ sơ</p>
-          <strong>{statusLabel(profile)}</strong>
-        </div>
-        <Badge tone={statusTone(profile)} className={`onboarding-status-pill ${changesRequested ? "is-warning" : profile?.status === "approved" ? "is-success" : ""}`}>
-          {statusLabel(profile)}
-        </Badge>
-      </Card>
-
       {profile?.suspended_at ? <p className="onboarding-alert" role="alert">Hồ sơ đang tạm ngưng. {profile.suspension_reason}</p> : null}
       {changesRequested && profile?.review_reason ? (
         <div className="onboarding-review-reason" role="status">
@@ -484,15 +474,20 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         })}
       </ol>
 
-      <Card className="onboarding-panel">
       <form className="onboarding-form" onSubmit={submit} noValidate>
+        <div className={`onboarding-editor-grid onboarding-editor-grid-${step}`}>
+        <Card className={`onboarding-step-main onboarding-step-main-${step}`}>
         <div className="onboarding-panel-heading">
           <div>
-            <p className="onboarding-eyebrow">Bước {step} / {steps.length}</p>
             <h2>{step === 1 ? "Thông tin cơ bản" : step === 2 ? "Chuyên môn giảng dạy" : step === 3 ? "Kinh nghiệm giảng dạy" : step === 4 ? "Tài liệu xác minh" : "Xem lại hồ sơ"}</h2>
-            <p>{step === 1 ? "Giúp học viên biết bạn là ai và xem ảnh đại diện của bạn." : step === 2 ? "Chọn chuyên môn phù hợp nhất với dịch vụ giảng dạy của bạn." : step === 3 ? "Chia sẻ số năm kinh nghiệm giảng dạy." : step === 4 ? "Tải tài liệu để chứng minh thông tin chuyên môn." : "Kiểm tra thông tin trước khi gửi xét duyệt."}</p>
+            <p>{step === 1 ? "Giúp học viên hiểu rõ hơn về bạn và cách bạn giảng dạy." : step === 2 ? "Chọn chuyên môn phù hợp nhất với dịch vụ giảng dạy của bạn." : step === 3 ? "Chia sẻ số năm kinh nghiệm giảng dạy." : step === 4 ? "Tải lên tài liệu chứng minh thông tin chuyên môn." : "Kiểm tra thông tin trước khi gửi xét duyệt."}</p>
           </div>
-          {locked ? <span className="onboarding-lock-note">Hồ sơ đã khóa</span> : null}
+          <div className="onboarding-heading-status">
+            <Badge tone={statusTone(profile)} className={`onboarding-status-pill ${changesRequested ? "is-warning" : profile?.status === "approved" ? "is-success" : ""}`}>
+              {statusLabel(profile)}
+            </Badge>
+            {locked ? <span className="onboarding-lock-note">Chỉ xem</span> : null}
+          </div>
         </div>
 
         {step === 1 ? (
@@ -505,7 +500,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
             </div>
             <div className="onboarding-field">
               <Field label="Giới thiệu bản thân *" htmlFor="tutor-bio" error={fieldError("bio")} hint="Viết vài câu về phong cách giảng dạy và điều bạn có thể giúp học viên đạt được.">
-                <textarea id="tutor-bio" rows={5} value={bio} disabled={locked || busy} required aria-invalid={Boolean(fieldError("bio"))} onChange={(event) => { setBio(event.target.value); clearFieldError("bio"); }} />
+                <textarea id="tutor-bio" rows={3} value={bio} disabled={locked || busy} required aria-invalid={Boolean(fieldError("bio"))} onChange={(event) => { setBio(event.target.value); clearFieldError("bio"); }} />
               </Field>
             </div>
           </div>
@@ -514,7 +509,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         {step === 2 ? (
           <div className="onboarding-fields">
             <div className="onboarding-field">
-              <Field label="Chuyên môn *" htmlFor="tutor-specialization_id" error={fieldError("specialization_id")} hint="Danh sách chuyên môn được lấy từ danh mục TutorLink.">
+              <Field label="Chuyên môn *" htmlFor="tutor-specialization_id" error={fieldError("specialization_id")} hint="Chọn chuyên môn phù hợp với dịch vụ giảng dạy mà bạn có thể cung cấp.">
                 <Select value={specializationId} disabled={locked || busy} required aria-invalid={Boolean(fieldError("specialization_id"))} onChange={(event) => { setSpecializationId(event.target.value); clearFieldError("specialization_id"); }}>
                   <option value="">Chọn chuyên môn</option>
                   {data.specializations.filter((item) => item.status === "active").map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
@@ -543,7 +538,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
             {renderUpload("verification_document", "Tài liệu xác minh")}
             <div className="onboarding-document-summary">
               <strong>Yêu cầu tải tệp</strong>
-              <p>Chọn tài liệu phù hợp, ví dụ bằng cấp hoặc chứng chỉ giảng dạy. Sau khi tải lên, hệ thống sẽ xác nhận tệp rồi gắn vào hồ sơ.</p>
+              <p>Tải lên bằng cấp hoặc chứng chỉ rõ nét để người xét duyệt xác minh chuyên môn của bạn.</p>
             </div>
             {uploads.avatar.error || queuedAvatar || !attachedAvatar ? (
               <div className="onboarding-avatar-summary">
@@ -557,38 +552,50 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         ) : null}
 
         {step === 5 ? (
-          <div className="onboarding-review-grid">
-            <Card className="onboarding-review-card" aria-labelledby="onboarding-review-profile">
-              <div className="onboarding-review-heading"><h3 id="onboarding-review-profile">Thông tin hồ sơ</h3><Button variant="ghost" type="button" className="onboarding-link-button" disabled={busy} onClick={() => goToStep(1)}>{locked ? "Xem bước" : "Chỉnh sửa"}</Button></div>
-              <dl>
-                <div><dt>Tiêu đề</dt><dd>{headline.trim() || "Chưa nhập"}</dd></div>
-                <div><dt>Giới thiệu</dt><dd className="onboarding-review-bio">{bio.trim() || "Chưa nhập"}</dd></div>
-                <div><dt>Ảnh đại diện</dt><dd>{attachedAvatar ? "Đã tải lên" : "Chưa tải lên"}</dd></div>
-              </dl>
-            </Card>
-            <Card className="onboarding-review-card" aria-labelledby="onboarding-review-teaching">
-              <div className="onboarding-review-heading"><h3 id="onboarding-review-teaching">Chuyên môn và kinh nghiệm</h3><Button variant="ghost" type="button" className="onboarding-link-button" disabled={busy} onClick={() => goToStep(2)}>{locked ? "Xem bước" : "Chỉnh sửa"}</Button></div>
-              <dl>
-                <div><dt>Chuyên môn</dt><dd>{selectedSpecialization}</dd></div>
-                <div><dt>Kinh nghiệm</dt><dd>{experienceYears === "" ? "Chưa nhập" : `${experienceYears} năm`}</dd></div>
-              </dl>
-            </Card>
-            <Card className="onboarding-review-card" aria-labelledby="onboarding-review-documents">
-              <div className="onboarding-review-heading"><h3 id="onboarding-review-documents">Tài liệu xác minh</h3><Button variant="ghost" type="button" className="onboarding-link-button" disabled={busy} onClick={() => goToStep(4)}>{locked ? "Xem bước" : "Chỉnh sửa"}</Button></div>
-              <dl><div><dt>Tài liệu</dt><dd>{attachedDocument ? "Đã tải lên" : "Chưa tải lên"}</dd></div></dl>
-            </Card>
-            <Card className="onboarding-review-card onboarding-review-status" aria-label="Trạng thái xét duyệt">
-              <span>Trạng thái hồ sơ</span>
-              <strong>{statusLabel(profile)}</strong>
-              {locked ? <p>Hồ sơ đang ở trạng thái xét duyệt và không thể chỉnh sửa.</p> : <p>Kiểm tra thông tin rồi gửi hồ sơ để bắt đầu xét duyệt.</p>}
-            </Card>
+          <div className="onboarding-review-main">
+            <div className="onboarding-review-identity">
+              <span className="onboarding-review-avatar" aria-hidden="true">{data.user.full_name.trim().charAt(0).toUpperCase() || "T"}</span>
+              <div>
+                <strong>{data.user.full_name}</strong>
+                <p>{headline.trim() || "Chưa nhập tiêu đề hồ sơ"}</p>
+                <small>{experienceYears === "" ? "Chưa nhập kinh nghiệm" : `${experienceYears} năm kinh nghiệm`} · {selectedSpecialization}</small>
+              </div>
+            </div>
+            <dl className="onboarding-review-details">
+              <div><dt>Giới thiệu</dt><dd className="onboarding-review-bio">{bio.trim() || "Chưa nhập"}</dd></div>
+              <div><dt>Ảnh đại diện</dt><dd>{attachedAvatar ? "Đã tải lên" : "Chưa tải lên"}</dd></div>
+              <div><dt>Tài liệu xác minh</dt><dd>{attachedDocument ? "Đã tải lên" : "Chưa tải lên"}</dd></div>
+            </dl>
+            <div className="onboarding-review-edit-links">
+              <Button variant="ghost" type="button" className="onboarding-link-button" disabled={busy} onClick={() => goToStep(1)}>{locked ? "Xem thông tin cơ bản" : "Chỉnh sửa thông tin"}</Button>
+              <Button variant="ghost" type="button" className="onboarding-link-button" disabled={busy} onClick={() => goToStep(2)}>{locked ? "Xem chuyên môn" : "Chỉnh sửa chuyên môn"}</Button>
+              <Button variant="ghost" type="button" className="onboarding-link-button" disabled={busy} onClick={() => goToStep(4)}>{locked ? "Xem tài liệu" : "Chỉnh sửa tài liệu"}</Button>
+            </div>
           </div>
         ) : null}
+        </Card>
 
-        {error ? <p className="onboarding-alert" role="alert">{error}</p> : null}
-        {message ? <p className="onboarding-inline-success" role="status">{message}</p> : null}
-        {locked && !changesRequested ? <p className="onboarding-lock-note">Hồ sơ đã gửi hoặc đã được xét duyệt nên hiện chỉ có thể xem lại.</p> : null}
-        {step === 5 && !verified ? <p className="onboarding-verification-note">Xác minh email trước khi gửi hồ sơ. <a href="/auth/verify-email">Xác minh email</a></p> : null}
+        {step === 5 ? (
+          <aside className="onboarding-editor-aside" aria-label="Trạng thái hồ sơ">
+            <Card className="onboarding-review-status">
+              <h3>Trạng thái hồ sơ</h3>
+              <ol className="onboarding-status-list" aria-label="Các trạng thái xét duyệt">
+                {["Bản nháp", "Đã gửi xét duyệt", "Yêu cầu chỉnh sửa", "Đã phê duyệt", ...(statusLabel(profile) === "Đã từ chối" ? ["Đã từ chối"] : [])].map((label) => (
+                  <li key={label} aria-current={statusLabel(profile) === label ? "step" : undefined}>
+                    {label}
+                  </li>
+                ))}
+              </ol>
+              {locked ? <p>Hồ sơ đang ở trạng thái xét duyệt và không thể chỉnh sửa.</p> : <p>Kiểm tra thông tin rồi gửi hồ sơ để bắt đầu xét duyệt.</p>}
+            </Card>
+          </aside>
+        ) : null}
+        </div>
+
+        {error ? <p className="onboarding-alert onboarding-form-notice" role="alert">{error}</p> : null}
+        {message ? <p className="onboarding-inline-success onboarding-form-notice" role="status">{message}</p> : null}
+        {locked && !changesRequested ? <p className="onboarding-lock-note onboarding-form-notice">Hồ sơ đã gửi hoặc đã được xét duyệt nên hiện chỉ có thể xem lại.</p> : null}
+        {step === 5 && !verified ? <p className="onboarding-verification-note onboarding-form-notice">Xác minh email trước khi gửi hồ sơ. <a href="/auth/verify-email">Xác minh email</a></p> : null}
 
         <div className="onboarding-actions">
           {step > 1 ? <Button variant="secondary" className="onboarding-button onboarding-button-secondary" type="button" disabled={busy} onClick={() => setStep((current) => Math.max(current - 1, 1))}>← Quay lại</Button> : <Button variant="ghost" className="onboarding-button onboarding-button-secondary onboarding-refresh" type="button" disabled={busy} onClick={onReload}>Tải lại dữ liệu</Button>}
@@ -599,7 +606,6 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
           )}
         </div>
       </form>
-      </Card>
     </div>
   );
 }

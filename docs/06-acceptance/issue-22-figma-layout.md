@@ -6,6 +6,8 @@ Nguồn: [TutorLink — Desktop Tutor Platform, trang Screens](https://www.figma
 
 Yêu cầu tiếp theo đã chuyển khung trang từ centered container sang full-width. Xem [bàn giao full-width](full-width-layout.md) cho thay đổi và evidence mới; 42 ảnh trong báo cáo #22 này giữ nguyên snapshot trước thay đổi chiều rộng.
 
+PNG/Figma đã được người dùng cập nhật lần nữa. Xem [bản cập nhật theo thiết kế full-width](issue-22-fullwidth-redesign.md) để xem source và evidence mới nhất; phần còn lại của tài liệu này là bàn giao lịch sử.
+
 ## Route và frame
 
 | Route / bước | Frame Figma | PNG trong repo |

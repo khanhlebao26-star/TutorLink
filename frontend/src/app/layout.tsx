@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
 import { SessionHintProvider } from "@/components/session-hint";
+import { MockRoleSwitcher } from "@/components/mock-role-switcher";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="vi">
       <body>
-        <SessionHintProvider authenticated={authenticated}>{children}</SessionHintProvider>
+        <SessionHintProvider authenticated={authenticated}>
+          <MockRoleSwitcher />
+          {children}
+        </SessionHintProvider>
       </body>
     </html>
   );
