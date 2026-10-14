@@ -2,14 +2,14 @@
 
 use App\Http\Controllers\Api\V1\AdminController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\FileController;
+use App\Http\Controllers\Api\V1\ListingController;
+use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\ListingController;
-use App\Http\Controllers\Api\V1\AvailabilityRuleController;
-use App\Http\Controllers\Api\V1\PublicTutorController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {

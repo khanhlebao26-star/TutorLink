@@ -17,7 +17,7 @@ class PublicTutorResource extends JsonResource
             'experience_years' => $this->experience_years,
 
             'specializations' => $this->specializations
-                ->map(fn($specialization) => [
+                ->map(fn ($specialization) => [
                     'id' => $specialization->id,
                     'name' => $specialization->name,
                     'slug' => $specialization->slug,
@@ -27,7 +27,7 @@ class PublicTutorResource extends JsonResource
                 ->values(),
 
             'availability_rules' => $this->availabilityRules
-                ->map(fn($rule) => [
+                ->map(fn ($rule) => [
                     'weekday' => $rule->weekday,
                     'start_time' => substr((string) $rule->start_time, 0, 5),
                     'end_time' => substr((string) $rule->end_time, 0, 5),

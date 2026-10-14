@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Specialization;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 
 class CatalogController extends Controller
 {
@@ -16,14 +16,14 @@ class CatalogController extends Controller
             'data' => Category::query()
                 ->where('status', 'active')
                 ->with([
-                    'subcategories' => fn($query) => $query
+                    'subcategories' => fn ($query) => $query
                         ->where('status', 'active')
                         ->with([
-                            'specializations' => fn($specializations) => $specializations
+                            'specializations' => fn ($specializations) => $specializations
                                 ->where('status', 'active')
-                                ->orderBy('name')
+                                ->orderBy('name'),
                         ])
-                        ->orderBy('name')
+                        ->orderBy('name'),
                 ])
                 ->orderBy('sort_order')
                 ->get(),
@@ -37,13 +37,11 @@ class CatalogController extends Controller
                 ->where('status', 'active')
                 ->whereHas(
                     'subcategory',
-                    fn(Builder $query) =>
-                        $query->where('status', 'active')
-                            ->whereHas(
-                                'category',
-                                fn(Builder $category) =>
-                                    $category->where('status', 'active')
-                            )
+                    fn (Builder $query) => $query->where('status', 'active')
+                        ->whereHas(
+                            'category',
+                            fn (Builder $category) => $category->where('status', 'active')
+                        )
                 )
                 ->with('subcategory.category')
                 ->orderBy('name')

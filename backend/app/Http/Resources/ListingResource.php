@@ -27,25 +27,25 @@ class ListingResource extends JsonResource
             'updated_at' => $this->updated_at?->toISOString(),
             'tutor_name' => $this->whenLoaded(
                 'tutorProfile',
-                fn() => $this->tutorProfile->user?->full_name,
+                fn () => $this->tutorProfile->user?->full_name,
             ),
 
             'specialization_name' => $this->whenLoaded(
                 'specialization',
-                fn() => $this->specialization->name,
+                fn () => $this->specialization->name,
             ),
 
             'subcategory_name' => $this->whenLoaded(
                 'specialization',
-                fn() => $this->specialization->subcategory?->name,
+                fn () => $this->specialization->subcategory?->name,
             ),
 
             'category_name' => $this->whenLoaded(
                 'specialization',
-                fn() => $this->specialization
+                fn () => $this->specialization
                     ->subcategory
                     ?->category
-                        ?->name,
+                    ?->name,
             ),
         ];
     }

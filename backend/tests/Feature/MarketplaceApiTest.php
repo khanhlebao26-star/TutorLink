@@ -2,18 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Models\Category;
 use App\Models\ServiceListing;
 use App\Models\Specialization;
+use App\Models\Subcategory;
 use App\Models\TutorProfile;
 use App\Models\User;
 use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
-use App\Models\Category;
-use App\Models\Subcategory;
-use Database\Seeders\MarketplaceDemoSeeder;
-use Illuminate\Support\Facades\DB;
 
 class MarketplaceApiTest extends TestCase
 {
@@ -222,7 +221,7 @@ class MarketplaceApiTest extends TestCase
         return ServiceListing::create(array_merge([
             'tutor_profile_id' => $profile->id,
             'specialization_id' => $specialization->id,
-            'slug' => 'listing-' . Str::lower(Str::random(8)),
+            'slug' => 'listing-'.Str::lower(Str::random(8)),
             'title' => 'Test listing',
             'description' => 'Test listing description.',
             'delivery_mode' => 'online',

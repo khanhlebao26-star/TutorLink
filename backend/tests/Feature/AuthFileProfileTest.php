@@ -142,7 +142,7 @@ class AuthFileProfileTest extends TestCase
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())],
         );
 
-        $this->getJson(parse_url($url, PHP_URL_PATH) . '?' . parse_url($url, PHP_URL_QUERY))
+        $this->getJson(parse_url($url, PHP_URL_PATH).'?'.parse_url($url, PHP_URL_QUERY))
             ->assertOk();
 
         $this->assertNotNull($user->refresh()->email_verified_at);
@@ -331,7 +331,7 @@ class AuthFileProfileTest extends TestCase
             $file = File::create([
                 'owner_id' => $tutor->id,
                 'disk' => 'local',
-                'object_key' => 'fixtures/' . $purpose,
+                'object_key' => 'fixtures/'.$purpose,
                 'original_name' => 'fixture.pdf',
                 'mime_type' => 'application/pdf',
                 'size_bytes' => 5,

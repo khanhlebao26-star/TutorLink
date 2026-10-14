@@ -29,7 +29,7 @@ class ServiceListing extends Model
                 $profile
                     ->where('approval_status', 'active')
                     ->whereNull('suspended_at')
-                    ->whereHas('user', fn(Builder $user) => $user->where('status', 'active'));
+                    ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'));
             })
             ->whereHas('specialization', function (Builder $specialization): void {
                 $specialization
@@ -37,7 +37,7 @@ class ServiceListing extends Model
                     ->whereHas('subcategory', function (Builder $subcategory): void {
                         $subcategory
                             ->where('status', 'active')
-                            ->whereHas('category', fn(Builder $category) => $category->where('status', 'active'));
+                            ->whereHas('category', fn (Builder $category) => $category->where('status', 'active'));
                     });
             });
     }

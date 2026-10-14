@@ -6,7 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::table('tutor_profiles', function (Blueprint $table): void {
@@ -27,7 +28,7 @@ return new class extends Migration {
                 ->value('full_name') ?? 'tutor';
 
             $base = Str::slug($name) ?: 'tutor';
-            $suffix = '-' . $profile->id;
+            $suffix = '-'.$profile->id;
             $base = Str::substr(
                 $base,
                 0,
@@ -37,7 +38,7 @@ return new class extends Migration {
             DB::table('tutor_profiles')
                 ->where('id', $profile->id)
                 ->update([
-                    'public_slug' => $base . $suffix,
+                    'public_slug' => $base.$suffix,
                 ]);
         }
     }

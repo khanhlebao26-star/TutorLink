@@ -17,7 +17,7 @@ class PublicTutorController extends Controller
             ->whereNull('suspended_at')
             ->whereHas(
                 'user',
-                fn(Builder $user) => $user->where('status', 'active'),
+                fn (Builder $user) => $user->where('status', 'active'),
             )
             ->with([
                 'user:id,full_name',

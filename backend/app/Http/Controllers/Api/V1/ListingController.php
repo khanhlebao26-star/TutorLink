@@ -54,7 +54,7 @@ class ListingController extends Controller
             ->visiblePublic();
 
         $query
-            ->when(!empty($filters['q']), function ($query) use ($filters): void {
+            ->when(! empty($filters['q']), function ($query) use ($filters): void {
                 $term = $filters['q'];
 
                 $query->where(function ($query) use ($term): void {
@@ -63,32 +63,27 @@ class ListingController extends Controller
                         ->orWhere('description', 'ilike', "%{$term}%");
                 });
             })
-            ->when(isset($filters['category_id']), fn($query) =>
-                $query->whereHas(
-                    'specialization.subcategory.category',
-                    fn($category) => $category->whereKey(
-                        $filters['category_id'],
-                    ),
-                ))
-            ->when(isset($filters['subcategory_id']), fn($query) =>
-                $query->whereHas(
-                    'specialization.subcategory',
-                    fn($subcategory) => $subcategory->whereKey(
-                        $filters['subcategory_id'],
-                    ),
-                ))
-            ->when(isset($filters['specialization_id']), fn($query) =>
-                $query->where(
-                    'specialization_id',
-                    $filters['specialization_id'],
-                ))
-            ->when(isset($filters['delivery_mode']), fn($query) =>
-                $query->where(
-                    'delivery_mode',
-                    $filters['delivery_mode'],
-                ))
-            ->when(isset($filters['city']), fn($query) =>
-                $query->where('city', $filters['city']));
+            ->when(isset($filters['category_id']), fn ($query) => $query->whereHas(
+                'specialization.subcategory.category',
+                fn ($category) => $category->whereKey(
+                    $filters['category_id'],
+                ),
+            ))
+            ->when(isset($filters['subcategory_id']), fn ($query) => $query->whereHas(
+                'specialization.subcategory',
+                fn ($subcategory) => $subcategory->whereKey(
+                    $filters['subcategory_id'],
+                ),
+            ))
+            ->when(isset($filters['specialization_id']), fn ($query) => $query->where(
+                'specialization_id',
+                $filters['specialization_id'],
+            ))
+            ->when(isset($filters['delivery_mode']), fn ($query) => $query->where(
+                'delivery_mode',
+                $filters['delivery_mode'],
+            ))
+            ->when(isset($filters['city']), fn ($query) => $query->where('city', $filters['city']));
 
         $sort = $filters['sort'] ?? 'newest';
         $priceUnit = $filters['price_unit'] ?? null;
@@ -182,11 +177,11 @@ class ListingController extends Controller
                 'tutor_profile_id' => $profile->id,
                 'status' => 'draft',
                 'currency' => strtoupper($data['currency']),
-                'slug' => 'pending-' . Str::uuid(),
+                'slug' => 'pending-'.Str::uuid(),
             ]);
 
             $listing->update([
-                'slug' => Str::slug($listing->title) . '-' . $listing->id,
+                'slug' => Str::slug($listing->title).'-'.$listing->id,
             ]);
 
             return $listing;
@@ -225,7 +220,6 @@ class ListingController extends Controller
         ]);
     }
 
-
     public function myShow(Request $request, ServiceListing $listing): ListingResource
     {
         abort_unless(
@@ -261,7 +255,7 @@ class ListingController extends Controller
         if ($requestedStatus === 'active') {
             abort_unless(
                 $request->user()->tutorProfile?->approval_status === 'active'
-                && !$request->user()->tutorProfile?->suspended_at,
+                && ! $request->user()->tutorProfile?->suspended_at,
                 403,
                 'Tutor is not eligible to publish listings.',
             );
@@ -271,13 +265,11 @@ class ListingController extends Controller
                 ->where('status', 'active')
                 ->whereHas(
                     'subcategory',
-                    fn($subcategory) =>
-                        $subcategory->where('status', 'active')
-                            ->whereHas(
-                                'category',
-                                fn($category) =>
-                                    $category->where('status', 'active')
-                            )
+                    fn ($subcategory) => $subcategory->where('status', 'active')
+                        ->whereHas(
+                            'category',
+                            fn ($category) => $category->where('status', 'active')
+                        )
                 )
                 ->exists();
 
@@ -294,7 +286,6 @@ class ListingController extends Controller
 
         $listing->fill($data);
         $listing->save();
-
 
         $listing->refresh()->load([
             'tutorProfile.user',
@@ -325,7 +316,7 @@ class ListingController extends Controller
             && $request->user()->hasVerifiedEmail()
             && $profile
             && $profile->approval_status === 'active'
-            && !$profile->suspended_at,
+            && ! $profile->suspended_at,
             403,
             'Tutor is not eligible to manage listings.',
         );

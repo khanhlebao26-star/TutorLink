@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\ServiceListing;
 use Illuminate\Support\Str;
 
 class TutorProfile extends Model
@@ -29,14 +28,14 @@ class TutorProfile extends Model
                 ->value('full_name') ?? 'tutor';
 
             $base = Str::slug($name) ?: 'tutor';
-            $suffix = '-' . $profile->id;
+            $suffix = '-'.$profile->id;
 
             $profile->forceFill([
                 'public_slug' => Str::substr(
                     $base,
                     0,
                     180 - strlen($suffix),
-                ) . $suffix,
+                ).$suffix,
             ])->saveQuietly();
         });
     }

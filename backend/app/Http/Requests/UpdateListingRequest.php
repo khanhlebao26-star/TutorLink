@@ -22,7 +22,7 @@ class UpdateListingRequest extends FormRequest
                 'sometimes',
                 'integer',
                 Rule::exists('specializations', 'id')
-                    ->where(fn($query) => $query->where('status', 'active')),
+                    ->where(fn ($query) => $query->where('status', 'active')),
             ],
             'title' => ['sometimes', 'string', 'min:3', 'max:180'],
             'description' => ['sometimes', 'string', 'min:1'],

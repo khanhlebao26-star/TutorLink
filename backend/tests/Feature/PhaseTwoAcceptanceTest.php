@@ -236,7 +236,7 @@ class PhaseTwoAcceptanceTest extends TestCase
         $file = File::create([
             'owner_id' => $owner->id,
             'disk' => 'local',
-            'object_key' => 'proof/' . str()->uuid(),
+            'object_key' => 'proof/'.str()->uuid(),
             'original_name' => 'fixture.pdf',
             'mime_type' => 'application/pdf',
             'size_bytes' => 5,
