@@ -445,6 +445,34 @@ paths:
         "422":
           $ref: "#/components/responses/ValidationError"
 
+  /api/v1/tutors/{slug}:
+    get:
+      operationId: getPublicTutorBySlug
+      tags: [Tutor Profile]
+      summary: Return a public tutor profile by slug
+      description: |
+        Returns the public profile of an eligible tutor.
+        Only public profile fields are exposed.
+        Email addresses, verification documents, and object_key
+        are never included in this response.
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 180
+      responses:
+        "200":
+          description: Public tutor profile.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicTutorResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /api/v1/tutor/profile/submit:
     post:
       operationId: submitTutorProfile
@@ -465,7 +493,6 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "422":
           $ref: "#/components/responses/ValidationError"
-
 
   /api/v1/tutor/profile/avatar:
     put:
@@ -532,22 +559,88 @@ paths:
   /api/v1/listings:
     get:
       tags: [Listings]
+      operationId: searchListings
       summary: Search public service listings
-      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
+      description: |
+        Returns public service listings only.
+
+        Results include listings with status active,
+        active catalog records, and tutors whose profile is approved,
+        not suspended, and linked user account is active.
+
+        Server-side filtering supports query, category, subcategory,
+        specialization, delivery mode, city, price range, price unit,
+        sorting, and pagination.
+
+        price_unit is required when filtering or sorting by price.
       parameters:
         - { $ref: "#/components/parameters/Page" }
         - { $ref: "#/components/parameters/PerPage" }
+
         - name: q
           in: query
-          schema: { type: string, maxLength: 120 }
+          schema:
+            type: string
+            maxLength: 120
+
+        - name: category_id
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+
+        - name: subcategory_id
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+
         - name: specialization_id
           in: query
-          schema: { type: integer, minimum: 1 }
+          schema:
+            type: integer
+            minimum: 1
+
         - name: delivery_mode
           in: query
-          schema: { type: string, enum: [online, offline, hybrid] }
-      operationId: searchListings
+          schema:
+            type: string
+            enum: [online, offline, hybrid]
+
+        - name: city
+          in: query
+          schema:
+            type: string
+            maxLength: 120
+
+        - name: min_price
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+
+        - name: max_price
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+
+        - name: price_unit
+          in: query
+          description: Required when filtering or sorting by price.
+          schema:
+            type: string
+            enum: [session, hour, course]
+
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [newest, price_asc, price_desc]
+            default: newest
+
       security: []
+
       responses:
         "200":
           description: Public listing collection.
@@ -555,6 +648,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ListingCollection"
+
         "422":
           $ref: "#/components/responses/ValidationError"
 
@@ -563,12 +657,20 @@ paths:
       - name: slug
         in: path
         required: true
-        schema: { type: string }
+        schema: { type: string, maxLength: 180 }
     get:
       operationId: getListingBySlug
       tags: [Listings]
       summary: Return a public listing by slug
-      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
+      description: |
+        Returns one public service listing by slug.
+
+        A listing is visible only when its status is active,
+        its catalog records are active, and its tutor profile is approved
+        and not suspended with an active user account.
+
+        Draft, inactive, cancelled, hidden, or otherwise ineligible
+        listings return 404.
       security: []
       responses:
         "200":
@@ -585,7 +687,14 @@ paths:
       operationId: listMyListings
       tags: [Listings]
       summary: List the current tutor's listings
-      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
+      description: |
+        Returns listings owned by the authenticated tutor.
+
+        The tutor must have an active account, verified email,
+        approved tutor profile, and no profile suspension.
+
+        Results include draft, active, inactive, and cancelled listings
+        belonging only to the current tutor.
       security: [{ sanctumCookie: [] }]
       responses:
         "200":
@@ -600,14 +709,21 @@ paths:
       operationId: createListing
       tags: [Listings]
       summary: Create a draft service listing
-      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
+      description: |
+        Creates a new draft listing for the authenticated tutor.
+
+        The tutor must have an active account, verified email,
+        approved tutor profile, and no profile suspension.
+
+        The server always creates the listing with status draft.
+        The client cannot directly create an active listing.
       security: [{ sanctumCookie: [] }]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ListingWriteRequest"
+              $ref: "#/components/schemas/ListingCreateRequest"
       responses:
         "201":
           description: Draft created.
@@ -632,7 +748,12 @@ paths:
       operationId: getMyListing
       tags: [Listings]
       summary: Return one listing owned by the current tutor
-      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
+      description: |
+        Returns one listing owned by the authenticated tutor.
+
+        Cross-owner access is rejected with 404.
+        Cancelled listings remain readable for history but cannot be edited
+        or published again.
       security: [{ sanctumCookie: [] }]
       responses:
         "200":
@@ -651,14 +772,25 @@ paths:
       operationId: updateListing
       tags: [Listings]
       summary: Update a draft listing
-      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
+      description: |
+        Updates a listing owned by the authenticated tutor.
+
+        The owner may edit an eligible draft or change its lifecycle status
+        according to the Listing policy.
+
+        Publishing with status active requires an active account,
+        verified email, approved tutor profile, active catalog data,
+        and no tutor profile suspension.
+
+        Cancelled listings are terminal and cannot be edited or published.
+        Cross-owner access is rejected with 404.
       security: [{ sanctumCookie: [] }]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ListingWriteRequest"
+              $ref: "#/components/schemas/ListingUpdateRequest"
       responses:
         "200":
           description: Updated listing.
@@ -679,12 +811,19 @@ paths:
     delete:
       operationId: deleteListing
       tags: [Listings]
-      summary: Delete a draft listing
-      description: Planned W1-A3 contract; this route is not implemented in the phase 2 runtime.
+      summary: Cancel a listing without deleting its database record
+      description: |
+        Sets the listing status to cancelled.
+        This is a soft cancellation; the database record is not physically deleted.
+
+        Foreign-key history and Program references are preserved.
+
+        A cancelled listing is excluded from public search and detail,
+        cannot be edited, and cannot be published again.
       security: [{ sanctumCookie: [] }]
       responses:
         "204":
-          description: Listing deleted.
+          description: Listing cancelled successfully. No response body is returned.
         "401":
           $ref: "#/components/responses/Unauthenticated"
         "403":
@@ -692,7 +831,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
-          description: Active or referenced listing cannot be deleted.
+          description: Listing is already cancelled or cannot be cancelled in its current state.
 
   /api/v1/admin/tutor-profiles:
     get:
@@ -703,7 +842,12 @@ paths:
       parameters:
         - name: status
           in: query
-          schema: { type: string, enum: [pending, changes_requested, active, rejected], default: pending }
+          schema:
+            {
+              type: string,
+              enum: [pending, changes_requested, active, rejected],
+              default: pending,
+            }
       responses:
         "200":
           description: Submitted profiles with per-actor allowed actions; drafts are excluded.
@@ -713,7 +857,11 @@ paths:
                 type: object
                 required: [data]
                 properties:
-                  data: { type: array, items: { $ref: "#/components/schemas/AdminTutorProfile" } }
+                  data:
+                    {
+                      type: array,
+                      items: { $ref: "#/components/schemas/AdminTutorProfile" },
+                    }
         "401":
           $ref: "#/components/responses/Unauthenticated"
         "403":
@@ -981,7 +1129,7 @@ components:
     PerPage:
       name: per_page
       in: query
-      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
   responses:
     Unauthenticated:
       description: Authentication is required.
@@ -1029,19 +1177,37 @@ components:
           type: array
           items:
             type: string
-            enum: [approve, request-changes, reject, suspend, restore, account-suspend, account-restore]
+            enum:
+              [
+                approve,
+                request-changes,
+                reject,
+                suspend,
+                restore,
+                account-suspend,
+                account-restore,
+              ]
         verification_documents:
           type: array
           nullable: true
           items:
             type: object
-            required: [id, tutor_profile_id, file_id, document_type, status, download_url]
+            required:
+              [
+                id,
+                tutor_profile_id,
+                file_id,
+                document_type,
+                status,
+                download_url,
+              ]
             properties:
               id: { type: integer, minimum: 1 }
               tutor_profile_id: { type: integer, minimum: 1 }
               file_id: { type: integer, minimum: 1 }
               document_type: { type: string }
-              status: { type: string, enum: [pending, active, rejected, expired] }
+              status:
+                { type: string, enum: [pending, active, rejected, expired] }
               reviewed_at: { type: string, nullable: true }
               original_name: { type: string, nullable: true }
               mime_type: { type: string }
@@ -1331,7 +1497,8 @@ components:
       properties:
         id: { type: integer, format: int64, minimum: 1 }
         user_id: { type: integer, format: int64, minimum: 1 }
-        specialization_id: { type: integer, format: int64, minimum: 1, nullable: true }
+        specialization_id:
+          { type: integer, format: int64, minimum: 1, nullable: true }
         avatar_file_id:
           { type: integer, format: int64, minimum: 1, nullable: true }
         verification_document_file_id:
@@ -1381,6 +1548,52 @@ components:
         bio: { type: string, nullable: true }
         experience_years: { type: integer, minimum: 0, maximum: 80 }
         specialization_id: { type: integer, format: int64, minimum: 1 }
+    PublicTutorResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: "#/components/schemas/PublicTutor"
+    PublicTutor:
+      type: object
+      description: Public-safe tutor profile. Private account and file metadata are excluded.
+      required:
+        [slug, name, headline, bio, experience_years, specializations, availability_rules, listings]
+      properties:
+        slug: { type: string, maxLength: 180 }
+        name: { type: string, maxLength: 255 }
+        headline: { type: string, nullable: true }
+        bio: { type: string, nullable: true }
+        experience_years: { type: integer, minimum: 0, maximum: 80 }
+        specializations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicTutorSpecialization"
+        availability_rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicTutorAvailabilityRule"
+        listings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Listing"
+    PublicTutorSpecialization:
+      type: object
+      required: [id, name, slug, subcategory, category]
+      properties:
+        id: { type: integer, format: int64, minimum: 1 }
+        name: { type: string, maxLength: 120 }
+        slug: { type: string, maxLength: 140 }
+        subcategory: { type: string, nullable: true }
+        category: { type: string, nullable: true }
+    PublicTutorAvailabilityRule:
+      type: object
+      required: [weekday, start_time, end_time, timezone]
+      properties:
+        weekday: { type: integer, minimum: 0, maximum: 6 }
+        start_time: { type: string, pattern: '^\d{2}:\d{2}$' }
+        end_time: { type: string, pattern: '^\d{2}:\d{2}$' }
+        timezone: { type: string }
     AttachTutorAvatarRequest:
       type: object
       required: [file_id]
@@ -1429,14 +1642,33 @@ components:
         specialization_id: { type: integer, format: int64, minimum: 1 }
         slug: { type: string, maxLength: 180 }
         title: { type: string, maxLength: 180 }
-        description: { type: string }
+        description:
+          type: string
+          description: Free-form description of the tutoring service.
+
         delivery_mode: { type: string, enum: [online, offline, hybrid] }
         city: { type: string, nullable: true }
         district: { type: string, nullable: true }
         price_from_minor: { type: integer, format: int64, minimum: 0 }
-        currency: { type: string, minLength: 3, maxLength: 3, example: VND }
-        price_unit: { type: string, example: session }
-        status: { type: string, enum: [draft, active, inactive, cancelled] }
+        currency: { type: string, enum: [VND], example: VND }
+        price_unit:
+          { type: string, enum: [session, hour, course], example: session }
+        tutor_name: { type: string, nullable: true }
+        specialization_name: { type: string, nullable: true }
+        subcategory_name: { type: string, nullable: true }
+        category_name: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [draft, active, inactive, cancelled]
+          description: |
+            Listing lifecycle:
+            - draft: Bản nháp
+            - active: Đang hoạt động
+            - inactive: Tạm dừng
+            - cancelled: Lưu trữ mềm
+
+            The cancelled state is terminal and cannot be published again.
+            Hidden is not part of the W1-A3 enum.
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     ListingResponse:
@@ -1453,7 +1685,7 @@ components:
           items: { $ref: "#/components/schemas/Listing" }
         meta:
           $ref: "#/components/schemas/PaginationMeta"
-    ListingWriteRequest:
+    ListingCreateRequest:
       type: object
       required:
         [
@@ -1470,11 +1702,27 @@ components:
         title: { type: string, minLength: 3, maxLength: 180 }
         description: { type: string, minLength: 1 }
         delivery_mode: { type: string, enum: [online, offline, hybrid] }
-        city: { type: string, maxLength: 120 }
-        district: { type: string, maxLength: 120 }
+        city: { type: string, maxLength: 120, nullable: true }
+        district: { type: string, maxLength: 120, nullable: true }
         price_from_minor: { type: integer, minimum: 0 }
-        currency: { type: string, minLength: 3, maxLength: 3, example: VND }
-        price_unit: { type: string, maxLength: 30 }
+        currency: { type: string, enum: [VND], example: VND }
+        price_unit:
+          { type: string, enum: [session, hour, course], example: session }
+    ListingUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        specialization_id: { type: integer, minimum: 1 }
+        title: { type: string, minLength: 3, maxLength: 180 }
+        description: { type: string, minLength: 1 }
+        delivery_mode: { type: string, enum: [online, offline, hybrid] }
+        city: { type: string, maxLength: 120, nullable: true }
+        district: { type: string, maxLength: 120, nullable: true }
+        price_from_minor: { type: integer, minimum: 0 }
+        currency: { type: string, enum: [VND], example: VND }
+        price_unit:
+          { type: string, enum: [session, hour, course], example: session }
+        status: { type: string, enum: [active, inactive] }
     PaginationMeta:
       type: object
       required: [current_page, per_page, total]

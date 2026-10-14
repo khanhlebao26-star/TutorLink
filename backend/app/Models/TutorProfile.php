@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ServiceListing;
+use Illuminate\Support\Str;
 
 class TutorProfile extends Model
 {
@@ -18,6 +20,25 @@ class TutorProfile extends Model
             'reviewed_at' => 'datetime',
             'suspended_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (TutorProfile $profile): void {
+            $name = $profile->user()
+                ->value('full_name') ?? 'tutor';
+
+            $base = Str::slug($name) ?: 'tutor';
+            $suffix = '-' . $profile->id;
+
+            $profile->forceFill([
+                'public_slug' => Str::substr(
+                    $base,
+                    0,
+                    180 - strlen($suffix),
+                ) . $suffix,
+            ])->saveQuietly();
+        });
     }
 
     public function user(): BelongsTo
@@ -38,5 +59,15 @@ class TutorProfile extends Model
     public function verificationDocuments(): HasMany
     {
         return $this->hasMany(VerificationDocument::class);
+    }
+
+    public function listings(): HasMany
+    {
+        return $this->hasMany(ServiceListing::class);
+    }
+
+    public function availabilityRules(): HasMany
+    {
+        return $this->hasMany(AvailabilityRule::class);
     }
 }

@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\ListingController;
+use App\Http\Controllers\Api\V1\AvailabilityRuleController;
+use App\Http\Controllers\Api\V1\PublicTutorController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -38,7 +41,30 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    Route::get('/listings', [ListingController::class, 'index']);
+    Route::get('/listings/{slug}', [ListingController::class, 'show']);
+
+    Route::get('/tutors/{slug}', [
+        PublicTutorController::class,
+        'show',
+    ])->where('slug', '[a-z0-9-]+');
+
     Route::middleware(['auth:sanctum', EnsureActiveAccount::class])->group(function () {
+        Route::get('/me/listings', [ListingController::class, 'myIndex']);
+        Route::post('/me/listings', [ListingController::class, 'store']);
+        Route::get('/me/listings/{listing}', [ListingController::class, 'myShow']);
+        Route::patch('/me/listings/{listing}', [ListingController::class, 'update']);
+        Route::delete('/me/listings/{listing}', [ListingController::class, 'destroy']);
+        Route::get('/me/availability-rules', [
+            AvailabilityRuleController::class,
+            'index',
+        ]);
+
+        Route::put('/me/availability-rules', [
+            AvailabilityRuleController::class,
+            'replace',
+        ]);
+
         Route::prefix('admin')->group(function () {
             Route::get('/tutor-profiles', [AdminController::class, 'index'])
                 ->name('admin.tutor-profiles.index');

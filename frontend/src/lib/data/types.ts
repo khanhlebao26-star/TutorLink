@@ -6,6 +6,8 @@ export type TutorProfileStatus = "draft" | "submitted" | "changes_requested" | "
 export type FilePurpose = "avatar" | "verification_document" | "task_attachment" | "profile_document";
 export type ListingStatus = "draft" | "active" | "inactive" | "cancelled";
 export type DeliveryMode = "online" | "offline" | "hybrid";
+export type PriceUnit = "session" | "hour" | "course";
+export type Currency = "VND";
 
 export interface User {
   id: number;
@@ -111,8 +113,8 @@ export interface Listing {
   city?: string | null;
   district?: string | null;
   price_from_minor: number;
-  currency: string;
-  price_unit: string;
+  currency: Currency;
+  price_unit: PriceUnit;
   status: ListingStatus;
   created_at: string;
   updated_at: string;
