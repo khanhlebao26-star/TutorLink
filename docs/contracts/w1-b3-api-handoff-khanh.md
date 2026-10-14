@@ -4,26 +4,26 @@ Ngày 13/10/2026, issue #15. FE làm trước BE theo yêu cầu. **Các shape d
 
 ## GET FE đã nối nhưng BE chưa có
 
-| Endpoint | Query FE gửi | Response FE cần |
-| --- | --- | --- |
-| `/listings` | `q,category_id,subcategory_id,specialization_id,delivery_mode,city,min_fee,max_fee,price_unit,sort,page,per_page` | `{data:PublicListing[],meta:{current_page,per_page,total}}`; total toàn kết quả sau filter |
-| `/listings/{slug}` | slug URL-encoded | `{data:PublicListing}`; public active only |
-| `/tutors/{slug}` | public slug URL-encoded | `{data:TutorPublic}`; DTO public riêng, không dùng TutorProfile private |
-| `/tutors/{slug}/reviews` | `page,per_page=5` | `{data:VisibleReview[],meta:{current_page,per_page,total},aggregate?}`; chỉ visible reviews |
-| `/me/listings` | `status?`, `page` | `{data:OwnerListing[],meta:{current_page,per_page,total,status_counts,allowed_actions:["create"]}}` |
-| `/me/listings/{id}` | owner Listing ID positive integer | `{data:OwnerListing}`; quyền owner kiểm server, dùng cả detail và edit deep link |
-| `/me/availability-rules` | không query | `{data:{timezone,rules:[{weekday,start_time,end_time}]}}` |
+| Endpoint                 | Query FE gửi                                                                                                          | Response FE cần                                                                                     |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `/listings`              | `q,category_id,subcategory_id,specialization_id,delivery_mode,city,min_price,max_price,price_unit,sort,page,per_page` | `{data:PublicListing[],meta:{current_page,per_page,total}}`; total toàn kết quả sau filter          |
+| `/listings/{slug}`       | slug URL-encoded                                                                                                      | `{data:PublicListing}`; public active only                                                          |
+| `/tutors/{slug}`         | public slug URL-encoded                                                                                               | `{data:TutorPublic}`; DTO public riêng, không dùng TutorProfile private                             |
+| `/tutors/{slug}/reviews` | `page,per_page=5`                                                                                                     | `{data:VisibleReview[],meta:{current_page,per_page,total},aggregate?}`; chỉ visible reviews         |
+| `/me/listings`           | `status?`, `page`                                                                                                     | `{data:OwnerListing[],meta:{current_page,per_page,total,status_counts,allowed_actions:["create"]}}` |
+| `/me/listings/{id}`      | owner Listing ID positive integer                                                                                     | `{data:OwnerListing}`; quyền owner kiểm server, dùng cả detail và edit deep link                    |
+| `/me/availability-rules` | không query                                                                                                           | `{data:{timezone,rules:[{weekday,start_time,end_time}]}}`                                           |
 
 `GET /catalog/categories`, `GET /me`, và `GET /sanctum/csrf-cookie` đã có trong BE; không cần tạo lại. Catalog đang chỉ có một category local; A3 cần seed idempotent các nhánh Education/Fitness/Sports theo mapping được duyệt. `/sanctum/csrf-cookie` nằm ngoài `/api/v1`.
 
 ## Mutation FE cũng đã nối, chờ BE
 
-| Method + endpoint | Request | Response và semantics cần chốt |
-| --- | --- | --- |
-| `POST /me/listings` | `{title,description,specialization_id,delivery_mode,city,district,price_from_minor,currency:"VND",price_unit}` | 201 `{data:OwnerListing}` Draft; **không gửi status**. Chốt eligibility Tutor pending/unverified/rejected. |
-| `PATCH /me/listings/{id}` | Edit fields như POST; hoặc riêng `{status:"active"}` publish / `{status:"paused"}` pause | 200 `{data:OwnerListing}`; kiểm quyền và lifecycle/publish predicate; 409 khi conflict. |
-| `DELETE /me/listings/{id}` | Không body | Đề xuất 204 **archive terminal**, không hard-delete, giữ FK/snapshot Program. **OpenAPI cũ là delete Draft: đây là khác biệt bắt buộc chốt trước tích hợp thật.** |
-| `PUT /me/availability-rules` | `{timezone,rules:[{weekday,start_time,end_time}]}` | 200 `{data:Availability}`; replacement weekly schedule; 422 nếu invalid/overlap. Chốt clear bằng `rules:[]` và conflict semantics. |
+| Method + endpoint            | Request                                                                                                        | Response và semantics cần chốt                                                                                                                                    |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /me/listings`          | `{title,description,specialization_id,delivery_mode,city,district,price_from_minor,currency:"VND",price_unit}` | 201 `{data:OwnerListing}` Draft; **không gửi status**. Chốt eligibility Tutor pending/unverified/rejected.                                                        |
+| `PATCH /me/listings/{id}`    | Edit fields như POST; hoặc riêng `{status:"active"}` publish / `{status:"paused"}` pause                       | 200 `{data:OwnerListing}`; kiểm quyền và lifecycle/publish predicate; 409 khi conflict.                                                                           |
+| `DELETE /me/listings/{id}`   | Không body                                                                                                     | Đề xuất 204 **archive terminal**, không hard-delete, giữ FK/snapshot Program. **OpenAPI cũ là delete Draft: đây là khác biệt bắt buộc chốt trước tích hợp thật.** |
+| `PUT /me/availability-rules` | `{timezone,rules:[{weekday,start_time,end_time}]}`                                                             | 200 `{data:Availability}`; replacement weekly schedule; 422 nếu invalid/overlap. Chốt clear bằng `rules:[]` và conflict semantics.                                |
 
 ## DTO và rule FE đang đọc
 

@@ -1,13 +1,13 @@
 import type { Availability } from "@/lib/data/marketplace-types";
 
 const weekdays: Record<number, string> = {
-  1: "Thứ hai",
-  2: "Thứ ba",
-  3: "Thứ tư",
-  4: "Thứ năm",
-  5: "Thứ sáu",
-  6: "Thứ bảy",
-  7: "Chủ nhật",
+  0: "Thứ hai",
+  1: "Thứ ba",
+  2: "Thứ tư",
+  3: "Thứ năm",
+  4: "Thứ sáu",
+  5: "Thứ bảy",
+  6: "Chủ nhật",
 };
 
 export function PublicAvailability({ availability }: { availability?: Availability | null }) {

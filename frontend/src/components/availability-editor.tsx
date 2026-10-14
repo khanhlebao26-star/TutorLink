@@ -49,7 +49,7 @@ function ScheduleForm({ initial }: { initial: Availability }) {
       <legend>Thiết lập lịch theo tuần</legend>
       <Field label="Múi giờ (IANA)" htmlFor="availability-timezone" error={fields.timezone?.[0]} hint="Khung giờ bên dưới theo múi giờ này. Ví dụ Asia/Ho_Chi_Minh."><input id="availability-timezone" value={value.timezone} required onChange={(event) => change({ ...value, timezone: event.target.value })} /></Field>
       {weekdayLabels.map((day, dayIndex) => {
-        const weekday = dayIndex + 1;
+        const weekday = dayIndex;
         const rules = value.rules.map((rule, index) => ({ ...rule, index })).filter((rule) => rule.weekday === weekday);
         return <section className="availability-day" key={weekday} aria-labelledby={`weekday-${weekday}`}>
           <h2 id={`weekday-${weekday}`}>{day}</h2>
@@ -66,7 +66,7 @@ function ScheduleForm({ initial }: { initial: Availability }) {
     </fieldset>
     {fields.rules ? <p role="alert" className="field-error">{fields.rules.join(" ")}</p> : null}
     {error ? <div role="alert"><p className="field-error">{describeApiError(error)}{error.status === 409 ? " Dữ liệu đã thay đổi. Bản đang nhập được giữ lại để bạn đối chiếu." : ""}</p>{error.status === 401 || error.status === 419 ? <Link className="text-button" href="/auth/login" target="_blank" rel="noopener noreferrer">Đăng nhập trong tab mới rồi thử lưu lại</Link> : null}</div> : null}
-    {latest ? <details><summary>Xem lịch mới nhất từ máy chủ</summary><p>{latest.timezone}</p>{latest.rules.map((rule, index) => <p key={index}>{weekdayLabels[rule.weekday - 1]}: {rule.start_time}–{rule.end_time}</p>)}<Button variant="secondary" disabled={pending} onClick={() => { change(latest); setLatest(null); }}>Dùng lịch từ máy chủ</Button></details> : null}
+    {latest ? <details><summary>Xem lịch mới nhất từ máy chủ</summary><p>{latest.timezone}</p>{latest.rules.map((rule, index) => <p key={index}>{weekdayLabels[rule.weekday]}: {rule.start_time}–{rule.end_time}</p>)}<Button variant="secondary" disabled={pending} onClick={() => { change(latest); setLatest(null); }}>Dùng lịch từ máy chủ</Button></details> : null}
     {message ? <p role="status" className="inline-success">{message}</p> : null}
     <div className="button-row"><Button type="submit" disabled={pending}>{pending ? "Đang lưu…" : "Lưu lịch khả dụng"}</Button></div>
   </form>;

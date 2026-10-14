@@ -9,7 +9,7 @@ export function validateAvailability(value: Availability): Record<string, string
   if (/^[+-]/.test(value.timezone)) errors.timezone = ["Dùng tên múi giờ IANA, không dùng độ lệch UTC."];
   const clock = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
   value.rules.forEach((rule, index) => {
-    if (!Number.isInteger(rule.weekday) || rule.weekday < 1 || rule.weekday > 7) errors[`rules.${index}.weekday`] = ["Ngày trong tuần không hợp lệ."];
+    if (!Number.isInteger(rule.weekday) || rule.weekday < 0 || rule.weekday > 6) errors[`rules.${index}.weekday`] = ["Ngày trong tuần không hợp lệ."];
     if (!clock.test(rule.start_time)) errors[`rules.${index}.start_time`] = ["Nhập giờ bắt đầu theo HH:mm."];
     if (!clock.test(rule.end_time) || rule.end_time <= rule.start_time) errors[`rules.${index}.end_time`] = ["Giờ kết thúc phải sau giờ bắt đầu trong cùng ngày."];
     value.rules.slice(0, index).forEach((previous, other) => {

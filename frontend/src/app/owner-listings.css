@@ -10,8 +10,6 @@
 .owner-row-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .owner-row-actions .button { font-size: 12px; min-height: 34px; padding: 7px 10px; }
 .owner-status { white-space: nowrap; }
-.owner-status-hidden { background: #ede5ff; color: #6f3bc0; }
-.owner-status-archived { background: #f2f3f7; color: #5f667d; }
 .owner-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 20px; }
 .owner-pagination span { margin-right: auto; }
 .owner-form-page > a, .owner-detail > a { display: inline-block; margin-bottom: 16px; }

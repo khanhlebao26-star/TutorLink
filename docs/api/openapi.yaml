@@ -478,7 +478,7 @@ paths:
       operationId: submitTutorProfile
       tags: [Tutor Profile]
       summary: Submit the current tutor draft for review
-      description: Requires active verified Tutor, headline, bio, active specialization, completed owned avatar and at least one completed owned verification document with storage present. Draft remains editable after 422; retry of Submitted returns its persisted state.
+      description: Requires active verified Tutor, headline, bio, active specialization, completed owned avatar and ( A verification document is optional during local testing and may be added later.) at least one completed owned verification document with storage present. Draft remains editable after 422; retry of Submitted returns its persisted state.
       security: [{ sanctumCookie: [] }]
       responses:
         "200":
@@ -1558,7 +1558,16 @@ components:
       type: object
       description: Public-safe tutor profile. Private account and file metadata are excluded.
       required:
-        [slug, name, headline, bio, experience_years, specializations, availability_rules, listings]
+        [
+          slug,
+          name,
+          headline,
+          bio,
+          experience_years,
+          specializations,
+          availability_rules,
+          listings,
+        ]
       properties:
         slug: { type: string, maxLength: 180 }
         name: { type: string, maxLength: 255 }

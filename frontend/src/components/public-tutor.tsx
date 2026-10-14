@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback } from "react";
 import { getPublicTutor, deliveryLabels, formatListingPrice } from "@/lib/data/marketplace";
@@ -34,8 +33,18 @@ export function PublicTutor({ slug }: { slug: string }) {
   }
   if (!data) return <StatePanel kind="empty" message="Chưa có thông tin hồ sơ gia sư." />;
 
-  const rating = data.rating;
-  const initial = data.full_name.trim().split(/\s+/).slice(-1)[0]?.[0]?.toLocaleUpperCase() ?? "G";
+  const name = data.name?.trim() || "Gia sư";
+  const initial = name.split(/\s+/).slice(-1)[0]?.[0]?.toLocaleUpperCase() ?? "G";
+  const availability = data.availability_rules.length
+    ? {
+        timezone: data.availability_rules[0].timezone,
+        rules: data.availability_rules.map((rule) => ({
+          weekday: rule.weekday,
+          start_time: rule.start_time,
+          end_time: rule.end_time,
+        })),
+      }
+    : null;
 
   return (
     <section className="content-stack public-tutor-page">
@@ -48,16 +57,14 @@ export function PublicTutor({ slug }: { slug: string }) {
         <div className="public-tutor-main">
           <section className="card public-profile-hero">
             <span className="public-avatar public-avatar-large" aria-hidden="true">
-              {data.avatar_url ? <Image src={data.avatar_url} alt="" fill unoptimized sizes="96px" /> : initial}
+              {initial}
             </span>
             <div className="public-profile-intro">
               <p className="eyebrow">Gia sư</p>
-              <h1>{data.full_name}</h1>
+              <h1>{name}</h1>
               <p className="public-headline">{data.headline}</p>
               <div className="public-profile-stats">
                 <span>{data.experience_years} năm kinh nghiệm</span>
-                {rating ? <span>{rating.average.toFixed(1)} ★ · {rating.count} đánh giá</span> : null}
-                <Link href={`/tutors/${encodeURIComponent(data.slug)}/reviews`}>Xem nhận xét</Link>
               </div>
             </div>
           </section>
@@ -95,19 +102,7 @@ export function PublicTutor({ slug }: { slug: string }) {
         </div>
 
         <aside className="public-tutor-sidebar" aria-label="Thông tin gia sư">
-          <PublicAvailability availability={data.availability} />
-          {rating ? <section className="card public-review-summary" aria-labelledby="tutor-rating-title">
-            <h2 id="tutor-rating-title">Đánh giá</h2>
-            {rating ? (
-              <>
-                <p className="public-rating-value"><strong>{rating.average.toFixed(1)}</strong><span aria-hidden="true">★</span></p>
-                <p className="muted">Từ {rating.count} đánh giá hiển thị</p>
-              </>
-            ) : <p className="muted">Chưa có tổng hợp đánh giá.</p>}
-            <Link className="button button-secondary public-profile-button" href={`/tutors/${encodeURIComponent(data.slug)}/reviews`}>
-              Đọc nhận xét
-            </Link>
-          </section> : null}
+          <PublicAvailability availability={availability} />
         </aside>
       </div>
     </section>

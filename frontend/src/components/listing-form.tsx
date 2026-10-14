@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { createOwnerListing, deliveryLabels, getMarketplaceCatalog, getOwnerListing, getOwnerListings, priceUnitLabels, updateOwnerListing } from "@/lib/data/marketplace";
 import type { CatalogCategory, DeliveryMode, ListingInput, OwnerListing, PriceUnit } from "@/lib/data/marketplace-types";
-import { Button, ErrorActions, Field, Input, Select, StatePanel } from "./ui";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { OwnerStatus } from "./owner-listings";
+import { Button, ErrorActions, Field, Input, Select, StatePanel } from "./ui";
 
 const emptyInput: ListingInput = { title: "", description: "", specialization_id: 0, delivery_mode: "online", city: null, district: null, price_from_minor: 0, currency: "VND", price_unit: "session" };
 
@@ -33,8 +33,8 @@ export function ListingForm({ id }: { id?: number }) {
     Promise.all([getMarketplaceCatalog(), id ? getOwnerListing(id) : getOwnerListings()]).then(([categories, resource]) => {
       if (!current) return;
       setCatalog(categories);
-      if ("allowed_actions" in resource) {
-        setListing(resource); setAllowed(resource.allowed_actions.includes("edit"));
+      if ("id" in resource) {
+        setListing(resource); setAllowed(resource.status !== "cancelled");
         if (!didInitialize.current) {
           setInput({ title: resource.title, description: resource.description, specialization_id: resource.specialization_id, delivery_mode: resource.delivery_mode, city: resource.city ?? null, district: resource.district ?? null, price_from_minor: resource.price_from_minor, currency: "VND", price_unit: resource.price_unit as PriceUnit });
           setFee(String(resource.price_from_minor));
@@ -42,7 +42,7 @@ export function ListingForm({ id }: { id?: number }) {
           setCategoryId(category?.id ?? 0);
           setSubcategoryId(category?.subcategories.find((sub) => sub.specializations.some((specialization) => specialization.id === resource.specialization_id))?.id ?? 0);
         }
-      } else setAllowed(resource.meta.allowed_actions.includes("create"));
+      } else setAllowed(true);
       didInitialize.current = true; setInitialized(true); setError(null);
     }).catch((reason) => { if (current) { setError(reason); setAllowed(false); } }).finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
@@ -63,7 +63,7 @@ export function ListingForm({ id }: { id?: number }) {
     if (!subcategory?.specializations.some((item) => item.id === input.specialization_id)) errors.specialization_id = ["Chọn chuyên ngành thuộc danh mục đã chọn."];
     if (needsCity && !input.city?.trim()) errors.city = ["Nhập thành phố cho dịch vụ trực tiếp hoặc kết hợp."];
     if (!/^\d+$/.test(fee) || !Number.isSafeInteger(Number(fee))) errors.price_from_minor = ["Nhập số nguyên VND không âm."];
-    if (!["hour", "session", "package"].includes(input.price_unit)) errors.price_unit = ["Chọn đơn vị phí."];
+    if (!["hour", "session", "course"].includes(input.price_unit)) errors.price_unit = ["Chọn đơn vị phí."];
     setFieldErrors(errors);
     if (Object.keys(errors).length) return;
     setBusy(true); setError(null);
@@ -78,8 +78,8 @@ export function ListingForm({ id }: { id?: number }) {
         if ([403, 404, 409].includes(reason.status ?? 0)) {
           setAllowed(false);
           try {
-            if (id) { const fresh = await getOwnerListing(id); setListing(fresh); setAllowed(fresh.allowed_actions.includes("edit")); }
-            else { const fresh = await getOwnerListings(); setAllowed(fresh.meta.allowed_actions.includes("create")); }
+            if (id) { const fresh = await getOwnerListing(id); setListing(fresh); setAllowed(fresh.status !== "cancelled"); }
+            else { await getOwnerListings(); setAllowed(true); }
           } catch (refreshError) { setError(refreshError); }
         }
       }
@@ -103,7 +103,7 @@ export function ListingForm({ id }: { id?: number }) {
       </div>
       <fieldset className="owner-delivery"><legend>Hình thức giảng dạy *</legend><div>{(["online", "offline", "hybrid"] as DeliveryMode[]).map((mode) => <label key={mode}><input type="radio" name="delivery_mode" value={mode} checked={input.delivery_mode === mode} onChange={() => change("delivery_mode", mode)} />{deliveryLabels[mode]}</label>)}</div>{fieldError("delivery_mode") ? <span className="field-error" role="alert">{fieldError("delivery_mode")}</span> : null}</fieldset>
       <div className="owner-form-grid owner-form-grid-two"><Field label={`Thành phố${needsCity ? " *" : ""}`} htmlFor="listing-city" error={fieldError("city")} hint="Bắt buộc khi dạy trực tiếp hoặc kết hợp."><Input required={needsCity} disabled={!needsCity} value={input.city ?? ""} onChange={(event) => change("city", event.target.value)} /></Field><Field label="Quận / huyện" htmlFor="listing-district" error={fieldError("district")}><Input disabled={!needsCity} value={input.district ?? ""} onChange={(event) => change("district", event.target.value)} /></Field></div>
-      <div className="owner-form-grid owner-form-grid-two"><Field label="Giá từ (VND) *" htmlFor="listing-fee" error={fieldError("price_from_minor")}><Input required type="number" min={0} max={Number.MAX_SAFE_INTEGER} step={1} inputMode="numeric" value={fee} onChange={(event) => setFee(event.target.value)} /></Field><Field label="Đơn vị phí *" htmlFor="listing-unit" error={fieldError("price_unit")}><Select required value={input.price_unit} onChange={(event) => change("price_unit", event.target.value as PriceUnit)}>{["hour", "session", "package"].map((unit) => <option key={unit} value={unit}>mỗi {priceUnitLabels[unit]}</option>)}</Select></Field></div>
+      <div className="owner-form-grid owner-form-grid-two"><Field label="Giá từ (VND) *" htmlFor="listing-fee" error={fieldError("price_from_minor")}><Input required type="number" min={0} max={Number.MAX_SAFE_INTEGER} step={1} inputMode="numeric" value={fee} onChange={(event) => setFee(event.target.value)} /></Field><Field label="Đơn vị phí *" htmlFor="listing-unit" error={fieldError("price_unit")}><Select required value={input.price_unit} onChange={(event) => change("price_unit", event.target.value as PriceUnit)}>{["hour", "session", "course"].map((unit) => <option key={unit} value={unit}>mỗi {priceUnitLabels[unit]}</option>)}</Select></Field></div>
     </fieldset>
     <footer className="owner-form-footer">{!busy ? <Link className="button button-outline" href="/me/listings">Hủy</Link> : null}<Button type="submit" disabled={busy || loading || !allowed}>{busy ? "Đang lưu…" : id ? "Lưu thay đổi" : "Lưu bản nháp"}</Button></footer>
   </form></section>;

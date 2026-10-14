@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useCallback } from "react";
 import { getPublicListing, deliveryLabels, formatListingPrice } from "@/lib/data/marketplace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { Badge, ErrorActions, StatePanel } from "./ui";
-import { PublicAvailability } from "./public-availability";
 
 export function ListingDetail({ slug }: { slug: string }) {
   const load = useCallback(() => getPublicListing(slug), [slug]);
@@ -35,8 +33,6 @@ export function ListingDetail({ slug }: { slug: string }) {
   if (!data) return <StatePanel kind="empty" message="Chưa có thông tin dịch vụ." />;
 
   const taxonomy = [data.category_name, data.subcategory_name, data.specialization_name].filter(Boolean);
-  const tutor = data.tutor;
-
   return (
     <section className="content-stack public-detail-page">
       <nav className="public-breadcrumb" aria-label="Đường dẫn">
@@ -68,29 +64,10 @@ export function ListingDetail({ slug }: { slug: string }) {
             </dl>
           </section>
 
-          {tutor ? (
-            <section className="card public-tutor-card" aria-labelledby="listing-tutor-title">
-              <h2 id="listing-tutor-title">Gia sư</h2>
-              <Link className="public-tutor-link" href={`/tutors/${encodeURIComponent(tutor.slug)}`}>
-                <span className="public-avatar" aria-hidden="true">
-                  {tutor.avatar_url ? <Image src={tutor.avatar_url} alt="" fill unoptimized sizes="48px" /> : tutor.full_name.trim().split(/\s+/).slice(-1)[0]?.[0]?.toLocaleUpperCase() ?? "G"}
-                </span>
-                <span className="public-tutor-copy">
-                  <strong>{tutor.full_name}</strong>
-                  <span>{tutor.headline}</span>
-                </span>
-              </Link>
-              <div className="public-tutor-meta">
-                <span>{tutor.experience_years} năm kinh nghiệm</span>
-                {tutor.rating ? <span>{tutor.rating.average.toFixed(1)} ★ · {tutor.rating.count} đánh giá</span> : null}
-              </div>
-              <Link className="button button-secondary public-profile-button" href={`/tutors/${encodeURIComponent(tutor.slug)}`}>
-                Xem hồ sơ gia sư
-              </Link>
-            </section>
-          ) : null}
-          <PublicAvailability availability={data.availability} />
-          {data.rating ? <section className="card public-review-summary"><h2>Đánh giá dịch vụ</h2><p>{data.rating.average.toFixed(1)} ★ · {data.rating.count} đánh giá hiển thị</p></section> : null}
+          {data.tutor_name ? <section className="card public-tutor-card" aria-labelledby="listing-tutor-title">
+            <h2 id="listing-tutor-title">Gia sư</h2>
+            <p>{data.tutor_name}</p>
+          </section> : null}
         </aside>
       </div>
     </section>
