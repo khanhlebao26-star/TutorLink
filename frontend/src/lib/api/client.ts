@@ -17,7 +17,7 @@ const apiBaseUrl = configuredUrl.endsWith(versionedSuffix)
   ? configuredUrl
   : `${configuredUrl}${versionedSuffix}`;
 
-const configuredMode = (process.env.NEXT_PUBLIC_DATA_MODE ?? "mock").toLowerCase();
+const configuredMode = (process.env.NEXT_PUBLIC_DATA_MODE ?? "api").toLowerCase();
 if (configuredMode !== "mock" && configuredMode !== "api") {
   throw new Error("NEXT_PUBLIC_DATA_MODE must be either mock or api");
 }
@@ -61,6 +61,7 @@ export function describeApiError(error: unknown, fallback = "Không thể thực
   if (error.status === 419) return "Phiên CSRF đã hết hạn. Hãy thử lại để tạo phiên bảo mật mới.";
   if (error.status === 422) return error.message || "Dữ liệu chưa hợp lệ. Hãy kiểm tra lại biểu mẫu.";
   if (error.status === 403) return `Bạn không có quyền thực hiện thao tác này. ${error.message}`;
+  if (error.status === 429) return "Bạn đã thao tác quá nhanh. Vui lòng đợi một lúc rồi thử lại.";
   return error.message || fallback;
 }
 

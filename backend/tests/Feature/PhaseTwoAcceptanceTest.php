@@ -76,10 +76,12 @@ class PhaseTwoAcceptanceTest extends TestCase
         $file = $this->file($tutor, 'verification_document');
         $document = $profile->verificationDocuments()->firstOrFail();
         $this->actingAs($tutor)->postJson("/api/v1/files/{$file->id}/links", [
-            'resource_type' => 'verification_document', 'resource_id' => $document->id,
+            'resource_type' => 'verification_document',
+            'resource_id' => $document->id,
         ])->assertForbidden();
         $this->actingAs($tutor)->postJson("/api/v1/files/{$file->id}/links", [
-            'resource_type' => 'task', 'resource_id' => 999,
+            'resource_type' => 'task',
+            'resource_id' => 999,
         ])->assertConflict();
         $this->assertDatabaseCount('file_links', 0);
     }
@@ -98,7 +100,7 @@ class PhaseTwoAcceptanceTest extends TestCase
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/submit')->assertForbidden();
         $tutor->markEmailAsVerified();
         $this->actingAs($tutor->refresh())->postJson('/api/v1/tutor/profile/submit')
-            ->assertUnprocessable()->assertJsonValidationErrors(['bio', 'specialization_id', 'avatar_file_id', 'verification_document_file_id']);
+            ->assertUnprocessable()->assertJsonValidationErrors(['bio', 'specialization_id', 'avatar_file_id']);
         $this->assertNull($profile->refresh()->submitted_at);
     }
 
@@ -112,7 +114,8 @@ class PhaseTwoAcceptanceTest extends TestCase
         $this->assertSame($first->json('data.submitted_at'), $second->json('data.submitted_at'));
         $this->actingAs($tutor)->putJson('/api/v1/tutor/profile/avatar', ['file_id' => $profile->avatar_file_id])->assertConflict();
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/verification-documents', [
-            'file_id' => $profile->verificationDocuments()->value('file_id'), 'document_type' => 'certificate',
+            'file_id' => $profile->verificationDocuments()->value('file_id'),
+            'document_type' => 'certificate',
         ])->assertConflict();
         $this->actingAs($tutor)->getJson('/api/v1/me')->assertOk()->assertJsonPath('data.profile.status', 'submitted');
     }
@@ -217,7 +220,9 @@ class PhaseTwoAcceptanceTest extends TestCase
     {
         $this->seed(CatalogSeeder::class);
         $profile = $tutor->tutorProfile()->create([
-            'headline' => 'English tutor', 'bio' => 'Experienced tutor.', 'approval_status' => 'pending',
+            'headline' => 'English tutor',
+            'bio' => 'Experienced tutor.',
+            'approval_status' => 'pending',
             'avatar_file_id' => $this->file($tutor, 'avatar')->id,
         ]);
         $profile->specializations()->attach(Specialization::query()->value('id'));
@@ -229,9 +234,15 @@ class PhaseTwoAcceptanceTest extends TestCase
     private function file(User $owner, string $purpose): File
     {
         $file = File::create([
-            'owner_id' => $owner->id, 'disk' => 'local', 'object_key' => 'proof/'.str()->uuid(),
-            'original_name' => 'fixture.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 5,
-            'visibility' => 'private', 'scan_status' => 'clean', 'purpose' => $purpose,
+            'owner_id' => $owner->id,
+            'disk' => 'local',
+            'object_key' => 'proof/'.str()->uuid(),
+            'original_name' => 'fixture.pdf',
+            'mime_type' => 'application/pdf',
+            'size_bytes' => 5,
+            'visibility' => 'private',
+            'scan_status' => 'clean',
+            'purpose' => $purpose,
         ]);
         Storage::disk('local')->put($file->object_key, 'proof');
 

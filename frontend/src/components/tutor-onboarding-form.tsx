@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import {
   attachTutorAvatar,
@@ -12,6 +11,7 @@ import {
   uploadFile,
 } from "@/lib/data/services";
 import type { FileRecord, TutorOnboardingData, TutorProfile } from "@/lib/data/types";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { Badge, Button, Card, Field, Input, Select } from "./ui";
 
 type UploadPurpose = "avatar" | "verification_document";
@@ -344,11 +344,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
       setUploads((current) => ({ ...current, avatar: { ...current.avatar, error: "Cần tải ảnh đại diện trước khi gửi hồ sơ." } }));
       return false;
     }
-    if (!attachedDocument) {
-      setStep(4);
-      setUploads((current) => ({ ...current, verification_document: { ...current.verification_document, error: "Cần tải tài liệu xác minh trước khi gửi hồ sơ." } }));
-      return false;
-    }
+
     return true;
   }
 
@@ -391,8 +387,11 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
             {purpose === "avatar" ? (data.user.full_name.trim().charAt(0).toUpperCase() || "T") : "↥"}
           </span>
           <div>
-            <strong className="onboarding-field-label">{label}<span className="onboarding-required"> *</span></strong>
-            <p>{purpose === "avatar" ? "Ảnh hồ sơ rõ mặt, JPG hoặc PNG, tối đa 2 MiB." : "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 10 MiB."}</p>
+            <strong className="onboarding-field-label">
+              {label}
+              {purpose === "avatar" ? <span className="onboarding-required"> *</span> : <span className="muted"> · Không bắt buộc</span>}
+            </strong>
+            <p>{purpose === "avatar" ? "Ảnh hồ sơ rõ mặt, JPG hoặc PNG, tối đa 2 MiB." : "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 10 MiB. Có thể bổ sung sau."}</p>
           </div>
         </div>
         {purpose === "verification_document" ? (

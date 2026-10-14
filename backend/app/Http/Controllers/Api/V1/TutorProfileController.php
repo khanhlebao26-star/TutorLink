@@ -77,13 +77,19 @@ class TutorProfileController extends Controller
                     && $avatar->isComplete() && Storage::disk($avatar->disk)->exists($avatar->object_key) ? $avatar->id : null,
                 'verification_document_file_id' => $hasDocument ? 1 : null,
             ], [
-                'headline' => ['required'], 'bio' => ['required'], 'specialization_id' => ['required'],
-                'avatar_file_id' => ['required'], 'verification_document_file_id' => ['required'],
+                'headline' => ['required'],
+                'bio' => ['required'],
+                'specialization_id' => ['required'],
+                'avatar_file_id' => ['required'],
+                'verification_document_file_id' => ['nullable'],
             ])->validate();
 
             $profile->forceFill([
-                'submitted_at' => now(), 'approval_status' => 'pending',
-                'review_reason' => null, 'reviewed_by' => null, 'reviewed_at' => null,
+                'submitted_at' => now(),
+                'approval_status' => 'pending',
+                'review_reason' => null,
+                'reviewed_by' => null,
+                'reviewed_at' => null,
             ])->save();
 
             return new TutorProfileResource($profile->refresh()->load(['specializations', 'verificationDocuments']));

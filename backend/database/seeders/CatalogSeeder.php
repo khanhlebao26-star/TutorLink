@@ -11,19 +11,101 @@ class CatalogSeeder extends Seeder
 {
     public function run(): void
     {
-        $category = Category::updateOrCreate(
-            ['slug' => 'languages'],
-            ['name' => 'Languages', 'status' => 'active', 'sort_order' => 1],
-        );
+        $catalog = [
+            [
+                'name' => 'Languages',
+                'slug' => 'languages',
+                'sort_order' => 1,
+                'subcategories' => [
+                    [
+                        'name' => 'English',
+                        'slug' => 'english',
+                        'specializations' => [
+                            ['name' => 'Conversation English', 'slug' => 'conversation-english'],
+                            ['name' => 'Business English', 'slug' => 'business-english'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'Education',
+                'slug' => 'education',
+                'sort_order' => 2,
+                'subcategories' => [
+                    [
+                        'name' => 'Mathematics',
+                        'slug' => 'mathematics',
+                        'specializations' => [
+                            ['name' => 'High School Math', 'slug' => 'high-school-math'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'Fitness',
+                'slug' => 'fitness',
+                'sort_order' => 3,
+                'subcategories' => [
+                    [
+                        'name' => 'Personal Training',
+                        'slug' => 'personal-training',
+                        'specializations' => [
+                            ['name' => 'Strength Training', 'slug' => 'strength-training'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'Sports',
+                'slug' => 'sports',
+                'sort_order' => 4,
+                'subcategories' => [
+                    [
+                        'name' => 'Racket Sports',
+                        'slug' => 'racket-sports',
+                        'specializations' => [
+                            ['name' => 'Badminton', 'slug' => 'badminton'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
 
-        $subcategory = Subcategory::updateOrCreate(
-            ['category_id' => $category->id, 'slug' => 'english'],
-            ['name' => 'English', 'status' => 'active'],
-        );
+        foreach ($catalog as $categoryData) {
+            $category = Category::updateOrCreate(
+                ['slug' => $categoryData['slug']],
+                [
+                    'name' => $categoryData['name'],
+                    'status' => 'active',
+                    'sort_order' => $categoryData['sort_order'],
+                ],
+            );
 
-        Specialization::updateOrCreate(
-            ['subcategory_id' => $subcategory->id, 'slug' => 'conversation-english'],
-            ['name' => 'Conversation English', 'status' => 'active'],
-        );
+            foreach ($categoryData['subcategories'] as $subcategoryData) {
+                $subcategory = Subcategory::updateOrCreate(
+                    [
+                        'category_id' => $category->id,
+                        'slug' => $subcategoryData['slug'],
+                    ],
+                    [
+                        'name' => $subcategoryData['name'],
+                        'status' => 'active',
+                    ],
+                );
+
+                foreach ($subcategoryData['specializations'] as $specializationData) {
+                    Specialization::updateOrCreate(
+                        [
+                            'subcategory_id' => $subcategory->id,
+                            'slug' => $specializationData['slug'],
+                        ],
+                        [
+                            'name' => $specializationData['name'],
+                            'status' => 'active',
+                        ],
+                    );
+                }
+            }
+        }
     }
 }

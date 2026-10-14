@@ -329,9 +329,15 @@ class AuthFileProfileTest extends TestCase
         $profile = $tutor->tutorProfile;
         foreach (['avatar', 'verification_document'] as $purpose) {
             $file = File::create([
-                'owner_id' => $tutor->id, 'disk' => 'local', 'object_key' => 'fixtures/'.$purpose,
-                'original_name' => 'fixture.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 5,
-                'visibility' => 'private', 'scan_status' => 'clean', 'purpose' => $purpose,
+                'owner_id' => $tutor->id,
+                'disk' => 'local',
+                'object_key' => 'fixtures/'.$purpose,
+                'original_name' => 'fixture.pdf',
+                'mime_type' => 'application/pdf',
+                'size_bytes' => 5,
+                'visibility' => 'private',
+                'scan_status' => 'clean',
+                'purpose' => $purpose,
             ]);
             Storage::disk('local')->put($file->object_key, 'proof');
             if ($purpose === 'avatar') {
@@ -430,6 +436,8 @@ class AuthFileProfileTest extends TestCase
 
         $this->getJson('/api/v1/catalog/specializations')
             ->assertOk()
-            ->assertJsonPath('data.0.slug', 'conversation-english');
+            ->assertJsonFragment([
+                'slug' => 'conversation-english',
+            ]);
     }
 }
