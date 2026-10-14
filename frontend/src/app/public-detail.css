@@ -1,0 +1,101 @@
+.public-detail-page,
+.public-tutor-page,
+.public-reviews-page { margin-inline: auto; max-width: 1180px; }
+.public-breadcrumb { align-items: center; color: var(--muted); display: flex; flex-wrap: wrap; font-size: .84rem; gap: 10px; }
+.public-breadcrumb a { color: var(--accent-dark); font-weight: 700; }
+.public-detail-grid { align-items: start; display: grid; gap: 22px; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr); }
+.public-detail-main { min-width: 0; padding: clamp(22px, 4vw, 42px); }
+.public-detail-tags { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; }
+.public-detail-main h1 { font-size: clamp(2rem, 4vw, 3.25rem); margin: 22px 0 12px; overflow-wrap: anywhere; }
+.public-taxonomy { color: var(--muted); font-weight: 600; }
+.public-description { border-top: 1px solid var(--line); margin-top: 30px; padding-top: 24px; }
+.public-description h2, .public-bio h2, .public-availability h2, .public-review-summary h2, .public-rating-summary h2, .public-tutor-card h2 { font-size: 1.12rem; margin-bottom: 14px; }
+.public-description p, .public-bio p { line-height: 1.8; margin-bottom: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.public-detail-sidebar, .public-tutor-sidebar { display: grid; gap: 16px; min-width: 0; }
+.public-price-card, .public-tutor-card, .public-availability, .public-review-summary, .public-rating-summary { padding: 22px; }
+.public-card-label { color: var(--muted); display: block; font-size: .82rem; font-weight: 700; margin-bottom: 6px; }
+.public-price { color: var(--accent-dark); display: block; font-size: clamp(1.35rem, 2.5vw, 1.8rem); line-height: 1.3; overflow-wrap: anywhere; }
+.public-facts { display: grid; gap: 12px; margin: 22px 0 0; }
+.public-facts div { border-top: 1px solid var(--line); display: flex; gap: 12px; justify-content: space-between; padding-top: 12px; }
+.public-facts dt { color: var(--muted); }
+.public-facts dd { font-weight: 700; margin: 0; text-align: right; }
+.public-tutor-card h2 { margin-bottom: 18px; }
+.public-tutor-link { align-items: center; display: flex; gap: 12px; min-width: 0; }
+.public-avatar { align-items: center; background: var(--accent-soft); border-radius: 50%; color: var(--accent-dark); display: inline-flex; flex: 0 0 48px; font-size: 1.05rem; font-weight: 800; height: 48px; justify-content: center; overflow: hidden; position: relative; width: 48px; }
+.public-avatar img { height: 100%; object-fit: cover; width: 100%; }
+.public-tutor-copy { display: grid; gap: 2px; min-width: 0; }
+.public-tutor-copy strong, .public-tutor-copy span { overflow: hidden; text-overflow: ellipsis; }
+.public-tutor-copy span { color: var(--muted); font-size: .84rem; }
+.public-tutor-meta { color: var(--muted); display: grid; font-size: .84rem; gap: 4px; margin: 16px 0; }
+.public-profile-button { width: 100%; }
+
+.public-tutor-layout { align-items: start; display: grid; gap: 22px; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr); }
+.public-tutor-main { display: grid; gap: 20px; min-width: 0; }
+.public-profile-hero { align-items: center; display: flex; gap: clamp(18px, 3vw, 32px); padding: clamp(22px, 4vw, 38px); }
+.public-avatar-large { flex-basis: 96px; font-size: 1.8rem; height: 96px; width: 96px; }
+.public-profile-intro { min-width: 0; }
+.public-profile-intro .eyebrow { margin-bottom: 5px; }
+.public-profile-intro h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 8px; overflow-wrap: anywhere; }
+.public-headline { color: var(--muted); font-size: 1.08rem; margin-bottom: 14px; }
+.public-profile-stats { align-items: center; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .86rem; }
+.public-profile-stats a { color: var(--accent-dark); font-weight: 700; }
+.public-bio { padding: 24px; }
+.public-listings-section { display: grid; gap: 14px; }
+.public-section-heading { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; }
+.public-section-heading h2 { font-size: 1.2rem; margin-bottom: 0; }
+.public-section-heading .eyebrow { margin-bottom: 8px; }
+.public-listings-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.public-listing-card { display: grid; gap: 12px; min-width: 0; transition: border-color .15s ease, transform .15s ease; }
+.public-listing-card:hover { border-color: #fa91c8; transform: translateY(-2px); }
+.public-listing-card h3 { font-size: 1.08rem; margin: 0; overflow-wrap: anywhere; }
+.public-listing-card p { color: var(--muted); font-size: .86rem; margin: 0; }
+.public-listing-card > strong { color: var(--accent-dark); }
+.public-section-heading .muted { flex: 0 0 auto; font-size: .86rem; }
+.public-availability { min-width: 0; }
+.public-timezone { color: var(--muted); display: block; font-size: .78rem; margin-top: 5px; overflow-wrap: anywhere; }
+.availability-list { display: grid; gap: 0; list-style: none; margin: 8px 0 0; padding: 0; }
+.availability-list li { align-items: baseline; border-top: 1px solid var(--line); display: flex; gap: 12px; justify-content: space-between; padding: 10px 0; }
+.availability-list strong { font-size: .88rem; }
+.availability-list span { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.public-no-availability { margin: 14px 0 0; }
+.public-reference-note { color: var(--muted); font-size: .78rem; margin: 14px 0 0; }
+.public-rating-value { align-items: center; color: var(--accent); display: flex; gap: 8px; margin: 4px 0; }
+.public-rating-value strong { color: var(--brand); font-size: 2.3rem; line-height: 1.1; }
+.public-rating-value span { font-size: 1.3rem; }
+.public-review-summary .muted, .public-rating-summary .muted { font-size: .85rem; margin: 8px 0 18px; }
+
+.public-reviews-layout { align-items: start; display: grid; gap: 20px; grid-template-columns: minmax(0, 1.5fr) minmax(260px, .65fr); }
+.public-review-list, .public-rating-summary { min-width: 0; padding: clamp(20px, 3vw, 30px); }
+.public-review-list > .public-section-heading { align-items: center; margin-bottom: 10px; }
+.public-review-list h1 { font-size: clamp(1.8rem, 3vw, 2.5rem); margin: 0; }
+.review-list { list-style: none; margin: 0; padding: 0; }
+.public-review { border-top: 1px solid var(--line); padding: 22px 0; }
+.review-heading { align-items: flex-start; display: flex; gap: 16px; justify-content: space-between; }
+.review-heading h2 { font-size: 1rem; margin: 0 0 4px; }
+.review-heading time { color: var(--muted); font-size: .8rem; }
+.review-stars { color: var(--accent); font-size: 1rem; letter-spacing: .08em; white-space: nowrap; }
+.public-review > p { line-height: 1.7; margin: 14px 0 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.review-pagination { align-items: center; border-top: 1px solid var(--line); display: flex; gap: 16px; justify-content: space-between; padding-top: 18px; }
+.review-pagination span { color: var(--muted); font-size: .86rem; }
+.rating-histogram { display: grid; gap: 11px; list-style: none; margin: 22px 0 0; padding: 0; }
+.rating-histogram li { align-items: center; display: grid; font-size: .82rem; gap: 9px; grid-template-columns: 42px minmax(0, 1fr) 28px; }
+.rating-histogram li > span:first-child { color: var(--brand); white-space: nowrap; }
+.rating-histogram li > span:last-child { color: var(--muted); text-align: right; }
+.rating-bar { background: #f1f2f7; border-radius: 999px; height: 8px; overflow: hidden; }
+.rating-bar > span { background: var(--accent); border-radius: inherit; display: block; height: 100%; }
+
+@media (max-width: 860px) {
+  .public-detail-grid, .public-tutor-layout, .public-reviews-layout { grid-template-columns: minmax(0, 1fr); }
+  .public-tutor-sidebar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .public-tutor-sidebar, .public-listings-grid { grid-template-columns: minmax(0, 1fr); }
+  .public-profile-hero { align-items: flex-start; flex-direction: column; }
+  .public-section-heading { flex-direction: column; gap: 8px; }
+  .public-facts div { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .public-facts dd { text-align: left; }
+  .review-heading { flex-direction: column; gap: 8px; }
+  .review-pagination { gap: 8px; }
+  .review-pagination .button { padding-inline: 10px; }
+}

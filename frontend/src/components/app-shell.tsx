@@ -4,12 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { describeApiError, ApiClientError, setAuthHint } from "@/lib/api/client";
+import { describeApiError, ApiClientError, request, setAuthHint } from "@/lib/api/client";
 import { getCurrentUser } from "@/lib/data/services";
-import type { Role, User } from "@/lib/data/types";
+import type { ApiEnvelope, Role, User } from "@/lib/data/types";
 import { LogoutButton } from "./logout-button";
+import { PublicFooter } from "./public-footer";
 import { useSessionHint } from "./session-hint";
 import { Button, StatePanel } from "./ui";
+import "@/app/landing.css";
 
 const roleLabels: Record<Role, string> = {
   customer: "Học viên",
@@ -64,9 +66,13 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     let current = true;
     if (publicMode) return;
 
-    getCurrentUser().then((user) => {
+    const sessionRequest = pathname.startsWith("/me/")
+      ? request<ApiEnvelope<User>>({ method: "GET", url: "/me" }).then((response) => response.data.data)
+      : getCurrentUser();
+    sessionRequest.then((user) => {
+      if (!current) return;
       setAuthHint(true);
-      if (current) setSession({ status: "authenticated", user });
+      setSession({ status: "authenticated", user });
     }).catch((reason: unknown) => {
       if (!current) return;
       if (reason instanceof ApiClientError && reason.status === 401) {
@@ -80,7 +86,9 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     return () => { current = false; };
   }, [pathname, publicMode, retry]);
 
-  const requiredRole: Role | undefined = pathname === "/admin"
+  const requiredRole: Role | undefined = pathname.startsWith("/me/")
+    ? role ?? "tutor"
+    : pathname === "/admin"
     ? role ?? "admin"
     : pathname === "/profile"
       ? role ?? "tutor"
@@ -152,7 +160,13 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
           </button>
           <nav id="public-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
             <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Khám phá dịch vụ</Link>
-            {showPublicActions ? <Link href="/auth/register" aria-current={pathname === "/auth/register" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dành cho người dạy</Link> : null}
+            {showPublicActions ? <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dành cho người dạy</Link> : null}
+            <Link href="/#why-tutorlink" onClick={() => setMenuOpen(false)}>Về chúng tôi</Link>
+            <form className="public-search" action="/marketplace" method="get">
+              <label className="landing-sr-only" htmlFor="public-search-q">Tìm dịch vụ</label>
+              <input id="public-search-q" type="search" name="q" placeholder="Tìm dịch vụ…" />
+              <button type="submit" aria-label="Tìm dịch vụ">⌕</button>
+            </form>
           </nav>
           <div className="public-actions">
             <LocaleDisplay />
@@ -165,6 +179,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         <main className={`page-content${authFrame ? " auth-page-content" : ""}`}>
           {protectedPage ? accessContent : children}
         </main>
+        {!authFrame ? <PublicFooter /> : null}
       </div>
     );
   }
@@ -173,7 +188,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
   const navItems = activeRole === "admin"
     ? [{ href: "/admin", label: "Duyệt hồ sơ Tutor" }]
     : activeRole === "tutor"
-      ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/marketplace", label: "Khám phá dịch vụ" }]
+      ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Dịch vụ của tôi" }, { href: "/me/availability", label: "Lịch khả dụng" }, { href: "/marketplace", label: "Khám phá dịch vụ" }]
       : [{ href: "/marketplace", label: "Tìm dịch vụ" }];
 
   return (

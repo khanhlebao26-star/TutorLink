@@ -1,4 +1,4 @@
-import type { AdminTutorProfile, CustomerProfile, ListingView, ProfileResponse, Role, TutorOnboardingData, TutorProfile, User } from "./types";
+import type { AdminTutorProfile, CustomerProfile, ProfileResponse, Role, TutorOnboardingData, TutorProfile, User } from "./types";
 
 const mockRoleKey = "tutorlink-mock-role";
 
@@ -23,46 +23,6 @@ const users: Record<string, User> = {
 const customerProfile: CustomerProfile = { id: 401, user_id: users.customer.id, avatar_file_id: null, city: "Đà Nẵng", district: "Hải Châu", bio: "Đang tìm gia sư tiếng Anh giao tiếp." };
 const tutorProfile: TutorProfile = { id: 201, user_id: users.tutor.id, specialization_id: 12, avatar_file_id: 701, verification_document_file_id: 702, headline: "Gia sư tiếng Anh giao tiếp", bio: "Tám năm hướng dẫn người đi làm luyện nói và phỏng vấn.", experience_years: 8, status: "approved", approval_status: "active", submitted_at: "2026-10-06T08:00:00Z", review_reason: null, reviewed_at: "2026-10-06T09:30:00Z", created_at: "2026-10-01T08:00:00Z", updated_at: "2026-10-06T09:30:00Z", };
 const pendingProfile: TutorProfile = { id: 202, user_id: users.pendingTutor.id, specialization_id: 21, avatar_file_id: null, verification_document_file_id: null, headline: "Toán lớp 9 online", bio: "Hỗ trợ học sinh củng cố nền tảng và chuẩn bị thi vào 10.", experience_years: 4, status: "submitted", approval_status: "pending", submitted_at: "2026-10-07T03:00:00Z", review_reason: null, reviewed_at: null,  };
-
-export const mockListings: ListingView[] = [
-{
-  id: 501,
-  tutor_profile_id: 201,
-  specialization_id: 12,
-  slug: "tieng-anh-giao-tiep-cho-nguoi-di-lam",
-  title: "Tiếng Anh giao tiếp cho người đi làm",
-  description: "Lộ trình thực hành theo tình huống họp, thuyết trình và phỏng vấn.",
-  delivery_mode: "hybrid",
-  city: "Đà Nẵng",
-  district: "Hải Châu",
-  price_from_minor: 480000,
-  currency: "VND",
-  price_unit: "hour",
-  status: "active",
-  tutor_name: users.tutor.full_name,
-  specialization_name: "Tiếng Anh giao tiếp",
-  created_at: "2026-10-01T08:00:00Z",
-  updated_at: "2026-10-01T08:00:00Z",
-},
-{
-  id: 502,
-  tutor_profile_id: 201,
-  specialization_id: 12,
-  slug: "luyen-phong-van-tieng-anh-online",
-  title: "Luyện phỏng vấn tiếng Anh online",
-  description: "Thực hành trả lời phỏng vấn và giới thiệu bản thân cùng gia sư.",
-  delivery_mode: "online",
-  city: "Đà Nẵng",
-  district: "Hải Châu",
-  price_from_minor: 480000,
-  currency: "VND",
-  price_unit: "hour",
-  status: "active",
-  tutor_name: users.tutor.full_name,
-  specialization_name: "Tiếng Anh giao tiếp",
-  created_at: "2026-10-01T08:00:00Z",
-  updated_at: "2026-10-01T08:00:00Z",
-}];
 
 export function mockCurrentUser(role: Role = getMockRole()): User { return users[role]; }
 export function mockProfile(role: "customer" | "tutor"): ProfileResponse { return role === "customer" ? { user: users.customer, profile: customerProfile } : { user: users.tutor, profile: tutorProfile }; }

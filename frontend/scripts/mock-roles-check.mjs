@@ -52,6 +52,4 @@ assert.equal((await services.getAdminTutorProfiles("pending")).length, 0);
 assert.equal((await services.getAdminTutorProfile(pending.profile.id)).profile.approval_status, "active");
 await services.performAdminAccountAction(pending.user.id, "suspend", "Tạm khóa xem thử");
 assert.deepEqual((await services.getAdminTutorProfile(pending.profile.id)).allowed_actions, ["account-restore"]);
-assert.equal(new Set(mock.mockListings.map((listing) => listing.slug)).size, mock.mockListings.length);
-assert.equal((await services.getListings()).length, mock.mockListings.length);
 console.log("Mock roles: customer, tutor, admin; filters and decisions passed without API calls.");

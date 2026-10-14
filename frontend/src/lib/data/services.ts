@@ -1,11 +1,10 @@
 import { ApiClientError, dataMode, request, setAuthHint } from "../api/client";
-import { mockAdminProfiles, mockCurrentUser, mockListings, mockProfile, mockTutorOnboarding, setMockRole } from "./mock";
+import { mockAdminProfiles, mockCurrentUser, mockProfile, mockTutorOnboarding, setMockRole } from "./mock";
 import type {
   AdminTutorProfile,
   ApiEnvelope,
   FilePurpose,
   FileRecord,
-  ListingView,
   ProfileResponse,
   RegisterRole,
   Specialization,
@@ -63,23 +62,6 @@ export async function getTutorOnboarding(): Promise<TutorOnboardingData> {
   }
 
   return { user, profile, specializations };
-}
-
-export async function getListings(): Promise<ListingView[]> {
-  if (dataMode === "mock") { await delay(); return mockListings; }
-  const response = await request<ApiEnvelope<ListingView[]>>({ method: "GET", url: "/listings" });
-  return unwrap(response.data);
-}
-
-export async function getListing(slug: string): Promise<ListingView> {
-  if (dataMode === "mock") {
-    await delay();
-    const listing = mockListings.find((item) => item.slug === slug);
-    if (!listing) throw new ApiClientError("Không tìm thấy dịch vụ.", { status: 404 });
-    return listing;
-  }
-  const response = await request<ApiEnvelope<ListingView>>({ method: "GET", url: `/listings/${encodeURIComponent(slug)}` });
-  return unwrap(response.data);
 }
 
 export async function getAdminTutorProfiles(status = "pending"): Promise<AdminTutorProfile[]> {
