@@ -64,9 +64,17 @@ export function ListingDetail({ slug }: { slug: string }) {
             </dl>
           </section>
 
-          {data.tutor_name ? <section className="card public-tutor-card" aria-labelledby="listing-tutor-title">
+          {data.tutor_name || data.tutor_slug ? <section className="card public-tutor-card" aria-labelledby="listing-tutor-title">
             <h2 id="listing-tutor-title">Gia sư</h2>
-            <p>{data.tutor_name}</p>
+            {data.tutor_slug ? (
+              <Link className="public-tutor-link" href={`/tutors/${encodeURIComponent(data.tutor_slug)}`}>
+                <span className="public-avatar" aria-hidden="true">{(data.tutor_name?.trim().split(/\s+/).slice(-1)[0]?.[0] ?? "G").toLocaleUpperCase()}</span>
+                <span className="public-tutor-copy">
+                  <strong>{data.tutor_name?.trim() || "Gia sư"}</strong>
+                  <span>Xem hồ sơ gia sư</span>
+                </span>
+              </Link>
+            ) : <p>{data.tutor_name}</p>}
           </section> : null}
         </aside>
       </div>

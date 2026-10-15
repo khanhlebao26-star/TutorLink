@@ -66,7 +66,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     let current = true;
     if (publicMode) return;
 
-    const sessionRequest = pathname.startsWith("/me/")
+    const sessionRequest = pathname.startsWith("/me/") || pathname === "/settings"
       ? request<ApiEnvelope<User>>({ method: "GET", url: "/me" }).then((response) => response.data.data)
       : getCurrentUser();
     sessionRequest.then((user) => {
@@ -86,6 +86,12 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     return () => { current = false; };
   }, [pathname, publicMode, retry]);
 
+  useEffect(() => {
+    const refreshAccount = () => setRetry((value) => value + 1);
+    window.addEventListener("tutorlink-account-updated", refreshAccount);
+    return () => window.removeEventListener("tutorlink-account-updated", refreshAccount);
+  }, []);
+
   const requiredRole: Role | undefined = pathname.startsWith("/me/")
     ? role ?? "tutor"
     : pathname === "/admin"
@@ -95,7 +101,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
       : undefined;
   const user = session.status === "authenticated" ? session.user : null;
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
-  const protectedPage = Boolean(requiredRole);
+  const protectedPage = Boolean(requiredRole) || pathname === "/settings";
   const needsLogin = protectedPage && session.status === "guest";
   const needsSessionError = protectedPage && session.status === "error";
   const needsRole = Boolean(protectedPage && user && roleMismatch);
@@ -185,11 +191,12 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
   }
 
   const activeRole = user?.role ?? role ?? "customer";
-  const navItems = activeRole === "admin"
+  const roleNavItems = activeRole === "admin"
     ? [{ href: "/admin", label: "Duyệt hồ sơ Tutor" }]
     : activeRole === "tutor"
       ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Dịch vụ của tôi" }, { href: "/me/availability", label: "Lịch khả dụng" }, { href: "/marketplace", label: "Khám phá dịch vụ" }]
       : [{ href: "/marketplace", label: "Tìm dịch vụ" }];
+  const navItems = [...roleNavItems, { href: "/settings", label: "Cài đặt tài khoản" }];
 
   return (
     <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}`}>
@@ -240,7 +247,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         <main className="app-main">
           <div className="page-content">
             {pathname !== "/profile" ? <div className="eyebrow">{roleLabels[activeRole]} · {title}</div> : null}
-            {requiredRole ? needsRole || needsLogin || needsSessionError || needsLoading ? accessContent : children : children}
+            {protectedPage ? accessContent : children}
           </div>
         </main>
       </div>

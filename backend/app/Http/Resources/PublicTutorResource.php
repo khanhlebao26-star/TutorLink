@@ -36,7 +36,7 @@ class PublicTutorResource extends JsonResource
                 ->values(),
 
             'listings' => ListingResource::collection(
-                $this->listings,
+                $this->listings->each(fn ($listing) => $listing->setRelation('tutorProfile', $this->resource)),
             ),
         ];
     }

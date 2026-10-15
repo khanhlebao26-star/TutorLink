@@ -65,6 +65,7 @@ export function PublicTutor({ slug }: { slug: string }) {
               <p className="public-headline">{data.headline}</p>
               <div className="public-profile-stats">
                 <span>{data.experience_years} năm kinh nghiệm</span>
+                <Link href={`/tutors/${encodeURIComponent(data.slug)}/reviews`}>Xem nhận xét công khai</Link>
               </div>
             </div>
           </section>

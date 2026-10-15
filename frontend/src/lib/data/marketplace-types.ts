@@ -3,8 +3,11 @@ import type { CatalogCategory, DeliveryMode, Listing, ListingStatus, PaginationM
 
 export type MarketplaceStatus = ListingStatus;
 export type PriceUnit = "hour" | "session" | "course";
+export type OwnerListingAction = "edit" | "publish" | "pause" | "archive";
+export type OwnerListingStatusFilter = MarketplaceStatus | "all";
 export interface PublicListing extends Omit<Listing, "status"> {
   status: "active";
+  tutor_slug: string | null;
   tutor_name?: string | null;
   category_name?: string;
   subcategory_name?: string;
@@ -12,6 +15,7 @@ export interface PublicListing extends Omit<Listing, "status"> {
 }
 export interface OwnerListing extends Omit<Listing, "status"> {
   status: MarketplaceStatus;
+  allowed_actions: OwnerListingAction[];
   category_name?: string;
   subcategory_name?: string;
   specialization_name?: string;
@@ -24,7 +28,10 @@ export interface ListingInput {
 export interface PublicListingCollection { data: PublicListing[]; meta: PaginationMeta }
 export interface OwnerListingCollection {
   data: OwnerListing[];
-  meta: PaginationMeta;
+  meta: PaginationMeta & {
+    status_counts: Record<OwnerListingStatusFilter, number>;
+    allowed_actions: Array<"create">;
+  };
 }
 export interface ListingQuery {
   q?: string; category_id?: number; subcategory_id?: number; specialization_id?: number;
@@ -49,5 +56,22 @@ export interface TutorPublic {
   specializations: PublicTutorSpecialization[];
   availability_rules: PublicTutorAvailabilityRule[];
   listings: PublicListing[];
+}
+export interface VisibleReview {
+  id: number;
+  author_name: string;
+  rating: number;
+  comment: string | null;
+  created_at: string | null;
+}
+export interface TutorReviewAggregate {
+  average: number | null;
+  count: number;
+  histogram: Record<"1" | "2" | "3" | "4" | "5", number>;
+}
+export interface TutorReviewCollection {
+  data: VisibleReview[];
+  meta: PaginationMeta;
+  aggregate: TutorReviewAggregate;
 }
 export type { CatalogCategory, DeliveryMode, PaginationMeta };
