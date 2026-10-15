@@ -43,7 +43,19 @@ Open:
 - Frontend: `http://localhost:3000`
 - Backend health endpoint: `http://localhost:8000/up`
 - Local email inbox: `http://localhost:8025` (Mailpit)
+- pgAdmin database UI: `http://127.0.0.1:5050`
 - PostgreSQL from the host: `127.0.0.1:5433`
+
+Sign in to the local pgAdmin UI with `admin@tutorlink.dev` and
+`pgadmin_dev_password`. Open the preconfigured **TutorLink Docker** server and
+enter the local database password (`POSTGRES_PASSWORD` in `docker-compose.yml`).
+Browse **Databases > tutorlink > Schemas > public > Tables**, then right-click
+a table and choose **View/Edit Data > All Rows**. pgAdmin uses `db:5432` within
+Docker to reach the same database published on host port 5433. Port 5433 itself
+is a PostgreSQL connection endpoint and cannot display a browser page.
+
+To add pgAdmin to an already running stack, run `docker compose up -d --no-deps pgadmin`.
+The UI is bound to the local machine, and its settings persist in `pgadmin_data`.
 
 Use `localhost` for both frontend and backend in the browser. `0.0.0.0` is
 the server's listen address; visiting it uses a different origin and breaks
