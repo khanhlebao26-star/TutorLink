@@ -15,6 +15,21 @@ services:
       timeout: 5s
       retries: 10
 
+  pgadmin:
+    image: dpage/pgadmin4:9.17
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@tutorlink.dev
+      PGADMIN_DEFAULT_PASSWORD: pgadmin_dev_password
+    ports:
+      - "127.0.0.1:5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
   mailpit:
     image: axllent/mailpit:latest
     ports:
@@ -71,6 +86,7 @@ services:
 
 volumes:
   postgres_data:
+  pgadmin_data:
   backend_vendor:
   backend_storage:
   frontend_node_modules:
