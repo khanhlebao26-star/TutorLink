@@ -1,6 +1,6 @@
 # TutorLink Documentation Hub
 
-Bộ tài liệu dùng cho nhóm và AI trước W1-A3/B3/C3 đến G4. Mục tiêu là giao việc có phạm vi, giữ quy tắc nghiệp vụ nhất quán và nghiệm thu bằng bằng chứng. Cập nhật baseline ngày 08/10/2026 tại commit `5db7404` cùng sáu thay đổi local chưa commit; đây không phải chứng nhận phase cũ đã Done.
+Bộ tài liệu dùng cho nhóm và AI từ W1 đến G4. Đồng bộ ngày 15/10/2026 theo [W1 closeout](06-acceptance/issue-16-closeout.md): Settings tối thiểu, Auth giữ nguyên và reviews GET theo Completed gate; lifecycle defer W3. Base 48dc7f8 và working-tree changes chưa commit/push; Verified local không thay Accepted hoặc CI remote.
 
 ## Bắt đầu một task
 
@@ -24,7 +24,7 @@ Bộ tài liệu dùng cho nhóm và AI trước W1-A3/B3/C3 đến G4. Mục ti
 
 ## Nguồn và cách xử lý mâu thuẫn
 
-Proposal [v3.1](../outputs/planning-update-2026-10-07/TutorLink_design_proposal_v3_1.docx) là nguồn thiết kế sản phẩm. [Kế hoạch v3.1](../outputs/planning-update-2026-10-07/Ke_hoach_xay_dung_TutorLink_v3_1.docx) và [backlog W1-A3 đến W4](../outputs/planning-update-2026-10-07/TutorLink_Issues_W1_A3_den_W4.docx) là nguồn phân công. Tên file giữ ngày 07/10; docs mới đối chiếu repo ngày 08/10.
+Proposal [v3.1](../outputs/planning-update-2026-10-07/TutorLink_design_proposal_v3_1.docx) là nguồn thiết kế sản phẩm. [Kế hoạch v3.1](../outputs/planning-update-2026-10-07/Ke_hoach_xay_dung_TutorLink_v3_1.docx) và [backlog W1-A3 đến W4](../outputs/planning-update-2026-10-07/TutorLink_Issues_W1_A3_den_W4.docx) là nguồn phân công. Giữ tên file/folder 07/10; nội dung liên quan đã đồng bộ 15/10 theo [quyết định closeout](plans/w1-c3-closeout-contract.md). Các đoạn historical/evidence cũ vẫn giữ thời điểm của chúng.
 
 Yêu cầu trực tiếp đã được nhóm xác nhận quyết định phạm vi task. Proposal/decision được duyệt quyết định hành vi đích; code và migration chứng minh hành vi đã triển khai; test/evidence chứng minh hành vi đã kiểm chứng. Không lấy code sai làm lý do sửa yêu cầu, cũng không coi thiết kế là feature đã chạy.
 

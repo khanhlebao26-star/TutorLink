@@ -10,6 +10,35 @@ class ServiceListing extends Model
 {
     protected $guarded = ['id'];
 
+    /** @return list<string> */
+    public function allowedOwnerActions(User $user): array
+    {
+        $profile = $user->tutorProfile;
+
+        if ($user->role !== 'tutor' || $user->status !== 'active'
+            || ! $user->hasVerifiedEmail() || ! $profile
+            || $profile->id !== $this->tutor_profile_id
+            || $profile->approval_status !== 'active' || $profile->suspended_at
+            || $this->status === 'cancelled') {
+            return [];
+        }
+
+        $actions = ['edit'];
+
+        if ($this->status === 'active') {
+            $actions[] = 'pause';
+        } elseif (in_array($this->status, ['draft', 'inactive'], true)
+            && $this->specialization?->status === 'active'
+            && $this->specialization?->subcategory?->status === 'active'
+            && $this->specialization?->subcategory?->category?->status === 'active') {
+            $actions[] = 'publish';
+        }
+
+        $actions[] = 'archive';
+
+        return $actions;
+    }
+
     public function tutorProfile(): BelongsTo
     {
         return $this->belongsTo(TutorProfile::class);

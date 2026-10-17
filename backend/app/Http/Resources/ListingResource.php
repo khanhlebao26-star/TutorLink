@@ -25,9 +25,18 @@ class ListingResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
+            'allowed_actions' => $this->when(
+                $request->is('api/v1/me/listings', 'api/v1/me/listings/*')
+                && $request->user() !== null,
+                fn () => $this->resource->allowedOwnerActions($request->user()),
+            ),
             'tutor_name' => $this->whenLoaded(
                 'tutorProfile',
                 fn () => $this->tutorProfile->user?->full_name,
+            ),
+            'tutor_slug' => $this->whenLoaded(
+                'tutorProfile',
+                fn () => $this->tutorProfile->public_slug,
             ),
 
             'specialization_name' => $this->whenLoaded(

@@ -6,6 +6,8 @@ Phân công kế thừa backlog v3.1; chưa thay đổi người làm. Team ph�
 
 Khanh A3: Catalog/Listing/public/availability API + seed + contract. Dũng B3: Marketplace owner/public UI/API integration. Hoàng C3: prerequisite evidence/G1 và Messaging schema review. A2/C2 closeout do owner cũ xử lý, không C3 tự tuyên bố Done thay.
 
+ W2 chỉ phân công phần chưa làm, không lặp các sửa W1 đã Verified.
+
 ## W2
 
 Khanh A1 schema/state/OpenAPI delta; A2 File policy; A3 queue/scheduler/event writer + PG harness. Dũng B1 chat; B2 Draft/snapshot UI; B3 invitation/G2. Hoàng C1 Messaging API; C2 Draft/snapshot API; C3 invitation/locks/atomic accept.

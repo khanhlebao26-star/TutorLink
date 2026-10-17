@@ -9,4 +9,4 @@
 
 Không sửa snapshot khi Pending/Active. Muốn đổi offer chưa được accept: cancel invitation, chỉnh Draft theo version đã chốt rồi gửi lời mời mới; bản cũ bất biến. Listing thay đổi/archive không làm đổi thỏa thuận lịch sử.
 
-Đây là lifecycle đích từ proposal/backlog v3.1. Schema `pending/active/rejected/cancelled/expired` hiện chưa biểu diễn đủ; cần A/C chốt mapping và migration trước API W2.
+Đây là lifecycle đích từ proposal/backlog v3.1. Schema `pending/active/rejected/cancelled/expired` hiện chưa biểu diễn đủ; W2-A1 chốt mapping/backfill phục vụ Program/Invitation. Theo quyết định Hoàng15/10/2026, CHECK/state completed và lifecycle sản sinh Completed giữ W3-C3; W1/W2 không mở completed chỉ để có public reviews. GET reviews W1 đã có và trả rỗng đúng gate; W3 tái dùng endpoint, thêm visibility/write contract và chạy populated PostgreSQL regression.

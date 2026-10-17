@@ -2,8 +2,10 @@
 .owner-heading h1 { margin: 0 0 8px; font-size: 28px; }
 .owner-heading p { max-width: 760px; margin: 0; }
 .owner-tabs { display: flex; gap: 16px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
-.owner-tabs .button { border-radius: 0; white-space: nowrap; padding: 16px 12px; }
+.owner-tabs .button { align-items: center; border-radius: 0; display: inline-flex; flex: 0 0 auto; gap: 8px; white-space: nowrap; padding: 16px 12px; }
 .owner-tabs .button[aria-pressed="true"] { color: var(--brand); border-bottom: 2px solid var(--accent); }
+.owner-tab-count { align-items: center; background: #f0f1f6; border-radius: 999px; color: var(--muted); display: inline-flex; font-size: 11px; font-variant-numeric: tabular-nums; font-weight: 700; justify-content: center; min-width: 22px; padding: 2px 6px; }
+.owner-tabs .button[aria-pressed="true"] .owner-tab-count { background: var(--accent-soft); color: var(--accent-dark); }
 .owner-listings .data-table { font-size: 13px; }
 .owner-listings .data-table th { white-space: nowrap; }
 .owner-title { font-weight: 600; }

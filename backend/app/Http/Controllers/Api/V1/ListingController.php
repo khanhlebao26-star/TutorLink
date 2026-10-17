@@ -59,8 +59,8 @@ class ListingController extends Controller
 
                 $query->where(function ($query) use ($term): void {
                     $query
-                        ->where('title', 'ilike', "%{$term}%")
-                        ->orWhere('description', 'ilike', "%{$term}%");
+                        ->whereLike('title', "%{$term}%")
+                        ->orWhereLike('description', "%{$term}%");
                 });
             })
             ->when(isset($filters['category_id']), fn ($query) => $query->whereHas(
@@ -201,14 +201,28 @@ class ListingController extends Controller
     {
         $profile = $this->profile($request);
 
-        $listings = ServiceListing::query()
+        $filters = $request->validate([
+            'status' => ['sometimes', Rule::in(['all', 'draft', 'active', 'inactive', 'cancelled'])],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
+        ]);
+
+        $owned = ServiceListing::query()->where('tutor_profile_id', $profile->id);
+        $counts = (clone $owned)->selectRaw('status, COUNT(*) AS total')
+            ->groupBy('status')->pluck('total', 'status');
+        $statusCounts = ['all' => (int) $counts->sum()];
+        foreach (['draft', 'active', 'inactive', 'cancelled'] as $status) {
+            $statusCounts[$status] = (int) ($counts[$status] ?? 0);
+        }
+
+        $listings = $owned
             ->with([
                 'tutorProfile.user',
                 'specialization.subcategory.category',
             ])
-            ->where('tutor_profile_id', $profile->id)
+            ->when(($filters['status'] ?? 'all') !== 'all', fn ($query) => $query->where('status', $filters['status']))
             ->latest('id')
-            ->paginate(min(max($request->integer('per_page', 20), 1), 50));
+            ->paginate($filters['per_page'] ?? 20);
 
         return response()->json([
             'data' => ListingResource::collection($listings->items()),
@@ -216,6 +230,8 @@ class ListingController extends Controller
                 'current_page' => $listings->currentPage(),
                 'per_page' => $listings->perPage(),
                 'total' => $listings->total(),
+                'status_counts' => $statusCounts,
+                'allowed_actions' => ['create'],
             ],
         ]);
     }
@@ -248,6 +264,12 @@ class ListingController extends Controller
         $data = $request->validated();
         $requestedStatus = $data['status'] ?? null;
         unset($data['status']);
+
+        abort_if(
+            $requestedStatus === 'inactive' && ! in_array($listing->status, ['active', 'inactive'], true),
+            409,
+            'Only active listings can be paused.',
+        );
 
         $specializationId = $data['specialization_id']
             ?? $listing->specialization_id;

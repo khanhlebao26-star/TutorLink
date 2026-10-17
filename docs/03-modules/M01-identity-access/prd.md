@@ -7,3 +7,5 @@ Hiện có routes Auth và FE auth pages; Mailpit nhận email local. Không có
 AC: tuổi dưới 18/role Admin/email trùng bị chặn; reset phản hồi trung tính và invalid/expired token không đổi password; signed verify hợp lệ/giả/hết hạn; suspended account không login/private; mutation thiếu CSRF bị chặn qua middleware thực; 429 và retry UI hoạt động.
 
 Không scope: multi-role, OAuth, Supabase Auth, đổi password_hash convention. Thay đổi phải cập nhật OpenAPI/types và AC-G1-01/05; không công bố Auth Accepted nếu thiếu browser evidence.
+
+Quyết định Hoàng 15/10/2026: giữ nguyên Auth Laravel Sanctum cookie/CSRF; Breeze/starter kit chỉ optional sau. Settings W1 tối thiểu `/settings` gọi GET `/me`, PATCH `/me` chỉ full_name; email/role/status/xác minh chỉ đọc. Chưa đổi mật khẩu hoặc avatar Settings; onboarding avatar giữ scope cũ. Không có reference Settings riêng: functional có evidence, phần visual comparison ghi Blocked. [Contract](../../plans/w1-c3-closeout-contract.md), [retest](../../06-acceptance/issue-16-closeout.md).

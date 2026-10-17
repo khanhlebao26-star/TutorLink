@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\ListingController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
+use App\Http\Controllers\Api\V1\PublicTutorReviewController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
 use Illuminate\Support\Facades\Route;
@@ -48,6 +49,9 @@ Route::prefix('v1')->group(function () {
         PublicTutorController::class,
         'show',
     ])->where('slug', '[a-z0-9-]+');
+
+    Route::get('/tutors/{slug}/reviews', [PublicTutorReviewController::class, 'index'])
+        ->where('slug', '[a-z0-9-]+');
 
     Route::middleware(['auth:sanctum', EnsureActiveAccount::class])->group(function () {
         Route::get('/me/listings', [ListingController::class, 'myIndex']);

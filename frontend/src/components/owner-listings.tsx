@@ -10,24 +10,27 @@ import {
   statusLabels,
   transitionOwnerListing,
 } from "@/lib/data/marketplace";
-import type { MarketplaceStatus, OwnerListing, OwnerListingCollection } from "@/lib/data/marketplace-types";
+import type { MarketplaceStatus, OwnerListing, OwnerListingAction, OwnerListingCollection, OwnerListingStatusFilter } from "@/lib/data/marketplace-types";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Badge, Button, DataTable, ErrorActions, StatePanel } from "./ui";
 
-type OwnerAction = "publish" | "pause" | "archive";
+type OwnerMutationAction = Exclude<OwnerListingAction, "edit">;
 
-const actionLabels: Record<OwnerAction, string> = {
+const actionLabels: Record<OwnerMutationAction, string> = {
   publish: "Công khai",
   pause: "Tạm dừng",
   archive: "Lưu trữ",
 };
 
-function availableActions(status: MarketplaceStatus): OwnerAction[] {
-  if (status === "cancelled") return [];
-  if (status === "active") return ["pause", "archive"];
-  return ["publish", "archive"];
-}
+const mutationActions: OwnerMutationAction[] = ["publish", "pause", "archive"];
+const ownerFilters: Array<{ status: OwnerListingStatusFilter; label: string }> = [
+  { status: "all", label: "Tất cả" },
+  { status: "draft", label: "Bản nháp" },
+  { status: "active", label: "Đang hoạt động" },
+  { status: "inactive", label: "Tạm dừng" },
+  { status: "cancelled", label: "Đã lưu trữ" },
+];
 
 export function OwnerListingActions({
   listing,
@@ -36,16 +39,16 @@ export function OwnerListingActions({
 }: {
   listing: OwnerListing;
   busy: boolean;
-  onAction: (action: OwnerAction) => void;
+  onAction: (action: OwnerMutationAction) => void;
 }) {
   return (
     <div className="owner-row-actions">
-      {listing.status !== "cancelled" && !busy ? (
+      {listing.allowed_actions.includes("edit") && !busy ? (
         <Link className="button button-ghost" href={`/me/listings/${listing.id}/edit`}>
           Chỉnh sửa
         </Link>
       ) : null}
-      {availableActions(listing.status).map((action) => (
+      {mutationActions.filter((action) => listing.allowed_actions.includes(action)).map((action) => (
         <Button
           key={action}
           variant={action === "archive" ? "danger" : "outline"}
@@ -65,13 +68,14 @@ export function OwnerStatus({ status }: { status: MarketplaceStatus }) {
       className={`owner-status owner-status-${status}`}
       tone={status === "active" ? "success" : status === "inactive" ? "warning" : "neutral"}
     >
-      {statusLabels[status]}
+      {status === "inactive" ? "Tạm dừng" : status === "cancelled" ? "Đã lưu trữ" : statusLabels[status]}
     </Badge>
   );
 }
 
 export function OwnerListings() {
   const [collection, setCollection] = useState<OwnerListingCollection | null>(null);
+  const [status, setStatus] = useState<OwnerListingStatusFilter>("all");
   const [page, setPage] = useState(1);
   const [retry, setRetry] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -81,7 +85,7 @@ export function OwnerListings() {
 
   useEffect(() => {
     let current = true;
-    getOwnerListings(page)
+    getOwnerListings({ page, status })
       .then((data) => {
         if (current) {
           setCollection(data);
@@ -100,10 +104,10 @@ export function OwnerListings() {
     return () => {
       current = false;
     };
-  }, [page, retry]);
+  }, [page, retry, status]);
 
-  async function act(listing: OwnerListing, action: OwnerAction) {
-    if (busy || !availableActions(listing.status).includes(action)) return;
+  async function act(listing: OwnerListing, action: OwnerMutationAction) {
+    if (busy || !listing.allowed_actions.includes(action)) return;
     if (action === "archive" && !window.confirm(`Lưu trữ “${listing.title}”? Dịch vụ sẽ không còn hiển thị công khai.`)) return;
 
     setBusy(true);
@@ -116,7 +120,10 @@ export function OwnerListings() {
       setRetry((value) => value + 1);
     } catch (reason) {
       setNotice(describeApiError(reason));
-      setError(reason);
+      if (reason instanceof ApiClientError && reason.status === 409) {
+        setLoading(true);
+        setRetry((value) => value + 1);
+      }
     } finally {
       setBusy(false);
     }
@@ -129,7 +136,7 @@ export function OwnerListings() {
           <h1>Dịch vụ của tôi</h1>
           <p className="muted">Tạo, chỉnh sửa và quản lý dịch vụ bạn cung cấp. Chỉ gia sư đã được phê duyệt mới có thể công khai dịch vụ.</p>
         </div>
-        {!busy ? <Link className="button button-primary" href="/me/listings/new">＋ Tạo dịch vụ mới</Link> : null}
+        {!busy && collection?.meta.allowed_actions.includes("create") ? <Link className="button button-primary" href="/me/listings/new">＋ Tạo dịch vụ mới</Link> : null}
       </header>
 
       {notice ? <p role="status" className="owner-notice">{notice}</p> : null}
@@ -143,8 +150,26 @@ export function OwnerListings() {
         />
       ) : (
         <>
+          <nav className="owner-tabs" aria-label="Lọc dịch vụ theo trạng thái">
+            {ownerFilters.map((filter) => (
+              <Button
+                key={filter.status}
+                variant="ghost"
+                aria-pressed={status === filter.status}
+                disabled={busy}
+                onClick={() => {
+                  if (status === filter.status) return;
+                  setLoading(true);
+                  setStatus(filter.status);
+                  setPage(1);
+                }}
+              >
+                {filter.label}<span className="owner-tab-count">{collection.meta.status_counts[filter.status]}</span>
+              </Button>
+            ))}
+          </nav>
           {!collection.data.length ? (
-            <StatePanel kind="empty" message="Bạn chưa có dịch vụ nào." />
+            <StatePanel kind="empty" message={status === "all" ? "Bạn chưa có dịch vụ nào." : `Không có dịch vụ ở trạng thái “${ownerFilters.find((filter) => filter.status === status)?.label}”.`} />
           ) : (
             <DataTable
               rows={collection.data}
@@ -162,9 +187,9 @@ export function OwnerListings() {
             />
           )}
           <div className="owner-pagination">
-            <span>{collection.meta.total} dịch vụ · Trang {collection.meta.current_page}</span>
-            <Button variant="outline" disabled={busy || page <= 1} onClick={() => { setLoading(true); setPage((value) => value - 1); }}>Trước</Button>
-            <Button variant="outline" disabled={busy || page * collection.meta.per_page >= collection.meta.total} onClick={() => { setLoading(true); setPage((value) => value + 1); }}>Sau</Button>
+            <span>{collection.meta.total} dịch vụ · Trang {collection.meta.current_page} / {Math.max(1, Math.ceil(collection.meta.total / collection.meta.per_page))}</span>
+            <Button variant="outline" disabled={busy || collection.meta.current_page <= 1} onClick={() => { setLoading(true); setPage((value) => Math.max(1, value - 1)); }}>Trước</Button>
+            <Button variant="outline" disabled={busy || collection.meta.current_page * collection.meta.per_page >= collection.meta.total} onClick={() => { setLoading(true); setPage((value) => value + 1); }}>Sau</Button>
           </div>
         </>
       )}
@@ -203,8 +228,8 @@ export function OwnerListingDetail({ id }: { id: number }) {
     };
   }, [id, retry]);
 
-  async function act(action: OwnerAction) {
-    if (!listing || busy || !availableActions(listing.status).includes(action)) return;
+  async function act(action: OwnerMutationAction) {
+    if (!listing || busy || !listing.allowed_actions.includes(action)) return;
     if (action === "archive" && !window.confirm("Lưu trữ dịch vụ? Dịch vụ sẽ không còn hiển thị công khai.")) return;
 
     setBusy(true);
@@ -216,6 +241,10 @@ export function OwnerListingDetail({ id }: { id: number }) {
       setRetry((value) => value + 1);
     } catch (reason) {
       setActionError(reason);
+      if (reason instanceof ApiClientError && reason.status === 409) {
+        setLoading(true);
+        setRetry((value) => value + 1);
+      }
     } finally {
       setBusy(false);
     }
