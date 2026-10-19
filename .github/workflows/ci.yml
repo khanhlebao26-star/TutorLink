@@ -47,7 +47,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
-          extensions: mbstring, pdo_pgsql
+          extensions: mbstring, pdo_pgsql, pdo_sqlite
           coverage: none
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -67,6 +67,26 @@ jobs:
           php artisan key:generate
       - name: Validate PostgreSQL migrations
         run: php artisan migrate --force
+      - name: Export OpenAPI from the migrated SQLite schema
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: /tmp/tutorlink-openapi.sqlite
+        run: |
+          touch "$DB_DATABASE"
+          php artisan migrate --force --no-interaction
+          php artisan scramble:export --no-interaction
+      - name: Set up Node for OpenAPI validation
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Lint OpenAPI contract
+        run: npx --yes @redocly/cli@2.60.0 lint ../docs/api/openapi.json --config ../.redocly.yaml
+      - name: Verify OpenAPI matches registered routes
+        run: php scripts/verify-openapi-routes.php
+      - name: Check committed OpenAPI is current
+        run: |
+          git ls-files --error-unmatch ../docs/api/openapi.json
+          git diff --exit-code -- ../docs/api/openapi.json
       - name: Run backend tests
         run: php artisan test
 
@@ -90,15 +110,3 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
-
-  openapi:
-    name: OpenAPI contract
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: Validate OpenAPI
-        run: npx --yes @redocly/cli@2.60.0 lint docs/api/openapi.yaml
