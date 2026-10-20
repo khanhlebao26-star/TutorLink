@@ -20,6 +20,7 @@ Cung cấp Conversation riêng tư giữa Customer và Tutor để trao đổi t
 # Các quyết định Product/Domain đã hoàn tất
 
 * Một Conversation duy nhất cho cặp Customer–Tutor; Listing chỉ là ngữ cảnh tùy chọn; Program liên quan qua đúng cặp này, không tạo chat riêng cho từng Listing hoặc Program.  
+* BR-17: request mở chat nhận `peer_user_id`/`context_listing_id` tùy chọn; response peer tối thiểu, không lộ direct_key/dữ liệu riêng tư. Context chỉ lưu lúc tạo đầu tiên và không ghi đè khi dùng lại/tái mở. Member active vẫn đọc lịch sử khi peer bị đình chỉ; member bị đình chỉ bị từ chối truy cập kể cả khi còn session cũ, khôi phục thì đọc lại theo membership. Đình chỉ không tự đổi ConversationStatus hoặc membership.
 * ConversationStatus đích chỉ active/cancelled. Conversation chỉ đóng khi không còn Program active/paused và không còn Invitation pending còn hạn; khi có hoạt động mới đủ điều kiện thì dùng lại Conversation cũ.  
 * Chỉ thành viên được đọc/gửi trong Conversation của họ. Admin chỉ truy cập khi được phân công xử lý Report và phải ghi log.  
 * Server derive direct\_key từ cặp participant; idempotency message theo (sender\_id, client\_message\_id); cursor theo (created\_at,id), read cursor đơn điệu.  
@@ -31,8 +32,8 @@ Cung cấp Conversation riêng tư giữa Customer và Tutor để trao đổi t
 * Đã có migration messaging, nhưng hiện chưa có messaging routes/controller/API/UI trong repo.  
 * Migration cho phép Conversation pending/active/cancelled/expired và MessageType text/file/system; target Domain giữ ConversationStatus active/cancelled và MessageType text/file/system. Như vậy MessageType đã thống nhất; khác biệt ConversationStatus với migration vẫn cần mapping/migration được duyệt.  
 * Local W1-C1 contract cũ mô tả cancelled là terminal và Conversation pending/expired, khác State Lifecycles hiện hành; Domain docs đã hoàn tất là target, cần mapping/migration được duyệt.  
-* Enum Catalog đã có MessageType.file và API Route Catalog mô tả gửi text/file; không còn câu hỏi có mở loại message file hay không. MIME/kích thước, số lượng attachment, nhiều file trong một message và xử lý khi file mất vẫn là policy mở ở M04-F06/M10.  
-* Read-only access khi Profile/User bị suspend, trigger close/reopen, cùng-key khác-payload response, body/rate limit, inbox DTO/sort/unread và Admin report scope cần được chốt.
+* Enum Catalog đã có MessageType.file và API Route Catalog mô tả gửi text/file; không còn câu hỏi có mở loại message file hay không. BR-21 chốt một file/message, 5 MiB, allow-list, scan, retention orphan và xử lý object mất; runtime còn cần thực hiện các kiểm tra này.
+* Customer hoặc Tutor đều được mở liên hệ với vai trò còn lại qua gate M04-F01; cancelled chỉ mở lại bằng yêu cầu mở liên hệ mới đủ điều kiện. BR-17 chốt DTO peer/context và lịch sử khi đình chỉ; BR-21 chốt member active không gửi khi peer bị đình chỉ, inbox/unread/read receipt, body/rate limit, conflict idempotency và policy file chat. Runtime, migration và wire DTO vẫn cần triển khai. Admin report scope đã chốt ở BR-11; field masking/retention của evidence vẫn theo D16–D17.
 
 # Implementation evidence
 

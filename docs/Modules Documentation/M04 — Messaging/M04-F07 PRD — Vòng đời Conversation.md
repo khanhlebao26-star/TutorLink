@@ -13,6 +13,7 @@ Giữ trạng thái Conversation đồng bộ với các Program/Invitation đan
 * Nếu còn quan hệ đang tiếp diễn, Conversation vẫn active.  
 * cancelled là read-only; khi có hoạt động dịch vụ mới và cặp đủ điều kiện, tái kích hoạt trên đúng Conversation cũ, không tạo Conversation thứ hai.  
 * Không tự xóa Conversation hoặc tin nhắn; giữ lịch sử theo policy.
+* Đình chỉ một participant không tự đổi ConversationStatus hoặc membership; người còn active tiếp tục đọc lịch sử, người bị đình chỉ bị từ chối đọc/gửi kể cả khi còn session cũ. Sau khi được khôi phục, participant đọc lại lịch sử theo membership; gửi mới vẫn phải qua status và policy M04-F04.
 
 # 3\. Hành vi đích
 
@@ -28,8 +29,8 @@ Máy chủ tính lại điều kiện theo quan hệ Program/Invitation trong tr
 # 5\. Chênh lệch/câu hỏi mở
 
 * Migration hiện cho status pending/active/cancelled/expired; target Domain chỉ active/cancelled. Local W1-C1 contract còn mô tả pending/expired terminal và cancelled không reopen, mâu thuẫn với State Lifecycles hiện hành. Cần migration/transition mapping được duyệt.  
-* Chốt event chính xác kích hoạt kiểm tra đóng, trigger reopen, và thông điệp system có ghi vào timeline khi đổi status hay không.  
-* Chốt quyền đọc lịch sử cancelled sau khi User/Tutor Profile bị suspend hoặc account bị khóa.
+* BR-21 chốt không tự ghi system message khi lifecycle đổi trạng thái. Server tính lại điều kiện đóng trong cùng giao dịch với sự kiện Program/Invitation làm thay đổi quan hệ; Conversation chỉ được mở lại qua request mở liên hệ mới đủ gate tại M04-F01.
+* BR-17 đã chốt quyền đọc lịch sử cancelled và trường hợp participant bị đình chỉ. Trigger đóng/mở, migration và chính sách gửi ở M04-F04 vẫn cần triển khai/kiểm thử.
 
 # 6\. Nguồn
 

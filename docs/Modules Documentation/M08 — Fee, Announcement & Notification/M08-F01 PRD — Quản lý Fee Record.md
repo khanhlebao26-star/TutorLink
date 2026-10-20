@@ -8,27 +8,28 @@ Tutor ghi nhận khoản phí đã thỏa thuận trong Program theo tháng; s�
 
 # 2\. Quy tắc nghiệp vụ
 
-* Tối đa một Fee Record mỗi Program/tháng YYYY-MM; amount là số nguyên VND không âm.  
+* Tối đa một Fee Record mỗi Program/tháng `YYYY-MM`, xác định theo lịch `Program.timezone`; `period_start` là ngày đầu tháng và `period_end` là ngày cuối tháng. Chỉ tạo khi Program Active, từ tháng kích hoạt đến tháng hiện tại; cho khai báo bù, không tạo tháng tương lai. Amount là số nguyên VND không âm; 0 đồng nghĩa là miễn phí, còn không có record là chưa khai báo.
 * Tutor owner nhập tay. Không tính từ Session, không gọi cổng thanh toán và không tuyên bố đã thanh toán.  
-* UI/response luôn ghi rõ “Do Tutor khai báo, không phải bằng chứng thanh toán”.  
-* FeeRecordStatus: declared → voided, không mở lại. TutorPaymentMark độc lập: unmarked → marked\_paid/marked\_unpaid; paid ↔ unpaid cần audit và reason khi đổi paid sang unpaid.  
-* Void giữ nguyên payment mark, giữ kỳ tháng và record để lịch sử không bị ghi đè.  
-* Program Paused cấm tạo Fee Record mới nhưng cho xử lý record có sẵn theo policy; terminal readonly.
+* UI/response luôn ghi rõ “Do Tutor khai báo, không phải bằng chứng thanh toán”. Customer member thấy kỳ, số tiền, status, payment mark, thời điểm cập nhật và lý do điều chỉnh. Copy của payment mark phải nói rõ “Tutor đánh dấu đã thu/chưa thu”, không nói Customer đã thanh toán thành công.
+* FeeRecordStatus: declared → voided, không mở lại. TutorPaymentMark độc lập: unmarked → marked\_paid/marked\_unpaid; paid ↔ unpaid cần audit và reason khi đổi paid sang unpaid. Amount 0 giữ mark unmarked và không cho mark paid/unpaid; chỉ cho sửa amount về 0 khi mark hiện tại là unmarked, không reset mark đã ghi. Voided là trạng thái cuối: không sửa amount, mark hoặc void lần nữa.
+* Void giữ nguyên payment mark, giữ kỳ tháng và record để lịch sử không bị ghi đè; void bắt buộc lý do và record voided vẫn chiếm kỳ. PATCH đổi amount cũng bắt buộc lý do.
+* Program Paused cấm tạo Fee Record mới nhưng cho sửa/mark/void record có sẵn theo policy; terminal readonly. Chỉ sửa `amount_minor`/reason khi status `declared` và payment mark chưa `marked_paid`; không đổi kỳ tháng và không sửa record `voided`.
+* Fee Record có integer `version` bắt đầu từ 1. PATCH/mark/void yêu cầu `expected_version`; mismatch trả 409 và không ghi một phần. Mỗi mutation thành công tăng version một lần; đổi `marked_paid` sang `marked_unpaid` vẫn cần reason và audit. Mọi mutation nhận Idempotency-Key; sau khi kiểm lại authorization, cùng actor/key/method/path/payload trả kết quả đã commit; cùng key nhưng request khác trả 409. Replay không tăng version/audit/notification. Mỗi mutation thành công phát `fee_record_changed` in-app cho Customer member sau commit.
 
 # 3\. Tiêu chí chấp nhận
 
-* Owner tạo đúng một record cho kỳ tháng; duplicate request trả conflict hoặc replay theo idempotency contract.  
+* Owner tạo đúng một record cho kỳ tháng; cùng key/payload retry trả record cũ, key khác cùng kỳ trả 409.
 * Amount âm, float, currency khác VND hoặc kỳ sai format bị từ chối.  
-* Mark paid/unpaid và void tuân state machine; voided không sửa hoặc chiếm kỳ mới.  
-* Customer member xem đúng phạm vi và disclaimer; outsider bị từ chối.
+* Mark paid/unpaid và void tuân state machine; voided không mutation được và vẫn chiếm kỳ unique.
+* Customer member xem đúng phạm vi, disclaimer và lý do được chia sẻ; outsider bị từ chối.
+* Stale PATCH/mark/void trả 409, không ghi thay đổi hoặc tạo side effect.
 
-# 4\. Chênh lệch/câu hỏi mở
+# 4\. Khoảng trống triển khai
 
-* Schema cũ dùng declared/confirmed/cancelled; target tách FeeRecordStatus và TutorPaymentMark. Mapping migration/API phải được duyệt.  
-* Chốt ngày/tháng theo timezone, edit policy cho record declared và action khi đổi marked\_paid → marked\_unpaid.
+* Schema cũ dùng declared/confirmed/cancelled; target tách FeeRecordStatus và TutorPaymentMark. Trước migration phải kiểm kê dữ liệu và xác minh nghĩa của `confirmed`; không suy nó thành Customer đã thanh toán.
+* BR-19, BR-20 và BR-22 đã chốt policy sửa, version, timezone, kỳ khai báo, số tiền 0, idempotency, thông báo và cách hiển thị Customer. API/schema/runtime còn cần đồng bộ; kiểm kê và xác minh ý nghĩa legacy `confirmed` trước migration, không suy thành bằng chứng thanh toán.
 
 # 5\. Nguồn
 
-Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-05 Workspace tới Completed. Link nguồn: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit · https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit · https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit · https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edi  
-Đồng bộ 18/10/2026 — Chống stale update: PATCH Fee hiện chỉ có amount\_minor/reason, chưa có giao thức version/ETag được chốt. Row lock và kiểm status không tự chứng minh không ghi đè thay đổi từ tab cũ. Theo D22, phần sửa phí bị chặn phát hành cho đến khi owner kỹ thuật xác nhận cơ chế và test PostgreSQL; lượt đồng bộ này không thêm cột, field, endpoint hoặc hạn chế nghiệp vụ mới.  
-t
+Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-05 Workspace tới Completed. Link nguồn: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit · https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit · https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit · https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit
+Đồng bộ 20/10/2026 — BR-19/20/22 chốt version guard, kỳ tháng và quy tắc Fee Record; runtime/schema còn cần đồng bộ.

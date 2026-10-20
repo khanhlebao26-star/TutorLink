@@ -21,13 +21,17 @@ Tách M01 thành các luồng người dùng/API có thể giao việc và nghi�
 
 * Customer từ đủ 15 tuổi; Tutor từ đủ 18 tuổi. Admin được tạo nội bộ; Guest là trạng thái truy cập công khai, không phải role.  
 * Một tài khoản chỉ có một role cố định. Backend kiểm tra role, trạng thái và quyền trên mọi API riêng tư.  
-* Dùng session cookie Sanctum và CSRF cho mutation; không lưu bearer token dài hạn trong localStorage.
+* Dùng session cookie Sanctum và CSRF cho mutation; không phát hành access token qua luồng đăng nhập của SPA.
+* Đăng ký và sửa ngày sinh tại màn hình hồ sơ đều kiểm tuổi theo role: Customer 15+, Tutor 18+. Đăng ký yêu cầu đồng ý điều khoản phiên bản hiện hành; lưu version và thời điểm chấp nhận. Reset mật khẩu thành công thu hồi các phiên cũ trên mọi thiết bị.
+* Đăng ký tạo tài khoản unverified để xác minh email nhưng không tạo session; chỉ đăng nhập sau khi email verified. Route gửi lại email xác minh cần truy cập công khai có chống dò và rate limit.
+* D09 đã chốt tại M01-F07: Customer Profile là resource riêng, các field tùy chọn; GET chưa có row trả `profile: null`, PUT upsert theo field, omission giữ nguyên, `null` xóa giá trị nullable. Avatar theo vòng đời File, không thuộc Tutor Profile.
 
 # Các điểm cần đồng bộ
 
 * Project Overview, Roles & Actors, Goals & Non-goals và Business Rules thống nhất Customer từ đủ 15 tuổi, Tutor từ đủ 18 tuổi. RegisterRequest/runtime hiện vẫn yêu cầu 18 tuổi cho cả hai role; API contract, validation và giao diện cần cập nhật trước khi coi quyết định này đã được triển khai.  
-* terms\_version hiện nullable trong schema/validation; chưa tự coi là điều kiện bắt buộc.  
+* `terms_version` hiện nullable, chưa có `terms_accepted_at`; backend/form và OpenAPI cần đồng bộ quy tắc đồng ý điều khoản đã chốt. Registration và UpdateMe vẫn áp ngưỡng 18 tuổi cho cả hai role; reset chưa thu hồi session. Runtime còn auto-login sau register, cho unverified login và đòi session khi resend; tất cả cần sửa theo BR-12.
 * Route login hiện chưa khai báo rate limit. Product/Domain Documents đã hoàn tất chưa quy định giới hạn này; chốt trong Security NFR trước khi đưa thành acceptance bắt buộc.
+* GET/PUT `/api/v1/customer/profile` vẫn Dự kiến và chưa có trong OpenAPI sinh từ code. Khi triển khai phải đồng bộ DTO, validation, quyền, File policy và kiểm thử theo D09 đã chốt.
 
 # NFR liên quan
 

@@ -299,6 +299,8 @@
 
 **43 NotificationType**
 
+* listing\_moderation\_hidden \= Admin đặt hold Listing; báo Tutor lý do có thể chia sẻ và cách liên hệ hỗ trợ;
+* listing\_moderation\_restored \= Admin gỡ hold Listing; báo Tutor kết quả thực tế (đã active hoặc cần Tutor tự publish lại);
 * tutor\_profile\_submitted \= Gửi hồ sơ;   
 * tutor\_profile\_approved \= Duyệt hồ sơ;   
 * tutor\_profile\_changes\_requested \= Yêu cầu sửa hồ sơ;  
@@ -318,6 +320,7 @@
 * task\_revision\_requested \= Yêu cầu sửa bài;   
     
 * announcement\_published \= Công bố thông báo;   
+* fee\_record\_changed \= Tutor cập nhật thông tin phí khai báo;
 * program\_paused \= Pause Program;   
 * program\_resumed \= Resume;   
 * program\_completed \= Hoàn thành Program;   
@@ -347,6 +350,7 @@
 * admin.tutor\_profiles.view \= Xem hồ sơ;   
 * admin.tutor\_profiles.decide \= Duyệt hồ sơ;   
 * admin.verification\_documents.download \= Tải giấy tờ;   
+* admin.verification\_documents.decide \= Duyệt/từ chối từng giấy tờ trong Profile được giao; tách khỏi quyền tải;
 * admin.tutor\_profiles.suspend \= Suspend/restore hồ sơ;   
 * admin.accounts.suspend \= Suspend/restore account;   
 * admin.reports.view \= Xem report/evidence theo scope;   
@@ -355,6 +359,7 @@
 * admin.audit\_logs.view \= Đọc audit theo scope  
 * admin.tutor\_profiles.assign \= Giao/chuyển/thu hồi người phụ trách hồ sơ Tutor;   
 * admin.reports.assign \= Giao/chuyển/thu hồi người phụ trách Report;
+* admin.listings.moderate \= Ẩn/gỡ moderation hold của mọi Listing trong MVP; không dùng assignment Report/Listing;
 
 **48 AdminTutorProfileAction**
 
@@ -380,6 +385,21 @@
 **51 ProgressAction**
 
 * edit \= Sửa tiến độ
+
+**52 ListingModerationReasonCode**
+
+* policy\_violation \= Hide do vi phạm chính sách;
+* issue\_resolved \= Restore sau khi vấn đề đã được xử lý;
+* decision\_reversed \= Restore vì quyết định hide được đảo lại;
+* other \= Lý do khác. Hide chỉ nhận policy\_violation/other; restore chỉ nhận issue\_resolved/decision\_reversed/other. Mọi code đều cần reason giải thích không rỗng.
+
+**53 TutorProfileRevisionStatus**
+
+* draft \= Bản sửa Profile approved đang chuẩn bị;
+* submitted \= Đã gửi để xét duyệt;
+* changes\_requested \= Admin yêu cầu sửa bản revision;
+* approved \= Revision được duyệt và đã thay bản công khai;
+* rejected \= Revision bị từ chối, không tự nộp lại trong MVP.
 
 F03 — Bổ sung AdminPermission  
 admin.tutor\_profiles.assign \= Giao/chuyển/thu hồi người phụ trách hồ sơ Tutor; chỉ cho phép xem metadata tối thiểu của hàng đợi phân công.  

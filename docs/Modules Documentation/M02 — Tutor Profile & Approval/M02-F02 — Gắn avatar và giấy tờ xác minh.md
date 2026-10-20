@@ -14,6 +14,9 @@ Liên kết tệp đã tải lên với hồ sơ Tutor theo đúng chủ sở h�
 * Giấy tờ xác minh là private, không được đưa vào hồ sơ công khai hay trả cho người chưa đăng nhập.  
 * Admin chỉ truy cập bằng chứng trong phạm vi hồ sơ được phân công. Quyền xem hồ sơ và quyền tải giấy tờ được tách biệt; tải/đọc bằng chứng phải được ghi nhật ký.  
 * VerificationDocumentStatus là vòng đời độc lập với TutorProfileStatus; tài liệu domain xác định pending, approved, rejected và expired theo điều kiện hết hiệu lực.
+* Checklist định danh cần một `identity_card` hoặc `passport` complete; `other` không thay thế. Degree/certificate chỉ bắt buộc khi Tutor khai báo qualification tương ứng bằng trường có cấu trúc. Thay file tạo document mới, giữ bản cũ và lịch sử quyết định.
+* Admin active đang được giao hồ sơ cần `admin.verification_documents.decide` để quyết định từng giấy tờ; quyền tải file riêng là `admin.verification_documents.download`. Reject cần reason và audit. Profile approval không tự approve document.
+* Giấy tờ có hạn lưu `expires_at`; degree không tự hết hạn nếu không có hạn thực tế. Giấy tờ bắt buộc expired làm mất gate công khai/tạo dịch vụ mới cho đến khi bản thay thế approved; không tự đình chỉ account/Profile hay hủy Program cũ.
 
 # Luồng
 
@@ -30,8 +33,8 @@ Liên kết tệp đã tải lên với hồ sơ Tutor theo đúng chủ sở h�
 
 # Điểm cần chốt
 
-* Danh sách document\_type, số lượng tối thiểu/tối đa, định dạng, dung lượng và quy tắc hết hạn phải khớp Enum Catalog và module File.  
-* State Lifecycles có trạng thái riêng cho giấy tờ; cần chốt quan hệ giữa trạng thái document và quyết định Profile. API Route Catalog có placeholder POST /api/v1/admin/verification-documents/{document}/approve và /reject, cả hai đang “Cần bổ sung”; WF01 mô tả đây là luồng dự kiến, chưa phải success contract được duyệt. Cần Product chốt permission/reason/notification, expiry/replacement, document\_type/count và điều kiện giấy tờ bắt buộc trước khi đồng bộ Enum/DB/OpenAPI. Không tự đổi VerificationDocumentStatus theo quyết định Profile.
+* MIME/dung lượng và giới hạn tổng số file thuộc D14–D15; checklist nghiệp vụ tối thiểu đã chốt ở BR-16. Qualification phải được biểu diễn bằng dữ liệu có cấu trúc trước khi áp dụng gate degree/certificate, không phân tích headline/bio tự động.
+* Hai route Admin document approve/reject trong Catalog vẫn “Dự kiến”, chưa có success DTO/runtime. Đồng bộ permission, reason, expiry và replacement vào schema/API trước triển khai; không tự đổi VerificationDocumentStatus theo quyết định Profile.
 
 # Nguồn và phụ thuộc
 

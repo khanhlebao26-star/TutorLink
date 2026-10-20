@@ -10,9 +10,12 @@ Phát notification trong ứng dụng tới đúng recipient sau khi sự kiện
 
 * Invitation nhận được → Customer được mời; accepted/rejected → Tutor owner; cancelled → Customer; expired → Tutor owner.  
 * Task assigned → Customer assignee; submitted → Tutor owner; feedback received/revision requested → Customer assignee.  
-* Announcement published → các Program member còn lại.  
+* Announcement published → các member hiện tại khác Tutor owner tại thời điểm publish; recipient được chốt trong transaction publish. Member tham gia Program sau đó đọc được Announcement khi truy cập Workspace nhưng không nhận thông báo hồi tố. Notification chỉ chứa nội dung trung tính, Announcement ID/deep link; không chứa body hoặc metadata file. Khi mở deep link, resource kiểm lại membership hiện tại.
+* Fee Record tạo/sửa amount/đổi payment mark/void thành công → Customer member nhận `fee_record_changed`; copy nói “Tutor đã cập nhật thông tin phí”, không khẳng định Customer đã thanh toán. Payload chỉ resource/deep link và kỳ, UI tải dữ liệu qua GET có quyền. Mỗi mutation có event key riêng theo Fee Record version; rollback hoặc replay không tạo notification mới.
 * Program paused/resumed/completed/cancelled → member còn lại của Program.  
-* Ma trận MVP theo NotificationType hiện có trong Enum: tutor\_profile\_submitted → coordinator có quyền phân công; tutor\_profile\_approved/changes\_requested/rejected/suspended/restored → Tutor sở hữu hồ sơ; invitation\_received → Customer được mời, accepted/rejected → Tutor owner, cancelled → Customer, expired → Tutor owner; task\_assigned → Customer assignee, submitted → Tutor owner, feedback\_received/revision\_requested → Customer assignee; announcement\_published → member còn lại; program\_paused/resumed/completed/cancelled → member còn lại; report\_resolved/dismissed → người gửi Report. Type mới phải cập nhật Enum và ma trận này.
+* Listing bị Admin hide thành công → Tutor owner nhận `listing_moderation_hidden` sau commit, payload tối thiểu gồm Listing ID/deep link, trạng thái đã ẩn, lý do được phép chia sẻ và hướng liên hệ hỗ trợ; không chứa reporter/evidence. Hide bị từ chối không ghi outbox/notification.
+* Listing moderation hold được gỡ thành công → Tutor owner nhận `listing_moderation_restored`; payload cho biết Listing đã `active` hay vẫn `inactive` do Tutor tự pause. Restore bị từ chối không ghi outbox/notification. Không báo “đã công khai” trước khi transaction active + gỡ hold hoàn tất.
+* Ma trận MVP theo NotificationType hiện có trong Enum: listing\_moderation\_hidden/restored → Tutor owner; tutor\_profile\_submitted → coordinator có quyền phân công; tutor\_profile\_approved/changes\_requested/rejected/suspended/restored → Tutor sở hữu hồ sơ; invitation\_received → Customer được mời, accepted/rejected → Tutor owner, cancelled → Customer, expired → Tutor owner; task\_assigned → Customer assignee, submitted → Tutor owner, feedback\_received/revision\_requested → Customer assignee; announcement\_published → member còn lại; fee\_record\_changed → Customer member; program\_paused/resumed/completed/cancelled → member còn lại; report\_resolved/dismissed → người gửi Report. Type mới phải cập nhật Enum và ma trận này.
 
 # 3\. Quy tắc reliability
 
@@ -25,7 +28,8 @@ Phát notification trong ứng dụng tới đúng recipient sau khi sự kiện
 # 4\. Tiêu chí chấp nhận
 
 * Mỗi event nghiệp vụ hợp lệ tạo notification đúng recipient và deep link đúng resource.  
-* Replay cùng event\_key chỉ có một bản ghi notification.  
+* Replay cùng event\_key chỉ có một bản ghi notification. Fee event key gồm Fee Record ID và version đã commit; một version chỉ phát tối đa một `fee_record_changed` tới Customer.
+* Announcement publish ghi outbox cho đúng recipient snapshot trong cùng transaction cập nhật Published và audit; retry cùng publish không tạo outbox/notification thứ hai.
 * Commit nghiệp vụ luôn có outbox row trong cùng transaction; rollback không để outbox/notification mồ côi. Worker retry/replay cùng recipient/type/event\_key không tạo notification thứ hai; lỗi tạo notification không đánh dấu outbox đã xử lý.  
 * Recipient khác không đọc được notification bằng ID/deep link.
 

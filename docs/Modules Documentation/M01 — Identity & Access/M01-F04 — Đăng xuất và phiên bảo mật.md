@@ -22,7 +22,7 @@ Khởi tạo cookie CSRF cho SPA và kết thúc phiên hiện tại một cách
 * Logout kết thúc session; request private tiếp theo trả 401\.  
 * Logout khi chưa xác thực trả 401; logout không để lại session có thể tái sử dụng.  
 * Mutation thiếu/sai CSRF trả 419 và state không đổi.  
-* Không lưu bearer token/session secret vào localStorage hoặc ghi cookie/token vào log.
+* Không lưu session secret vào localStorage hoặc ghi cookie/CSRF token vào log.
 
 # Ghi chú
 

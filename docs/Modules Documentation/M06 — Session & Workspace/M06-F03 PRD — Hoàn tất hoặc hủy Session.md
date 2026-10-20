@@ -20,11 +20,12 @@ Tutor owner ghi nhận kết quả của Scheduled Session mà không xóa mất
 * Retry/double-submit không tạo lesson occurrence thứ hai.  
 * Program Paused vẫn cho xử lý Session đã lên lịch theo policy; Program Completed/Cancelled readonly.  
 * Hủy chỉ chuyển program\_sessions sang cancelled, không tạo lesson\_sessions; lịch sử được giữ và Overview không tính lịch dự kiến hoặc Session bị hủy là buổi đã thực hiện. Replay request tương đương với trạng thái cuối và payload gốc trả lại kết quả hiện có, không tạo thêm actual hoặc audit; transition mới sau khi Program terminal vẫn bị từ chối.
+* Complete/cancel request mới phải gửi `expected_version`; kiểm version và trạng thái trong cùng transaction. Mỗi transition thành công tăng `program_sessions.version` một lần. Replay hợp lệ được trả kết quả đã lưu mà không tăng version/audit lần nữa.
 
 # 4\. Chênh lệch/câu hỏi mở
 
 * Thiết kế transaction đã chốt: đổi trạng thái lịch và tạo lesson\_sessions completed cùng transaction với audit bắt buộc; replay không tạo actual/audit lần hai. Chưa có bằng chứng runtime/kiểm thử thì giữ trạng thái chưa xác minh, không ghi lại đây là câu hỏi chọn mô hình.  
-* Đã được Dũng xác nhận ngày 18/10/2026: Tutor owner được hoàn tất/hủy Session đã lên lịch khi Program Active hoặc Paused; Paused không tạo mới, edit lịch còn mở. Program terminal cấm chuyển trạng thái mới; chỉ replay tương đương được trả kết quả đã lưu, không ghi lần hai.
+* Đã được Dũng xác nhận ngày 18/10/2026 và chốt D21–D22 tại BR-19 ngày 20/10/2026: Tutor owner được hoàn tất/hủy Session scheduled khi Program Active hoặc Paused; Paused không tạo mới và không cho sửa lịch. Program terminal cấm transition mới; chỉ replay tương đương được trả kết quả đã lưu, không ghi lần hai. Versioned write và implementation evidence còn cần đồng bộ.
 
 # 5\. Nguồn
 
