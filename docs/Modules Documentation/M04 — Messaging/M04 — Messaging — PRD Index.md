@@ -1,0 +1,51 @@
+# M04 — Messaging
+
+## PRD Index · 8 chức năng · Draft · Cập nhật 17/10/2026
+
+# Mục tiêu module
+
+Cung cấp Conversation riêng tư giữa Customer và Tutor để trao đổi trước và trong hành trình dịch vụ, với REST-first messaging, kiểm soát membership, retry an toàn, trạng thái đọc và tệp đính kèm theo policy.
+
+# Danh sách PRD chức năng
+
+[M04-F01 PRD — Tạo hoặc dùng lại Conversation](https://docs.google.com/document/d/1GrevCMkVk_GbjwAndRQTLaYhbE6i9YvFaOmb-rEsQ9s/edit)  
+[M04-F02 PRD — Danh sách Conversation của tôi](https://docs.google.com/document/d/1jvb947SedkCIdrMraAFWl-iKD3-ZkI1Gf4eCiOIyYS4/edit)  
+[M04-F03 PRD — Đọc lịch sử tin nhắn và đồng bộ](https://docs.google.com/document/d/1FKJDv64BKmw2Hq_49H3VCBJE7kK8d_smsFUWmtZUdUU/edit)  
+[M04-F04 PRD — Gửi tin nhắn văn bản và retry](https://docs.google.com/document/d/1D0FaU6rjXGFF8-bs9kubgYeLLjZlW0jfY88Vptmwz5c/edit)  
+[M04-F05 PRD — Cập nhật trạng thái đã đọc](https://docs.google.com/document/d/10TiImXCk03uq5Dn-KMzMvlh_tCij3hjIvNOCvVDTio0/edit)  
+[M04-F06 PRD — Đính kèm và truy cập tệp trong chat](https://docs.google.com/document/d/1Pa6h_Phz1z5lCq24KvsnkQ_PRJXvz8lLKcjv8Wzgb5o/edit)  
+[M04-F07 PRD — Vòng đời Conversation](https://docs.google.com/document/d/16f8jtst4_4xNtD9xPgoPumdixo5Gh2ifpHdKbnIMX9g/edit)  
+[M04-F08 PRD — Admin truy cập chat theo phạm vi báo cáo](https://docs.google.com/document/d/1fpbuBU1Cx7yarxP-UUhdUVjE32somV9AURacXnbn54g/edit)
+
+# Các quyết định Product/Domain đã hoàn tất
+
+* Một Conversation duy nhất cho cặp Customer–Tutor; Listing chỉ là ngữ cảnh tùy chọn; Program liên quan qua đúng cặp này, không tạo chat riêng cho từng Listing hoặc Program.  
+* ConversationStatus đích chỉ active/cancelled. Conversation chỉ đóng khi không còn Program active/paused và không còn Invitation pending còn hạn; khi có hoạt động mới đủ điều kiện thì dùng lại Conversation cũ.  
+* Chỉ thành viên được đọc/gửi trong Conversation của họ. Admin chỉ truy cập khi được phân công xử lý Report và phải ghi log.  
+* Server derive direct\_key từ cặp participant; idempotency message theo (sender\_id, client\_message\_id); cursor theo (created\_at,id), read cursor đơn điệu.  
+* REST persistence/polling và resync sau reconnect là baseline G2; Reverb/private channels là tùy chọn sau core.  
+* File attachment phải complete, đúng owner/purpose/resource, private theo membership; tệp được phép tải qua backend authorization.
+
+# Các chênh lệch và quyết định còn mở
+
+* Đã có migration messaging, nhưng hiện chưa có messaging routes/controller/API/UI trong repo.  
+* Migration cho phép Conversation pending/active/cancelled/expired và MessageType text/file/system; target Domain giữ ConversationStatus active/cancelled và MessageType text/file/system. Như vậy MessageType đã thống nhất; khác biệt ConversationStatus với migration vẫn cần mapping/migration được duyệt.  
+* Local W1-C1 contract cũ mô tả cancelled là terminal và Conversation pending/expired, khác State Lifecycles hiện hành; Domain docs đã hoàn tất là target, cần mapping/migration được duyệt.  
+* Enum Catalog đã có MessageType.file và API Route Catalog mô tả gửi text/file; không còn câu hỏi có mở loại message file hay không. MIME/kích thước, số lượng attachment, nhiều file trong một message và xử lý khi file mất vẫn là policy mở ở M04-F06/M10.  
+* Read-only access khi Profile/User bị suspend, trigger close/reopen, cùng-key khác-payload response, body/rate limit, inbox DTO/sort/unread và Admin report scope cần được chốt.
+
+# Implementation evidence
+
+* backend/database/migrations/2026\_10\_07\_000300\_create\_messaging\_tables.php tạo conversations, conversation\_members, messages; có unique direct\_key, unique (sender\_id, client\_message\_id), read cursor FK và index conversation/time.  
+* Data model note ghi natural key/cursor service policy còn cần hiện thực. Bảng migration không đồng nghĩa endpoint hoặc permission đã có.
+
+Nguồn chuẩn PRD: các Product/Domain Docs hoàn tất liên kết dưới đây. Module README, WF-03, ADR-002, OpenAPI và migration được dùng để đối chiếu implementation/contract, không ghi đè quyết định Product/Domain.
+
+# Product & Domain source documents
+
+Roles & Actors: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit  
+Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit  
+State Lifecycles: https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit  
+Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit  
+Domain Model: https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit  
+Project Overview: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit
