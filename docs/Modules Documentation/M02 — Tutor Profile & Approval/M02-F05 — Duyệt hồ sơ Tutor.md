@@ -13,7 +13,8 @@ Ghi nhận quyết định chấp thuận hồ sơ đã gửi, cho phép hồ s�
 * Quyết định lưu người duyệt, thời điểm và lý do vào lịch sử/audit.  
 * Sau approved, hồ sơ đủ điều kiện hiển thị công khai; Listing vẫn chỉ công khai nếu ListingStatus active, UserStatus active, email verified và các điều kiện catalog khác đều thỏa.  
 * Duyệt hồ sơ không tự kích hoạt Listing, không tạo Program và không cấp quyền truy cập tài nguyên riêng tư.  
-* Trạng thái từng VerificationDocument là lifecycle riêng. Tài liệu hoàn tất chưa xác định hồ sơ approved có yêu cầu mọi giấy tờ chuyển approved hay Admin quyết định giấy tờ riêng.
+* Chỉ duyệt khi từng giấy tờ bắt buộc hiện hành đã approved và chưa expired; giấy tờ bổ sung không bắt buộc không chặn duyệt. Admin quyết định giấy tờ bằng quyền/route riêng; duyệt Profile không tự duyệt giấy tờ.
+* Với revision của hồ sơ đã approved, cùng quyết định approve áp dụng lên revision và thay nội dung công khai nguyên tử; TutorProfileStatus vẫn approved. Phải kiểm version để không duyệt revision cũ.
 
 # Luồng
 
@@ -24,7 +25,7 @@ Ghi nhận quyết định chấp thuận hồ sơ đã gửi, cho phép hồ s�
 # Tiêu chí chấp nhận
 
 * Hồ sơ submitted hợp lệ chuyển đúng một lần sang approved.  
-* Hồ sơ draft, changes\_requested chưa gửi lại, rejected, suspended hoặc đã có decision không thể bị duyệt qua request cũ.  
+* Hồ sơ draft, changes\_requested chưa gửi lại, rejected, suspended hoặc đã có decision không thể bị duyệt qua request cũ; revision approved chỉ được quyết định nếu đã submitted.
 * Thiếu quyền, sai assignment hoặc trạng thái stale bị từ chối; trạng thái mới hơn không bị ghi đè.  
 * Decision có actor/time/reason; lỗi ghi nhận không để profile và audit lệch nhau.
 

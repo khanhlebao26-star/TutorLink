@@ -184,7 +184,7 @@ Khi đếm tổng số bản ghi và trả danh sách dữ liệu, API phải á
 * **Notification:** sử dụng cursor ổn định để tránh bỏ sót hoặc lặp dữ liệu khi tải tiếp.  
 * **Submission:** sử dụng version để xác định đúng phiên bản dữ liệu.
 
-API không được trả về danh sách không giới hạn số lượng bản ghi, kể cả Listing nhúng trong PublicTutor. Hợp đồng hiện chưa chốt giới hạn/cách tải tiếp của danh sách nhúng này; theo D06, chưa dùng response đó làm bằng chứng đạt PC-05 và chưa tự thêm filter, cursor hoặc endpoint. Truy vấn không được phát sinh thêm một truy vấn riêng cho từng bản ghi theo cách gây N+1.
+API không được trả về danh sách không giới hạn số lượng bản ghi. D06/BR-14 đã chốt Listing nhúng trong PublicTutor tối đa 10/trang, tải trang sau bằng `listings_page` trên cùng GET Tutor và `listings_meta.has_more`/`next_page`; không thêm endpoint. Runtime hiện còn dùng `get()` cho toàn bộ Listing nên chưa đạt PC-05. Truy vấn không được phát sinh thêm một truy vấn riêng cho từng bản ghi theo cách gây N+1.
 
 ### **Cách nghiệm thu**
 

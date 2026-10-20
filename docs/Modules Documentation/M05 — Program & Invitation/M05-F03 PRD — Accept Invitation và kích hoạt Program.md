@@ -8,8 +8,9 @@ Customer đích chấp nhận offer còn hạn; hệ thống tạo membership v�
 
 # 2\. Quy tắc
 
-* Chỉ Customer đúng target được accept Invitation pending trước expires\_at; Invitation hết hạn hoặc đã có terminal decision không thể accept.  
-* Máy chủ kiểm lại Customer active, Tutor eligibility, owner/target, Program/Invitation state, snapshot version và expiry trong transaction.  
+* Chỉ Customer đúng target được accept khi server time `< expires_at`; tại/qua `expires_at` không thể accept kể cả worker expire chưa chạy. Invitation terminal không thể accept.
+* Máy chủ kiểm lại Customer active, Tutor eligibility, owner/target, Program/Invitation state, Invitation.program\_version = Program.version, snapshot và expiry trong transaction. Mismatch hoặc stale state không tạo member/Program active.
+* Nếu source Listing đang có moderation hold, accept trả 409 và không đổi Invitation/snapshot. Pending Invitation giữ hạn gốc; sau khi hold được gỡ, accept chỉ hợp lệ trước expiry và khi Customer/Tutor còn đủ điều kiện; không yêu cầu source Listing active lại vì offer snapshot đã khóa theo BR-18.
 * Invitation → accepted, Program → active và ProgramMember customer được tạo trong cùng transaction.  
 * Idempotent retry cùng request/key trả kết quả đã commit; không tạo member/active đôi.  
 * Sử dụng lock order thống nhất theo ADR-09: Customer User → Tutor Profile → Program → Invitation; side effect phát sau commit.
@@ -18,13 +19,14 @@ Customer đích chấp nhận offer còn hạn; hệ thống tạo membership v�
 
 * Đúng Customer accept khi còn hạn tạo đúng một membership và Program Active.  
 * Sai Customer, outsider, Tutor, expired, rejected/cancelled hoặc stale state bị từ chối.  
-* Hai accept cạnh tranh chỉ một transaction thắng; trạng thái invitation, membership, Program nhất quán.  
-* Accept tranh chấp cancel/expiry/suspend không để dữ liệu nửa chừng; notification không phát khi transaction rollback.
+* Accept cạnh tranh với accept khác, reject/cancel, expiry, Tutor/Customer suspend hoặc Listing moderation chỉ có một transaction thắng; status Invitation, membership và Program nhất quán.
+* Notification chỉ phát sau commit; rollback/409 không tạo membership, Program Active hoặc notification giả.
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Schema legacy dùng Program pending/Invitation active; target là Program draft/active và Invitation accepted. Mapping/backfill cần được review trước khi viết API.  
-* Chốt response khi cùng key nhưng payload khác và cách client refetch capability sau 409\.
+* Schema legacy dùng Program pending/Invitation active; target là Program draft/active và Invitation accepted. Mapping/backfill cần được review trước khi viết API.
+* ADR-09 thứ tự khóa hiện là draft, chưa chứng minh được tương tác với suspend, expiry/cancel và Listing hold. Trước triển khai cần thống nhất protocol khóa/isolation dùng chung, rồi kiểm accept-vs-accept/cancel/expiry/suspend/moderation trên PostgreSQL; không coi việc có transaction hoặc lock order hiện ghi là bằng chứng đủ.
+* Response khi cùng idempotency key nhưng payload khác và cách client refetch capability sau 409 cần chốt trong API contract.
 
 # 5\. Nguồn
 

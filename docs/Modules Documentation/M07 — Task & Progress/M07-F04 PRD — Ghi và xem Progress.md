@@ -8,9 +8,10 @@ Tutor ghi nhận tiến độ học theo thời gian; Tutor owner quản lý rec
 
 # 2\. Dữ liệu và quyền
 
-* Progress lưu metric, value, note và thời điểm; không thêm ProgressStatus enum.  
-* Tutor owner tạo/sửa record trong Program; Tutor và Customer member đọc; outsider bị từ chối.  
-* Active/Paused cho phép ghi Progress theo BR-10; Completed/Cancelled readonly.  
+* Progress MVP chỉ dùng `metric_name=progress_percent`; `value` là số nguyên 0–100 do Tutor tự đánh giá, không suy từ điểm hoặc số Session. `note` tùy chọn; `recorded_at` do server đặt. Không thêm ProgressStatus enum.
+* Tutor owner tạo/sửa record trong Program; Tutor và Customer member đọc; outsider bị từ chối. PATCH yêu cầu `expected_version`; sửa ghi audit before/after. Không có DELETE.
+* Active/Paused cho phép ghi/sửa Progress theo BR-10/BR-20; Completed/Cancelled readonly.
+* Timestamp lưu theo UTC và hiển thị theo `Program.timezone`.
 * MVP không có chart nâng cao hoặc grading engine.
 
 # 3\. Tiêu chí chấp nhận
@@ -19,11 +20,12 @@ Tutor ghi nhận tiến độ học theo thời gian; Tutor owner quản lý rec
 * Member xem được dữ liệu đúng Program nhưng không sửa thay Tutor.  
 * Paused không chặn cập nhật Progress được phép; terminal Program từ chối mutation.  
 * Overview latest\_progress phản ánh record mới nhất mà không làm hỏng các tab khác.
+* Giá trị ngoài số nguyên 0–100, metric khác `progress_percent`, sửa thiếu/sai `expected_version` hoặc DELETE bị từ chối; sửa thành công tăng version một lần và audit giá trị trước/sau.
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Chốt kiểu dữ liệu/validation từng metric, timezone hiển thị và sửa/xóa record cũ.  
-* Schema progress\_records có; endpoint và UI chưa có.
+* Kiểu metric, timezone, lịch sử sửa và stale update được chốt tại BR-20. Schema/endpoint/UI chưa có đầy đủ và cần đồng bộ.
+* Schema hiện cần chuyển value sang số nguyên 0–100 và thêm version; endpoint và UI chưa có. Runtime/schema chưa đồng bộ BR-20.
 
 # 5\. Nguồn
 

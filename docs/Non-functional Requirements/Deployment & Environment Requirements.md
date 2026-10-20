@@ -241,11 +241,11 @@ Quy trình CI cần thực hiện các kiểm tra phù hợp với từng giai �
 * Browser E2E để kiểm tra cookie, CSRF và thao tác bàn phím.  
 * Kiểm thử hiệu năng và khôi phục dữ liệu trước khi hoàn tất G4.
 
-Tài liệu OpenAPI đầy đủ vẫn có thể chứa endpoint đang chờ quyết định. Việc endpoint xuất hiện trong OpenAPI không có nghĩa là endpoint đó đã được phép sử dụng.
+Catalog giữ toàn bộ method/path API đích, kể cả 7 endpoint D23 cần chốt chi tiết quyền và hành vi. OpenAPI sinh từ code phản ánh route đã đăng ký; một route xuất hiện trong OpenAPI không chứng minh nghiệp vụ đã đạt điều kiện phát hành.
 
 **Tiêu chí nghiệm thu**
 
-* Không bật 7 endpoint đang ở trạng thái conditional hoặc các endpoint Admin directory/evidence khi chưa có quyết định rõ ràng về phạm vi và quyền truy cập.  
+* Giữ cả 7 endpoint D23 trong phạm vi triển khai; chỉ mở quyền sử dụng từng endpoint sau khi đã chốt phạm vi dữ liệu, quyền truy cập và audit, đồng thời có kiểm thử tương ứng.
 * Nếu công cụ kiểm tra chưa hỗ trợ đầy đủ, kết quả phải ghi rõ phần đã kiểm tra và phần còn thiếu; không được báo cáo đạt hoàn toàn.  
 * Không phát hành khi còn lỗ hổng Critical hoặc High chưa được xử lý theo tiêu chí SP-10.  
 * Có bằng chứng kiểm thử cho từng cổng phát hành G1–G4.

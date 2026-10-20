@@ -14,18 +14,21 @@ Tutor owner đánh giá đúng version hiện tại, chấp nhận bài hoặc y
 * Yêu cầu sửa: Submission submitted → revision\_requested và Task submitted → in\_progress; Customer nộp lại sẽ tạo version mới.  
 * Program Paused vẫn cho feedback; Program Completed/Cancelled readonly.  
 * Feedback gắn version và được giữ lại qua resubmission; không overwrite lịch sử.
+* Payload chỉ gồm `feedback`; tối đa 5.000 ký tự. Với `revision_requested`, feedback bắt buộc không trắng và giải thích lý do; với accept, feedback tùy chọn.
+* Review/request-revision phải kiểm `expected_submission_version` và trạng thái hiện tại nguyên tử; mutation thành công cập nhật Task state/version cùng feedback. Replay hợp lệ không tăng version/audit/notification lần nữa.
 
 # 3\. Tiêu chí chấp nhận
 
 * Feedback đúng version cập nhật submission/task nhất quán trong transaction.  
 * Stale feedback trong cuộc đua resubmit trả 409, không ảnh hưởng version mới.  
+* Mỗi thay đổi Task state tăng `tasks.version` một lần theo BR-19.
 * Tutor khác, Customer, outsider hoặc submission không thuộc Program bị từ chối.  
 * Task completed/cancelled không nhận feedback hoặc mở lại.
 
 # 4\. Chênh lệch/câu hỏi mở
 
 * Schema version/expected version chưa được triển khai; cần migration additive và kiểm thử race trên PostgreSQL.  
-* Chốt payload feedback, độ dài và reason UX cho revision\_requested.
+* Payload/độ dài feedback được chốt tại BR-20; feedback của `revision_requested` chính là lý do hiển thị cho Customer.
 
 # 5\. Nguồn
 

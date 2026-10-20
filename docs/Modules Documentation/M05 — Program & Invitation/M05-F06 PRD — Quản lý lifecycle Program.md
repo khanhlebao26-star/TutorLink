@@ -12,7 +12,8 @@ Tutor owner quản lý Program sau khi được chấp nhận theo lifecycle đ�
 * Active ↔ paused; active/paused → completed hoặc cancelled.  
 * Completed/cancelled là terminal; chỉ owner được thực hiện ProgramAction phù hợp.  
 * Program completed/cancelled giữ membership và lịch sử để đọc; chỉ Program completed đủ điều kiện Review.  
-* Paused chặn tạo Session, Task, Announcement và Fee Record mới; vẫn cho đọc, nộp bài, feedback, Progress và xử lý dữ liệu phí sẵn có theo policy.
+* Hủy Draft có Invitation pending phải chuyển Invitation sang cancelled cùng transaction. Hủy Active/Paused chỉ khi không còn Session `scheduled` và mọi Task đã ở terminal `completed`/`cancelled`. Task `todo`, `in_progress`, `submitted` hoặc Session `scheduled` là blocker; trả `409 code=program_cancellation_blocked` với `blockers.sessions`/`blockers.tasks` gồm ID/status/hành động cần xử lý. Tutor phải hoàn tất hoặc hủy từng Session/Task tường minh; không cascade-cancel. Giữ nguyên records và audit sau khi Program chuyển cancelled.
+* Paused chặn tạo Session, Task và Fee Record mới; Tutor owner vẫn được tạo, sửa Draft và publish Announcement theo BR-10. Vẫn cho đọc, nộp bài, feedback, Progress và xử lý dữ liệu phí sẵn có theo policy.
 
 # 3\. Điều kiện Complete
 
@@ -24,14 +25,14 @@ Tutor owner quản lý Program sau khi được chấp nhận theo lifecycle đ�
 # 4\. Tiêu chí chấp nhận
 
 * Transition hợp lệ chỉ do Tutor owner thực hiện và được server kiểm tra trong transaction.  
-* Paused block đúng lệnh tạo mới nhưng cho phép hoạt động tiếp tục được BR-10 cho phép.  
+* Paused chặn các lệnh tạo Session/Task/Fee mới nhưng cho phép Announcement và các hoạt động tiếp tục được BR-10 cho phép.
 * Program terminal readonly; không resume/reopen.  
 * Điều kiện chưa đạt trả 409 code=program\_completion\_blocked với blockers.sessions/blockers.tasks gồm ID, status và required\_action; không đổi Program, không ghi một phần hoặc phát side effect. Sau khi xử lý blocker, client tải lại capability/version trước khi gửi lại.
 
 # 5\. Chênh lệch/câu hỏi mở
 
 * OpenAPI wire customer\_id map với PRD target\_customer\_id; DB programs.customer\_id vẫn là cột đề xuất cần migration trước triển khai. Điều kiện Complete đã được đồng bộ ở mục 3; lock order/version gate vẫn cần chốt trước runtime.  
-* Còn chốt UI/UX xác nhận hủy Task todo và cách hiển thị danh sách Session/Task blockers; contract đã định nghĩa nội dung 409\.
+* BR-18 đã chốt blockers và cấm cascade-cancel. Cách UI xác nhận hủy Task và trình bày Session/Task blockers vẫn cần đặc tả; lock/version implementation còn phải kiểm thử cạnh tranh.
 
 # 6\. Nguồn
 

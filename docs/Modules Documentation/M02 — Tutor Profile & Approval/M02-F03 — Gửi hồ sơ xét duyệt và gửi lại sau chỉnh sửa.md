@@ -8,10 +8,11 @@ Chuyển hồ sơ Tutor từ draft sang hàng đợi Admin, hoặc gửi lại n
 
 # Quy tắc sản phẩm
 
-* Transition hợp lệ: draft → submitted và changes\_requested → submitted. Các trạng thái khác không được gửi lại theo State Lifecycles.  
+* Với Profile chưa approved, transition hợp lệ: draft → submitted và changes\_requested → submitted. Profile approved có revision riêng theo BR-16; Profile rejected không tự gửi lại.
 * Chỉ Tutor sở hữu hồ sơ mới có thể gửi. Backend kiểm tra trạng thái và mọi điều kiện trước khi cập nhật để không nhận hồ sơ dở dang.  
 * Khi gửi thành công, hồ sơ xuất hiện trong phạm vi xét duyệt của Admin; quyết định và thay đổi trạng thái phải được ghi nhận theo audit policy.  
-* Không suy diễn danh sách trường/tệp bắt buộc từ mỗi timestamp submitted\_at. Checklist phải xác định rõ trong product/API contract.
+* Checklist BR-16: Tutor active/email verified, headline, bio, ít nhất một specialization active, avatar complete đúng owner/purpose và một identity_card hoặc passport complete. Qualification có cấu trúc kéo theo bằng cấp/chứng chỉ tương ứng; `other` không thay định danh.
+* Với hồ sơ approved, submit bản revision riêng để xét duyệt; bản approved giữ nguyên và tiếp tục công khai theo gate cho đến khi revision được duyệt. Revision bị request-changes được sửa/gửi lại, bị reject không tự gửi lại.
 
 # Luồng
 
@@ -29,8 +30,8 @@ Chuyển hồ sơ Tutor từ draft sang hàng đợi Admin, hoặc gửi lại n
 
 # Chênh lệch runtime và điểm cần chốt
 
-* API hiện yêu cầu Tutor có UserStatus active và email verified khi submit. Product/Domain Documents nêu email verified cho một số hành động Tutor và yêu cầu active cho thao tác cần tài khoản hoạt động, nhưng chưa nói rõ hai điều kiện này áp dụng cho hành động submit hồ sơ. Cần xác nhận gate sản phẩm.  
-* Checklist runtime hiện yêu cầu headline, bio, specialization active và avatar thuộc Tutor/đúng purpose/complete/có object trong storage. Code có kiểm tra giấy tờ xác minh nhưng trường validation tương ứng là nullable nên hiện không bắt buộc; mô tả OpenAPI vừa ghi optional trong local testing vừa ghi ít nhất một giấy tờ bắt buộc. Bộ tài liệu hoàn tất chưa định nghĩa checklist; xác nhận trường bắt buộc và điều kiện file trước khi chốt AC.  
+* Active và verified khi submit đã được chốt tại BR-16. Runtime hiện có các gate này và headline/bio/specialization/avatar, nhưng giấy tờ xác minh nullable nên chưa bắt buộc; OpenAPI sinh từ code phải phản ánh runtime cho đến khi sửa controller/test.
+* Runtime chưa có revision riêng cho hồ sơ approved và qualification có cấu trúc; cần migration, DTO và test trước khi quảng bá luồng này là khả dụng.
 * API hiện biểu diễn submitted bằng approval\_status=pending cùng submitted\_at; domain target dùng TutorProfileStatus=submitted. Đồng bộ OpenAPI, UI và migration theo enum đích.
 
 # Nguồn và phụ thuộc
@@ -38,4 +39,4 @@ Chuyển hồ sơ Tutor từ draft sang hàng đợi Admin, hoặc gửi lại n
 Business Rules; Roles & Actors; State Lifecycles; Enum Catalog; Domain Model. Phụ thuộc M02-F01 và M02-F02.
 
 F03 — Tác động assignment khi gửi/gửi lại  
-Hồ sơ mới gửi có thể vào hàng đợi chưa phân công (assigned\_admin\_id NULL) cho coordinator có admin.tutor\_profiles.assign. Khi Tutor gửi lại sau changes\_requested, quyết định giữ assignment hiện tại hay đưa lại hàng đợi chưa phân công còn mở; không tự xóa/chuyển assignment theo phỏng đoán. Dù assignment được giữ, quyền quyết định luôn kiểm tra lại trạng thái hồ sơ và assignment hiện tại.
+Hồ sơ mới gửi có thể vào hàng đợi chưa phân công (assigned\_admin\_id NULL) cho coordinator có admin.tutor\_profiles.assign. Khi Tutor gửi lại sau changes\_requested hoặc gửi revision, giữ assignment hiện tại nếu Admin còn active và đủ quyền xử lý; nếu không, đưa về hàng đợi chưa phân công. Quyền quyết định luôn kiểm tra lại trạng thái hồ sơ/revision và assignment hiện tại trong transaction.

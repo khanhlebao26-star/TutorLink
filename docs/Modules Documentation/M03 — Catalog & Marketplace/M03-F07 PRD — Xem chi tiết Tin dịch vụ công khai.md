@@ -8,7 +8,7 @@ Cho người chưa đăng nhập hoặc Customer mở trang chi tiết Listing b
 
 # 2\. Quy tắc hiển thị
 
-* Trang chi tiết dùng cùng visibility gate với public search: Listing active, User active, email verified, Tutor Profile approved, không suspended và toàn bộ taxonomy active.  
+* Trang chi tiết dùng cùng visibility gate với public search: Listing active, User active, email verified, Tutor Profile approved, giấy tờ bắt buộc còn hiệu lực theo BR-16, không suspended và toàn bộ taxonomy active.
 * Nếu Listing draft/inactive/archived, hoặc bất kỳ điều kiện visibility nào không còn đúng, response không tiết lộ nội dung Listing.  
 * Giá là giá tham khảo của Listing, không phải báo giá/Program đã được hai bên chấp thuận.  
 * Availability, nếu hiển thị, chỉ để tham khảo; không tạo booking.  
@@ -29,7 +29,7 @@ Public route hiện có: GET /api/v1/listings/{slug}. Tài nguyên Listing công
 # 5\. Khoảng cách triển khai và câu hỏi mở
 
 * API public detail đã tồn tại. Cần đối chiếu OpenAPI và giao diện để xác nhận payload đủ trường và không vượt public allowlist.  
-* Public Tutor slug/avatar và payload chính thức chưa được Product chốt; xem M03-F08.
+* Public Tutor slug/avatar và field allow-list đã chốt ở D06/M03-F08. Cần đối chiếu Listing detail với public gate, giữ slug Tutor ổn định và bảo đảm avatar chỉ tải theo policy M10.
 
 # 6\. Nguồn
 

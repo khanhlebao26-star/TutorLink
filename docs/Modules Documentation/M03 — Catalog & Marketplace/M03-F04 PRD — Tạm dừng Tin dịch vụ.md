@@ -13,10 +13,11 @@ Tutor chủ sở hữu có thể tạm dừng Listing đang hoạt động để
 * Listing inactive không xuất hiện trong public search, public detail hoặc danh sách Listing trên hồ sơ Tutor công khai.  
 * Pause Listing không tự hủy, kết thúc hoặc thay đổi Program/Invitation đã tạo; snapshot và lịch sử được giữ.  
 * Listing có thể được kích hoạt lại theo PRD M03-F03 nếu Tutor và catalog còn đủ điều kiện.
+* Nếu Listing đã `inactive` vì Admin đặt moderation hold, yêu cầu Tạm dừng tường minh từ Tutor không đổi status nhưng phải ghi lại ý định tạm dừng của Tutor. Khi Admin gỡ hold, hệ thống giữ Listing `inactive`; Tutor tự publish lại. Chỉ lặp lại request pause mà không có quyết định mới thì không tạo audit/notification trùng.
 
-# 3\. Hành vi và API hiện có
+# 3\. Hành vi và API
 
-Tutor chọn Tạm dừng trong quản lý Listing; máy chủ xác nhận quyền sở hữu, cập nhật status và phản hồi trạng thái mới. API hiện có: PATCH /api/v1/me/listings/{listing}; controller cho phép status inactive.
+Tutor chọn Tạm dừng trong quản lý Listing; máy chủ xác nhận quyền sở hữu, cập nhật status và phản hồi trạng thái mới. API đích theo Catalog: `POST /api/v1/me/listings/{listing}/pause`. `PATCH /api/v1/me/listings/{listing}` chỉ là contract đích để sửa nội dung. API hiện đã đăng ký vẫn dùng PATCH với `status=inactive`; frontend phải chuyển sang POST khi route đích được triển khai, kiểm thử và sinh vào OpenAPI Scramble.
 
 # 4\. Tiêu chí chấp nhận
 
@@ -27,7 +28,7 @@ Tutor chọn Tạm dừng trong quản lý Listing; máy chủ xác nhận quy�
 
 # 5\. Khoảng cách triển khai và câu hỏi mở
 
-* API hiện hỗ trợ PATCH status=inactive. Cần xác nhận contract lỗi thống nhất cho trạng thái archived/draft và thao tác lặp lại.
+* Chưa có route POST `/pause` trong OpenAPI hiện tại. API hiện hỗ trợ PATCH status=inactive; cần ghi rõ giai đoạn tương thích và thời điểm bỏ nhánh legacy. Cần xác nhận contract lỗi thống nhất cho trạng thái archived/draft và thao tác lặp lại.
 
 # 6\. Nguồn
 

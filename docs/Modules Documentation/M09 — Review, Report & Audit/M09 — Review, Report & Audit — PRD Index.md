@@ -25,7 +25,7 @@ Tạo Review đủ điều kiện sau Program Completed, hiển thị Review tin
 
 * Admin approval audit có; Review/Report APIs và scoped Admin evidence workflow chưa có.  
 * Schema legacy Report pending/reviewing cần map về open/resolved/dismissed.  
-* message đã là resource có thể report; conversation không phải ReportResourceType. Quyền xem ngữ cảnh chat làm evidence, phạm vi và retention vẫn chờ M09-F04/Product chốt.
+* message đã là resource có thể report; conversation không phải ReportResourceType. BR-11 đã chốt quyền đọc evidence chat khi Report open và cửa sổ tối đa 10 tin trước/5 tin sau; field masking và thời hạn lưu dữ liệu vẫn cần chốt theo M09-F04/M10.
 
 # Nguồn
 

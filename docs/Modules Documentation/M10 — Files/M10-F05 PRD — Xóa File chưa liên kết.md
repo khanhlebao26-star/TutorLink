@@ -10,7 +10,7 @@ Cho owner xóa tệp chưa được gắn vào resource; bảo toàn mọi lịc
 
 * Chỉ owner được xóa File.  
 * Chỉ cho xóa khi không có file\_links, verification document hoặc profile avatar reference; linked file không hard-delete.  
-* File object và row metadata được dọn nhất quán; nếu storage delete fail, transaction không được tạo trạng thái DB sai.  
+* File pending chưa liên kết được dọn sau 24 giờ; file complete chưa liên kết được dọn sau 7 ngày. File linked không thuộc orphan cleanup. Xóa object và row metadata cần retry/compensation: lỗi storage không để DB báo đã xóa object còn tồn tại hay giữ link tới object đã xóa.
 * File được dùng trong lịch sử business record phải bảo toàn theo retention; unlink không đồng nghĩa xóa lịch sử nếu resource còn tham chiếu.
 
 # 3\. Tiêu chí chấp nhận
@@ -23,7 +23,7 @@ Cho owner xóa tệp chưa được gắn vào resource; bảo toàn mọi lịc
 # 4\. Implementation hiện tại và câu hỏi mở
 
 * DELETE /files/{id} hiện ngăn xóa nếu có file\_links, verification\_document hoặc avatar reference; linked file trả 409\.  
-* Chốt retention/orphan cleanup cho upload pending/abandoned và storage cleanup compensation khi DB/storage lỗi chéo.
+* BR-21 chốt orphan retention 24 giờ (pending) và 7 ngày (complete, chưa link); file linked theo retention của resource. Runtime cần triển khai job dọn và retry/compensation an toàn.
 
 # 5\. Nguồn
 

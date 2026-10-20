@@ -24,11 +24,11 @@ Chỉ resource allow-list người gửi được xem; other cần description.
 
 Nhánh bác bỏ dùng POST /api/v1/admin/reports/{report}/dismiss; resolution\_note bắt buộc.
 
-## 05 Đọc evidence theo vụ việc có điều kiện
+## 05 Đọc evidence theo vụ việc
 
 **![Sơ đồ image5](assets/wf06-review-report-notification-va-audit-image5.png)**
 
-Đề xuất để khớp Product: chỉ đọc, đúng vụ việc/quyền, mọi truy cập có audit. Không cấp quyền gửi chat, tham gia Workspace hoặc tải giấy tờ toàn cục cho Admin.
+Theo BR-11, chỉ Admin active có `admin.reports.view`, assignment hiện tại và Report `open` mới đọc evidence, mọi truy cập có audit. Với Report về message, chỉ trả message bị báo cáo cùng tối đa 10 tin trước/5 tin sau trong cùng Conversation. Đóng Report hoặc chuyển/thu hồi assignment chặn evidence từ request tiếp theo. Không cấp quyền gửi chat, tham gia Workspace hoặc tải giấy tờ toàn cục cho Admin; file evidence còn qua policy M10.
 
 ## 06 Notification và điều hướng
 
@@ -47,4 +47,4 @@ Mở deep\_link nội bộ tới API resource tương ứng; resource vẫn ki�
 Chỉ Admin audit viewer trong scope; không API sửa/xóa log.
 
 F03 — Bước phân công Report  
-Report mới có thể chưa phân công. Coordinator có admin.reports.assign giao cho Admin nội bộ active có quyền xử lý; hệ thống ghi before/after, actor, reason, version và audit. Queue assignment chỉ lộ metadata tối thiểu. Xem detail/evidence cần admin.reports.view và assignment hiện tại; resolve/dismiss còn cần admin.reports.decide. Reassignment thu hồi scope cũ. Sơ đồ nhúng cần phản ánh bước này; phạm vi evidence sau khi Report đóng và retention còn chờ nhóm chốt.
+Report mới có thể chưa phân công. Coordinator có admin.reports.assign giao cho Admin nội bộ active có quyền xử lý; hệ thống ghi before/after, actor, reason, version và audit. Queue assignment chỉ lộ metadata tối thiểu. Xem detail/evidence cần admin.reports.view và assignment hiện tại; evidence còn yêu cầu Report open theo BR-11, resolve/dismiss cần admin.reports.decide. Reassignment thu hồi scope cũ. Sơ đồ nhúng cần phản ánh bước này; retention dữ liệu vẫn cần chốt riêng.

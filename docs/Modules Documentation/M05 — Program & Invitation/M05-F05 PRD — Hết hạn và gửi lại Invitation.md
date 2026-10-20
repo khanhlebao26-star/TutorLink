@@ -8,7 +8,7 @@ Hệ thống tự hết hạn Invitation pending sau 72 giờ và giữ đườn
 
 # 2\. Quy tắc
 
-* Invitation hết hạn khi expires\_at đã qua và trạng thái vẫn pending; transition pending → expired.  
+* Invitation hết hạn khi server time `>= expires_at` và trạng thái vẫn pending; transition pending → expired. `expires_at` là `sent_at + 72 giờ` theo UTC. Accept chỉ hợp lệ khi server time `< expires_at`, không phụ thuộc scheduler đã chạy hay chưa.
 * Expire phải an toàn khi chạy lặp và cạnh tranh với accept/cancel; chỉ một kết quả terminal được commit.  
 * Invitation expired là immutable; Program trở lại Draft, không tạo membership.  
 * Tutor chỉnh Draft theo version được phép rồi gửi Invitation mới; không kéo dài expiry hoặc tái dùng Invitation cũ.  
@@ -24,7 +24,7 @@ Hệ thống tự hết hạn Invitation pending sau 72 giờ và giữ đườn
 # 4\. Chênh lệch/câu hỏi mở
 
 * Baseline chưa có worker/scheduler; cần chọn cách dispatch, retry, queue failure và giám sát theo NFR.  
-* Chốt quy tắc tính 72 giờ UTC và biên chính xác tại expires\_at.
+* Biên 72 giờ UTC và so sánh tại expires_at đã chốt tại BR-18. Cơ chế scheduler, retry queue và giám sát vẫn là việc vận hành trước rollout.
 
 # 5\. Nguồn
 
