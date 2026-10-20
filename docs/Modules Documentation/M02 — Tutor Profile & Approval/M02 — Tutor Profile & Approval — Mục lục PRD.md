@@ -21,20 +21,20 @@ M02 đặc tả việc Tutor tạo, duy trì và gửi Hồ sơ Tutor; Admin đ�
 
 * TutorProfileStatus: draft → submitted → approved, changes\_requested hoặc rejected; changes\_requested → submitted.  
 * Hồ sơ ở trạng thái suspended lưu trạng thái trước đình chỉ. Khôi phục trả về đúng trạng thái đã lưu, không tự chuyển thành approved.  
-* VerificationDocumentStatus có vòng đời riêng: pending → approved/rejected; approved → expired khi có căn cứ hết hiệu lực. Quy tắc gắn kết quyết định từng giấy tờ với quyết định hồ sơ cần chốt.
+* VerificationDocumentStatus có vòng đời riêng: pending → approved/rejected; approved → expired khi có căn cứ hết hiệu lực. BR-16 yêu cầu giấy tờ bắt buộc approved và còn hạn trước quyết định Profile; revision của Profile approved có vòng đời xét duyệt riêng.
 
 # Quyền và riêng tư
 
 * Admin là tài khoản nội bộ; role Admin không cấp toàn bộ quyền. Quyền xem, quyết định, tải giấy tờ xác minh và đình chỉ hồ sơ/tài khoản được tách riêng.  
 * Chỉ hồ sơ approved mới đủ điều kiện xuất hiện công khai. Giấy tờ xác minh là dữ liệu riêng tư; chỉ người được giao xử lý hồ sơ được truy cập, tải xuống cần quyền riêng và hoạt động phải được ghi nhật ký.  
-* Tutor chỉ đủ điều kiện quản lý Listing, tạo Program hoặc gửi Invitation khi UserStatus active, email verified, TutorProfileStatus approved và hồ sơ không bị đình chỉ. Chỉ Customer đích được accept Invitation; khi accept, server kiểm lại điều kiện của Customer và Tutor.
+* Tutor chỉ đủ điều kiện quản lý Listing, tạo Program hoặc gửi Invitation khi UserStatus active, email verified, TutorProfileStatus approved, hồ sơ không bị đình chỉ và giấy tờ bắt buộc còn hiệu lực theo BR-16. Chỉ Customer đích được accept Invitation; khi accept, server kiểm lại điều kiện của Customer và Tutor.
 
 # Chênh lệch triển khai cần đồng bộ
 
 * Domain dùng TutorProfileStatus draft/submitted/changes\_requested/approved/rejected/suspended. API hiện dùng approval\_status pending/active/rejected/changes\_requested kết hợp submitted\_at và suspended\_at; cần đồng bộ contract, enum, response và migration. Không coi active/pending là enum đích.  
 * Domain yêu cầu khi đình chỉ hồ sơ của account đang active thì khóa account trong cùng transaction và cần cả quyền đình chỉ profile lẫn account. API hiện có endpoint suspend profile riêng và chưa thực hiện thay đổi account cùng transaction.  
 * Product Roles yêu cầu giới hạn Admin theo hồ sơ/vụ việc được phân công. API hiện kiểm tra permission chung; cần xác nhận và thực thi phạm vi assignment ở backend.  
-* Tài liệu hoàn tất chưa chốt checklist bắt buộc để gửi hồ sơ, cổng email-verified/account-active khi submit, cách cập nhật hồ sơ đã approved, chính sách nộp lại sau rejected, và việc Admin cập nhật VerificationDocumentStatus riêng. Runtime hiện yêu cầu headline, bio, specialization active và avatar hợp lệ; code kiểm tra sự tồn tại của giấy tờ nhưng quy tắc validation để nullable, còn mô tả OpenAPI mâu thuẫn. Xem M02-F03.
+* BR-16 đã chốt checklist, quyết định từng VerificationDocument, revision approved, rejected terminal và assignment khi gửi lại. Runtime hiện yêu cầu headline, bio, specialization active và avatar hợp lệ nhưng giấy tờ vẫn nullable; chưa có quyết định document riêng, revision, gate expiry hay qualification có cấu trúc. Hai route Admin document trong Catalog vẫn Dự kiến; xem M02-F02/F03.
 
 # Nguồn
 

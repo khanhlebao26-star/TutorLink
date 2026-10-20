@@ -9,7 +9,7 @@ Cung cấp cho Admin được giao xử lý khả năng tìm hồ sơ đã gửi
 # Quy tắc sản phẩm
 
 * Chỉ Admin có quyền admin.tutor\_profiles.view và được giao hồ sơ/vụ việc tương ứng mới xem được chi tiết.  
-* Hàng đợi quyết định bao gồm hồ sơ đang submitted; changes\_requested chỉ quay lại hàng đợi sau khi Tutor gửi lại.  
+* Hàng đợi quyết định bao gồm hồ sơ hoặc revision đang submitted; changes\_requested chỉ quay lại hàng đợi sau khi Tutor gửi lại. Với revision của Profile approved, màn hình review phân biệt rõ bản công khai hiện hành và bản chờ duyệt.
 * Quyền xem hồ sơ, quyền đưa ra quyết định và quyền tải verification document độc lập; Admin role không đồng nghĩa với mọi quyền.  
 * Tài liệu xác minh không được lộ trong list/public profile. Chi tiết chỉ cung cấp dữ liệu phục vụ review theo phạm vi được phép; tải file cần admin.verification\_documents.download.  
 * Truy cập hồ sơ/bằng chứng thuộc dữ liệu kiểm toán và phải được ghi nhận.
@@ -23,7 +23,7 @@ Cung cấp cho Admin được giao xử lý khả năng tìm hồ sơ đã gửi
 # Tiêu chí chấp nhận
 
 * Không có quyền xem hoặc không thuộc scope assignment thì không thể truy cập danh sách/chi tiết bằng cách đổi ID hay query.  
-* Hồ sơ chưa submitted không xuất hiện trong hàng đợi quyết định.  
+* Hồ sơ/revision chưa submitted không xuất hiện trong hàng đợi quyết định.
 * Không có quyền download thì response không chứa nội dung bằng chứng hoặc URL tải có thể dùng.  
 * List/detail phản ánh status và dữ liệu mới nhất; thao tác trên dữ liệu stale không được ghi đè quyết định mới hơn.
 
@@ -39,4 +39,4 @@ Roles & Actors; Enum Catalog; Domain Model; State Lifecycles. Phụ thuộc Admi
 
 F03 — Phạm vi hàng đợi và chi tiết  
 Nguồn scope là tutor\_profiles.assigned\_admin\_id. Người có admin.tutor\_profiles.assign xem được metadata tối thiểu để giao/chuyển/thu hồi, nhưng muốn đọc chi tiết phải có admin.tutor\_profiles.view và assignment hiện tại. Duyệt/yêu cầu sửa/từ chối cần admin.tutor\_profiles.decide và assignment hiện tại; tải giấy tờ còn cần admin.verification\_documents.download. Lọc unassigned/mine/all phải áp dụng trước pagination/count; assignment mutation gửi assignment\_version hiện đọc được. Không để assignment permission trả nội dung hồ sơ/giấy tờ.  
-Open dependency for assignment UI: currently no approved API lists eligible Admin targets. GET /api/v1/admin/users remains conditional; decide permission, scope and minimal DTO before the UI relies on it. Assignment requests still send assigned\_admin\_id, which the server validates for active status and required profile-processing permissions.
+Open dependency for assignment UI: `GET /api/v1/admin/users` remains in the target Catalog but is not registered yet. Define its permission, scope and minimal DTO before implementation or UI integration. Assignment requests still send assigned\_admin\_id, which the server validates for active status and required profile-processing permissions.

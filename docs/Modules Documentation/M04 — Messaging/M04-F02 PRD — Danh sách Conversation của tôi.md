@@ -11,12 +11,12 @@ Customer và Tutor xem các Conversation mà tài khoản của mình là thành
 * Chỉ participant là thành viên của Conversation mới được liệt kê/đọc Conversation đó.  
 * Không trả Conversation của cặp khác khi thay đổi ID, query hoặc cursor.  
 * Admin không xuất hiện như participant và không có inbox chat tổng thể; quyền xem theo report được phân công được mô tả ở M04-F08.  
-* Status cancelled vẫn có thể xuất hiện trong lịch sử, ở chế độ chỉ đọc; status active cho phép trao đổi nếu account/relationship policy còn hợp lệ.
+* Status cancelled vẫn có thể xuất hiện trong lịch sử, ở chế độ chỉ đọc. Status active chưa đủ để cho gửi: cả hai participant phải active và peer không bị đình chỉ; mọi quyền gửi được kiểm lại tại thời điểm ghi.
+* Khi một participant bị đình chỉ, membership và ConversationStatus không tự đổi. Participant đó bị từ chối đọc/gửi kể cả khi còn session cũ; participant còn active vẫn được liệt kê và đọc lịch sử chat của chính mình. Sau khi được khôi phục, member cũ đọc lại lịch sử theo membership; gửi tin mới vẫn phải kiểm status và policy M04-F04. Admin không có inbox participant.
 
 # 3\. Dữ liệu tối thiểu và trải nghiệm
 
-Danh sách cần định danh Conversation, peer participant, status, ngữ cảnh Listing nếu có, hoạt động gần nhất và trạng thái chưa đọc để người dùng chọn cuộc trò chuyện. Field allowlist, unread count, preview nội dung và thứ tự sắp xếp cần được thống nhất trong OpenAPI/UI contract.  
-Tải danh sách theo quyền ở server. Có thể phân trang nếu dữ liệu vượt giới hạn; quy tắc pagination/order hiện chưa được Product/Domain định nghĩa.
+Danh sách cần định danh Conversation, peer participant, status, ngữ cảnh Listing nếu có, hoạt động gần nhất và trạng thái chưa đọc để người dùng chọn cuộc trò chuyện. Peer tối thiểu theo BR-17 chỉ gồm `id`/`display_name`; không trả email, điện thoại hoặc thông tin riêng tư. `context_listing_id` là context bất biến từ lúc tạo, không ngầm thay bằng Listing mà người dùng vừa mở. Inbox sắp Conversation có message theo message mới nhất `(created_at,id)` giảm dần; Conversation chưa có message theo `(created_at,id)` giảm dần. Preview chỉ dùng loại/nội dung an toàn của message mới nhất; attachment preview hiển thị nhãn chung, không lộ tên file hay object key. `unread_count` đếm message của peer sau `last_read_message_id`; system message không tăng unread. Read receipt chỉ ở mức Conversation, không công bố đã đọc từng message cho peer. Phân trang dùng cursor ổn định theo khóa sắp xếp và ID Conversation; Catalog/API vẫn cần ghi wire schema khi triển khai.
 
 # 4\. Tiêu chí chấp nhận
 
@@ -27,8 +27,8 @@ Tải danh sách theo quyền ở server. Có thể phân trang nếu dữ liệ
 
 # 5\. Chênh lệch/câu hỏi mở
 
-* Chưa có API hoặc UI inbox trong repo. Cần chốt sort theo thời gian hoạt động mới nhất, fields public cho peer, cursor pagination và cách tính unread.  
-* Product cần chốt quyền đọc lịch sử của thành viên khi một participant bị suspend/khóa account.
+* Chưa có API hoặc UI inbox trong repo; runtime và wire schema cần triển khai theo BR-21.
+* BR-17 đã chốt quyền đọc lịch sử khi participant bị đình chỉ. Schema inbox/pagination và runtime vẫn cần triển khai; quyền gửi trong các trạng thái khác theo M04-F04.
 
 # 6\. Nguồn
 

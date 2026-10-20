@@ -25,7 +25,7 @@ Quản lý vòng đời File từ upload, complete, resource attachment, authori
 
 * Upload/complete/metadata/download/delete API đã có; link controller hiện chỉ hỗ trợ verification\_document.  
 * Upload purpose whitelist chưa khớp Enum Catalog đầy đủ; resource membership download policy chưa hiện thực.  
-* Cần chốt MIME/size/scan policy và orphan cleanup.
+* BR-20/BR-21 đã chốt MIME/size theo purpose, scanner/quarantine, orphan cleanup và compensation. Runtime cần triển khai; retention linked files tiếp tục theo policy resource.
 
 # Nguồn
 

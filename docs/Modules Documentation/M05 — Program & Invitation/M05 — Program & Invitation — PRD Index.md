@@ -21,12 +21,13 @@ Tạo thỏa thuận riêng giữa Tutor và một Customer, gửi Invitation c�
 * Invitation có hạn 72 giờ, snapshot bất biến, tối đa một pending mỗi Program.  
 * Accept đúng Customer tạo membership và Program Active trong một transaction; retry không tạo trùng.  
 * Program: draft → active/paused/completed/cancelled theo lifecycle; terminal readonly; complete không tự hoàn thành Task.
+* BR-18: offer Draft version tăng theo edit, `expected_version` bảo vệ PATCH/send; pending khóa Draft. Expiry UTC chặt tại `expires_at`; Draft cancel thu hồi Invitation pending nguyên tử; Program Active/Paused chỉ cancel sau khi xử lý Session/Task mở. Invitation cũ không accept trong lúc source Listing hold, nhưng có thể accept sau khi gỡ hold trước expiry.
 
 # Implementation gaps
 
 * Schema/migration có vocabulary legacy: Program pending và Invitation active; thiếu/mapping target\_customer\_id, snapshot/version, target uniqueness cần được review.  
 * Program API chưa có trong routes; migration tồn tại không đồng nghĩa endpoint/transaction đã được triển khai.  
-* Expiry worker/scheduler và event\_key idempotency chưa có trong baseline.
+* Expiry worker/scheduler và event\_key idempotency chưa có trong baseline. Lock/isolation của accept với expiry/cancel/suspend/moderation cần test cạnh tranh PostgreSQL; route/API chưa được triển khai.
 
 F19 — Bằng chứng current-state (18/10/2026): nội dung mục này là baseline của lượt rà soát trước, chưa được kiểm tra lại repository/commit trong lượt Drive-only này. Owner xác minh: chưa gán; ngày/commit kiểm chứng: chưa có; trạng thái: chưa xác minh. Migration tồn tại không tự chứng minh API, transaction hoặc UI đã được triển khai. Phân biệt ghi nhận này với “Quy tắc đích”; mô tả nháp ADR-09/BR-10 nằm trong Business Rules.
 

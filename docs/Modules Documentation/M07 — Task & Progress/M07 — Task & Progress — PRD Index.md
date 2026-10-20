@@ -16,14 +16,14 @@ Quản lý bài tập và submission có version, feedback chống race, cùng t
 # Quy tắc đích
 
 * TaskStatus: todo/in\_progress/submitted/completed/cancelled; todo hiển thị Chưa bắt đầu.  
-* Submission mỗi Task/Customer có một bản hiện tại và tăng version mỗi resubmit; feedback gắn version.  
+* Submission mỗi Task/Customer có một bản hiện tại và tăng version mỗi resubmit; feedback gắn version. Content tối đa 10.000 ký tự và cần text không trắng hoặc file; tối đa 5 file, 5 MiB/file. Submission retry/hash theo BR-20/D13; feedback tối đa 5.000 ký tự, bắt buộc lý do khi request revision.
 * Feedback dùng expected version; stale trả 409\. Overdue chỉ task còn mở; submitted\_late dựa timestamp.  
-* Paused vẫn cho submit/feedback/Progress; terminal readonly; không tự complete Task khi complete Program.
+* Paused cho Customer start/nộp Task đã giao, Tutor feedback; Tutor chỉ sửa todo khi Active và hủy todo/in\_progress khi Active/Paused. Terminal readonly; không tự complete Task khi complete Program. Task dùng `version`/`expected_version`; Submission giữ `expected_submission_version` + Idempotency-Key theo BR-19/D13.
 
 # Implementation gaps
 
 * Migration có tasks/task\_submissions/progress\_records; Task API, submission version/race policy, Progress API/UI chưa có.  
-* Chốt mapping todo/in\_progress và row locking/version strategy trước API.
+* Task policy, Progress metric `progress_percent` 0–100, edit/version/audit/no-delete policy, Submission canonicalization, content/file limits và feedback validation đã chốt tại BR-19/BR-20; API/schema/UI chưa đủ triển khai.
 
 F19 — Bằng chứng current-state (18/10/2026): nội dung mục này là baseline của lượt rà soát trước, chưa được kiểm tra lại repository/commit trong lượt Drive-only này. Owner xác minh: chưa gán; ngày/commit kiểm chứng: chưa có; trạng thái: chưa xác minh. Migration tồn tại không tự chứng minh API, transaction hoặc UI đã được triển khai. Phân biệt ghi nhận này với “Quy tắc đích”; mô tả nháp ADR-09/BR-10 nằm trong Business Rules.
 

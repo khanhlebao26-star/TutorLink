@@ -13,6 +13,7 @@ Trả hồ sơ đã submitted cho Tutor để sửa các điểm cần hoàn thi
 * Tutor chỉ sửa hồ sơ sau khi nhận trạng thái changes\_requested; gửi lại tạo transition changes\_requested → submitted.  
 * Lý do, người xử lý, thời điểm và thay đổi trạng thái phải được lưu trong audit.  
 * Request Changes không đồng nghĩa với từ chối và không đình chỉ User hoặc Tutor Profile.
+* Nếu đối tượng đang xét là revision của Profile approved, request-changes chỉ chuyển revision về trạng thái cần sửa; bản approved trước và TutorProfileStatus không đổi.
 
 # Luồng
 

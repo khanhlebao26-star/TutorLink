@@ -26,7 +26,9 @@ status — varchar(20); NOT NULL; mặc định: active; enum: UserStatus; cần
 
 date\_of\_birth — date; NULL.
 
-terms\_version — varchar(32); NULL.
+terms\_version — varchar(32); NULL trong schema hiện tại; bắt buộc cho đăng ký mới theo quy tắc đích, cần migration/validation tương ứng.
+
+terms\_accepted\_at — timestamptz; NOT NULL cho đăng ký mới theo quy tắc đích. Chưa có trong migration/runtime; phải đi cùng `terms_version` của bản điều khoản đã hiển thị và được người dùng đồng ý. Các tài khoản cũ cần chiến lược backfill hoặc yêu cầu đồng ý lại, không tự gán thời điểm chấp nhận giả.
 
 suspended\_at — timestamptz; NULL.
 
@@ -93,6 +95,10 @@ avatar\_file\_id — bigint; NULL; FK; tham chiếu files.id.
 public\_slug — varchar(180); NULL; UK.
 
 status\_before\_suspension — varchar(20); NULL; đề xuất thêm.
+
+Quy tắc D06 đã chốt: server tạo `public_slug` một lần khi tạo Tutor Profile từ tên và hậu tố ID duy nhất; đổi tên hiển thị không đổi slug. Không cần bảng alias/redirect slug trong MVP. Unique constraint ngăn trùng; chỉ hồ sơ đủ public gate mới được tra cứu qua slug.
+
+BR-16 yêu cầu lưu bản sửa của Profile approved tách khỏi dữ liệu công khai. Schema đích cần `tutor_profile_revisions` gắn `tutor_profile_id`, `revision_no`, payload các trường được sửa, trạng thái `draft/submitted/changes_requested/approved/rejected`, người/thời điểm/lý do quyết định và version; chỉ một revision chưa đóng cho mỗi Profile. Duyệt revision phải kiểm version và thay dữ liệu công khai cùng transaction; request-changes/reject giữ bản approved cũ. Qualification claims phải là dữ liệu có cấu trúc để xác định degree/certificate bắt buộc; không suy từ headline/bio. Migration/DTO cụ thể chưa có trong runtime.
 
 # 02 · Danh mục và marketplace
 
@@ -196,6 +202,34 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
+### Bảng listing\_moderation\_holds — target, chưa có migration
+
+Bản ghi hold riêng giữ nguồn `inactive` để Admin restore không ghi đè quyết định của Tutor. Tối đa một hold còn hiệu lực trên mỗi Listing; lịch sử hide/restore và audit không bị xóa khi gỡ hold.
+
+id — bigint; NOT NULL; PK.
+
+listing\_id — bigint; NOT NULL; FK tới service\_listings.id.
+
+hidden\_by\_admin\_id — bigint; NOT NULL; FK tới users.id.
+
+hidden\_at — timestamptz; NOT NULL.
+
+hide\_reason — text; NOT NULL.
+
+hide\_reason\_code — varchar(40); NOT NULL; ListingModerationReasonCode cho hide.
+
+reactivate\_on\_restore — boolean; NOT NULL; true chỉ khi Admin hide Listing đang active; chuyển false nếu Tutor chủ động pause trong thời gian hold.
+
+restored\_by\_admin\_id — bigint; NULL; FK tới users.id.
+
+restored\_at — timestamptz; NULL.
+
+restore\_reason — text; NULL khi hold còn hiệu lực, bắt buộc khi restore.
+
+restore\_reason\_code — varchar(40); NULL khi hold còn hiệu lực, bắt buộc khi restore.
+
+Migration cần ràng buộc duy nhất cho hold còn hiệu lực theo listing\_id. Không cần bảng assignment/scope Listing: Admin active có `admin.listings.moderate` được xử lý toàn bộ Listing trong MVP, audit ghi scope `all_listings`. Hide/restore, đổi ListingStatus, audit và notification outbox được ghi nguyên tử theo Business Rules/M03-F10; runtime hiện chưa có bảng hoặc hai route Admin này.
+
 ### Bảng availability\_rules
 
 id — bigint; NOT NULL; PK.
@@ -282,9 +316,13 @@ updated\_at — timestamptz; NULL.
 
 expires\_at — timestamptz; NULL; đề xuất thêm.
 
+review\_reason — text; NULL; cần lưu khi từ chối.
+
 Khóa ghép / unique: verification\_documents: UNIQUE(tutor\_profile\_id,file\_id).
 
 files chỉ lưu metadata, nội dung nằm ở object storage. purpose bắt buộc với upload mới; visibility chỉ private/public. Chỉ file scan\_status=clean và đúng owner/purpose mới được gắn vào tài nguyên. expires\_at được đề xuất để xác định giấy tờ hết hiệu lực. Avatar tham chiếu trực tiếp bằng avatar\_file\_id; profile\_document không tự bổ sung FileResourceType mới.
+
+BR-16: thay file tạo hàng VerificationDocument mới để giữ quyết định cũ. Có thể có nhiều hàng cùng `document_type`; gate chọn giấy tờ hiện hành approved, chưa expired, đúng owner/File hợp lệ. Identity yêu cầu ít nhất một `identity_card` hoặc `passport`; `other` không thay thế. Degree/certificate chỉ là yêu cầu nếu có qualification claim cấu trúc tương ứng. Document bắt buộc expired làm mất eligibility public/tạo dịch vụ mới nhưng không tự đổi TutorProfileStatus/UserStatus; khi bản thay thế approved, kiểm lại public gate. Các cột/constraint và job expiry cần migration/test trước khi xem là đã triển khai.
 
 # 03 · Tệp và xác minh (tiếp)
 
@@ -346,6 +384,8 @@ Khóa ghép / unique: conversation\_members: PRIMARY(conversation\_id,user\_id).
 
 Một Conversation cho đúng cặp Customer–Tutor: type cố định direct; direct\_key chuẩn hóa theo cặp và UNIQUE NOT NULL. conversation\_members có đúng hai người. last\_read\_message\_id phải thuộc cùng Conversation. System message do backend tạo; sender\_id dùng một tài khoản hệ thống được quản lý, không nhận từ client. Đóng chat theo điều kiện Program completed và không còn Program active/paused hoặc lời mời pending còn hiệu lực; dịch vụ mới mở lại cùng chat.
 
+BR-17: `context_listing_id` chỉ được ghi khi tạo Conversation đầu tiên, có thể NULL và không bị ghi đè khi find-or-create/tái mở từ Listing khác. Request context mới vẫn phải qua gate Listing nhưng không thay metadata/lịch sử cũ. Đình chỉ một participant không xóa `conversation_members`, message hoặc read cursor và không tự đổi status; participant còn active đọc lịch sử theo membership, participant bị đình chỉ bị từ chối truy cập kể cả khi còn session cũ, khôi phục thì đọc lại theo membership. Migration hiện có nhưng chưa có route/service thực thi chính sách này.
+
 # 04 · Hội thoại và tin nhắn
 
 ### Bảng messages
@@ -369,6 +409,8 @@ created\_at — timestamptz; NULL.
 updated\_at — timestamptz; NULL.
 
 Khóa ghép / unique: messages: UNIQUE(sender\_id,client\_message\_id).
+
+BR-21 schema implications: inbox order and unread count derive from `(created_at,id)` and member `last_read_message_id`; report read receipts only at Conversation level. File `scan_status=clean` requires scanner approval; chat FileLink and Message commit atomically. Orphan cleanup uses pending 24h / complete-unlinked 7d; linked file retention follows owning resource.
 
 # 05 · Program và lời mời
 
@@ -404,7 +446,7 @@ meeting\_url — text; NULL.
 
 schedule\_note — text; NULL.
 
-timezone — varchar(64); NOT NULL; mặc định: Asia/Ho\_Chi\_Minh.
+timezone — varchar(64); NOT NULL; IANA timezone authoritative của Program; mặc định: Asia/Ho\_Chi\_Minh.
 
 planned\_session\_count — integer; NULL.
 
@@ -452,9 +494,9 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-Khóa ghép / unique: programs: UNIQUE(id,version); program\_invitations: UNIQUE(invited\_by,idempotency\_key).
+Khóa ghép / unique: programs dùng PK(id), `version` là version offer hiện tại; không dùng FK Invitation về version row lịch sử vì snapshots bất biến nằm trên từng Invitation. program\_invitations: UNIQUE(invited\_by,idempotency\_key); thêm partial unique `UNIQUE(program\_id) WHERE status=pending`.
 
-programs.customer\_id là Customer đích cố định; owner\_tutor\_profile\_id là Tutor duy nhất. Invitation giữ snapshot bất biến và expires\_at \= thời điểm gửi \+ 72 giờ. Thay index pending cũ bằng UNIQUE(program\_id) WHERE status=pending; hết hạn phải chuyển expired trước khi gửi mới. Accept kiểm version/snapshot, tạo hai membership và chuyển Program active trong một transaction. Duy nhất một Customer member trong suốt Program; không tự thu hồi membership khi completed.
+programs.customer\_id là Customer đích cố định; owner\_tutor\_profile\_id là Tutor duy nhất. `Program.version` là offer version bắt đầu từ 1, tăng sau mỗi Draft edit. PATCH/send dùng `expected_version`; Invitation giữ `program_version` bất biến cùng snapshot và expires\_at = `sent_at` + 72 giờ UTC. `sent_at` là thời điểm server tạo Invitation, lưu cùng timestamp `created_at`; các Invitation cũ giữ program_version/snapshot của mình khi Program Draft về sau tăng version. Accept hợp lệ chỉ khi server time < expires\_at; worker trễ không kéo dài hạn. Hết hạn phải chuyển Invitation sang expired trước khi gửi mới. Draft bị khóa khi pending; Draft cancel phải cancel Invitation cùng transaction. Accept kiểm Program/Invitation/version/snapshot/expiry, tạo hai membership và chuyển Program active trong một transaction. Nếu source Listing đang hold thì accept bị từ chối 409, Invitation không đổi; có thể accept sau khi hold gỡ và trước expiry nếu Customer/Tutor còn đủ điều kiện; không recheck Listing active vì snapshot đã khóa. Hủy Active/Paused bị chặn khi còn Session scheduled hoặc Task todo/in\_progress/submitted; không tự cascade-cancel. Duy nhất một Customer member trong suốt Program; không tự thu hồi membership khi completed. Lock/isolation protocol cần kiểm thử cạnh tranh PostgreSQL trước triển khai.
 
 # 05 · Program và lời mời (tiếp)
 
@@ -502,7 +544,7 @@ planned\_starts\_at — timestamptz; NOT NULL.
 
 planned\_ends\_at — timestamptz; NOT NULL.
 
-timezone — varchar(64); NOT NULL.
+timezone — varchar(64); NOT NULL; snapshot `Program.timezone` tại lúc lập Session; mọi instant lưu UTC.
 
 delivery\_mode — varchar(20); NOT NULL; enum: DeliveryMode.
 
@@ -511,6 +553,8 @@ location\_text — text; NULL.
 meeting\_url — text; NULL.
 
 status — varchar(20); NOT NULL; mặc định: scheduled; enum: SessionStatus; cần điều chỉnh.
+
+version — integer; NOT NULL DEFAULT 1; BR-19, optimistic concurrency cho Session.
 
 created\_at — timestamptz; NULL.
 
@@ -542,6 +586,8 @@ Khóa ghép / unique: program\_sessions: UNIQUE(program\_id,program\_version,seq
 
 program\_sessions lưu kế hoạch; lesson\_sessions lưu kết quả thực hiện, quan hệ 1 → 0..1. Hai cột status dùng SessionStatus scheduled/completed/cancelled và được cập nhật nhất quán trong một transaction. Không dùng planned/in\_progress/no\_show làm enum đích. tutor\_joined\_at/customer\_joined\_at là cột legacy được giữ lại, không suy ra chức năng điểm danh. program\_version là số phiên bản lịch sử, không đặt FK ghép tới version hiện tại của programs.
 
+Theo BR-19, mọi mutation Session kiểm `expected_version` dưới cùng transaction với state gate; PATCH lịch chỉ khi Program Active và Session scheduled. Complete/cancel trong Active/Paused tăng version, cùng với tạo lesson\_sessions nguyên tử khi complete. Replay request hợp lệ trả kết quả đã lưu mà không tăng version/audit lần hai. `Program.timezone` authoritative; program\_sessions.timezone snapshot giá trị đó, instant lưu UTC. `meeting_url` chỉ nhận HTTPS, tối đa 2.048 ký tự, không credentials.
+
 # 07 · Nhiệm vụ và bài nộp
 
 ## tasks  ·  task\_submissions
@@ -560,6 +606,8 @@ due\_at — timestamptz; NULL.
 
 status — varchar(20); NOT NULL; mặc định: todo; enum: TaskStatus.
 
+version — integer; NOT NULL DEFAULT 1; BR-19, tăng theo mỗi Task mutation thành công.
+
 assigned\_to — bigint; NULL; FK; tham chiếu users.id.
 
 created\_at — timestamptz; NULL.
@@ -576,7 +624,7 @@ task\_id — bigint; NOT NULL; FK; tham chiếu tasks.id.
 
 customer\_id — bigint; NOT NULL; FK; tham chiếu users.id.
 
-content — text; NULL.
+content — text; NULL; tối đa 10.000 ký tự; phải có nội dung không trắng hoặc file đính kèm.
 
 status — varchar(20); NOT NULL; mặc định: submitted; enum: SubmissionStatus; cần điều chỉnh.
 
@@ -596,11 +644,13 @@ submission\_version — integer; NOT NULL; đề xuất thêm.
 
 idempotency\_key — uuid; NOT NULL; F05; khóa chống gửi trùng cùng version.
 
-request\_hash — char(64); NOT NULL; F05; SHA-256 request đã chuẩn hóa; không lưu bản sao nội dung riêng tư.
+request\_hash — char(64); NOT NULL; SHA-256 JSON canonical RFC 8785 của `expected_submission_version`, `content` và file IDs đã validation; không lưu bản sao nội dung riêng tư.
 
 Khóa ghép / unique: task\_submissions: UNIQUE(task\_id,customer\_id,submission\_version); UNIQUE(task\_id,customer\_id,idempotency\_key).
 
-Mỗi lần nộp/cập nhật chủ động tạo một task\_submissions mới: content, tệp và feedback của version cũ được bảo toàn; submission\_version tăng từ 1\. tasks.current\_submission\_id chỉ tới version mới nhất của chính Task và Customer được giao. Insert, cập nhật pointer, Task state và file links thực hiện trong cùng transaction. PUT bắt buộc Idempotency-Key UUID; lưu key và SHA-256 request\_hash đã validation/canonicalize trên đúng version, giữ theo lịch sử submission (không hết hạn khi version còn lưu). UNIQUE(task\_id,customer\_id,idempotency\_key) giới hạn key theo người nộp và Task. Sau khi kiểm tra quyền/assignee, cùng key \+ hash trả đúng version đã commit mà không tăng version/audit/notification; cùng key nhưng hash khác trả 409\. Key mới chỉ tạo version nếu expected\_submission\_version khớp version hiện tại; stale trả 409\. Feedback chỉ ghi cho version mới nhất và kiểm expected\_submission\_version; reviewed\_by/reviewed\_at/feedback gắn vào đúng row version.
+Mỗi lần nộp/cập nhật chủ động tạo một task\_submissions mới: content, tệp và feedback của version cũ được bảo toàn; submission\_version tăng từ 1\. tasks.current\_submission\_id chỉ tới version mới nhất của chính Task và Customer được giao. Insert, cập nhật pointer, Task state và file links thực hiện trong cùng transaction. PUT bắt buộc Idempotency-Key UUID; lưu key và SHA-256 request\_hash theo BR-20, giữ theo lịch sử submission (không hết hạn khi version còn lưu). UNIQUE(task\_id,customer\_id,idempotency\_key) giới hạn key theo người nộp và Task. Mỗi Submission tối đa 5 file, mỗi file tối đa 5 MiB; MIME PDF/JPG/PNG/DOC/DOCX. Sau khi kiểm tra quyền/assignee, cùng key \+ hash trả đúng version đã commit mà không tăng version/audit/notification; cùng key nhưng hash khác trả 409\. Key mới chỉ tạo version nếu expected\_submission\_version khớp version hiện tại; stale trả 409\. Feedback chỉ ghi cho version mới nhất và kiểm expected\_submission\_version; reviewed\_by/reviewed\_at/feedback gắn vào đúng row version.
+
+`tasks.version` theo BR-19 tăng mỗi mutation Task thành công, gồm edit/start/cancel và status change cùng Submission/feedback. PATCH/start/cancel kiểm `expected_version`; Submission/feedback giữ guard `expected_submission_version` riêng. Các thay đổi liên quan phải đồng bộ trong transaction; replay không tăng version/audit/notification.
 
 # 08 · Tiến độ và thông báo lớp
 
@@ -614,15 +664,17 @@ program\_id — bigint; NOT NULL; FK; tham chiếu programs.id.
 
 customer\_id — bigint; NOT NULL; FK; tham chiếu users.id.
 
-metric\_name — varchar(100); NOT NULL.
+metric\_name — varchar(100); NOT NULL; MVP chỉ nhận `progress_percent`.
 
-value — numeric(12,4); NOT NULL.
+value — smallint; NOT NULL; check 0–100 inclusive; Tutor tự đánh giá.
 
 note — text; NULL.
 
 recorded\_by — bigint; NOT NULL; FK; tham chiếu users.id.
 
-recorded\_at — timestamptz; NOT NULL.
+recorded\_at — timestamptz; NOT NULL; server-assigned instant.
+
+version — integer; NOT NULL DEFAULT 1; optimistic concurrency cho PATCH.
 
 created\_at — timestamptz; NULL.
 
@@ -642,11 +694,15 @@ body — text; NOT NULL.
 
 published\_at — timestamptz; NULL.
 
+version — integer; NOT NULL DEFAULT 1; BR-19, optimistic concurrency cho Draft/publish.
+
 created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-Progress lưu metric\_name/value/note; không thêm status. customer\_id phải là Customer của Program; recorded\_by là Tutor có quyền sửa. Announcement draft/published suy ra từ published\_at; bản nháp không hiển thị với Customer. Chỉ thành viên phù hợp của Program được đọc nội dung và tệp workspace.
+Progress lưu metric\_name/value/note; không thêm status. Chỉ cho `metric_name=progress_percent`, value nguyên 0–100. customer\_id phải là Customer của Program; recorded\_by là Tutor owner. Mọi PATCH kiểm `expected_version`, tăng version và ghi audit before/after; không hard-delete. `recorded_at` do server đặt; đọc/hiển thị theo Program timezone. Announcement draft/published suy ra từ published\_at; bản nháp không hiển thị với Customer. Title/body giới hạn 180/10.000 ký tự; tối đa 5 file, mỗi file tối đa 5 MiB, MIME PDF/JPG/PNG/DOC/DOCX. Chỉ thành viên phù hợp của Program được đọc nội dung và tệp workspace.
+
+Announcement có `version` theo BR-19; PATCH Draft và publish kiểm `expected_version`. Khi published, nội dung/tệp không được sửa; đính chính bằng record mới.
 
 # 09 · Phí, đánh giá và xử lý vi phạm
 
@@ -676,7 +732,11 @@ updated\_at — timestamptz; NULL.
 
 tutor\_payment\_mark — varchar(20); NOT NULL; mặc định: unmarked; enum: TutorPaymentMark; đề xuất thêm.
 
+version — integer; NOT NULL DEFAULT 1; BR-19, optimistic concurrency cho edit/mark/void.
+
 voided\_at — timestamptz; NULL; đề xuất thêm.
+
+Fee `version` theo BR-19 tăng mỗi lần sửa/mark/void thành công; các mutation kiểm `expected_version`. Chỉ record declared chưa marked_paid được sửa amount; kỳ tháng và record voided giữ nguyên.
 
 voided\_by — bigint; NULL; FK; tham chiếu users.id; đề xuất thêm.
 
@@ -716,7 +776,7 @@ moderation\_reason — text; NULL; đề xuất thêm.
 
 Khóa ghép / unique: fee\_records: UNIQUE(program\_id,period\_start); reviews: UNIQUE(program\_id,customer\_id).
 
-Fee Record có hai enum độc lập: status=declared/voided và tutor\_payment\_mark=unmarked/marked\_paid/marked\_unpaid. Kỳ tháng lưu period\_start=ngày đầu tháng, period\_end=ngày cuối cùng cùng tháng; API suy ra YYYY-MM. UNIQUE(program\_id,period\_start) áp dụng cả voided, không tái khai báo cùng kỳ. Số tiền VND nguyên ≥0; void giữ dấu thanh toán và là trạng thái cuối. Mỗi sửa phí/dấu thanh toán/void ghi Audit với lý do và thời gian. Review chỉ tạo cho Program completed hợp lệ, rating 1..5; visibility quyết định công khai. Report dùng open/resolved/dismissed.
+Fee Record có hai enum độc lập: status=declared/voided và tutor\_payment\_mark=unmarked/marked\_paid/marked\_unpaid. Kỳ tháng lưu period\_start=ngày đầu tháng, period\_end=ngày cuối cùng cùng tháng theo lịch Program.timezone; API suy ra YYYY-MM. UNIQUE(program\_id,period\_start) áp dụng cả voided, không tái khai báo cùng kỳ. Số tiền VND nguyên ≥0; void giữ dấu thanh toán và là trạng thái cuối. Mỗi sửa phí/dấu thanh toán/void ghi Audit với lý do và thời gian. Legacy `confirmed` không được tự suy thành bằng chứng thanh toán nếu chưa xác minh ngữ nghĩa. BR-22: period\_start không trước tháng activated\_at hoặc sau tháng hiện tại trong Program.timezone; service kiểm tra vì cần timezone/current month. amount\_minor=0 giữ payment mark unmarked; service không cho mark paid/unpaid hoặc sửa về 0 khi mark đã được ghi. DB check tương ứng bảo đảm amount=0 ⇒ mark=unmarked. Mọi amount edit/void lưu reason trong audit before/after; Customer đọc allow-list reason/update time. Idempotency-Key Fee cần durable command replay receipt (actor\_id, key, method/path, request hash, response snapshot), unique theo actor/key và giữ tối thiểu theo retention của Fee Record. Tạo hoặc sửa/mark/void thành công ghi notification\_outbox `fee_record_changed` với event key theo record/version trong cùng transaction; retry không tạo side effect lần hai. Review chỉ tạo cho Program completed hợp lệ, rating 1..5; visibility quyết định công khai. Report dùng open/resolved/dismissed.
 
 # 09 · Phí, đánh giá và xử lý vi phạm (tiếp)
 
@@ -734,7 +794,7 @@ resource\_id — bigint; NOT NULL.
 
 reason — varchar(100); NOT NULL; enum: ReportReasonCode.
 
-details — text; NULL.
+details — text; NULL. API Report dùng tên trường `description` và ánh xạ vào cột này; không đổi tên cột dữ liệu.
 
 status — varchar(20); NOT NULL; mặc định: open; enum: ReportStatus; cần điều chỉnh.
 
@@ -994,7 +1054,7 @@ Giữ lịch sử Program, Invitation, Submission, Fee, Review và Audit; không
 
 ## Phạm vi triển khai
 
-Không tạo bảng Order/Payment riêng: Program là thỏa thuận dịch vụ, fee\_records là phí tự khai báo và dấu đã/chưa thu do Tutor đặt; không có thanh toán qua cổng, hoàn tiền hoặc đối soát ngân hàng. Không thêm moderation riêng từng Listing, support ticket hoặc metrics Admin khi các chức năng đó còn điều kiện trong API Route Catalog. Không tự thêm enum vào catalog trong tài liệu này.
+Không tạo bảng Order/Payment riêng: Program là thỏa thuận dịch vụ, fee\_records là phí tự khai báo và dấu đã/chưa thu do Tutor đặt; không có thanh toán qua cổng, hoàn tiền hoặc đối soát ngân hàng. Listing moderation hold đã chốt nghiệp vụ tại BR-15/M03-F10 nhưng chưa có migration; không tạo support-ticket/appeal route trong MVP, còn Admin users/metrics cần quyết định riêng. Không tự thêm giá trị `hidden` vào ListingStatus.
 
 ## Tài liệu nguồn
 

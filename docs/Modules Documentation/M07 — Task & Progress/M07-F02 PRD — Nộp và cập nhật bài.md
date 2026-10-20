@@ -14,6 +14,9 @@ Customer được giao Task nộp nội dung hoặc tệp và cập nhật bài 
 * \`submitted\_late\` dựa vào submitted\_at \> due\_at; due\_at null không bị coi là trễ.  
 * Program Paused vẫn cho nộp/cập nhật theo BR-10; Program terminal readonly.  
 * Attachment phải complete, thuộc actor, purpose/resource đúng Task Submission.
+* Submission phải có `content` không trắng hoặc tối thiểu một tệp; `content` tối đa 10.000 ký tự. Mỗi Submission tối đa 5 tệp, mỗi tệp tối đa 5 MiB theo allow-list purpose/MIME của M10.
+* `expected_submission_version` và Idempotency-Key là concurrency guard của Submission; khi PUT làm đổi Task state, cập nhật Submission, pointer, Task state và `tasks.version` nguyên tử. Mỗi lần state Task đổi tăng `tasks.version` một lần; replay cùng key/payload không tăng version hoặc phát notification lần nữa.
+* Request hash tính trên `expected_submission_version`, `content` và file IDs duy nhất được sắp tăng dần; attachment order không có ý nghĩa trong MVP. Thiếu `content` và `null` tương đương `null`; content chỉ gồm whitespace được chuẩn hóa thành `null`; chuẩn hóa CRLF/CR thành LF, không chuẩn hóa Unicode. File IDs trùng bị từ chối. Hash là SHA-256 của JSON canonical theo RFC 8785 sau validation.
 
 # 3\. Tiêu chí chấp nhận
 
@@ -22,11 +25,13 @@ Customer được giao Task nộp nội dung hoặc tệp và cập nhật bài 
 * Hai update đồng thời không mất bản mới; version race được phản hồi stale/conflict.  
 * Task state, submitted\_at, lateness và file links đồng bộ sau transaction.  
 * Outsider, Tutor, wrong Program member và terminal Task không thể nộp.
+* Customer được nộp Task đã giao khi Program Paused; stale Submission hoặc sai Task state trả 409, không tạo version một phần.
+* Chỉ cho nộp khi có text không trắng hoặc ít nhất một file; quá 10.000 ký tự, hơn 5 file, file lớn hơn 5 MiB hoặc file sai purpose/MIME đều bị từ chối.
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Đã chốt cho submission: lưu idempotency\_key và SHA-256 của request đã validation/canonicalize trên task\_submissions; phạm vi UNIQUE(task\_id,customer\_id,idempotency\_key), giữ khóa cùng lịch sử version, không TTL khi Submission còn được lưu. Quyền/assignment được kiểm trước replay. Key mới phải gửi expected\_submission\_version hiện tại; stale trả 409 và không tạo version.  
-* Schema đích cần idempotency\_key, request\_hash và unique constraint tương ứng. Tạo Submission version mới, current pointer, Task state và liên kết file trong một transaction. Phương án lưu key/hash đã chốt; hàm canonicalize cụ thể (field vào hash, omitted/null, thứ tự file, Unicode/newline và expected\_submission\_version), giới hạn content/attachment vẫn cần chốt ở D13 trước phát hành. Không tự xem SHA-256 là đặc tả đầy đủ của cùng payload.
+* Đã chốt cho submission: lưu idempotency\_key và SHA-256 của request đã validation/canonicalize trên task\_submissions; phạm vi UNIQUE(task\_id,customer\_id,idempotency\_key), giữ khóa cùng lịch sử version, không TTL khi Submission còn được lưu. Quyền/assignment được kiểm trước replay. Key mới phải gửi expected\_submission\_version hiện tại; stale trả 409 và không tạo version. Task version tăng cùng transaction khi submission làm đổi Task state theo BR-19.
+* Schema đích cần idempotency\_key, request\_hash và unique constraint tương ứng. Tạo Submission version mới, current pointer, Task state và liên kết file trong một transaction. Cấu trúc hash và giới hạn đã chốt tại BR-20; generic replay store/retention D08 vẫn là câu hỏi riêng, không ảnh hưởng retention D13 theo vòng đời Submission.
 
 # 5\. Nguồn
 
