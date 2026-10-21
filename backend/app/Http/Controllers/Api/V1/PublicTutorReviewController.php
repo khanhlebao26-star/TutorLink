@@ -21,8 +21,7 @@ class PublicTutorReviewController extends Controller
 
         $profile = TutorProfile::query()
             ->where('public_slug', $slug)
-            ->where('approval_status', 'active')
-            ->whereNull('suspended_at')
+            ->where('status', 'approved')
             ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'))
             ->firstOrFail();
 
@@ -56,8 +55,11 @@ class PublicTutorReviewController extends Controller
         }
 
         $reviews = $visible->select([
-            'reviews.id', 'authors.full_name as author_name', 'reviews.rating',
-            'reviews.comment', 'reviews.created_at',
+            'reviews.id',
+            'authors.full_name as author_name',
+            'reviews.rating',
+            'reviews.comment',
+            'reviews.created_at',
         ])->orderByDesc('reviews.created_at')->orderByDesc('reviews.id')
             ->paginate($filters['per_page'] ?? 5);
 

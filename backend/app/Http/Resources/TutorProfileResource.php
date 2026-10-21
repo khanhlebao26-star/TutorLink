@@ -9,13 +9,6 @@ class TutorProfileResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $status = match ($this->approval_status) {
-            'active' => 'approved',
-            'changes_requested' => 'changes_requested',
-            'rejected' => 'rejected',
-            default => $this->submitted_at ? 'submitted' : 'draft',
-        };
-
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
@@ -25,8 +18,7 @@ class TutorProfileResource extends JsonResource
             'headline' => $this->headline,
             'bio' => $this->bio,
             'experience_years' => $this->experience_years,
-            'status' => $status,
-            'approval_status' => $this->approval_status,
+            'status' => $this->status,
             'submitted_at' => $this->submitted_at?->toISOString(),
             'review_reason' => $this->review_reason,
             'reviewed_by' => $this->reviewed_by,

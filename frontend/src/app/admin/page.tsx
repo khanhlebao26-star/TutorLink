@@ -2,25 +2,43 @@
 
 import { AppShell } from "@/components/app-shell";
 import { Badge, Button, DataTable, ErrorActions, Field, StatePanel } from "@/components/ui";
-import { getAdminTutorProfile, getAdminTutorProfiles, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
 import { describeApiError } from "@/lib/api/client";
-import type { AdminTutorProfile, TutorApprovalStatus } from "@/lib/data/types";
+import { getAdminTutorProfile, getAdminTutorProfiles, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
+import type { AdminTutorProfile, TutorProfileStatus } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { useCallback, useRef, useState } from "react";
 
-const labels: Record<TutorApprovalStatus, string> = {
-  pending: "Đang chờ",
+const labels: Record<TutorProfileStatus, string> = {
+  draft: "Bản nháp",
+  submitted: "Đang chờ",
   changes_requested: "Yêu cầu chỉnh sửa",
-  active: "Đã duyệt",
+  approved: "Đã duyệt",
   rejected: "Từ chối",
-  // cancelled: "Đã huỷ",
-  // expired: "Hết hạn",
+  suspended: "Đình chỉ hồ sơ",
 };
 
-const filters = ["pending", "changes_requested", "active", "rejected"] as const;
+const filters = [
+  "submitted",
+  "changes_requested",
+  "approved",
+  "rejected",
+  "suspended",
+] as const;
 
-function tone(status: TutorApprovalStatus): "neutral" | "success" | "warning" {
-  return status === "active" ? "success" : status === "pending" || status === "changes_requested" ? "warning" : "neutral";
+function tone(
+  status: TutorProfileStatus,
+): "neutral" | "success" | "warning" {
+  if (status === "approved") return "success";
+
+  if (
+    status === "submitted"
+    || status === "changes_requested"
+    || status === "suspended"
+  ) {
+    return "warning";
+  }
+
+  return "neutral";
 }
 
 function date(value: string | null | undefined): string {
@@ -29,7 +47,7 @@ function date(value: string | null | undefined): string {
 
 export default function AdminPage() {
   const detailRequest = useRef(0);
-  const [status, setStatus] = useState<(typeof filters)[number]>("pending");
+  const [status, setStatus] = useState<(typeof filters)[number]>("submitted");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<AdminTutorProfile | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -139,7 +157,7 @@ export default function AdminPage() {
               { key: "name", label: "Tutor", render: (row) => <strong>{row.user.full_name}</strong> },
               { key: "headline", label: "Chuyên môn", render: (row) => row.profile.headline },
               { key: "experience", label: "Kinh nghiệm", render: (row) => `${row.profile.experience_years} năm` },
-              { key: "status", label: "Trạng thái", render: (row) => <Badge tone={tone(row.profile.approval_status)}>{labels[row.profile.approval_status]}</Badge> },
+              { key: "status", label: "Trạng thái", render: (row) => <Badge tone={tone(row.profile.status)}>{labels[row.profile.status]}</Badge> },
               { key: "action", label: "Thao tác", render: (row) => <button className="text-button" type="button" disabled={saving} onClick={() => openProfile(row.profile.id)}>Mở hồ sơ</button> },
             ]}
           />
@@ -149,7 +167,7 @@ export default function AdminPage() {
           <section className="card detail-card" aria-live="polite">
             <div className="section-heading">
               <div><p className="eyebrow">Tutor Profile #{selectedId}</p><h2>{detail?.user.full_name ?? "Chi tiết hồ sơ"}</h2></div>
-              {detail ? <Badge tone={tone(detail.profile.approval_status)}>{labels[detail.profile.approval_status]}</Badge> : null}
+              {detail ? <Badge tone={tone(detail.profile.status)}>{labels[detail.profile.status]}</Badge> : null}
             </div>
             {detailLoading ? <StatePanel kind="loading" message="Đang tải chi tiết hồ sơ…" /> : detailError ? <StatePanel kind="error" message={detailError} action={<ErrorActions onRetry={() => openProfile(selectedId)} />} /> : detail ? (
               <>

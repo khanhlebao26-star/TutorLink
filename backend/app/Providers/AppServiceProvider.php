@@ -5,8 +5,13 @@ namespace App\Providers;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        Fortify::ignoreRoutes();
     }
 
     /**
@@ -47,6 +52,19 @@ class AppServiceProvider extends ServiceProvider
                 'token' => $token,
                 'email' => $user->getEmailForPasswordReset(),
             ]);
+        });
+
+        RateLimiter::for('login', function (Request $request) {
+            $email = Str::transliterate(Str::lower((string) $request->input('email')));
+
+            return [
+                Limit::perMinute(5)->by($email.'|'.$request->ip()),
+                Limit::perMinute(20)->by($request->ip()),
+            ];
+        });
+
+        RateLimiter::for('register', function (Request $request) {
+            return Limit::perMinute(3)->by($request->ip());
         });
     }
 }

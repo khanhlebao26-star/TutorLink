@@ -22,7 +22,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$tutor, $profile] = $this->createTutor('pending');
+        [$tutor, $profile] = $this->createTutor('submitted');
 
         $listing = $this->createListing(
             $profile,
@@ -43,7 +43,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$owner, $ownerProfile] = $this->createTutor('active');
+        [$owner, $ownerProfile] = $this->createTutor('approved');
         $listing = $this->createListing(
             $ownerProfile,
             $specialization,
@@ -52,7 +52,7 @@ class MarketplaceApiTest extends TestCase
             ],
         );
 
-        [$otherTutor] = $this->createTutor('active');
+        [$otherTutor] = $this->createTutor('approved');
 
         $this->actingAs($otherTutor)
             ->patchJson("/api/v1/me/listings/{$listing->id}", [
@@ -65,7 +65,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [, $profile] = $this->createTutor('active');
+        [, $profile] = $this->createTutor('approved');
 
         $active = $this->createListing(
             $profile,
@@ -104,7 +104,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [, $profile] = $this->createTutor('active');
+        [, $profile] = $this->createTutor('approved');
 
         $cheap = $this->createListing(
             $profile,
@@ -140,7 +140,7 @@ class MarketplaceApiTest extends TestCase
 
     public function test_overlapping_availability_is_rejected(): void
     {
-        [$approvedTutor] = $this->createTutor('active');
+        [$approvedTutor] = $this->createTutor('approved');
 
         $this->actingAs($approvedTutor)
             ->putJson('/api/v1/me/availability-rules', [
@@ -166,7 +166,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$tutor, $profile] = $this->createTutor('active');
+        [$tutor, $profile] = $this->createTutor('approved');
 
         $listing = $this->createListing(
             $profile,
@@ -196,7 +196,7 @@ class MarketplaceApiTest extends TestCase
     }
 
     private function createTutor(
-        string $approvalStatus,
+        string $profileStatus,
     ): array {
         $tutor = User::factory()->create([
             'role' => 'tutor',
@@ -207,7 +207,7 @@ class MarketplaceApiTest extends TestCase
             'headline' => 'Test tutor',
             'bio' => 'Test tutor profile.',
             'experience_years' => 3,
-            'approval_status' => $approvalStatus,
+            'status' => $profileStatus,
         ]);
 
         return [$tutor, $profile];
@@ -238,11 +238,12 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$tutor, $profile] = $this->createTutor('active');
+        [$tutor, $profile] = $this->createTutor('approved');
 
         $listing = $this->createListing($profile, $specialization);
 
         $profile->update([
+            'status' => 'suspended',
             'suspended_at' => now(),
         ]);
 
@@ -253,16 +254,16 @@ class MarketplaceApiTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_inactive_account_cannot_manage_listing(): void
+    public function test_suspended_account_cannot_manage_listing(): void
     {
         $specialization = $this->seedCatalog();
 
-        [$tutor, $profile] = $this->createTutor('active');
+        [$tutor, $profile] = $this->createTutor('approved');
 
         $listing = $this->createListing($profile, $specialization);
 
         $tutor->update([
-            'status' => 'inactive',
+            'status' => 'suspended',
         ]);
 
         $this->actingAs($tutor)
@@ -276,7 +277,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$owner, $ownerProfile] = $this->createTutor('active');
+        [$owner, $ownerProfile] = $this->createTutor('approved');
         $listing = $this->createListing(
             $ownerProfile,
             $specialization,
@@ -285,7 +286,7 @@ class MarketplaceApiTest extends TestCase
             ],
         );
 
-        [$otherTutor] = $this->createTutor('active');
+        [$otherTutor] = $this->createTutor('approved');
 
         $this->actingAs($otherTutor)
             ->getJson("/api/v1/me/listings/{$listing->id}")
@@ -300,7 +301,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [, $profile] = $this->createTutor('active');
+        [, $profile] = $this->createTutor('approved');
 
         $active = $this->createListing(
             $profile,
@@ -348,7 +349,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$tutor, $profile] = $this->createTutor('active');
+        [$tutor, $profile] = $this->createTutor('approved');
 
         $listing = $this->createListing(
             $profile,
@@ -362,6 +363,7 @@ class MarketplaceApiTest extends TestCase
             ->assertJsonCount(1, 'data');
 
         $profile->update([
+            'status' => 'suspended',
             'suspended_at' => now(),
         ]);
 
@@ -369,6 +371,7 @@ class MarketplaceApiTest extends TestCase
             ->assertJsonCount(0, 'data');
 
         $profile->update([
+            'status' => 'approved',
             'suspended_at' => null,
         ]);
 
@@ -376,7 +379,7 @@ class MarketplaceApiTest extends TestCase
             ->assertJsonCount(1, 'data');
 
         $tutor->update([
-            'status' => 'inactive',
+            'status' => 'suspended',
         ]);
 
         $this->getJson('/api/v1/listings')
@@ -394,7 +397,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [, $profile] = $this->createTutor('active');
+        [, $profile] = $this->createTutor('approved');
 
         $listing = $this->createListing(
             $profile,
@@ -425,7 +428,7 @@ class MarketplaceApiTest extends TestCase
         $specialization = $this->seedCatalog();
         $specialization->load('subcategory.category');
 
-        [, $profile] = $this->createTutor('active');
+        [, $profile] = $this->createTutor('approved');
 
         $matching = $this->createListing(
             $profile,
@@ -471,7 +474,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [, $profile] = $this->createTutor('active');
+        [, $profile] = $this->createTutor('approved');
 
         foreach (range(1, 3) as $number) {
             $this->createListing(
@@ -496,7 +499,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [, $profile] = $this->createTutor('active');
+        [, $profile] = $this->createTutor('approved');
 
         $session = $this->createListing(
             $profile,
@@ -535,7 +538,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$tutor, $profile] = $this->createTutor('active');
+        [$tutor, $profile] = $this->createTutor('approved');
 
         $listing = $this->createListing(
             $profile,
@@ -585,7 +588,7 @@ class MarketplaceApiTest extends TestCase
     {
         $specialization = $this->seedCatalog();
 
-        [$tutor, $profile] = $this->createTutor('active');
+        [$tutor, $profile] = $this->createTutor('approved');
 
         $listing = $this->createListing(
             $profile,

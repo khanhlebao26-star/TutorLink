@@ -11,6 +11,7 @@ import type {
   SpecializationCollection,
   TutorOnboardingData,
   TutorProfile,
+  TutorProfileStatus,
   User,
   VerificationDocument
 } from "./types";
@@ -64,7 +65,7 @@ export async function getTutorOnboarding(): Promise<TutorOnboardingData> {
   return { user, profile, specializations };
 }
 
-export async function getAdminTutorProfiles(status = "pending"): Promise<AdminTutorProfile[]> {
+export async function getAdminTutorProfiles(status: TutorProfileStatus = "submitted",): Promise<AdminTutorProfile[]> {
   if (dataMode === "mock") { await delay(); return mockAdminProfiles(status); }
   const response = await request<ApiEnvelope<AdminTutorProfile[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}` });
   return unwrap(response.data);
@@ -82,14 +83,28 @@ export async function performAdminTutorAction(id: number, action: AdminAction, r
   if (dataMode === "mock") {
     await delay();
     const current = await getAdminTutorProfile(id);
-    const profile = action === "approve"
-      ? { ...current.profile, status: "approved" as const, approval_status: "active" as const, review_reason: reason }
-      : action === "request-changes"
-        ? { ...current.profile, status: "changes_requested" as const, approval_status: "changes_requested" as const, review_reason: reason }
-        : action === "reject"
-          ? { ...current.profile, status: "rejected" as const, approval_status: "rejected" as const, review_reason: reason }
-          : { ...current.profile, suspended_at: action === "suspend" ? new Date().toISOString() : null, suspension_reason: action === "suspend" ? reason : null };
-    current.profile = profile;
+const nextStatus: Record<AdminAction, TutorProfileStatus> = {
+  approve: "approved",
+  "request-changes": "changes_requested",
+  reject: "rejected",
+  suspend: "suspended",
+  restore: "approved",
+};
+
+const profile: TutorProfile = {
+  ...current.profile,
+  status: nextStatus[action],
+};
+
+if (action === "suspend") {
+  profile.suspended_at = new Date().toISOString();
+  profile.suspension_reason = reason;
+} else if (action === "restore") {
+  profile.suspended_at = null;
+  profile.suspension_reason = null;
+} else {
+  profile.review_reason = reason;
+}    current.profile = profile;
     return (await getAdminTutorProfile(id));
   }
   const response = await request<ApiEnvelope<AdminTutorProfile>>({ method: "POST", url: `/admin/tutor-profiles/${id}/${action}`, data: { reason } }, true);
@@ -101,7 +116,7 @@ export async function performAdminAccountAction(id: number, action: "suspend" | 
     await delay();
     const entry = mockAdminProfiles().find((item) => item.user.id === id);
     if (!entry) throw new ApiClientError("Không tìm thấy tài khoản.", { status: 404 });
-    entry.user = { ...entry.user, status: action === "suspend" ? "inactive" : "active" };
+    entry.user = { ...entry.user, status: action === "suspend" ? "suspended" : "active" };
     return entry.user;
   }
   const response = await request<ApiEnvelope<User>>({ method: "POST", url: `/admin/users/${id}/${action}`, data: { reason } }, true);

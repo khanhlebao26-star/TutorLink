@@ -15,8 +15,7 @@ class CreateListingRequest extends FormRequest
         return $user?->role === 'tutor'
             && $user->status === 'active'
             && $user->hasVerifiedEmail()
-            && $user->tutorProfile?->approval_status === 'active'
-            && ! $user->tutorProfile?->suspended_at;
+            && $user->tutorProfile?->status === 'approved';
     }
 
     /** @return array<string, ValidationRule|array<mixed>|string> */

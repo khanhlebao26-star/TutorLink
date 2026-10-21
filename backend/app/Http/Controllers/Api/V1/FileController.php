@@ -66,10 +66,13 @@ class FileController extends Controller
             abort_unless(Storage::disk($file->disk)->exists($file->object_key), 409, 'Uploaded file is missing.');
             abort_if($file->scan_status === 'rejected', 409, 'Rejected files cannot be completed.');
             $disk = Storage::disk($file->disk);
-            abort_unless($disk->size($file->object_key) === (int) $file->size_bytes
+            abort_unless(
+                $disk->size($file->object_key) === (int) $file->size_bytes
                 && $disk->mimeType($file->object_key) === $file->mime_type
                 && hash_equals($file->checksum_sha256 ?? '', hash('sha256', $disk->get($file->object_key))),
-                409, 'Uploaded file does not match its metadata.');
+                409,
+                'Uploaded file does not match its metadata.'
+            );
             $file->update(['scan_status' => 'clean']);
 
             return new FileResource($file->refresh());
@@ -88,20 +91,35 @@ class FileController extends Controller
             $document = VerificationDocument::findOrFail($data['resource_id']);
             $profile = TutorProfile::lockForUpdate()->findOrFail($document->tutor_profile_id);
             abort_unless($profile->user_id === $user->id, 403, 'Forbidden.');
-            abort_if($profile->suspended_at, 403, 'Suspended profiles cannot be edited.');
-            abort_if($profile->submitted_at && $profile->approval_status !== 'changes_requested', 409, 'Submitted profile cannot be edited.');
+            abort_if(
+                $profile->status === 'suspended',
+                403,
+                'Suspended profiles cannot be edited.',
+            );
+
+            abort_unless(
+                in_array($profile->status, ['draft', 'changes_requested'], true),
+                409,
+                'Only draft or changes-requested profiles can be edited.',
+            );
             $file = File::lockForUpdate()->findOrFail($file->id);
             abort_unless($file->isComplete(), 409, 'File must be complete before it can be attached.');
             abort_unless($document->file_id === $file->id && $file->purpose === 'verification_document', 422, 'File does not match this verification document.');
 
             DB::table('file_links')->updateOrInsert([
-                'file_id' => $file->id, 'resource_type' => $data['resource_type'], 'resource_id' => $data['resource_id'],
+                'file_id' => $file->id,
+                'resource_type' => $data['resource_type'],
+                'resource_id' => $data['resource_id'],
             ], ['purpose' => $data['purpose'] ?? null]);
 
-            return response()->json(['data' => [
-                'file_id' => $file->id, 'resource_type' => $data['resource_type'],
-                'resource_id' => $data['resource_id'], 'purpose' => $data['purpose'] ?? null,
-            ]]);
+            return response()->json([
+                'data' => [
+                    'file_id' => $file->id,
+                    'resource_type' => $data['resource_type'],
+                    'resource_id' => $data['resource_id'],
+                    'purpose' => $data['purpose'] ?? null,
+                ],
+            ]);
         });
     }
 
@@ -136,10 +154,12 @@ class FileController extends Controller
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
 
-            if (DB::table('file_links')->where('file_id', $file->id)->exists()
+            if (
+                DB::table('file_links')->where('file_id', $file->id)->exists()
                 || DB::table('verification_documents')->where('file_id', $file->id)->exists()
                 || DB::table('tutor_profiles')->where('avatar_file_id', $file->id)->exists()
-                || DB::table('customer_profiles')->where('avatar_file_id', $file->id)->exists()) {
+                || DB::table('customer_profiles')->where('avatar_file_id', $file->id)->exists()
+            ) {
                 return response()->json(['message' => 'Linked files cannot be deleted.'], 409);
             }
 

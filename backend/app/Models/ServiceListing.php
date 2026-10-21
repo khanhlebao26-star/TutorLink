@@ -15,11 +15,13 @@ class ServiceListing extends Model
     {
         $profile = $user->tutorProfile;
 
-        if ($user->role !== 'tutor' || $user->status !== 'active'
+        if (
+            $user->role !== 'tutor' || $user->status !== 'active'
             || ! $user->hasVerifiedEmail() || ! $profile
             || $profile->id !== $this->tutor_profile_id
-            || $profile->approval_status !== 'active' || $profile->suspended_at
-            || $this->status === 'cancelled') {
+            || $profile->status !== 'approved'
+            || $this->status === 'cancelled'
+        ) {
             return [];
         }
 
@@ -27,10 +29,12 @@ class ServiceListing extends Model
 
         if ($this->status === 'active') {
             $actions[] = 'pause';
-        } elseif (in_array($this->status, ['draft', 'inactive'], true)
+        } elseif (
+            in_array($this->status, ['draft', 'inactive'], true)
             && $this->specialization?->status === 'active'
             && $this->specialization?->subcategory?->status === 'active'
-            && $this->specialization?->subcategory?->category?->status === 'active') {
+            && $this->specialization?->subcategory?->category?->status === 'active'
+        ) {
             $actions[] = 'publish';
         }
 
@@ -56,8 +60,7 @@ class ServiceListing extends Model
             ->where('currency', 'VND')
             ->whereHas('tutorProfile', function (Builder $profile): void {
                 $profile
-                    ->where('approval_status', 'active')
-                    ->whereNull('suspended_at')
+                    ->where('status', 'approved')
                     ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'));
             })
             ->whereHas('specialization', function (Builder $specialization): void {

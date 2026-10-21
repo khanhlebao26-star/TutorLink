@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register'])
+            ->middleware('throttle:register')
             ->name('auth.register');
 
         Route::post('/login', [AuthController::class, 'login'])
+            ->middleware('throttle:login')
             ->name('auth.login');
 
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
@@ -95,6 +97,9 @@ Route::prefix('v1')->group(function () {
 
         Route::patch('/me', [AuthController::class, 'updateMe'])
             ->name('auth.update-me');
+
+        Route::put('/me/password', [AuthController::class, 'updatePassword'])
+            ->name('auth.update-password');
 
         Route::post('/files', [FileController::class, 'store'])
             ->name('files.store');

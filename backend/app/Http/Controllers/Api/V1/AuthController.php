@@ -8,6 +8,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\UpdateMeRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -17,29 +18,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Laravel\Fortify\Contracts\ResetsUserPasswords;
+use Laravel\Fortify\Contracts\UpdatesUserPasswords;
+use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request): JsonResponse
-    {
-        $data = $request->validated();
-
-        $user = User::create([
-            'full_name' => $data['full_name'],
-            'email' => $data['email'],
-            'password_hash' => $data['password'],
-            'role' => $data['role'],
-            'status' => 'active',
-            'date_of_birth' => $data['date_of_birth'],
-            'terms_version' => $data['terms_version'] ?? null,
-        ]);
+    public function register(
+        RegisterRequest $request,
+        CreatesNewUsers $creator,
+    ): JsonResponse {
+        $user = $creator->create($request->validated());
 
         event(new Registered($user));
-
-        if ($request->hasSession()) {
-            Auth::login($user);
-            $request->session()->regenerate();
-        }
 
         return (new UserResource($user))
             ->response()
@@ -55,12 +47,12 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials.'], 401);
         }
 
-        if (in_array($user->status, ['inactive', 'cancelled'], true)) {
+        if ($user->status !== 'active') {
             return response()->json(['message' => 'This account is not available.'], 403);
         }
 
         if ($request->hasSession()) {
-            Auth::login($user, $data['remember'] ?? false);
+            Auth::guard('web')->login($user, $data['remember'] ?? false);
             $request->session()->regenerate();
         }
         $user->load(['customerProfile', 'tutorProfile']);
@@ -88,14 +80,17 @@ class AuthController extends Controller
         return new UserResource($user);
     }
 
-    public function updateMe(UpdateMeRequest $request): UserResource
-    {
-        /** @var User $user */
+    public function updateMe(
+        UpdateMeRequest $request,
+        UpdatesUserProfileInformation $updater,
+    ): UserResource {
         $user = $request->user();
-        $user->fill($request->validated());
-        $user->save();
 
-        return new UserResource($user->load(['customerProfile', 'tutorProfile']));
+        $updater->update($user, $request->validated());
+
+        return new UserResource(
+            $user->load(['customerProfile', 'tutorProfile']),
+        );
     }
 
     public function verifyEmail(Request $request, int $id, string $hash): JsonResponse
@@ -129,6 +124,15 @@ class AuthController extends Controller
         return response()->json(['message' => 'Verification notification sent.']);
     }
 
+    public function updatePassword(
+        UpdatePasswordRequest $request,
+        UpdatesUserPasswords $updater,
+    ): JsonResponse {
+        $updater->update($request->user(), $request->validated());
+
+        return response()->json(status: 204);
+    }
+
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         $status = Password::sendResetLink($request->validated());
@@ -147,17 +151,18 @@ class AuthController extends Controller
         return response()->json(['message' => 'If the email exists, a reset link has been sent.']);
     }
 
-    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request, ResetsUserPasswords $resetter): JsonResponse
     {
         $data = $request->validated();
 
+        $authenticatedUserId = Auth::guard('web')->id();
+        $resetUserId = null;
+
         $status = Password::reset(
             $data,
-            function (User $user) use ($data): void {
-                $user->forceFill([
-                    'password_hash' => $data['password'],
-                    'remember_token' => str()->random(60),
-                ])->save();
+            function (User $user) use ($data, $resetter, &$resetUserId): void {
+                $resetter->reset($user, $data);
+                $resetUserId = $user->getKey();
             },
         );
 
@@ -167,6 +172,18 @@ class AuthController extends Controller
                     ? 'The password reset token is invalid or expired.'
                     : __($status),
             ], 422);
+        }
+
+        if (
+            $authenticatedUserId !== null
+            && (string) $authenticatedUserId === (string) $resetUserId
+        ) {
+            Auth::guard('web')->logout();
+
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
         }
 
         return response()->json(['message' => __($status)]);

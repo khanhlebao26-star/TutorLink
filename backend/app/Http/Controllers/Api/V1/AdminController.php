@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Auth\RevokeUserSessions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminDecisionRequest;
 use App\Http\Resources\TutorProfileResource;
@@ -19,8 +20,8 @@ class AdminController extends Controller
     {
         $this->requirePermission($request, AdminPermissions::VIEW_TUTOR_PROFILES);
 
-        $status = $request->query('status', 'pending');
-        $allowedStatuses = ['pending', 'changes_requested', 'active', 'rejected'];
+        $status = $request->query('status', 'submitted');
+        $allowedStatuses = ['submitted', 'changes_requested', 'approved', 'rejected', 'suspended'];
 
         if (! in_array($status, $allowedStatuses, true)) {
             return response()->json(['message' => 'Invalid tutor profile status.'], 422);
@@ -28,8 +29,7 @@ class AdminController extends Controller
 
         $profiles = TutorProfile::query()
             ->with(['user', 'specializations', 'verificationDocuments'])
-            ->where('approval_status', $status)
-            ->whereNotNull('submitted_at')
+            ->where('status', $status)
             ->orderByDesc('submitted_at')
             ->get()
             ->map(fn (TutorProfile $profile): array => $this->profilePayload($profile));
@@ -51,7 +51,7 @@ class AdminController extends Controller
 
     public function approve(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
     {
-        return $this->decide($request, $tutorProfile, 'active', 'tutor_profile_approved');
+        return $this->decide($request, $tutorProfile, 'approved', 'tutor_profile_approved');
     }
 
     public function requestChanges(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
@@ -88,14 +88,15 @@ class AdminController extends Controller
                 ->lockForUpdate()
                 ->findOrFail($tutorProfile->id);
 
-            if ($suspend === (bool) $profile->suspended_at) {
-                abort(409, $suspend
-                    ? 'Tutor profile is already suspended.'
-                    : 'Tutor profile is not suspended.');
+            $expectedStatus = $suspend ? 'approved' : 'suspended';
+
+            if ($profile->status !== $expectedStatus) {
+                abort(409, 'The requested profile status transition is not allowed.');
             }
 
             $before = $this->profileState($profile);
             $profile->forceFill([
+                'status' => $suspend ? 'suspended' : 'approved',
                 'suspended_at' => $suspend ? now() : null,
                 'suspension_reason' => $suspend ? $data['reason'] : null,
             ])->save();
@@ -122,7 +123,7 @@ class AdminController extends Controller
 
     public function suspendAccount(AdminDecisionRequest $request, User $user): JsonResponse
     {
-        return $this->changeAccountStatus($request, $user, 'inactive', 'account_suspended');
+        return $this->changeAccountStatus($request, $user, 'suspended', 'account_suspended');
     }
 
     public function restoreAccount(AdminDecisionRequest $request, User $user): JsonResponse
@@ -145,17 +146,17 @@ class AdminController extends Controller
                 ->lockForUpdate()
                 ->findOrFail($tutorProfile->id);
 
-            if ($profile->approval_status !== 'pending' || ! $profile->submitted_at) {
-                abort(409, 'Only submitted pending profiles can be decided.');
+            if ($profile->status !== 'submitted') {
+                abort(409, 'Only submitted profiles can be decided.');
             }
 
-            if ($profile->suspended_at || in_array($profile->user->status, ['inactive', 'cancelled'], true)) {
-                abort(409, 'Suspended profiles cannot be decided.');
+            if ($profile->user->status !== 'active') {
+                abort(409, 'This account is not available.');
             }
 
             $before = $this->profileState($profile);
             $profile->forceFill([
-                'approval_status' => $status,
+                'status' => $status,
                 'reviewed_by' => $actor->id,
                 'reviewed_at' => now(),
                 'review_reason' => $data['reason'],
@@ -188,26 +189,41 @@ class AdminController extends Controller
 
         $target = DB::transaction(function () use ($actor, $data, $status, $action, $target): User {
             $target = User::query()->lockForUpdate()->findOrFail($target->id);
-            $alreadyInState = $status === 'inactive'
-                ? $target->status !== 'active'
-                : $target->status !== 'inactive';
+            $canTransition = match ($status) {
+                'suspended' => $target->status === 'active',
+                'active' => $target->status === 'suspended',
+                default => false,
+            };
 
-            if ($alreadyInState) {
-                abort(409, $status === 'inactive' ? 'Account is already suspended.' : 'Account is not suspended.');
+            if (! $canTransition) {
+                abort(409, 'The requested account status transition is not allowed.');
             }
 
             $before = [
                 'status' => $target->status,
                 'suspended_at' => $target->suspended_at?->toISOString(),
             ];
-            $target->forceFill([
+
+            $updateData = [
                 'status' => $status,
-                'suspended_at' => $status === 'inactive' ? now() : null,
-            ])->save();
+                'suspended_at' => $status === 'suspended' ? now() : null,
+            ];
+
+            if ($status === 'suspended') {
+                $updateData['remember_token'] = str()->random(60);
+            }
+
+            $target->forceFill($updateData)->save();
+
+            if ($status === 'suspended') {
+                app(RevokeUserSessions::class)->handle($target);
+            }
+
             $after = [
                 'status' => $target->status,
                 'suspended_at' => $target->suspended_at?->toISOString(),
             ];
+
             $this->writeAudit($actor, $action, 'user', $target->id, $before, $after, $data['reason']);
 
             return $target->refresh();
@@ -279,18 +295,30 @@ class AdminController extends Controller
     {
         $actor = request()->user();
         $actions = [];
-        if ($actor->hasPermission(AdminPermissions::DECIDE_TUTOR_PROFILES)
-            && $profile->approval_status === 'pending' && $profile->submitted_at
-            && ! $profile->suspended_at && $profile->user->status === 'active') {
+
+        if (
+            $actor->hasPermission(AdminPermissions::DECIDE_TUTOR_PROFILES)
+            && $profile->status === 'submitted'
+            && $profile->user->status === 'active'
+        ) {
             $actions = ['approve', 'request-changes', 'reject'];
         }
+
         if ($actor->hasPermission(AdminPermissions::SUSPEND_TUTOR_PROFILES)) {
-            $actions[] = $profile->suspended_at ? 'restore' : 'suspend';
+            if ($profile->status === 'approved') {
+                $actions[] = 'suspend';
+            } elseif ($profile->status === 'suspended') {
+                $actions[] = 'restore';
+            }
         }
-        if ($actor->hasPermission(AdminPermissions::SUSPEND_ACCOUNTS) && $actor->id !== $profile->user_id) {
+
+        if (
+            $actor->hasPermission(AdminPermissions::SUSPEND_ACCOUNTS)
+            && $actor->id !== $profile->user_id
+        ) {
             if ($profile->user->status === 'active') {
                 $actions[] = 'account-suspend';
-            } elseif ($profile->user->status === 'inactive') {
+            } elseif ($profile->user->status === 'suspended') {
                 $actions[] = 'account-restore';
             }
         }
@@ -304,7 +332,7 @@ class AdminController extends Controller
     private function profileState(TutorProfile $profile): array
     {
         return [
-            'approval_status' => $profile->approval_status,
+            'status' => $profile->status,
             'reviewed_by' => $profile->reviewed_by,
             'reviewed_at' => $profile->reviewed_at?->toISOString(),
             'review_reason' => $profile->review_reason,

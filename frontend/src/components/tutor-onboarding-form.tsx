@@ -22,22 +22,41 @@ const steps = ["Thông tin cơ bản", "Chuyên môn", "Kinh nghiệm", "Tài li
 const emptyUpload: UploadState = { file: null, message: "", error: "", busy: false };
 
 function statusLabel(profile: TutorProfile | null) {
-  if (!profile || profile.status === "draft") return "Bản nháp";
-  if (profile.status === "changes_requested" || profile.approval_status === "changes_requested") return "Yêu cầu chỉnh sửa";
-  if (profile.status === "approved" || profile.approval_status === "active") return "Đã phê duyệt";
-  if (profile.status === "rejected" || profile.approval_status === "rejected") return "Đã từ chối";
-  return "Đã gửi xét duyệt";
+  if (!profile) return "Bản nháp";
+
+  const labels: Record<TutorProfile["status"], string> = {
+    draft: "Bản nháp",
+    submitted: "Đã gửi xét duyệt",
+    changes_requested: "Yêu cầu chỉnh sửa",
+    approved: "Đã phê duyệt",
+    rejected: "Đã từ chối",
+    suspended: "Đình chỉ hồ sơ",
+  };
+
+  return labels[profile.status];
 }
 
-function statusTone(profile: TutorProfile | null): "neutral" | "success" | "warning" | "brand" {
-  if (profile?.approval_status === "active" || profile?.status === "approved") return "success";
-  if (profile?.status === "changes_requested" || profile?.approval_status === "changes_requested" || profile?.status === "submitted") return "warning";
-  return profile ? "neutral" : "brand";
+function statusTone(
+  profile: TutorProfile | null,
+): "neutral" | "success" | "warning" | "brand" {
+  if (!profile) return "brand";
+  if (profile.status === "approved") return "success";
+
+  if (
+    profile.status === "submitted"
+    || profile.status === "changes_requested"
+    || profile.status === "suspended"
+  ) {
+    return "warning";
+  }
+
+  return "neutral";
 }
 
 function profileIsLocked(profile: TutorProfile | null) {
-  const changesRequested = profile?.status === "changes_requested" || profile?.approval_status === "changes_requested";
-  return Boolean(profile?.suspended_at || (profile && !changesRequested && (profile.submitted_at || profile.status !== "draft")));
+  return profile !== null
+    && profile.status !== "draft"
+    && profile.status !== "changes_requested";
 }
 
 function fieldStep(name: string) {
@@ -82,7 +101,8 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
   }, [data]);
 
   const locked = profileIsLocked(profile);
-  const changesRequested = profile?.status === "changes_requested" || profile?.approval_status === "changes_requested";
+  const changesRequested =
+    profile?.status === "changes_requested";
   const busy = saving || Object.values(uploads).some((upload) => upload.busy);
   const verified = Boolean(data.user.email_verified_at);
   const attachedAvatar = Boolean(profile?.avatar_file_id);
@@ -447,7 +467,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
   return (
     <div className="onboarding-layout">
-      {profile?.suspended_at ? <p className="onboarding-alert" role="alert">Hồ sơ đang tạm ngưng. {profile.suspension_reason}</p> : null}
+      {profile?.status === "suspended"? <p className="onboarding-alert" role="alert">Hồ sơ đang tạm ngưng. {profile.suspension_reason}</p> : null}
       {changesRequested && profile?.review_reason ? (
         <div className="onboarding-review-reason" role="status">
           <strong>Ý kiến từ người xét duyệt</strong>

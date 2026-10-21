@@ -25,7 +25,7 @@ abstract class TestCase extends BaseTestCase
             'APP_CONFIG_CACHE' => getenv('TEST_CONFIG_CACHE') ?: sys_get_temp_dir().'/tutorlink-test-config.php',
             'MAIL_MAILER' => 'array',
             'QUEUE_CONNECTION' => 'sync',
-            'SESSION_DRIVER' => 'array',
+            'SESSION_DRIVER' => 'database',
         ];
 
         if ($databaseConnection === 'sqlite') {
@@ -47,11 +47,14 @@ abstract class TestCase extends BaseTestCase
             $database = $app['config']->get("database.connections.{$connection}", []);
             $safeTarget = ($connection === 'sqlite' && ($database['database'] ?? null) === ':memory:')
                 || ($connection === 'pgsql' && in_array($database['database'] ?? null, [
-                    'tutorlink_test', 'tutorlink_phase2_test',
+                    'tutorlink_test',
+                    'tutorlink_phase2_test',
                 ], true));
 
-            if ($app['config']->get('app.env') !== 'testing' || ! $safeTarget
-                || ! empty($database['url']) || ! empty($database['read']) || ! empty($database['write'])) {
+            if (
+                $app['config']->get('app.env') !== 'testing' || ! $safeTarget
+                || ! empty($database['url']) || ! empty($database['read']) || ! empty($database['write'])
+            ) {
                 throw new RuntimeException('Unsafe test database configuration. Use SQLite :memory: or an explicitly isolated tutorlink_test/tutorlink_phase2_test database.');
             }
         });

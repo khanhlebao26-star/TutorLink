@@ -23,7 +23,7 @@ class MarketplaceSearchCompatibilityTest extends TestCase
             'headline' => 'Search tutor',
             'bio' => 'Search compatibility fixture.',
             'experience_years' => 3,
-            'approval_status' => 'active',
+            'status' => 'approved',
         ]);
 
         $createListing = fn (array $overrides): ServiceListing => ServiceListing::create(array_merge([

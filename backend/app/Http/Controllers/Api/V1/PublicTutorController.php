@@ -13,8 +13,7 @@ class PublicTutorController extends Controller
     {
         $profile = TutorProfile::query()
             ->where('public_slug', $slug)
-            ->where('approval_status', 'active')
-            ->whereNull('suspended_at')
+            ->where('status', 'approved')
             ->whereHas(
                 'user',
                 fn (Builder $user) => $user->where('status', 'active'),

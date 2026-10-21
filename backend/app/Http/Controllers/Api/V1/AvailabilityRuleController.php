@@ -70,7 +70,7 @@ class AvailabilityRuleController extends Controller
 
         abort_unless($profile, 422, 'Tutor profile not found.');
         abort_if(
-            $profile->suspended_at,
+            $profile->status === 'suspended',
             403,
             'Suspended tutor profiles cannot manage availability.',
         );

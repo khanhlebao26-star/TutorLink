@@ -276,7 +276,7 @@ class ListingController extends Controller
 
         if ($requestedStatus === 'active') {
             abort_unless(
-                $request->user()->tutorProfile?->approval_status === 'active'
+                $request->user()->tutorProfile?->status === 'approved'
                 && ! $request->user()->tutorProfile?->suspended_at,
                 403,
                 'Tutor is not eligible to publish listings.',
@@ -337,7 +337,7 @@ class ListingController extends Controller
             && $request->user()->status === 'active'
             && $request->user()->hasVerifiedEmail()
             && $profile
-            && $profile->approval_status === 'active'
+            && $profile->status === 'approved'
             && ! $profile->suspended_at,
             403,
             'Tutor is not eligible to manage listings.',
