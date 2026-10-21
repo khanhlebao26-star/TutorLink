@@ -2,13 +2,21 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            $this->upSqlite();
+
+            return;
+        }
+
         if (DB::getDriverName() !== 'pgsql') {
             throw new RuntimeException(
-                'This identity migration requires PostgreSQL.'
+                'Unsupported database driver.'
             );
         }
 
@@ -165,6 +173,90 @@ return new class extends Migration {
                 CREATE INDEX tutor_profiles_status_index
                 ON tutor_profiles (status)
             ');
+        });
+    }
+
+    private function upSqlite(): void
+    {
+        DB::transaction(function (): void {
+            $invalidUsers = DB::table('users')
+                ->whereRaw("
+                role IS NULL
+                OR role NOT IN ('customer', 'tutor', 'admin')
+                OR status IS NULL
+                OR status NOT IN ('active', 'inactive', 'cancelled')
+            ")
+                ->exists();
+
+            if ($invalidUsers) {
+                throw new RuntimeException('Unmapped users in SQLite.');
+            }
+
+            $invalidProfiles = DB::table('tutor_profiles')
+                ->whereRaw("
+                approval_status IS NULL
+                OR NOT (
+                    (
+                        approval_status = 'pending'
+                        AND suspended_at IS NULL
+                    )
+                    OR (
+                        approval_status IN (
+                            'changes_requested', 'active', 'rejected'
+                        )
+                        AND submitted_at IS NOT NULL
+                        AND suspended_at IS NULL
+                    )
+                    OR (
+                        approval_status = 'active'
+                        AND submitted_at IS NOT NULL
+                        AND suspended_at IS NOT NULL
+                    )
+                )
+            ")
+                ->exists();
+
+            if ($invalidProfiles) {
+                throw new RuntimeException(
+                    'Unmapped tutor profiles in SQLite.',
+                );
+            }
+
+            DB::table('users')
+                ->where('status', 'inactive')
+                ->update(['status' => 'suspended']);
+
+            DB::table('users')
+                ->where('status', 'cancelled')
+                ->update(['status' => 'deactivated']);
+
+            Schema::table('tutor_profiles', function (Blueprint $table): void {
+                $table->string('status', 20)->default('draft');
+            });
+
+            DB::statement("
+            UPDATE tutor_profiles
+            SET status = CASE
+                WHEN suspended_at IS NOT NULL
+                    THEN 'suspended'
+                WHEN approval_status = 'active'
+                    THEN 'approved'
+                WHEN approval_status = 'changes_requested'
+                    THEN 'changes_requested'
+                WHEN approval_status = 'rejected'
+                    THEN 'rejected'
+                WHEN approval_status = 'pending'
+                    AND submitted_at IS NOT NULL
+                    THEN 'submitted'
+                WHEN approval_status = 'pending'
+                    AND submitted_at IS NULL
+                    THEN 'draft'
+            END
+        ");
+
+            Schema::table('tutor_profiles', function (Blueprint $table): void {
+                $table->index('status');
+            });
         });
     }
 
