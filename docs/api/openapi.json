@@ -28,7 +28,7 @@
                         "in": "query",
                         "schema": {
                             "type": "string",
-                            "default": "pending"
+                            "default": "submitted"
                         }
                     }
                 ],
@@ -1186,6 +1186,7 @@
                     "Auth"
                 ],
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
@@ -1209,6 +1210,43 @@
                                     "required": [
                                         "data"
                                     ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/me/password": {
+            "put": {
+                "operationId": "auth.update-password",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdatePasswordRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No content",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {}
                                 }
                             }
                         }
@@ -2981,7 +3019,7 @@
                 "type": "apiKey",
                 "description": "Sanctum session cookie. Browser mutations also require X-XSRF-TOKEN after GET /sanctum/csrf-cookie.",
                 "in": "cookie",
-                "name": "laravel-session"
+                "name": "tutorlink-session"
             }
         },
         "schemas": {
@@ -3648,6 +3686,10 @@
                         "type": "string",
                         "minLength": 8
                     },
+                    "password_confirmation": {
+                        "type": "string",
+                        "minLength": 8
+                    },
                     "role": {
                         "type": "string",
                         "enum": [
@@ -3665,19 +3707,15 @@
                             "null"
                         ],
                         "maxLength": 32
-                    },
-                    "password_confirmation": {
-                        "type": "string",
-                        "minLength": 8
                     }
                 },
                 "required": [
                     "full_name",
                     "email",
                     "password",
+                    "password_confirmation",
                     "role",
-                    "date_of_birth",
-                    "password_confirmation"
+                    "date_of_birth"
                 ],
                 "title": "RegisterRequest"
             },
@@ -3820,16 +3858,6 @@
                         "type": "integer"
                     },
                     "status": {
-                        "type": "string",
-                        "enum": [
-                            "approved",
-                            "changes_requested",
-                            "rejected",
-                            "submitted",
-                            "draft"
-                        ]
-                    },
-                    "approval_status": {
                         "type": "string"
                     },
                     "submitted_at": {
@@ -3891,7 +3919,6 @@
                     "bio",
                     "experience_years",
                     "status",
-                    "approval_status",
                     "submitted_at",
                     "review_reason",
                     "reviewed_by",
@@ -3975,13 +4002,34 @@
                         "type": "string",
                         "minLength": 2,
                         "maxLength": 255
-                    },
-                    "date_of_birth": {
-                        "type": "string",
-                        "format": "date-time"
                     }
                 },
+                "required": [
+                    "full_name"
+                ],
                 "title": "UpdateMeRequest"
+            },
+            "UpdatePasswordRequest": {
+                "type": "object",
+                "properties": {
+                    "current_password": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string",
+                        "minLength": 8
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "minLength": 8
+                    }
+                },
+                "required": [
+                    "current_password",
+                    "password",
+                    "password_confirmation"
+                ],
+                "title": "UpdatePasswordRequest"
             },
             "UserResource": {
                 "type": "object",

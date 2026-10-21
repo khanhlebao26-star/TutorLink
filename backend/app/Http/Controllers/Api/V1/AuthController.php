@@ -21,6 +21,7 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Laravel\Fortify\Contracts\ResetsUserPasswords;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
+use App\Http\Requests\UpdatePasswordRequest;
 
 class AuthController extends Controller
 {
@@ -124,10 +125,10 @@ class AuthController extends Controller
     }
 
     public function updatePassword(
-        Request $request,
+        UpdatePasswordRequest $request,
         UpdatesUserPasswords $updater,
     ): JsonResponse {
-        $updater->update($request->user(), $request->all());
+        $updater->update($request->user(), $request->validated());
 
         return response()->json(status: 204);
     }
