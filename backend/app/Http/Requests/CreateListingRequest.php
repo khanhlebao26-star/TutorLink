@@ -15,8 +15,7 @@ class CreateListingRequest extends FormRequest
         return $user?->role === 'tutor'
             && $user->status === 'active'
             && $user->hasVerifiedEmail()
-            && $user->tutorProfile?->approval_status === 'active'
-            && ! $user->tutorProfile?->suspended_at;
+            && $user->tutorProfile?->status === 'approved';
     }
 
     /** @return array<string, ValidationRule|array<mixed>|string> */
@@ -27,7 +26,7 @@ class CreateListingRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('specializations', 'id')
-                    ->where(fn ($query) => $query->where('status', 'active')),
+                    ->where(fn($query) => $query->where('status', 'active')),
             ],
             'title' => ['required', 'string', 'min:3', 'max:180'],
             'description' => ['required', 'string', 'min:1'],

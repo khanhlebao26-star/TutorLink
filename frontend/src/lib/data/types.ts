@@ -1,8 +1,7 @@
 export type Role = "customer" | "tutor" | "admin";
 export type RegisterRole = Exclude<Role, "admin">;
-export type UserStatus = "draft" | "active" | "inactive" | "cancelled";
-export type TutorApprovalStatus = "pending" | "changes_requested" | "active" | "rejected";
-export type TutorProfileStatus = "draft" | "submitted" | "changes_requested" | "approved" | "rejected";
+export type UserStatus = "active" | "suspended" | "deactivated";
+export type TutorProfileStatus = "draft" | "submitted" | "changes_requested" | "approved" | "rejected" | "suspended";
 export type FilePurpose = "avatar" | "verification_document" | "task_attachment" | "profile_document";
 export type ListingStatus = "draft" | "active" | "inactive" | "cancelled";
 export type DeliveryMode = "online" | "offline" | "hybrid";
@@ -51,7 +50,6 @@ export interface TutorProfile {
   bio?: string | null;
   experience_years: number;
   status: TutorProfileStatus;
-  approval_status: TutorApprovalStatus;
   submitted_at?: string | null;
   review_reason?: string | null;
   reviewed_by?: number | null;

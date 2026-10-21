@@ -83,7 +83,7 @@ class DatabaseSchemaTest extends TestCase
     {
         $this->requirePostgres();
 
-        foreach (['draft', 'active', 'inactive', 'cancelled'] as $status) {
+        foreach (['active', 'suspended', 'deactivated'] as $status) {
             $user = User::factory()->create([
                 'email' => "status-{$status}@example.test",
                 'status' => $status,
@@ -91,6 +91,14 @@ class DatabaseSchemaTest extends TestCase
 
             $this->assertSame($status, $user->status);
         }
+    }
+
+    public function test_postgres_rejects_legacy_inactive_user_status(): void
+    {
+        $this->requirePostgres();
+        $this->expectException(QueryException::class);
+
+        User::factory()->create(['status' => 'inactive']);
     }
 
     public function test_postgres_rejects_legacy_pending_user_status(): void
@@ -101,50 +109,52 @@ class DatabaseSchemaTest extends TestCase
         User::factory()->create(['status' => 'pending']);
     }
 
-    public function test_postgres_rejects_legacy_suspended_user_status(): void
-    {
-        $this->requirePostgres();
-        $this->expectException(QueryException::class);
-
-        User::factory()->create(['status' => 'suspended']);
-    }
-
-    public function test_postgres_accepts_current_tutor_approval_statuses(): void
+    public function test_postgres_accepts_current_tutor_profile_statuses(): void
     {
         $this->requirePostgres();
 
-        foreach (['pending', 'changes_requested', 'active', 'rejected'] as $approvalStatus) {
+        foreach ([
+            'draft',
+            'submitted',
+            'changes_requested',
+            'approved',
+            'rejected',
+            'suspended',
+        ] as $status) {
             $user = User::factory()->create(['role' => 'tutor']);
+
             $profile = $user->tutorProfile()->create([
-                'headline' => "Approval {$approvalStatus}",
-                'approval_status' => $approvalStatus,
+                'headline' => "Profile {$status}",
+                'status' => $status,
             ]);
 
-            $this->assertSame($approvalStatus, $profile->approval_status);
+            $this->assertSame($status, $profile->status);
         }
     }
 
-    public function test_postgres_rejects_cancelled_tutor_approval_status(): void
+    public function test_postgres_rejects_cancelled_tutor_profile_status(): void
     {
         $this->requirePostgres();
         $this->expectException(QueryException::class);
 
         $user = User::factory()->create(['role' => 'tutor']);
+
         $user->tutorProfile()->create([
-            'headline' => 'Invalid cancelled approval',
-            'approval_status' => 'cancelled',
+            'headline' => 'Invalid cancelled profile',
+            'status' => 'cancelled',
         ]);
     }
 
-    public function test_postgres_rejects_expired_tutor_approval_status(): void
+    public function test_postgres_rejects_expired_tutor_profile_status(): void
     {
         $this->requirePostgres();
         $this->expectException(QueryException::class);
 
         $user = User::factory()->create(['role' => 'tutor']);
+
         $user->tutorProfile()->create([
-            'headline' => 'Invalid expired approval',
-            'approval_status' => 'expired',
+            'headline' => 'Invalid expired profile',
+            'status' => 'expired',
         ]);
     }
 

@@ -21,8 +21,8 @@ const users: Record<string, User> = {
 };
 
 const customerProfile: CustomerProfile = { id: 401, user_id: users.customer.id, avatar_file_id: null, city: "Đà Nẵng", district: "Hải Châu", bio: "Đang tìm gia sư tiếng Anh giao tiếp." };
-const tutorProfile: TutorProfile = { id: 201, user_id: users.tutor.id, specialization_id: 12, avatar_file_id: 701, verification_document_file_id: 702, headline: "Gia sư tiếng Anh giao tiếp", bio: "Tám năm hướng dẫn người đi làm luyện nói và phỏng vấn.", experience_years: 8, status: "approved", approval_status: "active", submitted_at: "2026-10-06T08:00:00Z", review_reason: null, reviewed_at: "2026-10-06T09:30:00Z", created_at: "2026-10-01T08:00:00Z", updated_at: "2026-10-06T09:30:00Z", };
-const pendingProfile: TutorProfile = { id: 202, user_id: users.pendingTutor.id, specialization_id: 21, avatar_file_id: null, verification_document_file_id: null, headline: "Toán lớp 9 online", bio: "Hỗ trợ học sinh củng cố nền tảng và chuẩn bị thi vào 10.", experience_years: 4, status: "submitted", approval_status: "pending", submitted_at: "2026-10-07T03:00:00Z", review_reason: null, reviewed_at: null,  };
+const tutorProfile: TutorProfile = { id: 201, user_id: users.tutor.id, specialization_id: 12, avatar_file_id: 701, verification_document_file_id: 702, headline: "Gia sư tiếng Anh giao tiếp", bio: "Tám năm hướng dẫn người đi làm luyện nói và phỏng vấn.", experience_years: 8, status: "approved", submitted_at: "2026-10-06T08:00:00Z", review_reason: null, reviewed_at: "2026-10-06T09:30:00Z", created_at: "2026-10-01T08:00:00Z", updated_at: "2026-10-06T09:30:00Z", };
+const pendingProfile: TutorProfile = { id: 202, user_id: users.pendingTutor.id, specialization_id: 21, avatar_file_id: null, verification_document_file_id: null, headline: "Toán lớp 9 online", bio: "Hỗ trợ học sinh củng cố nền tảng và chuẩn bị thi vào 10.", experience_years: 4, status: "submitted", submitted_at: "2026-10-07T03:00:00Z", review_reason: null, reviewed_at: null,  };
 
 export function mockCurrentUser(role: Role = getMockRole()): User { return users[role]; }
 export function mockProfile(role: "customer" | "tutor"): ProfileResponse { return role === "customer" ? { user: users.customer, profile: customerProfile } : { user: users.tutor, profile: tutorProfile }; }
@@ -30,20 +30,37 @@ export function mockTutorOnboarding(): TutorOnboardingData { return { user: user
 const adminProfiles: AdminTutorProfile[] = [
   { user: { ...users.pendingTutor }, profile: { ...pendingProfile }, allowed_actions: [], verification_documents: [] },
   { user: { ...users.tutor }, profile: { ...tutorProfile }, allowed_actions: [], verification_documents: [] },
-  { user: { ...users.pendingTutor, id: 305, full_name: "Đỗ Hoàng Nam", email: "nam@example.test" }, profile: { ...pendingProfile, id: 203, user_id: 305, status: "changes_requested", approval_status: "changes_requested", review_reason: "Vui lòng bổ sung mô tả kinh nghiệm giảng dạy." }, allowed_actions: [], verification_documents: [] },
-  { user: { ...users.pendingTutor, id: 306, full_name: "Vũ Thảo Linh", email: "linh@example.test" }, profile: { ...pendingProfile, id: 204, user_id: 306, status: "rejected", approval_status: "rejected", review_reason: "Hồ sơ xác minh chưa đáp ứng yêu cầu." }, allowed_actions: [], verification_documents: [] },
+  { user: { ...users.pendingTutor, id: 305, full_name: "Đỗ Hoàng Nam", email: "nam@example.test" }, profile: { ...pendingProfile, id: 203, user_id: 305, status: "changes_requested", review_reason: "Vui lòng bổ sung mô tả kinh nghiệm giảng dạy." }, allowed_actions: [], verification_documents: [] },
+  { user: { ...users.pendingTutor, id: 306, full_name: "Vũ Thảo Linh", email: "linh@example.test" }, profile: { ...pendingProfile, id: 204, user_id: 306, status: "rejected", review_reason: "Hồ sơ xác minh chưa đáp ứng yêu cầu." }, allowed_actions: [], verification_documents: [] },
 ];
 
 // Preview decisions persist until a full page reload; no backend is involved.
-export function mockAdminProfiles(status?: string): AdminTutorProfile[] {
+export function mockAdminProfiles(
+  status?: TutorProfile["status"],
+): AdminTutorProfile[] {
   for (const entry of adminProfiles) {
-    entry.allowed_actions = entry.user.status === "inactive"
-      ? ["account-restore"]
-      : entry.profile.approval_status === "active"
-        ? [entry.profile.suspended_at ? "restore" : "suspend", "account-suspend"]
-        : entry.profile.approval_status === "rejected"
-          ? ["account-suspend"]
-          : ["approve", "request-changes", "reject", "account-suspend"];
+  const actions: AdminTutorProfile["allowed_actions"] = [];
+
+    if (entry.user.status === "active") {
+      actions.push("account-suspend");
+
+      if (entry.profile.status === "submitted") {
+        actions.push("approve", "request-changes", "reject");
+      }
+    } else if (entry.user.status === "suspended") {
+      actions.push("account-restore");
+    }
+
+    if (entry.profile.status === "approved") {
+      actions.push("suspend");
+    } else if (entry.profile.status === "suspended") {
+      actions.push("restore");
+    }
+
+    entry.allowed_actions = actions;
   }
-  return status ? adminProfiles.filter((entry) => entry.profile.approval_status === status) : adminProfiles;
+
+  return status
+    ? adminProfiles.filter((entry) => entry.profile.status === status)
+    : adminProfiles;
 }

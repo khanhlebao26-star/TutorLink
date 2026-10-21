@@ -20,12 +20,7 @@ class UpdateMeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'full_name' => ['sometimes', 'string', 'min:2', 'max:255'],
-            'date_of_birth' => [
-                'sometimes',
-                'date',
-                'before_or_equal:'.now()->subYears(18)->toDateString(),
-            ],
+            'full_name' => ['required', 'string', 'min:2', 'max:255'],
         ];
     }
 }

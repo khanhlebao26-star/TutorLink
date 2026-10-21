@@ -20,7 +20,7 @@ class AvailabilityRuleController extends Controller
             ->orderBy('weekday')
             ->orderBy('start_time')
             ->get()
-            ->map(fn ($rule) => [
+            ->map(fn($rule) => [
                 'id' => $rule->id,
                 'weekday' => $rule->weekday,
                 'start_time' => substr((string) $rule->start_time, 0, 5),
@@ -70,7 +70,7 @@ class AvailabilityRuleController extends Controller
 
         abort_unless($profile, 422, 'Tutor profile not found.');
         abort_if(
-            $profile->suspended_at,
+            $profile->status === 'suspended',
             403,
             'Suspended tutor profiles cannot manage availability.',
         );

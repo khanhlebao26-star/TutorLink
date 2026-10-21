@@ -12,8 +12,7 @@ class MarketplaceDemoSeeder extends Seeder
     public function run(): void
     {
         $profile = TutorProfile::query()
-            ->where('approval_status', 'active')
-            ->whereNull('suspended_at')
+            ->where('status', 'approved')
             ->whereHas('user', function ($query): void {
                 $query->where('status', 'active');
             })
@@ -30,7 +29,7 @@ class MarketplaceDemoSeeder extends Seeder
             })
             ->first();
 
-        if (! $profile || ! $specialization) {
+        if (!$profile || !$specialization) {
             return;
         }
 

@@ -25,9 +25,15 @@ class AdminApprovalAuditTest extends TestCase
         Storage::fake('local');
         foreach (['avatar', 'verification_document'] as $purpose) {
             $file = File::create([
-                'owner_id' => $tutor->id, 'disk' => 'local', 'object_key' => 'fixtures/'.$purpose,
-                'original_name' => 'fixture.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 5,
-                'visibility' => 'private', 'scan_status' => 'clean', 'purpose' => $purpose,
+                'owner_id' => $tutor->id,
+                'disk' => 'local',
+                'object_key' => 'fixtures/' . $purpose,
+                'original_name' => 'fixture.pdf',
+                'mime_type' => 'application/pdf',
+                'size_bytes' => 5,
+                'visibility' => 'private',
+                'scan_status' => 'clean',
+                'purpose' => $purpose,
             ]);
             Storage::disk('local')->put($file->object_key, 'proof');
             if ($purpose === 'avatar') {
@@ -52,7 +58,7 @@ class AdminApprovalAuditTest extends TestCase
 
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/submit')
             ->assertOk()
-            ->assertJsonPath('data.approval_status', 'pending');
+            ->assertJsonPath('data.status', 'submitted');
 
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", [
             'reason' => 'Đã kiểm tra và hồ sơ hợp lệ.',
@@ -60,7 +66,7 @@ class AdminApprovalAuditTest extends TestCase
 
         $this->assertDatabaseHas('tutor_profiles', [
             'id' => $profile->id,
-            'approval_status' => 'active',
+            'status' => 'approved',
             'reviewed_by' => $admin->id,
             'review_reason' => 'Đã kiểm tra và hồ sơ hợp lệ.',
         ]);
@@ -113,13 +119,13 @@ class AdminApprovalAuditTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_removed_tutor_approval_statuses_are_rejected(): void
+    public function test_invalid_tutor_profile_status_filters_are_rejected(): void
     {
         $admin = User::factory()->admin()->create();
 
-        foreach (['cancelled', 'expired'] as $status) {
+        foreach (['pending', 'active', 'cancelled', 'expired'] as $status) {
             $this->actingAs($admin)
-                ->getJson('/api/v1/admin/tutor-profiles?status='.$status)
+                ->getJson('/api/v1/admin/tutor-profiles?status=' . $status)
                 ->assertUnprocessable()
                 ->assertJsonPath('message', 'Invalid tutor profile status.');
         }
@@ -140,7 +146,7 @@ class AdminApprovalAuditTest extends TestCase
         $file = File::create([
             'owner_id' => $tutor->id,
             'disk' => 'local',
-            'object_key' => 'uploads/'.$tutor->id.'/certificate.pdf',
+            'object_key' => 'uploads/' . $tutor->id . '/certificate.pdf',
             'original_name' => 'certificate.pdf',
             'mime_type' => 'application/pdf',
             'size_bytes' => 7,
@@ -177,23 +183,34 @@ class AdminApprovalAuditTest extends TestCase
         $tutor = User::factory()->create(['role' => 'tutor']);
         $profile = $this->createSubmittedProfile($tutor);
 
+        $profile->update([
+            'status' => 'approved',
+            'reviewed_by' => $admin->id,
+            'reviewed_at' => now(),
+        ]);
+
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/suspend", [
             'reason' => 'Tạm dừng kiểm tra hồ sơ.',
         ])->assertOk();
-        $this->assertDatabaseHas('users', ['id' => $tutor->id, 'status' => 'active']);
-        $this->assertNotNull($profile->refresh()->suspended_at);
+        $this->assertDatabaseHas('users', [
+            'id' => $tutor->id,
+            'status' => 'active',
+        ]);
 
+        $this->assertSame('suspended', $profile->refresh()->status);
+        $this->assertNotNull($profile->suspended_at);
         $this->actingAs($tutor->refresh())->postJson('/api/v1/tutor/profile/submit')->assertForbidden();
 
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/restore", [
             'reason' => 'Đã hoàn tất kiểm tra hồ sơ.',
         ])->assertOk();
-        $this->assertNull($profile->refresh()->suspended_at);
+        $this->assertSame('approved', $profile->refresh()->status);
+        $this->assertNull($profile->suspended_at);
 
         $this->actingAs($admin)->postJson("/api/v1/admin/users/{$tutor->id}/suspend", [
             'reason' => 'Tạm dừng tài khoản theo chính sách.',
         ])->assertOk();
-        $this->assertDatabaseHas('users', ['id' => $tutor->id, 'status' => 'inactive']);
+        $this->assertDatabaseHas('users', ['id' => $tutor->id, 'status' => 'suspended']);
         $this->actingAs($tutor->refresh())->postJson('/api/v1/tutor/profile/submit')->assertForbidden();
 
         $this->assertDatabaseHas('audit_logs', [
@@ -214,7 +231,7 @@ class AdminApprovalAuditTest extends TestCase
             'headline' => 'English tutor',
             'bio' => 'Experienced tutor.',
             'experience_years' => 5,
-            'approval_status' => 'pending',
+            'status' => 'submitted',
             'submitted_at' => now(),
         ]);
     }

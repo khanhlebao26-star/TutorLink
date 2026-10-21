@@ -23,13 +23,13 @@ class MarketplaceSearchCompatibilityTest extends TestCase
             'headline' => 'Search tutor',
             'bio' => 'Search compatibility fixture.',
             'experience_years' => 3,
-            'approval_status' => 'active',
+            'status' => 'approved',
         ]);
 
-        $createListing = fn (array $overrides): ServiceListing => ServiceListing::create(array_merge([
+        $createListing = fn(array $overrides): ServiceListing => ServiceListing::create(array_merge([
             'tutor_profile_id' => $profile->id,
             'specialization_id' => $specialization->id,
-            'slug' => 'search-'.Str::uuid(),
+            'slug' => 'search-' . Str::uuid(),
             'title' => 'Other subject',
             'description' => 'Individual tuition.',
             'delivery_mode' => 'online',
@@ -59,14 +59,14 @@ class MarketplaceSearchCompatibilityTest extends TestCase
             'per_page' => 1,
         ]);
 
-        $this->getJson('/api/v1/listings?'.$query)
+        $this->getJson('/api/v1/listings?' . $query)
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', $descriptionMatch->id)
             ->assertJsonPath('meta.total', 2)
             ->assertJsonPath('meta.current_page', 1);
 
-        $this->getJson('/api/v1/listings?'.$query.'&page=2')
+        $this->getJson('/api/v1/listings?' . $query . '&page=2')
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', $titleMatch->id)

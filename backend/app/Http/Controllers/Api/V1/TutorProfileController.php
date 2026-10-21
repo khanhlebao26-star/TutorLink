@@ -26,7 +26,7 @@ class TutorProfileController extends Controller
             'verificationDocuments',
         ])->first();
 
-        if (! $profile) {
+        if (!$profile) {
             return response()->json(['message' => 'Tutor profile not found.'], 404);
         }
 
@@ -43,7 +43,7 @@ class TutorProfileController extends Controller
 
             $profile ??= new TutorProfile(['user_id' => $request->user()->id]);
             $profile->fill($data);
-            $profile->approval_status ??= 'pending';
+            $profile->status ??= 'draft';
             $profile->save();
             $profile->specializations()->sync([$specializationId]);
 
@@ -59,16 +59,29 @@ class TutorProfileController extends Controller
             abort_unless($user->hasVerifiedEmail(), 403, 'Email verification is required.');
             $profile = $user->tutorProfile()->lockForUpdate()->first();
             abort_unless($profile, 422, 'Create a draft profile first.');
-            abort_if($profile->suspended_at, 403, 'Suspended tutor profiles cannot be submitted.');
+            abort_if(
+                $profile->status === 'suspended',
+                403,
+                'Suspended tutor profiles cannot be submitted.',
+            );
 
-            if ($profile->submitted_at && $profile->approval_status !== 'changes_requested') {
-                return new TutorProfileResource($profile->load(['specializations', 'verificationDocuments']));
+            // Retry gửi hồ sơ đang chờ không tạo lần gửi mới.
+            if ($profile->status === 'submitted') {
+                return new TutorProfileResource(
+                    $profile->load(['specializations', 'verificationDocuments']),
+                );
             }
 
+            abort_unless(
+                in_array($profile->status, ['draft', 'changes_requested'], true),
+                409,
+                'Only draft or changes-requested profiles can be submitted.',
+            );
+
             $avatar = $profile->avatarFile;
-            $hasDocument = $profile->verificationDocuments()->whereHas('file', fn ($query) => $query
+            $hasDocument = $profile->verificationDocuments()->whereHas('file', fn($query) => $query
                 ->where('owner_id', $user->id)->where('purpose', 'verification_document')
-                ->where('scan_status', 'clean'))->get()->contains(fn ($document) => Storage::disk($document->file->disk)->exists($document->file->object_key));
+                ->where('scan_status', 'clean'))->get()->contains(fn($document) => Storage::disk($document->file->disk)->exists($document->file->object_key));
             Validator::make([
                 'headline' => trim($profile->headline),
                 'bio' => trim($profile->bio ?? ''),
@@ -86,7 +99,7 @@ class TutorProfileController extends Controller
 
             $profile->forceFill([
                 'submitted_at' => now(),
-                'approval_status' => 'pending',
+                'status' => 'submitted',
                 'review_reason' => null,
                 'reviewed_by' => null,
                 'reviewed_at' => null,
@@ -112,7 +125,7 @@ class TutorProfileController extends Controller
                 return response()->json(['message' => 'File purpose must be avatar.'], 422);
             }
 
-            if (! $file->isComplete()) {
+            if (!$file->isComplete()) {
                 return response()->json(['message' => 'File must be complete before it can be attached.'], 409);
             }
 
@@ -143,7 +156,7 @@ class TutorProfileController extends Controller
                 return response()->json(['message' => 'File purpose must be verification_document.'], 422);
             }
 
-            if (! $file->isComplete()) {
+            if (!$file->isComplete()) {
                 return response()->json(['message' => 'File must be complete before it can be attached.'], 409);
             }
 
@@ -172,9 +185,19 @@ class TutorProfileController extends Controller
         $user = $request->user()->newQuery()->lockForUpdate()->findOrFail($request->user()->id);
         abort_unless($user->role === 'tutor' && $user->status === 'active', 403, 'Only active tutors can use onboarding.');
         $profile = $user->tutorProfile()->lockForUpdate()->first();
-        abort_if($profile?->suspended_at, 403, 'Suspended profiles cannot be edited.');
-        abort_if($profile?->submitted_at && $profile->approval_status !== 'changes_requested', 409, 'Submitted profile cannot be edited.');
+        abort_if(
+            $profile?->status === 'suspended',
+            403,
+            'Suspended profiles cannot be edited.',
+        );
 
+        if ($profile !== null) {
+            abort_unless(
+                in_array($profile->status, ['draft', 'changes_requested'], true),
+                409,
+                'Only draft or changes-requested profiles can be edited.',
+            );
+        }
         return $profile;
     }
 }

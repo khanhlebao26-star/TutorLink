@@ -1,16 +1,19 @@
 "use client";
 
-import { useCallback, useRef, useState, type FormEvent } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Button, ErrorActions, Field, StatePanel } from "@/components/ui";
 import { ApiClientError, describeApiError, request } from "@/lib/api/client";
 import type { ApiEnvelope, Role, User, UserStatus } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import { useCallback, useRef, useState, type FormEvent } from "react";
 import "./settings.css";
 
 const roleLabels: Record<Role, string> = { customer: "Học viên", tutor: "Gia sư / Coach", admin: "Quản trị viên" };
-const statusLabels: Record<UserStatus, string> = { draft: "Bản nháp", active: "Đang hoạt động", inactive: "Tạm ngưng", cancelled: "Đã ngừng hoạt động" };
-
+const statusLabels: Record<UserStatus, string> = {
+  active: "Đang hoạt động",
+  suspended: "Bị đình chỉ",
+  deactivated: "Đã vô hiệu hóa",
+};
 function AccountSettingsForm({ initialUser }: { initialUser: User }) {
   const [user, setUser] = useState(initialUser);
   const [name, setName] = useState(initialUser.full_name);

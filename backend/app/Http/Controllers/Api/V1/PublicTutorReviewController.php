@@ -21,9 +21,8 @@ class PublicTutorReviewController extends Controller
 
         $profile = TutorProfile::query()
             ->where('public_slug', $slug)
-            ->where('approval_status', 'active')
-            ->whereNull('suspended_at')
-            ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'))
+            ->where('status', 'approved')
+            ->whereHas('user', fn(Builder $user) => $user->where('status', 'active'))
             ->firstOrFail();
 
         // Completed is intentionally not produced by the current Program lifecycle.
@@ -56,13 +55,16 @@ class PublicTutorReviewController extends Controller
         }
 
         $reviews = $visible->select([
-            'reviews.id', 'authors.full_name as author_name', 'reviews.rating',
-            'reviews.comment', 'reviews.created_at',
+            'reviews.id',
+            'authors.full_name as author_name',
+            'reviews.rating',
+            'reviews.comment',
+            'reviews.created_at',
         ])->orderByDesc('reviews.created_at')->orderByDesc('reviews.id')
             ->paginate($filters['per_page'] ?? 5);
 
         return response()->json([
-            'data' => collect($reviews->items())->map(fn ($review) => [
+            'data' => collect($reviews->items())->map(fn($review) => [
                 'id' => (int) $review->id,
                 'author_name' => $review->author_name,
                 'rating' => (int) $review->rating,

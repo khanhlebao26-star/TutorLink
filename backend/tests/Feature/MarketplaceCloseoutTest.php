@@ -53,7 +53,7 @@ class MarketplaceCloseoutTest extends TestCase
         $this->patchJson("/api/v1/me/listings/{$draft->id}", ['status' => 'active'])->assertUnprocessable();
         $this->deleteJson("/api/v1/me/listings/{$draft->id}")->assertNoContent();
         $this->patchJson("/api/v1/me/listings/{$draft->id}", ['title' => 'Cannot edit'])->assertConflict();
-        $profile->update(['approval_status' => 'pending']);
+        $profile->update(['status' => 'submitted']);
         $user->unsetRelation('tutorProfile');
         $this->getJson('/api/v1/me/listings')->assertForbidden();
     }
@@ -90,12 +90,12 @@ class MarketplaceCloseoutTest extends TestCase
             $this->getJson("{$path}?{$query}")->assertUnprocessable();
         }
         $this->getJson('/api/v1/tutors/unknown-slug/reviews')->assertNotFound();
-        $profile->update(['approval_status' => 'pending']);
+        $profile->update(['status' => 'submitted']);
         $this->getJson($path)->assertNotFound();
-        $profile->update(['approval_status' => 'active', 'suspended_at' => now()]);
+        $profile->update(['status' => 'suspended', 'suspended_at' => now()]);
         $this->getJson($path)->assertNotFound();
-        $profile->update(['suspended_at' => null]);
-        $user->update(['status' => 'inactive']);
+        $profile->update(['status' => 'approved', 'suspended_at' => null]);
+        $user->update(['status' => 'suspended']);
         $this->getJson($path)->assertNotFound();
     }
 
@@ -156,7 +156,7 @@ class MarketplaceCloseoutTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'tutor', 'status' => 'active']);
 
-        return [$user, $user->tutorProfile()->create(['headline' => 'Test tutor', 'approval_status' => 'active'])];
+        return [$user, $user->tutorProfile()->create(['headline' => 'Test tutor', 'status' => 'approved'])];
     }
 
     private function listing(TutorProfile $profile, string $status): ServiceListing
@@ -166,9 +166,14 @@ class MarketplaceCloseoutTest extends TestCase
         return ServiceListing::create([
             'tutor_profile_id' => $profile->id,
             'specialization_id' => Specialization::where('status', 'active')->firstOrFail()->id,
-            'slug' => 'closeout-'.Str::uuid(), 'title' => 'Closeout listing', 'description' => 'Service description',
-            'delivery_mode' => 'online', 'price_from_minor' => 200000, 'currency' => 'VND',
-            'price_unit' => 'session', 'status' => $status,
+            'slug' => 'closeout-' . Str::uuid(),
+            'title' => 'Closeout listing',
+            'description' => 'Service description',
+            'delivery_mode' => 'online',
+            'price_from_minor' => 200000,
+            'currency' => 'VND',
+            'price_unit' => 'session',
+            'status' => $status,
         ]);
     }
 
@@ -176,19 +181,34 @@ class MarketplaceCloseoutTest extends TestCase
     {
         $customer = User::factory()->create(['role' => 'customer', 'status' => 'active']);
         $program = DB::table('programs')->insertGetId([
-            'owner_tutor_profile_id' => $profile->id, 'title' => 'Private Program', 'delivery_mode' => 'online',
-            'agreed_fee_minor' => 200000, 'currency' => 'VND', 'fee_unit' => 'session', 'status' => $status,
-            'created_at' => now(), 'updated_at' => now(),
+            'owner_tutor_profile_id' => $profile->id,
+            'title' => 'Private Program',
+            'delivery_mode' => 'online',
+            'agreed_fee_minor' => 200000,
+            'currency' => 'VND',
+            'fee_unit' => 'session',
+            'status' => $status,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
         DB::table('program_members')->insert([
-            'program_id' => $program, 'user_id' => $customer->id, 'member_role' => 'customer',
-            'status' => 'active', 'created_at' => now(), 'updated_at' => now(), ...$membership,
+            'program_id' => $program,
+            'user_id' => $customer->id,
+            'member_role' => 'customer',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+            ...$membership,
         ]);
 
         return DB::table('reviews')->insertGetId([
-            'program_id' => $program, 'customer_id' => $customer->id, 'tutor_profile_id' => $profile->id,
-            'rating' => $rating, 'comment' => 'Helpful lessons',
-            'created_at' => '2026-10-15 01:00:00', 'updated_at' => now(),
+            'program_id' => $program,
+            'customer_id' => $customer->id,
+            'tutor_profile_id' => $profile->id,
+            'rating' => $rating,
+            'comment' => 'Helpful lessons',
+            'created_at' => '2026-10-15 01:00:00',
+            'updated_at' => now(),
         ]);
     }
 }

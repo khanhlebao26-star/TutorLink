@@ -1,17 +1,28 @@
 "use client";
 
-import Link from "next/link";
-import { useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { getCurrentUser, login, register } from "@/lib/data/services";
 import type { RegisterRole } from "@/lib/data/types";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useRef, useState, type FormEvent } from "react";
 import { Button, Field } from "./ui";
 
-function maxBirthDate() {
+function maxBirthDate(minAge: number) {
   const date = new Date();
-  date.setFullYear(date.getFullYear() - 18);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const month = date.getMonth();
+
+  date.setFullYear(date.getFullYear() - minAge);
+
+  if (date.getMonth() !== month) {
+    date.setDate(0);
+  }
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
 }
 
 function describedBy(id: string, hint?: string, error?: string) {
@@ -83,6 +94,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
+  const minAge = role === "tutor" ? 18 : 15;
+  const birthDateHint = `Bạn phải từ đủ ${minAge} tuổi.`;
+  const latestBirthDate = maxBirthDate(minAge);
 
   function fieldError(name: string) {
     return fieldErrors[name]?.[0];
@@ -183,17 +197,26 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
 
       {mode === "register" ? (
         <div className="auth-field">
-          <Field label="Ngày sinh" htmlFor="date-of-birth" hint="Bạn phải từ 18 tuổi." error={fieldError("date_of_birth")}>
+          <Field
+            label="Ngày sinh"
+            htmlFor="date-of-birth"
+            hint={birthDateHint}
+            error={fieldError("date_of_birth")}
+          >
             <div>
               <input
                 id="date-of-birth"
                 type="date"
                 autoComplete="bday"
-                max={maxBirthDate()}
+                max={latestBirthDate}
                 value={dateOfBirth}
                 onChange={(event) => setDateOfBirth(event.target.value)}
                 aria-invalid={Boolean(fieldError("date_of_birth"))}
-                aria-describedby={describedBy("date-of-birth", "Bạn phải từ 18 tuổi.", fieldError("date_of_birth"))}
+                aria-describedby={describedBy(
+                  "date-of-birth",
+                  birthDateHint,
+                  fieldError("date_of_birth"),
+                )}
                 required
               />
             </div>

@@ -86,9 +86,9 @@ class PhaseTwoAcceptanceTest extends TestCase
         $this->assertDatabaseCount('file_links', 0);
     }
 
-    public function test_cancelled_account_cannot_use_me_or_login(): void
+    public function test_deactivated_account_cannot_use_me_or_login(): void
     {
-        $user = User::factory()->create(['status' => 'cancelled', 'password_hash' => 'Password123!']);
+        $user = User::factory()->create(['status' => 'deactivated', 'password_hash' => 'Password123!']);
         $this->actingAs($user)->getJson('/api/v1/me')->assertForbidden();
         $this->postJson('/api/v1/auth/login', ['email' => $user->email, 'password' => 'Password123!'])->assertForbidden();
     }
@@ -96,7 +96,7 @@ class PhaseTwoAcceptanceTest extends TestCase
     public function test_unverified_tutor_cannot_submit_and_incomplete_profile_returns_field_errors(): void
     {
         $tutor = User::factory()->unverified()->create(['role' => 'tutor']);
-        $profile = $tutor->tutorProfile()->create(['headline' => 'Incomplete', 'approval_status' => 'pending']);
+        $profile = $tutor->tutorProfile()->create(['headline' => 'Incomplete', 'status' => 'draft']);
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/submit')->assertForbidden();
         $tutor->markEmailAsVerified();
         $this->actingAs($tutor->refresh())->postJson('/api/v1/tutor/profile/submit')
@@ -123,7 +123,7 @@ class PhaseTwoAcceptanceTest extends TestCase
     public function test_admin_queue_excludes_drafts_and_view_only_admin_has_no_actions(): void
     {
         $tutor = User::factory()->create(['role' => 'tutor']);
-        $profile = $tutor->tutorProfile()->create(['headline' => 'Draft', 'approval_status' => 'pending']);
+        $profile = $tutor->tutorProfile()->create(['headline' => 'Draft', 'status' => 'draft']);
         $admin = User::factory()->create(['role' => 'admin', 'permissions' => [AdminPermissions::VIEW_TUTOR_PROFILES]]);
         $this->actingAs($admin)->getJson('/api/v1/admin/tutor-profiles')->assertOk()->assertJsonCount(0, 'data');
         $this->actingAs($admin)->getJson("/api/v1/admin/tutor-profiles/{$profile->id}")->assertOk()->assertJsonPath('data.allowed_actions', []);
@@ -133,39 +133,43 @@ class PhaseTwoAcceptanceTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
         $tutor = User::factory()->create(['role' => 'tutor']);
-        $profile = $tutor->tutorProfile()->create(['headline' => 'Submitted', 'approval_status' => 'pending', 'submitted_at' => now()]);
+        $profile = $tutor->tutorProfile()->create(['headline' => 'Submitted', 'status' => 'submitted', 'submitted_at' => now()]);
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/reject", ['reason' => 'Invalid proof.'])->assertOk()->assertJsonPath('data.profile.status', 'rejected');
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", ['reason' => 'Stale action.'])->assertConflict();
-        $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/suspend", ['reason' => 'Policy.'])->assertOk();
+        $this->actingAs($admin)
+            ->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/suspend", [
+                'reason' => 'Policy.',
+            ])
+            ->assertConflict();
         $viewer = User::factory()->create(['role' => 'admin', 'permissions' => [AdminPermissions::VIEW_TUTOR_PROFILES]]);
         $this->actingAs($viewer)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/restore", ['reason' => 'No permission.'])->assertForbidden();
         $this->actingAs($viewer)->postJson("/api/v1/admin/users/{$tutor->id}/restore", ['reason' => 'No permission.'])->assertForbidden();
-        $this->assertSame('rejected', $profile->refresh()->approval_status);
-        $this->assertNotNull($profile->suspended_at);
+        $this->assertSame('rejected', $profile->refresh()->status);
+        $this->assertNull($profile->suspended_at);
     }
 
-    public function test_cancelled_accounts_cannot_be_approved_or_reactivated_by_suspend_restore(): void
+    public function test_deactivated_accounts_cannot_be_approved_or_reactivated_by_suspend_restore(): void
     {
         $admin = User::factory()->admin()->create();
-        $tutor = User::factory()->create(['role' => 'tutor', 'status' => 'cancelled']);
-        $profile = $tutor->tutorProfile()->create(['headline' => 'Submitted', 'approval_status' => 'pending', 'submitted_at' => now()]);
+        $tutor = User::factory()->create(['role' => 'tutor', 'status' => 'deactivated']);
+        $profile = $tutor->tutorProfile()->create(['headline' => 'Submitted', 'status' => 'submitted', 'submitted_at' => now()]);
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", ['reason' => 'Cancelled account.'])->assertConflict();
         $this->actingAs($admin)->postJson("/api/v1/admin/users/{$tutor->id}/suspend", ['reason' => 'Cancelled account.'])->assertConflict();
-        $this->assertSame('cancelled', $tutor->refresh()->status);
+        $this->assertSame('deactivated', $tutor->refresh()->status);
     }
 
     public function test_audit_failure_rolls_back_admin_decision(): void
     {
         $admin = User::factory()->admin()->create();
         $tutor = User::factory()->create(['role' => 'tutor']);
-        $profile = $tutor->tutorProfile()->create(['headline' => 'Submitted', 'approval_status' => 'pending', 'submitted_at' => now()]);
+        $profile = $tutor->tutorProfile()->create(['headline' => 'Submitted', 'status' => 'submitted', 'submitted_at' => now()]);
         DB::listen(function ($query): void {
             if (str_contains($query->sql, 'insert into "audit_logs"')) {
                 throw new RuntimeException('Injected audit write failure.');
             }
         });
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", ['reason' => 'Must roll back.'])->assertStatus(500);
-        $this->assertSame('pending', $profile->refresh()->approval_status);
+        $this->assertSame('submitted', $profile->refresh()->status);
         $this->assertNull($profile->reviewed_at);
         $this->assertDatabaseCount('audit_logs', 0);
     }
@@ -222,7 +226,7 @@ class PhaseTwoAcceptanceTest extends TestCase
         $profile = $tutor->tutorProfile()->create([
             'headline' => 'English tutor',
             'bio' => 'Experienced tutor.',
-            'approval_status' => 'pending',
+            'status' => 'draft',
             'avatar_file_id' => $this->file($tutor, 'avatar')->id,
         ]);
         $profile->specializations()->attach(Specialization::query()->value('id'));
@@ -236,7 +240,7 @@ class PhaseTwoAcceptanceTest extends TestCase
         $file = File::create([
             'owner_id' => $owner->id,
             'disk' => 'local',
-            'object_key' => 'proof/'.str()->uuid(),
+            'object_key' => 'proof/' . str()->uuid(),
             'original_name' => 'fixture.pdf',
             'mime_type' => 'application/pdf',
             'size_bytes' => 5,

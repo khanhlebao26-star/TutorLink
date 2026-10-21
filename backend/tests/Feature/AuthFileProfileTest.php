@@ -81,16 +81,24 @@ class AuthFileProfileTest extends TestCase
         $this->assertStringContainsString('signature=', $url);
     }
 
-    public function test_user_under_eighteen_is_rejected(): void
+    public function test_customer_exactly_fifteen_can_register(): void
     {
-        $this->postJson('/api/v1/auth/register', [
-            'full_name' => 'Under Age',
-            'email' => 'under-age@example.com',
-            'password' => 'Password123!',
-            'password_confirmation' => 'Password123!',
-            'role' => 'customer',
-            'date_of_birth' => now()->subYears(17)->toDateString(),
-        ])->assertUnprocessable();
+        $this->assertRegistrationAge('customer', '2011-10-20', 201);
+    }
+
+    public function test_customer_one_day_under_fifteen_cannot_register(): void
+    {
+        $this->assertRegistrationAge('customer', '2011-10-21', 422);
+    }
+
+    public function test_tutor_exactly_eighteen_can_register(): void
+    {
+        $this->assertRegistrationAge('tutor', '2008-10-20', 201);
+    }
+
+    public function test_tutor_one_day_under_eighteen_cannot_register(): void
+    {
+        $this->assertRegistrationAge('tutor', '2008-10-21', 422);
     }
 
     public function test_role_cannot_be_changed_through_me(): void
@@ -142,7 +150,7 @@ class AuthFileProfileTest extends TestCase
             ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())],
         );
 
-        $this->getJson(parse_url($url, PHP_URL_PATH).'?'.parse_url($url, PHP_URL_QUERY))
+        $this->getJson(parse_url($url, PHP_URL_PATH) . '?' . parse_url($url, PHP_URL_QUERY))
             ->assertOk();
 
         $this->assertNotNull($user->refresh()->email_verified_at);
@@ -331,7 +339,7 @@ class AuthFileProfileTest extends TestCase
             $file = File::create([
                 'owner_id' => $tutor->id,
                 'disk' => 'local',
-                'object_key' => 'fixtures/'.$purpose,
+                'object_key' => 'fixtures/' . $purpose,
                 'original_name' => 'fixture.pdf',
                 'mime_type' => 'application/pdf',
                 'size_bytes' => 5,
@@ -439,5 +447,76 @@ class AuthFileProfileTest extends TestCase
             ->assertJsonFragment([
                 'slug' => 'conversation-english',
             ]);
+    }
+
+    public function test_login_is_rate_limited(): void
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->postJson('/api/v1/auth/login', [
+                'email' => 'missing-user@example.test',
+                'password' => 'Password123!',
+            ])->assertUnauthorized();
+        }
+
+        $this->postJson('/api/v1/auth/login', [
+            'email' => 'missing-user@example.test',
+            'password' => 'Password123!',
+        ])
+            ->assertStatus(429)
+            ->assertHeader('Retry-After');
+    }
+
+    public function test_register_is_rate_limited(): void
+    {
+        // Payload sai vẫn là request và được tính vào limiter.
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $this->postJson('/api/v1/auth/register', [])
+                ->assertUnprocessable();
+        }
+
+        $this->postJson('/api/v1/auth/register', [])
+            ->assertStatus(429)
+            ->assertHeader('Retry-After');
+    }
+
+    private function assertRegistrationAge(
+        string $role,
+        string $dateOfBirth,
+        int $expectedStatus,
+    ): void {
+        Notification::fake();
+
+        Carbon::setTestNow(Carbon::parse('2026-10-20 12:00:00'));
+
+        try {
+            $response = $this->postJson('/api/v1/auth/register', [
+                'full_name' => 'Age Boundary User',
+                'email' => 'age-boundary@example.test',
+                'password' => 'Password123!',
+                'password_confirmation' => 'Password123!',
+                'role' => $role,
+                'date_of_birth' => $dateOfBirth,
+            ]);
+
+            $response->assertStatus($expectedStatus);
+
+            if ($expectedStatus === 201) {
+                $response->assertJsonPath('data.role', $role);
+
+                $this->assertDatabaseHas('users', [
+                    'email' => 'age-boundary@example.test',
+                    'role' => $role,
+                    'date_of_birth' => $dateOfBirth,
+                ]);
+            } else {
+                $response->assertJsonValidationErrors('date_of_birth');
+
+                $this->assertDatabaseMissing('users', [
+                    'email' => 'age-boundary@example.test',
+                ]);
+            }
+        } finally {
+            Carbon::setTestNow();
+        }
     }
 }
