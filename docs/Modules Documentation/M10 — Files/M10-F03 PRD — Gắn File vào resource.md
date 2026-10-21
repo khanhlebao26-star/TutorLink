@@ -9,11 +9,11 @@ Liên kết File đã complete với resource đúng owner, purpose và authoriz
 # 2\. Quy tắc
 
 * Chỉ File owner được đề nghị link; resource owner/member/actor được xác nhận theo resource type.  
-* File phải complete, có purpose tương thích và resource phải thuộc scope được phép.  
+* File phải complete và `clean` sau scanner thực tế, có purpose tương thích và resource thuộc scope được phép. Với Message, kiểm member active, Conversation active, sender là owner; tạo Message và FileLink nguyên tử. Chat giới hạn một file/message và 5 MiB/file theo BR-21.
 * Resource type theo Enum Catalog: message, task, task\_submission, announcement, verification\_document; các liên kết avatar dùng profile attachment flow.  
 * Verification documents/private task submissions/message/announcement attachments không public.  
 * Link retry idempotent; unique resource/file relation không tạo duplicate.  
-* Không xóa File hoặc resource làm mất lịch sử/foreign key; attachment scope nằm ở M04/M07/M08 và verification ở M02.
+* Không xóa File hoặc resource làm mất lịch sử/foreign key; attachment scope nằm ở M04/M07/M08 và verification ở M02. Một Submission hoặc Announcement được gắn tối đa 5 file; mỗi file tối đa 5 MiB với MIME PDF/JPG/PNG/DOC/DOCX. Duplicate file ID trong một request bị từ chối.
 
 # 3\. Tiêu chí chấp nhận
 
@@ -26,6 +26,7 @@ Liên kết File đã complete với resource đúng owner, purpose và authoriz
 
 * POST /files/{id}/links tồn tại nhưng Controller hiện chỉ thực hiện verification\_document; các business resource type khác trả conflict “not available yet”.  
 * Upload purpose whitelist hiện chưa gồm message\_attachment, task\_submission, announcement\_attachment. Cần quyết định link semantics per-resource và transaction/lock owner membership.
+* BR-20 chốt Workspace: `task_submission` và `announcement_attachment` tối đa 5 MiB/file, tối đa 5 file/resource. BR-21 chốt Chat: một file/message, tối đa 5 MiB/file. Runtime kiểm quota và MIME theo purpose/resource khi link; quyền download vẫn theo resource membership.
 
 # 5\. Nguồn
 

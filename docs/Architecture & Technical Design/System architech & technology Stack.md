@@ -72,7 +72,7 @@ M01–M10 dưới đây là ranh giới logic trong cùng ứng dụng và cùng
 
 Next.js hiển thị form xác thực; Laravel Fortify cung cấp các luồng đăng nhập, đăng ký, đăng xuất, quên/reset mật khẩu và xác minh email khi được bật. Sanctum nhận diện phiên người dùng khi gọi API. Fortify/Sanctum là package chính thức của Laravel; nhóm vẫn chịu trách nhiệm cấu hình, tích hợp, kiểm thử và nghiệp vụ riêng. Chưa cài Fortify trong checkout được rà soát. \[T1, T2\]
 
-Client trình duyệt khởi tạo CSRF qua /sanctum/csrf-cookie, gửi cookie và X-XSRF-TOKEN cho mutation theo luồng xác thực. Fortify dùng web guard phối hợp Sanctum; giao diện Next.js tiếp tục được sử dụng. Tên miền, CORS/stateful domain, cookie, response và chuyển tiếp phiên khi render phía server cần được chốt khi tích hợp. Personal access token chỉ mở cho client/tích hợp được duyệt, không lưu bearer token dài hạn trong localStorage. \[P2, T1, T2\]
+Client trình duyệt khởi tạo CSRF qua /sanctum/csrf-cookie, gửi cookie phiên và X-XSRF-TOKEN cho mutation theo luồng xác thực. Fortify dùng web guard phối hợp Sanctum; giao diện Next.js tiếp tục được sử dụng. Tên miền, CORS/stateful domain, cookie, response và chuyển tiếp phiên khi render phía server cần được chốt khi tích hợp. Contract TutorLink hiện chỉ mô tả xác thực bằng cookie phiên và CSRF; không phát hành personal access token cho client từ luồng M01. \[P2, T1, T2\]
 
 Filament là panel nội bộ dùng cùng nguồn User của Laravel; chỉ Admin active có quyền mới được truy cập. Mỗi resource/action/query và tải bằng chứng phải kiểm permission cùng assignment hiện tại. Quyền vào panel không cấp quyền đọc mọi dữ liệu. API Admin hiện có chưa chứng minh đáp ứng đầy đủ assignment scope; panel dùng cùng nghiệp vụ/Policy, không sao chép quy tắc riêng.
 
@@ -84,7 +84,7 @@ Accept phải kiểm lại actor, hạn lời mời, trạng thái Program, Cust
 
 ## 5.3. Workspace, tác vụ nền và tệp
 
-Owner/member đọc Workspace theo scope. Program paused chặn tạo Session/Task/Announcement/Fee mới; Tutor vẫn được hoàn tất/hủy Session đã có theo xác nhận 18/10/2026. Sửa lịch hoặc publish Announcement draft khi paused còn cần quyết định. Program completed/cancelled chỉ đọc, ngoại trừ Review hợp lệ sau completed. \[D1\]
+Owner/member đọc Workspace theo scope. Program paused chặn tạo Session/Task/Fee mới; Tutor vẫn được hoàn tất/hủy Session đã có theo xác nhận 18/10/2026, đồng thời được tạo, sửa Draft và publish Announcement theo BR-10 đã chốt ngày 20/10/2026. Sửa lịch Session khi paused còn cần quyết định. Program completed/cancelled chỉ đọc, ngoại trừ Review hợp lệ sau completed. \[D1\]
 
 Thiết kế đích lưu Outbox Event cùng transaction nghiệp vụ; worker xử lý dữ liệu đã commit để tạo notification không trùng, scheduler xử lý hết hạn Invitation và công việc định kỳ. Database queue tái sử dụng PostgreSQL. Outbox không đồng nhất với bảng jobs. Chưa thấy Outbox, worker/scheduler service trong Compose hiện tại; cần triển khai và kiểm thử cùng các luồng nghiệp vụ sử dụng chúng. \[N2\]
 

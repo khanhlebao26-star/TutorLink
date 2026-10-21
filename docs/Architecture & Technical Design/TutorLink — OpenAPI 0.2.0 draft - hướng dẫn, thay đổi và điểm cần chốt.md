@@ -1,5 +1,7 @@
 # TutorLink — Hợp đồng OpenAPI toàn hệ thống
 
+> **Bản lưu lịch sử của thiết kế đích ngày 18/10/2026.** Số operation, schema, trạng thái quyết định và liên kết YAML/ZIP dưới đây phản ánh thời điểm lập bản nháp; không dùng làm contract API đang triển khai. Để tích hợp với code hiện tại, xem [OpenAPI sinh bởi Scramble](../api/README.md). [API Route Catalog](<API Route Catalog.md>) hiện là chuẩn method/path API đích và giữ đủ 7 route D23 trong phạm vi. Các quyết định mới hơn tại [Business Rules](../Domain%20Documentation/Business%20Rules.md) và PRD hiện hành có ưu tiên hơn toàn bộ trạng thái D01–D24 bên dưới: BR-10 cho phép publish Announcement khi Program Paused, BR-11 chốt evidence chat 10 trước/5 sau, BR-12 chốt đăng ký/xác minh/ngày sinh/phiên sau reset, BR-13 chốt Customer Profile (thay D09 cũ), BR-14 chốt public Tutor/Listing (thay D06 cũ), BR-15 chốt Listing moderation (thay phần D23 liên quan hide/restore), BR-16 chốt M02/D10 về giấy tờ và sửa hồ sơ approved, BR-17 chốt M04/D11 về DTO peer/context và đọc lịch sử khi đình chỉ, BR-18 chốt M05/D12 về Program version/expiry/cancel và Listing hold, BR-19 chốt D21–D22 về policy Paused và optimistic concurrency, M04-F01 cho cả Customer và Tutor mở liên hệ. Tên trường Report trên API đích là `description`, ánh xạ tới `reports.details`; mục 10 bên dưới vẫn ghi wire `details` theo bản nháp lịch sử.
+
 ## 0.2.0-draft · 18/10/2026 · Bản nháp để review
 
 Bộ hợp đồng mô tả toàn hệ thống M01–M10: request, response, xác thực, quyền truy cập, lỗi, phân trang, retry và ràng buộc chuyển trạng thái. Đây là hợp đồng đích được đề xuất, chưa phải xác nhận backend đã triển khai hoặc hợp đồng đã được cả nhóm phê duyệt.
@@ -100,11 +102,15 @@ Trạng thái: blocking. Một pair/Conversation active/cancelled, direct\_key n
 
 ## D12 — Version và hủy Program
 
+> **Đã được thay thế bởi BR-18 (20/10/2026).** Các trạng thái “blocking” và nội dung đề xuất dưới đây là ghi chép lịch sử, không còn là quyết định đang chờ. Quy tắc hiện hành xem tại [Business Rules](../Domain%20Documentation/Business%20Rules.md) và các PRD M05.
+
 Trạng thái: blocking. customer\_id là wire canonical theo DB; PRD target\_customer\_id là mapping. expected\_program\_version đề xuất cho update/send/action/accept. Expiry boundary đề xuất server\_now\<expires\_at và đúng72h UTC; phải review. Hủy Program có Session/Task mở, lý do Invitation reject/cancel và state-gate resume cần chốt. Snapshot lịch sử không FK tới current version. ADR-09 còn cần owner kỹ thuật xác nhận giao thức khóa/isolation với đình chỉ riêng tài khoản Tutor (users.status) và test PostgreSQL; chưa kết luận race-safe từ khóa Tutor Profile.
 
 ## D13 — Submission retry/version
 
-Trạng thái: confirmed-and-open; đã chốt nơi lưu key/hash cho Submission, chưa triển khai runtime. PUT /submission bắt buộc Idempotency-Key UUID; task\_submissions lưu key \+ SHA-256 request\_hash với UNIQUE(task\_id,customer\_id,idempotency\_key), giữ theo lịch sử version. Cùng key/payload trả version gốc; khác payload 409; key mới cần expected\_submission\_version hiện hành. Kiểm scope trước replay; feedback chỉ latest version. D13 vẫn blocking cho hàm canonicalize cụ thể và giới hạn content/attachment; không phụ thuộc replay store chung D08 và không tự thêm thiết kế mới.
+> **D13 được chốt tại BR-20 (20/10/2026).** Nội dung dưới đây là ghi chép trạng thái lịch sử. Quy tắc canonicalization và giới hạn hiện hành xem tại [Business Rules](../Domain%20Documentation/Business%20Rules.md) và M07-F02; runtime vẫn chưa triển khai.
+
+Idempotency-Key UUID, lưu key/hash với UNIQUE(task\_id,customer\_id,idempotency\_key), giữ theo lịch sử version; cùng key/payload trả version gốc, khác payload trả 409; key mới cần expected\_submission\_version hiện hành. D13 dùng canonical JSON RFC 8785 theo BR-20, không phụ thuộc replay store chung D08.
 
 ## D14 — File message và atomic attach
 
@@ -136,9 +142,13 @@ Trạng thái: blocking. Append-only, audit mutation cùng transaction; truy c�
 
 ## D21 — Session hai bảng
 
+> **Phần policy Paused và stale update đã được thay thế bởi BR-19 (20/10/2026).** Nội dung D21 bên dưới là ghi chép lịch sử; xem PRD M06 và API Route Catalog hiện hành.
+
 Trạng thái: confirmed-and-open. Giữ hai bảng program\_sessions \+ lesson\_sessions, API id=planned ID, Tutor complete nguyên tử tạo actual 0..1; cancel không actual. Dũng xác nhận ngày 18/10/2026: khi Program Paused vẫn cho Tutor hoàn tất/hủy lịch đã có, chặn tạo mới; edit lịch khi Paused còn mở. Program terminal cấm transition mới, chỉ cho replay chỉ đọc đã hợp lệ; actual time optional, không thêm attendance/video.
 
 ## D22 — Sửa nội dung và stale data
+
+> **Đã được thay thế bởi BR-19 (20/10/2026).** Chính sách sửa Task/Fee/Announcement và `expected_version` hiện hành xem tại Business Rules, PRD M07–M08 và API Route Catalog. Metric Progress vẫn là câu hỏi mở riêng.
 
 Trạng thái: blocking cho PATCH Task ở submitted/paused, start/cancel Task paused, Announcement sau publish/paused, metric validation và optimistic concurrency cho edit chưa có giao thức chống stale, bao gồm PATCH Fee Record. Row lock/status gate không tự ngăn lost update cùng trạng thái; chưa thêm version/ETag vào wire hoặc DB. Riêng Complete Program đã chốt: không còn Session scheduled, mọi Task completed/cancelled tường minh; lỗi program\_completion\_blocked trả blockers.sessions/tasks, không tự chuyển Task.
 

@@ -12,7 +12,7 @@ Cho phép Tutor tạo và quản lý hồ sơ của chính mình làm nguồn th
 * Hồ sơ mô tả người cung cấp dịch vụ. Các trường nghiệp vụ được lưu theo schema Tutor Profile đã thống nhất; contract hiện có các trường headline, bio, experience và specialization. Avatar và giấy tờ xác minh được liên kết theo M02-F02.  
 * Hồ sơ draft hoặc chưa approved không xuất hiện trong dữ liệu công khai. Chỉ hồ sơ approved mới đủ điều kiện hiển thị công khai; các điều kiện công khai khác vẫn do module Listing áp dụng.  
 * Tutor có thể sửa draft và nội dung được yêu cầu chỉnh sửa. Khi đã submitted, hồ sơ chờ quyết định; chỉ được gửi lại sau trạng thái changes\_requested. Hồ sơ suspended không cho sửa.  
-* State Lifecycles chưa định nghĩa cách sửa nội dung của hồ sơ approved và đưa lại qua xét duyệt. Không thay đổi âm thầm nội dung đã được duyệt; cần thống nhất transition riêng trước khi mở luồng này.
+* Hồ sơ approved được sửa trên một revision chờ duyệt, không ghi đè bản công khai. GET của Tutor trả cả bản approved và revision hiện có; PUT cập nhật revision của owner. Khi revision được duyệt, thay bản công khai nguyên tử; nếu yêu cầu sửa hoặc từ chối, bản approved trước vẫn công khai nếu các gate khác thỏa. Mỗi hồ sơ chỉ có một revision đang xử lý.
 
 # Luồng
 
@@ -26,10 +26,11 @@ Cho phép Tutor tạo và quản lý hồ sơ của chính mình làm nguồn th
 * Draft có thể được tạo và cập nhật theo schema; dữ liệu sai định dạng trả lỗi gắn trường và không làm hỏng dữ liệu đã lưu.  
 * Hồ sơ submitted không bị thay đổi trong lúc chờ Admin; changes\_requested mở lại khả năng sửa để Tutor gửi lại.  
 * Hồ sơ draft, submitted, changes\_requested, rejected hoặc suspended không bị trả như hồ sơ công khai đã duyệt.
+* Sửa bản approved không làm TutorProfileStatus rời approved; revision riêng không xuất hiện công khai trước khi được duyệt.
 
 # Điểm cần chốt
 
-* Danh sách trường chính thức, độ dài, trường bắt buộc và quy tắc thay đổi nội dung sau approved cần được xác định trong contract sản phẩm/API.  
+* Wire DTO/version và migration để lưu revision approved cần đặc tả/triển khai; quy tắc xét duyệt bản sửa đã chốt tại BR-16.
 * API hiện tại cho phép lưu headline, bio, experience và specialization; điều kiện required/optional cần được đối chiếu với schema sản phẩm hoàn tất.
 
 # Nguồn và phụ thuộc

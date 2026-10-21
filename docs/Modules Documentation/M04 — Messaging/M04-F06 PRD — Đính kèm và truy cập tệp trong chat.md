@@ -10,9 +10,10 @@ Participant đính kèm và tải tệp trong Conversation theo cùng File lifec
 
 * Chỉ gắn file đã upload/complete, thuộc sender và có purpose/resource phù hợp với message attachment.  
 * Tệp chat là private; chỉ participant đủ quyền trong Conversation được tải xuống. Admin cần thêm report scope và audit nếu truy cập evidence.  
-* Incomplete file, sai owner/purpose, resource scope sai hoặc outsider download đều bị từ chối.  
+* Khi peer bị đình chỉ, participant còn active vẫn được đọc lịch sử và tải tệp đã gắn nếu qua chính sách File/resource M10; người bị đình chỉ bị từ chối truy cập kể cả khi còn session cũ. Khôi phục account cho phép đọc lại theo membership. BR-17 không cấp Admin quyền tải file ngoài evidence BR-11.
+* Incomplete, chưa scan clean, sai owner/purpose, resource scope sai hoặc outsider download đều bị từ chối. Gửi file và tạo Message/FileLink phải cùng một giao dịch; lỗi giữa chừng không để lại message thiếu file hoặc link mồ côi.
 * Không để public API lộ object key, verification document hoặc metadata riêng tư.  
-* MVP không có Program file library hoặc đính kèm trực tiếp vào Session; thao tác này thuộc message chat nếu được policy cho phép.
+* MVP không có Program file library hoặc đính kèm trực tiếp vào Session; thao tác này thuộc message chat theo giới hạn BR-21.
 
 # 3\. Hành vi và API đích
 
@@ -27,9 +28,8 @@ Luồng file theo M10: POST multipart /files → complete → attach vào resour
 
 # 5\. Chênh lệch/câu hỏi mở
 
-* Enum Catalog đã có MessageType.file và API Route Catalog đã mô tả gửi text/file; không còn quyết định về việc có MessageType riêng cho file. File chỉ gắn với Message theo File lifecycle M10; giới hạn MIME/kích thước, số attachment, nhiều file trong một message và xử lý file bị mất vẫn cần chốt.  
-* Chốt loại MIME/kích thước allow-list, số attachment mỗi message, nhiều attachment trong cùng message và xử lý khi file mất sau khi gửi.  
-* Kiểm tra API authorization dùng membership hiện tại và lịch sử Conversation cancelled theo policy M10.
+* BR-21 đã chốt một tệp mỗi message, giới hạn 5 MiB, MIME allow-list, malware scan trước khi sử dụng, atomic link, retention orphan và trạng thái unavailable nếu object mất. Runtime File scan và authorization theo resource vẫn chưa triển khai.
+* Kiểm tra quyền download phải dùng membership hiện tại và cho member active đọc lịch sử Conversation cancelled theo BR-17/BR-21.
 
 # 6\. Nguồn
 

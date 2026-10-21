@@ -3,7 +3,7 @@
     "info": {
         "title": "TutorLink API",
         "version": "1.0.0",
-        "description": "Generated from registered Laravel API routes. Conditional D23 endpoints are omitted until approved and implemented."
+        "description": "Generated from registered Laravel API routes. First-party clients use Sanctum session cookies: GET /sanctum/csrf-cookie before login or mutations, then send the session cookie and X-XSRF-TOKEN on state-changing requests. Conditional D23 endpoints are omitted until approved and implemented."
     },
     "servers": [
         {
@@ -12,7 +12,7 @@
     ],
     "security": [
         {
-            "http": []
+            "sessionCookie": []
         }
     ],
     "paths": {
@@ -2977,9 +2977,11 @@
     },
     "components": {
         "securitySchemes": {
-            "http": {
-                "type": "http",
-                "scheme": "bearer"
+            "sessionCookie": {
+                "type": "apiKey",
+                "description": "Sanctum session cookie. Browser mutations also require X-XSRF-TOKEN after GET /sanctum/csrf-cookie.",
+                "in": "cookie",
+                "name": "laravel-session"
             }
         },
         "schemas": {

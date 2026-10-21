@@ -12,6 +12,7 @@ Recipient xem notification, mở deep link và cập nhật trạng thái đã �
 * Inbox có list, unread\_count, deep\_link, mark một notification read và mark-all-read.  
 * Read/read-all retry an toàn; badge count phản ánh cùng tập record.  
 * Deep link vẫn chạy kiểm quyền trên resource đích; notification không cấp entitlement.
+* Trạng thái read/unread thuộc Notification Inbox. Announcement không có read state hoặc unread count riêng trong MVP.
 
 # 3\. Tiêu chí chấp nhận
 

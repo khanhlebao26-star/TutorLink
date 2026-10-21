@@ -11,18 +11,19 @@ Cho phép Tutor đủ điều kiện đưa Listing ra Marketplace hoặc kích h
 * Publish: draft → active.  
 * Reactivate: inactive → active.  
 * Listing archived là trạng thái kết thúc; không được kích hoạt lại.  
+* Listing đang có moderation hold không được Tutor publish/reactivate, dù status là inactive và Tutor đủ điều kiện khác; chỉ Admin đúng quyền/scope mới gỡ hold. Nếu Tutor đã tự pause trong thời gian hold, sau restore Tutor tự publish lại.
 * Yêu cầu publish khi Listing đã active phải đánh giá lại eligibility như quy tắc State Lifecycles; không tạo trạng thái mới.
 
 # 3\. Điều kiện kích hoạt
 
-* UserStatus=active, email đã xác minh, TutorProfileStatus=approved và Tutor không suspended.  
+* UserStatus=active, email đã xác minh, TutorProfileStatus=approved, giấy tờ bắt buộc còn hiệu lực theo BR-16 và Tutor không suspended.
 * Specialization, Subcategory và Category gắn với Listing đều active.  
 * Dữ liệu Listing hợp lệ theo Enum Catalog: DeliveryMode online/offline/hybrid, PriceUnit session/hour/course, Currency VND.
 
 # 4\. Hành vi và contract
 
 Tutor chọn Đăng hoặc Kích hoạt lại. Máy chủ kiểm tra quyền sở hữu và đánh giá lại toàn bộ điều kiện tại thời điểm gửi yêu cầu; không dựa vào trạng thái nút trên giao diện. Nếu thành công, status là active và Listing đủ điều kiện xuất hiện công khai sau khi qua public visibility gate.  
-API hiện có: PATCH /api/v1/me/listings/{listing}; controller cho phép chuyển status sang active và kiểm tra eligibility cùng active catalog chain.
+API đích theo Catalog: `POST /api/v1/me/listings/{listing}/publish` cho cả draft → active và inactive → active. `PATCH /api/v1/me/listings/{listing}` dùng sửa nội dung, không là contract đích để đổi status. API hiện đã đăng ký vẫn dùng PATCH với `status=active`; frontend phải chuyển sang POST khi route đích được triển khai, kiểm thử và sinh vào OpenAPI Scramble.
 
 # 5\. Tiêu chí chấp nhận
 
@@ -35,6 +36,7 @@ API hiện có: PATCH /api/v1/me/listings/{listing}; controller cho phép chuy�
 # 6\. Khoảng cách triển khai và câu hỏi mở
 
 * API code dùng profile approval\_status=active theo mapping legacy. Cần giữ contract cùng nghĩa với target TutorProfileStatus=approved.  
+* Chưa có route POST `/publish` trong OpenAPI hiện tại; không giới thiệu route đích như API đã gọi được. Trong giai đoạn chuyển đổi, ghi rõ client nào còn dùng PATCH status và thời điểm bỏ nhánh legacy.
 * Xác nhận thông báo lỗi/field error cụ thể cho từng điều kiện; không đổi status nếu bất kỳ điều kiện nào thất bại.
 
 # 7\. Nguồn

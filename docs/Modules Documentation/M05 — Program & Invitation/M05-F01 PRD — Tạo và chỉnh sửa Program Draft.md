@@ -10,12 +10,14 @@ Tutor đủ điều kiện tạo một Program Draft nhắm tới đúng một C
 
 * Draft gồm target\_customer\_id (wire OpenAPI: customer\_id; DB: programs.customer\_id), mục tiêu/phạm vi dịch vụ, delivery\_mode, agreed\_fee\_minor, currency=VND, fee\_unit và source Listing tùy chọn.  
 * Program là thỏa thuận riêng; Listing chỉ làm nguồn tham khảo. Archive/chỉnh Listing không sửa Program offer hoặc snapshot đã gửi.  
+* Nếu request tạo Program Draft mới tham chiếu source Listing đang có moderation hold, server từ chối trước khi tạo. Tutor vẫn có thể tạo Draft không tham chiếu Listing đó, nếu đủ eligibility. Hold đặt sau khi Draft tồn tại không tự xóa/sửa Draft hoặc snapshot cũ; gửi Invitation mới từ Draft tham chiếu Listing đang hold bị chặn theo M05-F02.
 * Một Program có một Tutor owner và một Customer target; chỉ một Customer member được tạo khi Invitation được accept.
 
 # 3\. Quy tắc
 
-* Tạo Program yêu cầu Tutor account active, email verified, Profile approved, không suspended; Customer target phải là Customer hợp lệ.  
-* Draft được sửa trước khi snapshot bị khóa. Dữ liệu tiền là số nguyên VND không âm; không dùng float.  
+* Tạo Program yêu cầu Tutor account active, email verified, Profile approved, giấy tờ bắt buộc còn hiệu lực theo BR-16, không suspended; Customer target phải là Customer hợp lệ.
+* `Program.version` là phiên bản offer của Draft, bắt đầu từ 1 và tăng đúng 1 sau mỗi lần sửa Draft thành công. PATCH Draft nhận `expected_version`; version không khớp trả 409 và không ghi một phần. Dữ liệu tiền là số nguyên VND không âm; không dùng float.
+* Khi có Invitation pending, Draft bị khóa đến khi Invitation đạt accepted/rejected/cancelled/expired. Sau trạng thái terminal, Tutor có thể sửa Draft theo version hiện tại hoặc gửi Invitation mới với snapshot/version mới.
 * Tạo/sửa Draft không kích hoạt Program, không tạo membership và không cho tạo workspace activity.
 
 # 4\. Tiêu chí chấp nhận
@@ -28,7 +30,7 @@ Tutor đủ điều kiện tạo một Program Draft nhắm tới đúng một C
 # 5\. Chênh lệch/câu hỏi mở
 
 * OpenAPI draft dùng customer\_id làm wire name cho target\_customer\_id. Database Design đề xuất programs.customer\_id (bigint NOT NULL FK users.id), nên migration/mapping DB vẫn cần trước triển khai; chưa có migration.  
-* Còn chốt versioning cho snapshot và luật sửa Draft sau khi Invitation bị reject/cancel/expired; wire name customer\_id đã được map trong OpenAPI guide.
+* BR-18 đã chốt versioning/khóa Draft. Wire name customer\_id đã được map trong OpenAPI guide; request DTO `expected_version` cần đồng bộ khi triển khai.
 
 # 6\. Nguồn
 

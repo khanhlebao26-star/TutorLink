@@ -11,7 +11,7 @@ Ghi nhận quyết định từ chối hồ sơ đã submitted với lý do có 
 * Transition hợp lệ: submitted → rejected.  
 * Admin cần admin.tutor\_profiles.decide và assignment hợp lệ; mọi quyết định phải ghi actor, thời điểm, reason và audit.  
 * Hồ sơ rejected không phải hồ sơ approved và không được xuất hiện công khai như hồ sơ đã duyệt.  
-* State Lifecycles không định nghĩa transition ra khỏi rejected. Quy trình khiếu nại, mở lại hoặc nộp hồ sơ mới chưa thuộc phạm vi đã chốt.  
+* Rejected là trạng thái cuối cho lần xét duyệt hiện tại; Tutor không tự gửi lại qua submit trong MVP. Khiếu nại/mở lại cần quy trình riêng và không được suy ra từ route hiện có. Nếu từ chối revision của Profile approved, chỉ revision bị rejected; bản approved trước giữ nguyên.
 * Từ chối hồ sơ không tự đổi UserStatus; quyết định đình chỉ account là chức năng riêng và cần quyền riêng.
 
 # Luồng
@@ -30,7 +30,7 @@ Ghi nhận quyết định từ chối hồ sơ đã submitted với lý do có 
 # Chênh lệch runtime và điểm cần chốt
 
 * API hiện chỉ quyết định trên approval\_status=pending có submitted\_at; target status là submitted.  
-* Cần chốt chính sách khi Tutor muốn nộp lại sau rejected; hiện Domain Documents không có transition đó.
+* BR-16 chốt không tự nộp lại sau rejected trong MVP; nếu muốn mở lại về sau cần quyết định và transition riêng.
 
 # Nguồn và phụ thuộc
 

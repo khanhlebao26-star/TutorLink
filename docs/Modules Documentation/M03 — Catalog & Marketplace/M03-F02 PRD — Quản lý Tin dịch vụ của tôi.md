@@ -23,11 +23,11 @@ Cho phép Tutor quản lý danh sách Tin dịch vụ của chính mình: xem, t
 * Listing mới luôn là draft và chưa xuất hiện ở tìm kiếm công khai.  
 * specialization phải thuộc taxonomy hợp lệ. Listing gắn với đúng một Specialization.  
 * Không được sửa Listing của người khác bằng cách thay ID/slug trong URL hoặc request body.  
-* Quyền sửa nội dung ở trạng thái active và cách cập nhật tức thời ra trang công khai cần được thể hiện nhất quán trong UI; API hiện cho phép PATCH nội dung ở trạng thái hiện tại. Quy tắc kiểm duyệt/phiên bản nội dung chưa được Product/Domain chốt.
+* Tutor owner được sửa nội dung Listing đang `active` bằng PATCH theo field allow-list hiện có. Server kiểm lại ownership, eligibility, dữ liệu Listing và taxonomy tại request; nếu hợp lệ, nội dung mới hiện công khai ngay, ghi audit thay đổi. Không thêm trạng thái chờ duyệt hay vòng phê duyệt mới cho lần sửa này. Listing không đủ gate vẫn không công khai dù PATCH thành công ở trạng thái khác. Program/Invitation đã hình thành giữ snapshot cũ.
 
 # 5\. Hành vi và API hiện có
 
-Routes: GET/POST /api/v1/me/listings, GET/PATCH /api/v1/me/listings/{listing}. Routes yêu cầu đăng nhập và EnsureActiveAccount; controller giới hạn truy vấn theo chủ sở hữu và kiểm tra eligibility khi tạo.
+API đích theo Catalog: `GET/POST /api/v1/me/listings` và `GET/PATCH /api/v1/me/listings/{listing}` để xem, tạo Draft và sửa nội dung. Publish/reactivate dùng `POST /api/v1/me/listings/{listing}/publish` (M03-F03); pause dùng `POST /api/v1/me/listings/{listing}/pause` (M03-F04). Các route đang đăng ký yêu cầu đăng nhập và EnsureActiveAccount; controller giới hạn truy vấn theo chủ sở hữu và kiểm tra eligibility khi tạo. API hiện tại còn cho đổi status qua PATCH; đó là hành vi legacy cần chuyển đổi, không là quy tắc API đích.
 
 # 6\. Tiêu chí chấp nhận
 
@@ -40,7 +40,7 @@ Routes: GET/POST /api/v1/me/listings, GET/PATCH /api/v1/me/listings/{listing}. R
 # 7\. Khoảng cách triển khai và câu hỏi mở
 
 * API hiện dùng approval\_status=active làm điều kiện tương thích cho profile approved; cần giữ mapping rõ trong khi schema legacy chưa theo target enum.  
-* Xác nhận trạng thái nào được sửa nội dung và liệu sửa Listing active có cần kiểm duyệt, versioning hay thông báo ra công khai.
+* D06 đã chốt sửa Listing `active` có hiệu lực công khai ngay sau validation và audit, không qua xét duyệt lại. Cần triển khai audit, kiểm tra các gate tại mutation và bảo đảm cache/public search/detail/profile phản ánh nội dung mới. Chống ghi đè do cập nhật đồng thời vẫn thuộc D21–D22, không tự coi đã chốt ở D06.
 
 # 8\. Nguồn
 

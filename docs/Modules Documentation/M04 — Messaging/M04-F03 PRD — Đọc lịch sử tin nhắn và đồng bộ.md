@@ -9,6 +9,7 @@ Participant mở Conversation, xem lịch sử theo thứ tự và nhận các t
 # 2\. Quy tắc nghiệp vụ
 
 * Chỉ thành viên của Conversation được đọc lịch sử. Admin chỉ theo ngoại lệ có report scope và audit ở M04-F08.  
+* Theo BR-17, participant active vẫn đọc lịch sử của Conversation mình tham gia khi peer bị đình chỉ hoặc Conversation cancelled. Participant bị đình chỉ bị từ chối đọc kể cả khi còn session cũ; sau khôi phục, họ đọc lại lịch sử theo membership. Việc đình chỉ không xóa message/cursor hay tự đổi ConversationStatus.
 * Cursor có thứ tự kép (created\_at, id) để xử lý nhiều message cùng timestamp; không dùng created\_at đơn lẻ.  
 * Client dùng server message ID để dedupe giữa response, polling và sự kiện realtime nếu bổ sung sau.  
 * REST polling và resync sau reconnect là baseline G2. Reverb/private channel là tối ưu tùy chọn sau khi REST được nghiệm thu.  
@@ -29,7 +30,7 @@ GET lịch sử trả page message theo cursor, next\_cursor và trạng thái �
 # 5\. Chênh lệch/câu hỏi mở
 
 * Migration có index conversation\_id/created\_at nhưng cursor composite (created\_at,id) là policy service/API còn thiếu.  
-* Chốt page size, cursor encoding, thứ tự khi clock values lệch, và response dành cho Conversation cancelled.
+* Chốt page size, cursor encoding và thứ tự khi clock values lệch. Conversation cancelled đã chốt chỉ đọc theo membership/BR-17; wire response và runtime còn cần triển khai.
 
 # 6\. Nguồn
 

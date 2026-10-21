@@ -134,7 +134,7 @@ Các trường hợp sau không được tạo thêm bản ghi, version hoặc t
 * Người dùng kết nối lại và gửi lại yêu cầu.  
 * Hai yêu cầu có cùng Idempotency Key được gửi đồng thời.
 
-**Lưu ý:** Cơ chế lưu và kiểm tra key dùng chung cho các API, được đề cập trong D08, vẫn còn vấn đề cần quyết định về cách chuẩn hóa yêu cầu và thời gian lưu key. Những API phụ thuộc cơ chế này chưa được xem là sẵn sàng phát hành chỉ vì quy tắc riêng của Submission đã được xác định.
+**Lưu ý:** D08 tiếp tục mở cho các command chưa có policy riêng. Messaging có replay theo BR-21, Fee Record theo BR-22 và Submission theo D13; các rule riêng này không tự hoàn tất thiết kế idempotency dùng chung.
 
 ## RR-05 \- Outbox và worker xử lý tác vụ nền
 

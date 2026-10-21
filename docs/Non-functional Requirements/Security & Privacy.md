@@ -6,10 +6,10 @@
 
 ### **Yêu cầu**
 
-* **Đăng nhập:** TutorLink sử dụng cookie phiên của Laravel Sanctum để xác thực người dùng. Sau khi đăng nhập hoặc đăng ký thành công và tạo phiên, hệ thống phải tạo session ID mới.  
+* **Đăng nhập:** TutorLink sử dụng cookie phiên của Laravel Sanctum để xác thực người dùng. Đăng ký không tạo phiên; sau khi xác minh email, đăng nhập thành công phải tạo session ID mới.
 * **Đăng xuất:** Server phải vô hiệu hóa phiên hiện tại và tạo CSRF token mới. Chỉ xóa cookie trên trình duyệt là chưa đủ.  
 * **Kiểm tra trạng thái tài khoản:** Chỉ tài khoản có UserStatus \= active mới được thực hiện những thao tác yêu cầu tài khoản đang hoạt động. Server phải kiểm tra trạng thái hiện tại trong mỗi request cần xác thực.  
-* **Xác minh email:** Người dùng chưa xác minh email vẫn có thể đăng nhập nếu đáp ứng các điều kiện khác. Tuy nhiên, họ không được thực hiện những thao tác yêu cầu email đã xác minh.  
+* **Xác minh email:** Tài khoản chưa xác minh tồn tại để nhận và kiểm tra link email nhưng không được đăng nhập hoặc dùng API riêng tư. Gửi lại email xác minh là thao tác công khai có phản hồi trung tính và rate limit. Xác minh link không tự tạo session; người dùng đăng nhập sau đó.
 * **Điều kiện dành cho Tutor:** Những thao tác yêu cầu Tutor đã được duyệt chỉ được phép thực hiện khi hồ sơ Tutor đáp ứng điều kiện tương ứng. Trạng thái tài khoản và trạng thái hồ sơ Tutor phải được kiểm tra riêng.  
 * **Quyền do server quản lý:** Người dùng không được tự thay đổi role, permissions hoặc trạng thái tài khoản bằng dữ liệu gửi từ frontend.
 
@@ -19,6 +19,7 @@
 * Thử đăng nhập và truy cập API bằng tài khoản suspended hoặc deactivated. Các thao tác bị cấm phải bị từ chối, kể cả khi trình duyệt còn cookie phiên cũ.  
 * Thử thực hiện chức năng dành riêng cho Tutor đã xác minh hoặc được duyệt bằng tài khoản chưa đáp ứng điều kiện. Server phải từ chối.  
 * Thử gửi role, permissions hoặc status giả trong request. Người dùng không được tự cấp quyền cho mình.
+* Sau đăng ký không có session xác thực; login trước xác minh bị từ chối, link hợp lệ xác minh email, sau đó login mới tạo session. Resend không cần login và không phân biệt email không tồn tại/đã xác minh trong phản hồi.
 
 ## SP-02 · HTTPS, cookie và CSRF
 
@@ -53,14 +54,14 @@ Không chỉ dựa vào unit test khi middleware CSRF hoặc các lớp bảo v�
 * **Lưu mật khẩu:** Không lưu mật khẩu dạng văn bản thuần. Server phải sử dụng password hasher chuyên dụng có salt, chẳng hạn bcrypt hoặc Argon2id. Không dùng các hash nhanh như MD5 hoặc SHA-256 trực tiếp để lưu mật khẩu.  
 * **Không cắt mật khẩu:** Hệ thống không được âm thầm cắt bớt mật khẩu. Nếu sử dụng bcrypt, phải xử lý giới hạn đầu vào 72 byte UTF-8 một cách rõ ràng. Nếu sử dụng Argon2id, phải kiểm thử cấu hình trước khi triển khai.  
 * **Token đặt lại mật khẩu:** Token phải được tạo ngẫu nhiên, lưu dưới dạng hash, có hiệu lực 60 phút và chỉ được sử dụng một lần.  
-* **Thu hồi phiên sau khi reset:** Đề xuất vô hiệu hóa các phiên đăng nhập cũ sau khi người dùng đổi mật khẩu thành công. Chính sách này phải được xác nhận trong D04/M01-F06 trước khi phát hành. Không tự bổ sung chức năng quản lý thiết bị nếu Product chưa yêu cầu.
+* **Thu hồi phiên sau khi reset:** Product đã chốt ngày 20/10/2026: sau reset thành công, mọi phiên đăng nhập có trước của tài khoản bị vô hiệu hóa, để các thiết bị phải đăng nhập lại. Reset thất bại không thu hồi phiên. Không tự tạo phiên mới hoặc mở chức năng quản lý thiết bị từ quyết định này.
 
 ### **Cách kiểm chứng**
 
 * Token sai, token hết hạn, email không phù hợp hoặc token đã được sử dụng không được phép thay đổi mật khẩu.  
 * Sau khi đổi mật khẩu thành công, mật khẩu cũ không còn đăng nhập được.  
 * Kiểm tra rằng mật khẩu không bị cắt âm thầm.  
-* Nếu chính sách thu hồi phiên sau reset được chốt, kiểm tra các phiên cũ không thể tiếp tục sử dụng.
+* Kiểm thử bằng ít nhất hai session trình duyệt: reset thành công làm cookie cũ không thể gọi API riêng tư; reset thất bại giữ nguyên các session.
 
 ## SP-04 · Chống dò mật khẩu và spam
 
@@ -97,10 +98,11 @@ Các giới hạn trên phải được áp dụng theo đúng cách tính đã 
 
 ### **Yêu cầu**
 
-Phạm vi SP-05 là đăng nhập, quên mật khẩu và đặt lại mật khẩu: các luồng này không được cho người ngoài xác định email đã đăng ký qua lỗi, mã phản hồi, throttle hoặc hành vi khác nhau. Theo xác nhận của Dũng ngày 18/10/2026, đăng ký giữ validation email trùng hiện tại; đây là ngoại lệ được chấp thuận, không tuyên bố đăng ký chống account enumeration. Không thay luồng đăng ký sang phản hồi trung tính trong đợt đồng bộ này.
+Phạm vi SP-05 là đăng nhập, quên/đặt lại mật khẩu và gửi lại email xác minh: các luồng này không được cho người ngoài xác định email đã đăng ký qua lỗi, mã phản hồi, throttle hoặc hành vi khác nhau. Theo xác nhận của Dũng ngày 18/10/2026, đăng ký giữ validation email trùng hiện tại; đây là ngoại lệ được chấp thuận, không tuyên bố đăng ký chống account enumeration. Không thay luồng đăng ký sang phản hồi trung tính trong đợt đồng bộ này.
 
 * **Đăng nhập:** Khi email hoặc mật khẩu không đúng, sử dụng thông báo chung, không cho biết riêng email có tồn tại hay không.  
 * **Quên mật khẩu và đặt lại mật khẩu:** Không tiết lộ tài khoản tồn tại thông qua status code, response body hoặc cách áp dụng giới hạn request.  
+* **Gửi lại email xác minh:** Route công khai nhận email và trả phản hồi trung tính dù email không tồn tại, đã xác minh hoặc còn chờ; chỉ gửi thư cho tài khoản chưa xác minh, áp rate limit và không ghi link/token vào log.
 * **Giới hạn request nhất quán:** Các email có tài khoản và không có tài khoản phải được xử lý theo chính sách rate limiting nhất quán.  
 * **Bảo vệ token:** Không ghi token đặt lại mật khẩu vào log hoặc analytics, và không trả token trong response nếu không cần thiết cho quy trình.  
 * **Bảo vệ trang reset:** Không để token trong URL bị gửi qua header `Referer` đến dịch vụ bên ngoài. Cần cấu hình chính sách Referrer-Policy và hạn chế tài nguyên bên thứ ba trên trang reset.  
@@ -137,7 +139,7 @@ Các quy tắc bổ sung:
 * Khi assignment bị thu hồi hoặc chuyển cho người khác, người không còn được phân quyền phải mất quyền truy cập từ request tiếp theo.  
 * `allowed_actions` chỉ giúp frontend hiển thị những thao tác phù hợp. Server vẫn phải kiểm tra quyền khi nhận request.  
 * Nếu thao tác đình chỉ hồ sơ Tutor đồng thời giữ tài khoản ở trạng thái active hoặc thay đổi trạng thái tài khoản, phải kiểm tra đủ hai permission theo chính sách và thực hiện các thay đổi liên quan trong cùng transaction.  
-* Không mở endpoint truy cập evidence sau khi Report đóng hoặc endpoint Admin directory khi phạm vi quyền tương ứng vẫn chưa được chốt.
+* Theo BR-11, chỉ Admin active có `admin.reports.view` và assignment hiện tại được đọc evidence khi Report còn `open`; Report đóng hoặc assignment đổi/thu hồi chặn từ request tiếp theo. Với message, giới hạn message bị báo cáo cùng tối đa 10 tin trước/5 tin sau; mỗi lần đọc phải audit. Endpoint Admin directory vẫn cần chốt phạm vi quyền riêng trước khi triển khai.
 
 ### **Cách kiểm chứng**
 
@@ -153,16 +155,17 @@ Các quy tắc bổ sung:
 
 * **Lưu trữ riêng tư:** Storage phải ở chế độ private theo mặc định. Việc tải xuống phải được kiểm tra quyền truy cập đối với người dùng, mục đích sử dụng và tài nguyên liên quan.  
 * **Kiểm tra file:** Trước khi gắn file vào tài nguyên hoặc cho phép tải xuống, phải kiểm tra quyền sở hữu, mục đích sử dụng (`purpose`), MIME type thực tế, extension, dung lượng, checksum và tài nguyên liên quan.  
-* **Giới hạn file hiện tại:**  
+* **Giới hạn file theo purpose:**
   * Avatar: JPG/PNG, tối đa 2 MiB.  
-  * Các file khác: PDF/JPG/PNG/DOC/DOCX, tối đa 10 MiB.  
+  * Chat: PDF/JPG/PNG/DOC/DOCX, tối đa 5 MiB/tệp và một tệp/message.
+  * Submission/Announcement: PDF/JPG/PNG/DOC/DOCX, tối đa 5 MiB/tệp, tối đa 5 tệp/resource.
+  * Purpose khác: giới hạn hiện hành tối đa 10 MiB, PDF/JPG/PNG/DOC/DOCX, trừ quy định riêng của purpose.
 * **Loại file được phép:** Mỗi `FilePurpose` phải có danh sách định dạng được phép rõ ràng. Không tự cho phép định dạng mới nếu chưa có quy định.  
 * **Trạng thái upload:** Chỉ file đã upload hoàn tất và vượt qua các kiểm tra bắt buộc mới được sử dụng.  
 * **Bảo vệ đường dẫn:** Không trả object key hoặc đường dẫn storage nội bộ trong API công khai.  
 * **Xử lý file rủi ro:** File có thể chứa nội dung nguy hiểm phải được cung cấp theo cách hạn chế thực thi, chẳng hạn tải về dưới dạng attachment khi phù hợp. Server không được thực thi HTML, script hoặc macro Office từ file người dùng tải lên.  
 * **Nội dung do người dùng nhập:** Không hiển thị nội dung người dùng dưới dạng HTML không được lọc hoặc mã hóa phù hợp.  
-* **Kết quả quét file:** Trạng thái `clean` chỉ có nghĩa file đã vượt qua những bước kiểm tra đang triển khai; không đồng nghĩa đã chứng minh file hoàn toàn không có malware.  
-* **Scanner:** Nếu yêu cầu quét malware, phải có scanner được cấu hình thực tế, quy trình cách ly file và bằng chứng kiểm thử riêng. Không tuyên bố đã quét malware nếu chưa triển khai scanner.
+* **Quarantine và quét malware:** Mọi file phải ở trạng thái cách ly cho đến khi scanner malware được cấu hình thực tế trả kết quả clean. Scanner không sẵn sàng/lỗi thì file giữ pending và không được attach hoặc download; phát hiện malware chuyển rejected. `clean` chỉ biểu thị đã qua các kiểm tra được triển khai, không bảo đảm file hoàn toàn không có malware. Không tuyên bố đã scan nếu chưa tích hợp scanner.
 
 ### **Cách kiểm chứng**
 
@@ -266,7 +269,7 @@ Kiểm tra HTTPS, cookie, log, backup, secret và dependency trên đúng bản 
 | Điểm chưa chốt | Yêu cầu cần giải quyết |
 | ----- | ----- |
 | Public allow-list | Xác định chính xác field nào được phép xuất hiện trong Public Tutor Profile và Listing. |
-| Report evidence | Xác định ai được xem hoặc tải evidence, kể cả sau khi Report đã đóng. |
+| Report evidence | BR-11 đã chốt actor, permission, assignment, cửa sổ chat và chặn evidence sau khi Report đóng; còn cần chốt field masking, retention dữ liệu và DTO evidence cho resource khác message. |
 | Admin directory | Xác định phạm vi dữ liệu Admin được phép tìm kiếm và xem. |
 | Retention dữ liệu thật | Chốt thời gian lưu, điều kiện giữ lại và quy trình xóa dữ liệu. |
 | Rate limiting | Xác nhận quota và đồng bộ với D07/OpenAPI. |
