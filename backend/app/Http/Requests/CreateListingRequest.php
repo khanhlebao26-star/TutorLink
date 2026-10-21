@@ -26,7 +26,7 @@ class CreateListingRequest extends FormRequest
                 'required',
                 'integer',
                 Rule::exists('specializations', 'id')
-                    ->where(fn($query) => $query->where('status', 'active')),
+                    ->where(fn ($query) => $query->where('status', 'active')),
             ],
             'title' => ['required', 'string', 'min:3', 'max:180'],
             'description' => ['required', 'string', 'min:1'],

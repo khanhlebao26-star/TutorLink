@@ -8,6 +8,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\UpdateMeRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -18,10 +19,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
-use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 use Laravel\Fortify\Contracts\ResetsUserPasswords;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
-use App\Http\Requests\UpdatePasswordRequest;
+use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class AuthController extends Controller
 {
@@ -43,7 +43,7 @@ class AuthController extends Controller
         $data = $request->validated();
         $user = User::where('email', $data['email'])->first();
 
-        if (!$user || !Hash::check($data['password'], $user->password_hash)) {
+        if (! $user || ! Hash::check($data['password'], $user->password_hash)) {
             return response()->json(['message' => 'Invalid credentials.'], 401);
         }
 
@@ -104,7 +104,7 @@ class AuthController extends Controller
             'Invalid verification link.',
         );
 
-        if (!$user->hasVerifiedEmail()) {
+        if (! $user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
             event(new Verified($user));
         }
@@ -117,7 +117,7 @@ class AuthController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        if (!$user->hasVerifiedEmail()) {
+        if (! $user->hasVerifiedEmail()) {
             $user->sendEmailVerificationNotification();
         }
 
@@ -132,7 +132,6 @@ class AuthController extends Controller
 
         return response()->json(status: 204);
     }
-
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
@@ -152,7 +151,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'If the email exists, a reset link has been sent.']);
     }
 
-    public function resetPassword(ResetPasswordRequest $request, ResetsUserPasswords $resetter, ): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request, ResetsUserPasswords $resetter): JsonResponse
     {
         $data = $request->validated();
 
@@ -161,7 +160,7 @@ class AuthController extends Controller
 
         $status = Password::reset(
             $data,
-            function (User $user) use ($data, $resetter, &$resetUserId, ): void {
+            function (User $user) use ($data, $resetter, &$resetUserId): void {
                 $resetter->reset($user, $data);
                 $resetUserId = $user->getKey();
             },

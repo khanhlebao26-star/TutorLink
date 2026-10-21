@@ -1,11 +1,12 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         if (DB::getDriverName() === 'sqlite') {
@@ -40,7 +41,7 @@ return new class extends Migration {
 
             if ($invalidUsers->isNotEmpty()) {
                 throw new RuntimeException(
-                    'Unmapped users: ' . $invalidUsers->implode(', ')
+                    'Unmapped users: '.$invalidUsers->implode(', ')
                 );
             }
 
@@ -74,7 +75,7 @@ return new class extends Migration {
             if ($invalidProfiles->isNotEmpty()) {
                 throw new RuntimeException(
                     'Unmapped tutor profiles: '
-                    . $invalidProfiles->implode(', ')
+                    .$invalidProfiles->implode(', ')
                 );
             }
 
@@ -264,7 +265,7 @@ return new class extends Migration {
     {
         throw new RuntimeException(
             'Automatic rollback is disabled. '
-            . 'Restore the backup or use a reviewed reverse migration.'
+            .'Restore the backup or use a reviewed reverse migration.'
         );
     }
 };

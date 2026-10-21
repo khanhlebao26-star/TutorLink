@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Http\Requests\UpdateMeRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -20,7 +21,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     {
         $data = Validator::make(
             $input,
-            (new \App\Http\Requests\UpdateMeRequest)->rules(),
+            (new UpdateMeRequest)->rules(),
         )->validate();
 
         $user->update($data);

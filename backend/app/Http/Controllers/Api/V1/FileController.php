@@ -31,12 +31,12 @@ class FileController extends Controller
     {
         $data = $request->validated();
 
-        if ($data['purpose'] !== 'avatar' && !$request->user()->hasVerifiedEmail()) {
+        if ($data['purpose'] !== 'avatar' && ! $request->user()->hasVerifiedEmail()) {
             return response()->json(['message' => 'Email verification is required.'], 403);
         }
 
         $uploaded = $request->file('file');
-        $objectKey = 'uploads/' . $request->user()->id . '/' . Str::uuid() . '.' . $uploaded->extension();
+        $objectKey = 'uploads/'.$request->user()->id.'/'.Str::uuid().'.'.$uploaded->extension();
         abort_unless(Storage::disk('local')->putFileAs(dirname($objectKey), $uploaded, basename($objectKey)), 500, 'Unable to store uploaded file.');
 
         $file = File::create([
@@ -118,7 +118,7 @@ class FileController extends Controller
                     'resource_type' => $data['resource_type'],
                     'resource_id' => $data['resource_id'],
                     'purpose' => $data['purpose'] ?? null,
-                ]
+                ],
             ]);
         });
     }
@@ -133,11 +133,11 @@ class FileController extends Controller
             AdminPermissions::DOWNLOAD_VERIFICATION_DOCUMENTS,
         );
 
-        if (!$isOwner && !($isVerificationDocument && $isAuthorizedReviewer)) {
+        if (! $isOwner && ! ($isVerificationDocument && $isAuthorizedReviewer)) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
-        if (!$file->isComplete()) {
+        if (! $file->isComplete()) {
             return response()->json(['message' => 'File is not complete.'], 409);
         }
 

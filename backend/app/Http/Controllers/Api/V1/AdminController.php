@@ -21,9 +21,9 @@ class AdminController extends Controller
         $this->requirePermission($request, AdminPermissions::VIEW_TUTOR_PROFILES);
 
         $status = $request->query('status', 'submitted');
-        $allowedStatuses = ['submitted', 'changes_requested', 'approved', 'rejected', 'suspended',];
+        $allowedStatuses = ['submitted', 'changes_requested', 'approved', 'rejected', 'suspended'];
 
-        if (!in_array($status, $allowedStatuses, true)) {
+        if (! in_array($status, $allowedStatuses, true)) {
             return response()->json(['message' => 'Invalid tutor profile status.'], 422);
         }
 
@@ -32,7 +32,7 @@ class AdminController extends Controller
             ->where('status', $status)
             ->orderByDesc('submitted_at')
             ->get()
-            ->map(fn(TutorProfile $profile): array => $this->profilePayload($profile));
+            ->map(fn (TutorProfile $profile): array => $this->profilePayload($profile));
 
         return response()->json(['data' => $profiles]);
     }
@@ -195,7 +195,7 @@ class AdminController extends Controller
                 default => false,
             };
 
-            if (!$canTransition) {
+            if (! $canTransition) {
                 abort(409, 'The requested account status transition is not allowed.');
             }
 
@@ -268,7 +268,7 @@ class AdminController extends Controller
                     'files.size_bytes',
                     'files.scan_status',
                 ])
-                ->map(fn(object $document): array => [
+                ->map(fn (object $document): array => [
                     'id' => (int) $document->id,
                     'tutor_profile_id' => $profile->id,
                     'file_id' => (int) $document->file_id,

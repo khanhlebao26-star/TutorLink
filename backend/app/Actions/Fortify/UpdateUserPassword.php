@@ -4,12 +4,12 @@ namespace App\Actions\Fortify;
 
 use App\Actions\Auth\RevokeUserSessions;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
 
 class UpdateUserPassword implements UpdatesUserPasswords
 {
@@ -43,13 +43,12 @@ class UpdateUserPassword implements UpdatesUserPasswords
             ],
             'password' => $this->passwordRules(),
         ], [
-            'current_password.current_password' =>
-                __('The provided password does not match your current password.'),
+            'current_password.current_password' => __('The provided password does not match your current password.'),
         ])->validateWithBag('updatePassword');
 
         $currentSessionId = $request->session()->getId();
 
-        DB::transaction(function () use ($user, $input, $currentSessionId, ): void {
+        DB::transaction(function () use ($user, $input, $currentSessionId): void {
             $user->forceFill([
                 'password_hash' => $input['password'],
                 'remember_token' => str()->random(60),

@@ -29,7 +29,7 @@ class RegisterRequest extends FormRequest
             'date_of_birth' => [
                 'required',
                 'date',
-                'before_or_equal:' . $maxDate,
+                'before_or_equal:'.$maxDate,
             ],
             'terms_version' => ['nullable', 'string', 'max:32'],
         ];

@@ -26,7 +26,7 @@ class TutorProfileController extends Controller
             'verificationDocuments',
         ])->first();
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Tutor profile not found.'], 404);
         }
 
@@ -79,9 +79,9 @@ class TutorProfileController extends Controller
             );
 
             $avatar = $profile->avatarFile;
-            $hasDocument = $profile->verificationDocuments()->whereHas('file', fn($query) => $query
+            $hasDocument = $profile->verificationDocuments()->whereHas('file', fn ($query) => $query
                 ->where('owner_id', $user->id)->where('purpose', 'verification_document')
-                ->where('scan_status', 'clean'))->get()->contains(fn($document) => Storage::disk($document->file->disk)->exists($document->file->object_key));
+                ->where('scan_status', 'clean'))->get()->contains(fn ($document) => Storage::disk($document->file->disk)->exists($document->file->object_key));
             Validator::make([
                 'headline' => trim($profile->headline),
                 'bio' => trim($profile->bio ?? ''),
@@ -125,7 +125,7 @@ class TutorProfileController extends Controller
                 return response()->json(['message' => 'File purpose must be avatar.'], 422);
             }
 
-            if (!$file->isComplete()) {
+            if (! $file->isComplete()) {
                 return response()->json(['message' => 'File must be complete before it can be attached.'], 409);
             }
 
@@ -156,7 +156,7 @@ class TutorProfileController extends Controller
                 return response()->json(['message' => 'File purpose must be verification_document.'], 422);
             }
 
-            if (!$file->isComplete()) {
+            if (! $file->isComplete()) {
                 return response()->json(['message' => 'File must be complete before it can be attached.'], 409);
             }
 
@@ -198,6 +198,7 @@ class TutorProfileController extends Controller
                 'Only draft or changes-requested profiles can be edited.',
             );
         }
+
         return $profile;
     }
 }

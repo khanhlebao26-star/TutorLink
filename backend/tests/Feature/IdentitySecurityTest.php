@@ -29,7 +29,8 @@ class IdentitySecurityTest extends TestCase
 
         // Chạy kiểm tra CSRF thật trong môi trường test.
         $this->app->bind($middleware, function ($app) {
-            return new class ($app, $app['encrypter']) extends ValidateCsrfToken {
+            return new class($app, $app['encrypter']) extends ValidateCsrfToken
+            {
                 protected function runningUnitTests()
                 {
                     return false;
@@ -104,7 +105,7 @@ class IdentitySecurityTest extends TestCase
 
         $url = preg_replace(
             '/([?&]signature=)[^&]+/',
-            '${1}' . str_repeat('0', 64),
+            '${1}'.str_repeat('0', 64),
             $url,
         );
 
@@ -163,6 +164,6 @@ class IdentitySecurityTest extends TestCase
     private function relativeUrl(string $url): string
     {
         return parse_url($url, PHP_URL_PATH)
-            . '?' . parse_url($url, PHP_URL_QUERY);
+            .'?'.parse_url($url, PHP_URL_QUERY);
     }
 }

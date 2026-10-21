@@ -361,7 +361,7 @@ class IdentitySessionTest extends TestCase
     {
         $remember = array_filter(
             $cookies,
-            fn(string $name): bool => str_starts_with(
+            fn (string $name): bool => str_starts_with(
                 $name,
                 'remember_web_',
             ),

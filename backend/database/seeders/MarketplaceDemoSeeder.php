@@ -29,7 +29,7 @@ class MarketplaceDemoSeeder extends Seeder
             })
             ->first();
 
-        if (!$profile || !$specialization) {
+        if (! $profile || ! $specialization) {
             return;
         }
 

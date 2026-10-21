@@ -166,7 +166,7 @@ class MarketplaceCloseoutTest extends TestCase
         return ServiceListing::create([
             'tutor_profile_id' => $profile->id,
             'specialization_id' => Specialization::where('status', 'active')->firstOrFail()->id,
-            'slug' => 'closeout-' . Str::uuid(),
+            'slug' => 'closeout-'.Str::uuid(),
             'title' => 'Closeout listing',
             'description' => 'Service description',
             'delivery_mode' => 'online',

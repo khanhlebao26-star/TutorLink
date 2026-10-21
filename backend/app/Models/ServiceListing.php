@@ -17,7 +17,7 @@ class ServiceListing extends Model
 
         if (
             $user->role !== 'tutor' || $user->status !== 'active'
-            || !$user->hasVerifiedEmail() || !$profile
+            || ! $user->hasVerifiedEmail() || ! $profile
             || $profile->id !== $this->tutor_profile_id
             || $profile->status !== 'approved'
             || $this->status === 'cancelled'
@@ -61,7 +61,7 @@ class ServiceListing extends Model
             ->whereHas('tutorProfile', function (Builder $profile): void {
                 $profile
                     ->where('status', 'approved')
-                    ->whereHas('user', fn(Builder $user) => $user->where('status', 'active'));
+                    ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'));
             })
             ->whereHas('specialization', function (Builder $specialization): void {
                 $specialization
@@ -69,7 +69,7 @@ class ServiceListing extends Model
                     ->whereHas('subcategory', function (Builder $subcategory): void {
                         $subcategory
                             ->where('status', 'active')
-                            ->whereHas('category', fn(Builder $category) => $category->where('status', 'active'));
+                            ->whereHas('category', fn (Builder $category) => $category->where('status', 'active'));
                     });
             });
     }

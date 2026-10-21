@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use Laravel\Fortify\Fortify;
 use App\Models\User;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Laravel\Fortify\Fortify;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
             );
             parse_str((string) parse_url($apiUrl, PHP_URL_QUERY), $query);
 
-            return rtrim((string) config('app.frontend_url'), '/') . '/auth/verify-email?' . http_build_query([
+            return rtrim((string) config('app.frontend_url'), '/').'/auth/verify-email?'.http_build_query([
                 'id' => $user->getKey(),
                 'hash' => sha1($user->getEmailForVerification()),
                 'expires' => $query['expires'],
@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         ResetPassword::createUrlUsing(function (User $user, string $token): string {
-            return rtrim((string) config('app.frontend_url'), '/') . '/auth/reset-password?' . http_build_query([
+            return rtrim((string) config('app.frontend_url'), '/').'/auth/reset-password?'.http_build_query([
                 'token' => $token,
                 'email' => $user->getEmailForPasswordReset(),
             ]);
@@ -58,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
             $email = Str::transliterate(Str::lower((string) $request->input('email')));
 
             return [
-                Limit::perMinute(5)->by($email . '|' . $request->ip()),
+                Limit::perMinute(5)->by($email.'|'.$request->ip()),
                 Limit::perMinute(20)->by($request->ip()),
             ];
         });

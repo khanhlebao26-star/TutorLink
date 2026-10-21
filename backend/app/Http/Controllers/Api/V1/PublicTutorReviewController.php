@@ -22,7 +22,7 @@ class PublicTutorReviewController extends Controller
         $profile = TutorProfile::query()
             ->where('public_slug', $slug)
             ->where('status', 'approved')
-            ->whereHas('user', fn(Builder $user) => $user->where('status', 'active'))
+            ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'))
             ->firstOrFail();
 
         // Completed is intentionally not produced by the current Program lifecycle.
@@ -64,7 +64,7 @@ class PublicTutorReviewController extends Controller
             ->paginate($filters['per_page'] ?? 5);
 
         return response()->json([
-            'data' => collect($reviews->items())->map(fn($review) => [
+            'data' => collect($reviews->items())->map(fn ($review) => [
                 'id' => (int) $review->id,
                 'author_name' => $review->author_name,
                 'rating' => (int) $review->rating,

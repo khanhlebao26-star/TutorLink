@@ -20,7 +20,7 @@ class AvailabilityRuleController extends Controller
             ->orderBy('weekday')
             ->orderBy('start_time')
             ->get()
-            ->map(fn($rule) => [
+            ->map(fn ($rule) => [
                 'id' => $rule->id,
                 'weekday' => $rule->weekday,
                 'start_time' => substr((string) $rule->start_time, 0, 5),

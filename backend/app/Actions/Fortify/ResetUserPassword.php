@@ -2,12 +2,12 @@
 
 namespace App\Actions\Fortify;
 
+use App\Actions\Auth\RevokeUserSessions;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\ResetsUserPasswords;
-use App\Actions\Auth\RevokeUserSessions;
-use Illuminate\Support\Facades\DB;
 
 class ResetUserPassword implements ResetsUserPasswords
 {

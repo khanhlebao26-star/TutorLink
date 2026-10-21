@@ -221,7 +221,7 @@ class MarketplaceApiTest extends TestCase
         return ServiceListing::create(array_merge([
             'tutor_profile_id' => $profile->id,
             'specialization_id' => $specialization->id,
-            'slug' => 'listing-' . Str::lower(Str::random(8)),
+            'slug' => 'listing-'.Str::lower(Str::random(8)),
             'title' => 'Test listing',
             'description' => 'Test listing description.',
             'delivery_mode' => 'online',

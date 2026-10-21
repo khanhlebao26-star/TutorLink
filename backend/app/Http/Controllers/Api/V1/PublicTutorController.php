@@ -16,7 +16,7 @@ class PublicTutorController extends Controller
             ->where('status', 'approved')
             ->whereHas(
                 'user',
-                fn(Builder $user) => $user->where('status', 'active'),
+                fn (Builder $user) => $user->where('status', 'active'),
             )
             ->with([
                 'user:id,full_name',
