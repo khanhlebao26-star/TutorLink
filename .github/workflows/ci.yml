@@ -30,6 +30,8 @@ jobs:
       run:
         working-directory: backend
     env:
+      APP_NAME: TutorLink
+      SESSION_COOKIE: tutorlink-session
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
