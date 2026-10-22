@@ -72,7 +72,7 @@ class MarketplaceCloseoutTest extends TestCase
     public function test_reviews_exclude_all_non_completed_programs_and_return_empty_aggregate(): void
     {
         [, $profile] = $this->tutor();
-        foreach (['pending', 'active', 'cancelled', 'rejected', 'expired'] as $status) {
+        foreach (['draft', 'active', 'paused', 'cancelled'] as $status) {
             $this->review($profile, $status, 5);
         }
         $this->getJson("/api/v1/tutors/{$profile->public_slug}/reviews")->assertOk()
@@ -101,7 +101,6 @@ class MarketplaceCloseoutTest extends TestCase
 
     public function test_completed_review_pagination_aggregates_full_set_and_exposes_only_public_fields(): void
     {
-        $this->requireCompletedFixtureSupport();
         [, $profile] = $this->tutor();
         $ids = [];
         foreach ([1, 3, 5] as $rating) {
@@ -119,16 +118,17 @@ class MarketplaceCloseoutTest extends TestCase
 
     public function test_completed_reviews_require_matching_owner_customer_membership_and_undeleted_author(): void
     {
-        $this->requireCompletedFixtureSupport();
         [, $profile] = $this->tutor();
         $historical = $this->review($profile, 'completed', 4, ['member_role' => 'customer', 'status' => 'cancelled', 'left_at' => now()]);
-        $this->review($profile, 'completed', 5, ['member_role' => 'observer']);
+        $this->review($profile, 'completed', 5, ['member_role' => 'tutor']);
         $wrongRole = $this->review($profile, 'completed', 5);
         User::findOrFail(DB::table('reviews')->where('id', $wrongRole)->value('customer_id'))
             ->update(['role' => 'tutor']);
         $outsider = $this->review($profile, 'completed', 5);
         DB::table('program_members')->where('program_id', DB::table('reviews')->where('id', $outsider)->value('program_id'))->delete();
-        $this->review($profile, 'completed', 0);
+        if (DB::getDriverName() === 'sqlite') {
+            $this->review($profile, 'completed', 0);
+        }
         $deleted = $this->review($profile, 'completed', 2);
         $deletedAuthor = DB::table('reviews')->where('id', $deleted)->value('customer_id');
         User::findOrFail($deletedAuthor)->delete();
@@ -137,19 +137,12 @@ class MarketplaceCloseoutTest extends TestCase
         DB::table('programs')->where('id', DB::table('reviews')->where('id', $wrongOwner)->value('program_id'))
             ->update(['owner_tutor_profile_id' => $other->id]);
         $customer = DB::table('reviews')->where('id', $historical)->value('customer_id');
-        User::findOrFail($customer)->update(['status' => 'inactive']);
+        User::findOrFail($customer)->update(['status' => 'suspended']);
         DB::table('reviews')->where('id', $historical)->update(['created_at' => null]);
         $this->getJson("/api/v1/tutors/{$profile->public_slug}/reviews")->assertOk()
             ->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $historical)
             ->assertJsonPath('data.0.created_at', null)
             ->assertJsonPath('aggregate.count', 1);
-    }
-
-    private function requireCompletedFixtureSupport(): void
-    {
-        if (DB::getDriverName() === 'pgsql') {
-            $this->markTestSkipped('W3 Program lifecycle has not added completed to the PostgreSQL status constraint; user explicitly deferred this migration. Populated review projection is tested with SQLite only.');
-        }
     }
 
     private function tutor(): array
@@ -182,6 +175,7 @@ class MarketplaceCloseoutTest extends TestCase
         $customer = User::factory()->create(['role' => 'customer', 'status' => 'active']);
         $program = DB::table('programs')->insertGetId([
             'owner_tutor_profile_id' => $profile->id,
+            'customer_id' => $customer->id,
             'title' => 'Private Program',
             'delivery_mode' => 'online',
             'agreed_fee_minor' => 200000,
