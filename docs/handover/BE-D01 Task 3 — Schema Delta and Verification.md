@@ -16,6 +16,8 @@
 
 After the user's explicit approval, the three Task 3 migrations were applied individually to live `tutorlink` on 2026-10-22 at 08:24 UTC (15:24 Asia/Ho_Chi_Minh). They were recorded in batches 4, 5, and 6. The unrelated older migrations were not run. The preceding status-alignment migration remains present on live. Three older migrations remain Pending: public tutor slug, two-factor columns, and passkeys.
 
+**Status update after Task 4 (2026-10-22):** The two-factor and Passkeys schema migrations were later applied individually as approved prerequisites for Task 4 (batches 7 and 8). The public tutor-slug migration remains Pending because it backfills existing Tutor Profile rows. The Task 3 deployment and its backup record below remain historical and unchanged; see [Task 4 handover](BE-D01-Task-4-Database-Conventions.md) for the subsequent backup and schema rollout.
+
 ## Migrations
 
 ### Admin Assignment
@@ -58,7 +60,7 @@ Legacy guard evidence: a separate disposable PostgreSQL database was seeded with
 - Legacy Submission guard DB: `tutorlink_task3_legacy_guard_test_20261022`. The expected preflight failure preserved the synthetic legacy row and left the schema unchanged.
 - Focused feature tests: `Task3SchemaDeltaTest` passed **3 tests, 22 assertions** on PostgreSQL (`tutorlink_task3_phpunit_test_20261022`) and **3 tests, 19 assertions** on SQLite `:memory:`. PostgreSQL constraint failures run inside savepoints so later assertions can continue in the same test transaction.
 - Live deployment verification: `migrate:status` shows all three Task 3 migrations Ran. PostgreSQL introspection confirms the expected columns, foreign keys, checks, unique constraints, queue indexes, and partial worker index. There are 18 tutor profiles (7 `draft`, 11 `submitted`); all 18 retain null assignment fields and `assignment_version = 0`. Live currently has 0 reports, notifications, outbox rows, tasks, and task submissions. Because live notifications were empty, no legacy notification rows required backfill.
-- Fresh live backup: `/tmp/tutorlink_pre_task3_live_20261022.dump`, 138 KB, custom-format archive; `pg_restore -l` succeeded. SHA-256: `1a509dd486a3a8f764602dbc7ec65ae105ff0d7dfcb21867eb08d9c4de399fba`.
+- Fresh live backup before Task 3: `/tmp/tutorlink_pre_task3_live_20261022.dump`, 140,926 bytes (about 138 KB), custom-format archive; `pg_restore -l` succeeded. The file remains present and its SHA-256 still matches: `1a509dd486a3a8f764602dbc7ec65ae105ff0d7dfcb21867eb08d9c4de399fba`. This is the Task 3 pre-deployment snapshot; the separate Task 4 pre-change backup is recorded in the Task 4 handover.
 - PHP syntax checks passed for the three migration files and feature test. `git diff --check` passed.
 - Full backend suite on SQLite: **99 passed, 8 skipped, 3 failed**. The failures were two age-boundary assertions comparing a date-only value with SQLite's date-time representation, plus `ExampleTest` requiring a `sessions` table without refreshing/migrating the database. The focused Task 3 tests pass; these three failures are outside the Task 3 schema changes.
 
