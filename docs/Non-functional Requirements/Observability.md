@@ -73,7 +73,7 @@ Customer chấp nhận Invitation nhưng request bị lỗi. Người phát tri�
 * Request ID không hợp lệ được xử lý an toàn, không thể lợi dụng để chèn dòng log.  
 * Quy ước header và các trường lỗi phải thống nhất với tài liệu API D03.
 
-Các trường này là yêu cầu đề xuất; không mặc định rằng API handler hiện tại đã hỗ trợ đầy đủ.
+Header `X-Request-ID` và error request_id đã chốt tại BR-26; trace API→transaction→job/outbox theo cùng request_id là implementation gap, chưa xác nhận runtime hỗ trợ đầy đủ.
 
 ## OB-02 \- Bảo vệ dữ liệu nhạy cảm trong log
 
@@ -94,9 +94,9 @@ Việc che dữ liệu nhạy cảm (*redaction*) phải áp dụng cho tất c�
 Thời hạn lưu trữ được đề xuất:
 
 * Log phục vụ vận hành: 30 ngày.  
-* Audit nghiệp vụ: tối thiểu 180 ngày theo baseline SP-09.
+* Audit nghiệp vụ: 24 tháng theo BR-25.
 
-Đây là thời hạn đề xuất cần được xác nhận và cấu hình, không phải bằng chứng cho thấy hệ thống hiện đã áp dụng.
+Log vận hành 30 ngày là đề xuất riêng; thời hạn Audit 24 tháng đã chốt tại BR-25. Cả hai cần được cấu hình và chưa phải bằng chứng runtime đã áp dụng.
 
 **Điều kiện nghiệm thu**
 
@@ -184,7 +184,7 @@ Các endpoint health check không được trả về credential, stack trace ho
 
 Hệ thống cần tự động cảnh báo cho người vận hành khi các chỉ số vượt ngưỡng đã đặt.
 
-Các ngưỡng được đề xuất:
+Các ngưỡng được xác định như sau (trạng thái phê duyệt ghi ngay dưới bảng):
 
 | Điều kiện | Ngưỡng cảnh báo |
 | ----- | ----- |
@@ -193,10 +193,10 @@ Các ngưỡng được đề xuất:
 | API phản hồi chậm | p95 trên 2 giây trong 10 phút, với đủ số lượng mẫu |
 | Database hoặc storage | Mức sử dụng đạt từ 80% |
 | Worker | Không có heartbeat trong hơn 60 giây |
-| Outbox | Sự kiện chờ lâu nhất quá 120 giây khi worker đang hoạt động |
+| Outbox | Có sự kiện failed hoặc pending quá 5 phút (BR-25) |
 | Outbox Event | Có sự kiện mới chuyển sang trạng thái thất bại |
 
-Đây là các ngưỡng đề xuất để bắt đầu giám sát. Cần xác nhận chúng phù hợp với tải thực tế của TutorLink trước khi dùng làm tiêu chí chính thức.
+Các ngưỡng probe/API/worker trong bảng là baseline vận hành cần theo dõi và hiệu chỉnh bằng telemetry; ngưỡng Outbox 5 phút và storage 80% đã chốt tại BR-25/PC-08. Chỉ coi target đạt khi có bằng chứng runtime.
 
 **Điều kiện nghiệm thu**
 
@@ -307,17 +307,17 @@ Không cần mở trang Admin Metrics đang chờ phê duyệt chỉ để đáp
 
 Log kỹ thuật, Audit nghiệp vụ và dữ liệu kiểm thử là ba loại bằng chứng riêng biệt. Có đầy đủ một loại không có nghĩa là đã đáp ứng hai loại còn lại.
 
-# 4\. Phụ thuộc và điểm chưa chốt
+# 4. Hạng mục vận hành còn lại
 
-Các nội dung sau là yêu cầu bổ sung, cần được xác nhận trước khi trở thành tiêu chí chính thức:
+Các nội dung vận hành chưa chốt riêng, không thuộc năm nhóm đã đóng:
 
 * Ngưỡng cảnh báo.  
 * Cách truyền `request_id` qua API, transaction, job và Outbox.  
 * Thời gian lưu log vận hành.  
 * Cơ chế heartbeat cho worker và scheduler.
 
-D03, D19 và D20 còn các nội dung cần đồng bộ về header, hành động và thời hạn lưu trữ. Không công khai endpoint Audit hoặc evidence ngoài phạm vi quyền truy cập chỉ để thuận tiện cho việc tìm lỗi
+BR-25 chốt ngưỡng và retention outbox/audit; BR-26 chốt request ID/error envelope. Các ngưỡng cảnh báo còn lại phải lấy từ OB-05 và được đo/hiệu chỉnh theo môi trường. Không công khai endpoint Audit hoặc evidence ngoài phạm vi quyền truy cập chỉ để thuận tiện cho việc tìm lỗi.
 
-Đồng bộ trạng thái NFR 18/10/2026: mục ghi Nguồn giữ quyết định đã có; mọi Bổ sung NFR/đề xuất chưa có xác nhận vẫn Proposed, chưa dùng đơn lẻ để pass/fail G4. Trước khi áp dụng, ghi mã yêu cầu, giá trị, owner/approver, ngày xác nhận, test/evidence và phụ thuộc Dxx trong chính phần yêu cầu hoặc Lịch sử làm việc hiện có. Nếu thiếu xác nhận thì giữ Pending; không suy phê duyệt từ từ “phải” trong mục nghiệm thu, không dùng NFR mới để tự mở lại quyết định đã chốt. Chỉ nghiệm thu phạm vi và môi trường đã được duyệt; không đồng nhất G4 trình diễn với production thực tế.
+Các target tại NFR được chấp nhận trong phạm vi đã nêu ngày 21/10/2026; mục tiêu đã duyệt chưa phải bằng chứng runtime đạt. Chỉ cập nhật trạng thái đạt khi có kiểm thử/evidence trên môi trường xác định.
 
 .

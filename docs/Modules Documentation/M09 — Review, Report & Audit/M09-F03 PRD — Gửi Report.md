@@ -13,22 +13,23 @@ Người dùng đăng nhập báo cáo tài nguyên thuộc allow-list để Adm
 * Reporter chỉ gửi report cho resource tồn tại và resource type được phép; không dùng Report để đọc resource private.  
 * Một report không làm resource tự động ẩn/đình chỉ; moderation là quyết định riêng theo permission.  
 * Mọi quyết định/đổi trạng thái cần reason và audit.
+* Mỗi reporter chỉ có tối đa một Report `open` cho cùng `resource_type/resource_id`; gửi lại cùng Idempotency-Key trả kết quả đã lưu, còn gửi key mới khi đã có Report open trả 409. Sau Report đóng, có thể gửi Report mới cho resource đó.
+* Quota tối đa 10 Report/người/giờ và 30 Report/người/ngày. Vượt quota trả 429 cùng `Retry-After`; retry cùng Idempotency-Key đã ghi nhận không tính quota lần nữa.
+* `description` tối đa 2.000 ký tự. Khi `reason_code=other`, description bắt buộc có ký tự không phải khoảng trắng; lý do khác được để null hoặc lược bỏ.
 
 # 3\. Tiêu chí chấp nhận
 
 * Resource/reason code trong allow-list tạo Report open.  
 * Unknown type/id hoặc user không đủ quyền bị từ chối mà không rò rỉ resource.  
 * Public response không lộ reporter identity hoặc evidence private.  
-* Duplicate, rate limit và report cùng resource policy được thực thi sau khi Product chốt.
+* Duplicate, quota, giới hạn description và Report open trên cùng resource tuân các quy tắc trên.
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* `message` là ReportResourceType; `conversation` không phải resource type được report. BR-11 đã chốt chỉ Admin active có `admin.reports.view`, assignment hiện tại và Report `open` được đọc message bị báo cáo cùng tối đa 10 tin trước/5 tin sau trong đúng Conversation; mỗi lần đọc phải audit, Report đóng hoặc đổi assignment thì ngừng quyền evidence. M09-F04/M04-F08 mô tả chi tiết; field masking và retention vẫn cần đặc tả riêng.
-* Chốt report duplicate policy, giới hạn `description` và rate limit. Quyền gửi thuộc Customer/Tutor đã đăng nhập theo Roles & Actors; guest không được gửi Report.
+* `message` là ReportResourceType; `conversation` không phải resource type được report. BR-11/BR-24 chốt chỉ Admin active có `admin.reports.view`, assignment hiện tại và Report `open` được đọc evidence allow-list; với message chỉ gồm message bị báo cáo cùng tối đa 10 tin trước/5 tin sau trong đúng Conversation. Mỗi lần đọc phải audit; đóng Report hoặc đổi assignment thì ngừng quyền evidence. M09-F04/M04-F08 mô tả chi tiết.
+* Quyền gửi thuộc Customer/Tutor đã đăng nhập theo Roles & Actors; guest không được gửi Report. Các giới hạn trên đã chốt ngày 21/10/2026; API còn phải triển khai.
 * Report API chưa có trong repo.
 
 # 5\. Nguồn
 
 Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-06 Review và moderation. Link nguồn: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit · https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit · https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit · https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit
-
-Khi `reason_code=other`, API yêu cầu `description` là chuỗi có ít nhất một ký tự không phải khoảng trắng; thiếu/null/rỗng/toàn khoảng trắng trả 422. Với lý do khác, `description` tùy chọn và có thể null. Cột lưu trữ vẫn là `reports.details`; không tạo thêm cột `description`. Giới hạn độ dài và duplicate policy còn chờ chốt; không mở thêm reason/resource type.

@@ -11,7 +11,7 @@ Có hai loại yêu cầu:
 * **Nguồn:** Yêu cầu đã có trong các tài liệu của dự án.  
 * **Bổ sung NFR:** Mục tiêu hoặc cách kiểm tra được đề xuất thêm. Những nội dung này chưa có nghĩa là hệ thống đã triển khai hoặc đã đạt được.
 
-Những quy tắc nghiệp vụ đang được đánh dấu là cần làm rõ hoặc chưa được phê duyệt trong OpenAPI vẫn phải được xác nhận trước khi áp dụng chính thức.
+Các quyết định nghiệp vụ hiện hành nằm trong Business Rules/PRD; OpenAPI sinh từ code chỉ xác nhận route đã đăng ký, không phải cơ chế phê duyệt nghiệp vụ.
 
 **Mục tiêu chính:**
 
@@ -125,6 +125,8 @@ Người dùng có thể bấm nút nhiều lần, mất kết nối hoặc gử
 * Key được giữ theo vòng đời version liên quan, không tự áp dụng thời hạn xóa chung cho mọi loại yêu cầu.  
 * Trước khi trả về kết quả của một yêu cầu đã xử lý, hệ thống vẫn phải kiểm tra quyền truy cập và trạng thái nghiệp vụ.
 
+Đối với command chưa có replay policy riêng, D08 được chốt ngày 21/10/2026: Idempotency-Key UUID; unique theo actor và key; lưu method, path, hash payload canonical, status/body response và thời điểm hết hạn trong PostgreSQL. Canonical payload được xác định sau validation theo quy tắc field của endpoint; JSON dùng RFC 8785, chuỗi không chuẩn hóa Unicode, newline chỉ chuẩn hóa nếu endpoint quy định, file IDs được sắp tăng dần khi thứ tự không có ý nghĩa. `expected_version` là một phần payload. Cùng actor/key/method/path/hash trả response đã lưu sau khi kiểm quyền hiện tại; cùng key nhưng request khác trả 409. Transaction đồng thời chỉ cho một command tạo tác động. Giữ receipt 30 ngày; sau hết hạn xóa receipt, còn state/version/unique constraints vẫn kiểm soát lệnh mới. Submission D13, Messaging BR-21 và Fee BR-22 tiếp tục theo policy riêng.
+
 **Điều kiện nghiệm thu**
 
 Các trường hợp sau không được tạo thêm bản ghi, version hoặc tác động nghiệp vụ ngoài ý muốn:
@@ -134,7 +136,7 @@ Các trường hợp sau không được tạo thêm bản ghi, version hoặc t
 * Người dùng kết nối lại và gửi lại yêu cầu.  
 * Hai yêu cầu có cùng Idempotency Key được gửi đồng thời.
 
-**Lưu ý:** D08 tiếp tục mở cho các command chưa có policy riêng. Messaging có replay theo BR-21, Fee Record theo BR-22 và Submission theo D13; các rule riêng này không tự hoàn tất thiết kế idempotency dùng chung.
+**Lưu ý:** D08 đã được chốt; các policy riêng của Messaging BR-21, Fee BR-22 và Submission D13 vẫn được ưu tiên cho đúng nhóm command đó.
 
 ## RR-05 \- Outbox và worker xử lý tác vụ nền
 
@@ -153,7 +155,7 @@ Các quy tắc cần đảm bảo:
 * Ràng buộc UNIQUE(user\_id, type, event\_key) giúp ngăn tạo notification trùng.  
 * Khi worker bị dừng hoặc khởi động lại, các sự kiện chưa xử lý vẫn phải được giữ lại.
 
-**Chính sách thử lại được đề xuất**
+**Chính sách thử lại đã chốt ngày 21/10/2026**
 
 * Khoảng thời gian giữa các lần thử tăng dần và có thêm độ ngẫu nhiên (*backoff with jitter*) để tránh nhiều worker thử lại cùng lúc.  
 * Khoảng cách tối đa giữa các lần thử là 5 phút.  
@@ -161,7 +163,7 @@ Các quy tắc cần đảm bảo:
 * Ghi lại failed\_at và mã lỗi an toàn để hỗ trợ điều tra.  
 * Giữ bản ghi thất bại để người vận hành có thể kiểm tra và xử lý lại khi cần.
 
-Đây là chính sách đề xuất cho D19, chưa phải hành vi đã được triển khai và xác nhận của hệ thống.
+Sau ngưỡng, giữ hàng failed để operator kiểm tra. Replay operator dùng event_key cũ, yêu cầu quyền phù hợp, reason và audit; UNIQUE(user_id,type,event_key) ngăn tạo notification trùng. Cảnh báo khi có hàng failed hoặc hàng pending lâu hơn 5 phút. Retention đã chốt: xóa outbox processed sau 30 ngày; giữ failed cho tới khi xử lý rồi thêm 90 ngày; giữ notification 180 ngày; giữ Audit 24 tháng. Đây là chính sách thiết kế đã được Product/nhóm duyệt ngày 21/10/2026, chưa khẳng định runtime đã triển khai.
 
 ## RR-06 \- Sao lưu và khôi phục dữ liệu
 
@@ -272,11 +274,11 @@ Sau khi khôi phục:
 
 **Lưu ý kỹ thuật:** Unit test hoặc test bằng SQLite không đủ để chứng minh các hành vi phụ thuộc vào khóa đồng thời, unique partial index và SKIP LOCKED của PostgreSQL. Những trường hợp này cần được kiểm thử trên PostgreSQL.
 
-# 4\. Phụ thuộc và điểm chưa chốt
+# 4. Implementation gaps và chính sách reliability độc lập
 
 * Mục tiêu hoạt động 99% mỗi tháng được lấy từ tài liệu Product.  
 * Cách đo availability, RPO/RTO, lịch sao lưu, thời gian dọn tệp chưa liên kết và giới hạn thử lại là các yêu cầu NFR được đề xuất bổ sung.  
-* Chính sách lưu giữ chứng cứ và lịch sử vẫn cần được làm rõ. Không áp dụng cơ chế dọn tệp chưa liên kết cho các tệp đã được gắn với dữ liệu nghiệp vụ hoặc cần lưu giữ.  
-* Các vấn đề còn mở trong D08, D19 và D20 phải có quyết định rõ ràng trước khi phát hành những chức năng phụ thuộc vào chúng  
-* Đồng bộ trạng thái NFR 18/10/2026: mục ghi Nguồn giữ quyết định đã có; mọi Bổ sung NFR/đề xuất chưa có xác nhận vẫn Proposed, chưa dùng đơn lẻ để pass/fail G4. Trước khi áp dụng, ghi mã yêu cầu, giá trị, owner/approver, ngày xác nhận, test/evidence và phụ thuộc Dxx trong chính phần yêu cầu hoặc Lịch sử làm việc hiện có. Nếu thiếu xác nhận thì giữ Pending; không suy phê duyệt từ từ “phải” trong mục nghiệm thu, không dùng NFR mới để tự mở lại quyết định đã chốt. Chỉ nghiệm thu phạm vi và môi trường đã được duyệt; không đồng nhất G4 trình diễn với production thực tế.  
+* Retention Report/Audit evidence đã chốt tại BR-24/BR-25; retention của resource nguồn và tệp liên kết tiếp tục theo policy resource tương ứng. Không áp dụng cơ chế dọn tệp chưa liên kết cho tệp đã gắn với dữ liệu nghiệp vụ hoặc cần lưu giữ.
+* D08, D19 và D20 đã có policy đích trong RR-04, RR-05 và M09-F05; việc triển khai và đo kiểm vẫn là implementation gap.
+* Các Bổ sung NFR được chốt ngày 21/10/2026 là mục tiêu nghiệm thu, không phải bằng chứng hệ thống đã đạt. Chỉ báo cáo đạt khi có số liệu/evidence trên môi trường và tải đã nêu.
 * .

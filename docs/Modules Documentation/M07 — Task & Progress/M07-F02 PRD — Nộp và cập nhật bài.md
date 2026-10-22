@@ -31,7 +31,7 @@ Customer được giao Task nộp nội dung hoặc tệp và cập nhật bài 
 # 4\. Chênh lệch/câu hỏi mở
 
 * Đã chốt cho submission: lưu idempotency\_key và SHA-256 của request đã validation/canonicalize trên task\_submissions; phạm vi UNIQUE(task\_id,customer\_id,idempotency\_key), giữ khóa cùng lịch sử version, không TTL khi Submission còn được lưu. Quyền/assignment được kiểm trước replay. Key mới phải gửi expected\_submission\_version hiện tại; stale trả 409 và không tạo version. Task version tăng cùng transaction khi submission làm đổi Task state theo BR-19.
-* Schema đích cần idempotency\_key, request\_hash và unique constraint tương ứng. Tạo Submission version mới, current pointer, Task state và liên kết file trong một transaction. Cấu trúc hash và giới hạn đã chốt tại BR-20; generic replay store/retention D08 vẫn là câu hỏi riêng, không ảnh hưởng retention D13 theo vòng đời Submission.
+* Schema đích cần idempotency\_key, request\_hash và unique constraint tương ứng. Tạo Submission version mới, current pointer, Task state và liên kết file trong một transaction. Cấu trúc hash và giới hạn đã chốt tại BR-20; D08 đã chốt ở BR-23 cho command khác và không thay retention D13 theo vòng đời Submission.
 
 # 5\. Nguồn
 

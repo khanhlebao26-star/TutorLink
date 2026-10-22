@@ -104,6 +104,11 @@ Request
 | BR-20 | Quy ước Workspace | Dùng `Program.timezone` (mặc định `Asia/Ho_Chi_Minh`), lưu instant UTC và API timestamp RFC 3339. Summary chọn latest/next theo thứ tự xác định; Progress là số nguyên 0–100. Payload, file và validation theo giới hạn trong BR-20. |
 | BR-21 | Messaging & Files | Chỉ member được đọc Conversation; gửi tin cần kiểm tra trạng thái/quota/idempotency. Message tối đa 4.000 ký tự; 30 tin mới/phút/người dùng. File phải đúng owner/purpose, private, qua kiểm tra size/MIME/checksum và malware scan trước khi dùng. |
 | BR-22 | Fee Record | Mỗi Program/tháng tối đa một record; chỉ tạo khi Program Active, trong khoảng từ tháng kích hoạt đến tháng hiện tại. `0` là miễn phí, khác với chưa khai báo. Thay tiền/void cần reason + audit; record là khai báo của Tutor, không phải bằng chứng thanh toán. |
+| BR-23 | Idempotency dùng chung | Command có Idempotency-Key dùng UUID; cùng actor/key và cùng method/path/canonical payload replay response đã lưu, payload khác trả 409. JSON canonical theo RFC 8785, không Unicode-normalize; giữ 30 ngày. Submission, Messaging và Fee Record tiếp tục theo policy riêng. |
+| BR-24 | Review, Report và evidence | Review: rating 1–5, comment tùy chọn tối đa 2.000 ký tự. Report: một Report open cho mỗi reporter/resource, description tối đa 2.000 ký tự; quota 10/giờ và 30/ngày; duplicate open khác idempotency key trả 409. Evidence theo allow-list, chỉ khi Report open và assignment hiện tại; Report/decision 24 tháng, audit 24 tháng. |
+| BR-25 | Outbox và audit | Outbox retry tối đa 10 lần hoặc 60 phút; cảnh báo failed hoặc pending >5 phút; replay thủ công giữ event_key và cần quyền/reason/audit. Processed 30 ngày; failed đến khi giải quyết +90 ngày; Notification 180 ngày; Audit 24 tháng. Audit append-only với action catalog/DTO allow-list tại M09-F05. |
+| BR-26 | Chuẩn API/NFR | API dùng error envelope `{code,message,request_id,errors?}`, request ID `X-Request-ID`, timestamp UTC RFC 3339, tiền VND là integer. Trang mặc định 20, tối đa 50; ngoại lệ theo route được ghi trong Catalog. Quota mục tiêu được chốt tại SP-04; mục tiêu hiệu năng/tải được chấp nhận ngày 21/10/2026 là target nghiệm thu, chưa phải bằng chứng đạt. |
+| BR-27 | Admin directory và metrics | `admin.users.view` chỉ tra cứu exact user_id hoặc email chuẩn hóa chính xác trong hỗ trợ; danh sách chỉ Admin active đủ quyền giao việc, DTO tối thiểu. `admin.users.update` chỉ sửa full_name với reason/audit; không sửa role/email/DOB/password/status. `admin.metrics.view` chỉ aggregate, không trả row cá nhân/private content. |
 
 ## Ma trận truy vết
 
@@ -123,6 +128,11 @@ Request
 | BR-20 | M06-F01/F02, M07-F02/F03/F04, M08-F01/F02, M10-F01/F03, WF05, Database Design |
 | BR-21 | M04-F02/F04/F06/F07, M10-F01/F02/F03/F04/F05, WF03, Security & Privacy, State Lifecycles, Database Design |
 | BR-22 | M08-F01/F03, WF05, Enum Catalog, Domain Model, State Lifecycles, Database Design, API Route Catalog |
+| BR-23 | Reliability & Recovery, API Route Catalog, Database Design |
+| BR-24 | M09-F01–F04, Security & Privacy, API Route Catalog, Database Design |
+| BR-25 | M08-F03, M09-F05, Observability, Database Design |
+| BR-26 | API Route Catalog, Performance & Capacity, Security & Privacy |
+| BR-27 | M09-F04, M03-F10, Enum Catalog, API Route Catalog |
 
 ## Trạng thái triển khai
 

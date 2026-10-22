@@ -360,6 +360,9 @@
 * admin.tutor\_profiles.assign \= Giao/chuyển/thu hồi người phụ trách hồ sơ Tutor;   
 * admin.reports.assign \= Giao/chuyển/thu hồi người phụ trách Report;
 * admin.listings.moderate \= Ẩn/gỡ moderation hold của mọi Listing trong MVP; không dùng assignment Report/Listing;
+* admin.users.view \= Tra cứu user theo scope hỗ trợ và danh sách Admin đủ điều kiện phân công;
+* admin.users.update \= Sửa full_name allow-list, bắt buộc reason/audit;
+* admin.metrics.view \= Đọc metrics tổng hợp, không có dữ liệu cá nhân;
 
 **48 AdminTutorProfileAction**
 

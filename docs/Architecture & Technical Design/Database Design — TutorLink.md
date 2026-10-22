@@ -1,5 +1,7 @@
 # Database Design — TutorLink
 
+Tài liệu mô tả 43 bảng của **thiết kế đích** sau các business rule đã chốt. Cột/bảng ghi “chưa có migration” cần được triển khai trong issue database; sơ đồ draw.io cùng tên phải phản ánh thiết kế đích này. Không suy rằng mọi bảng/cột bên dưới đã tồn tại trong runtime. Riêng `users.terms_accepted_at` bắt buộc cho đăng ký mới; trước khi áp ràng buộc NOT NULL cho toàn bảng phải có phương án lấy lại đồng ý hoặc backfill có bằng chứng đối với tài khoản cũ.
+
 # 01\. Tài khoản và hồ sơ
 
 ### **Bảng users**
@@ -96,9 +98,47 @@ public\_slug — varchar(180); NULL; UK.
 
 status\_before\_suspension — varchar(20); NULL; đề xuất thêm.
 
+qualification\_claims — jsonb; NOT NULL; mặc định: []; danh sách claim có cấu trúc `type` (`degree`/`certificate`), tên claim và thông tin hiển thị được allow-list; không chứa file hoặc nội dung giấy tờ.
+
+assigned\_admin\_id — bigint; NULL; FK users.id; Admin hiện được giao xử lý.
+
+assigned\_by — bigint; NULL; FK users.id; Admin đổi assignment gần nhất.
+
+assigned\_at — timestamptz; NULL.
+
+assignment\_version — integer; NOT NULL DEFAULT 0; tăng khi giao/chuyển/thu hồi.
+
 Quy tắc D06 đã chốt: server tạo `public_slug` một lần khi tạo Tutor Profile từ tên và hậu tố ID duy nhất; đổi tên hiển thị không đổi slug. Không cần bảng alias/redirect slug trong MVP. Unique constraint ngăn trùng; chỉ hồ sơ đủ public gate mới được tra cứu qua slug.
 
-BR-16 yêu cầu lưu bản sửa của Profile approved tách khỏi dữ liệu công khai. Schema đích cần `tutor_profile_revisions` gắn `tutor_profile_id`, `revision_no`, payload các trường được sửa, trạng thái `draft/submitted/changes_requested/approved/rejected`, người/thời điểm/lý do quyết định và version; chỉ một revision chưa đóng cho mỗi Profile. Duyệt revision phải kiểm version và thay dữ liệu công khai cùng transaction; request-changes/reject giữ bản approved cũ. Qualification claims phải là dữ liệu có cấu trúc để xác định degree/certificate bắt buộc; không suy từ headline/bio. Migration/DTO cụ thể chưa có trong runtime.
+BR-16 yêu cầu lưu bản sửa của Profile approved tách khỏi dữ liệu công khai. Duyệt revision phải kiểm version và thay dữ liệu công khai cùng transaction; request-changes/reject giữ bản approved cũ. `qualification_claims` là dữ liệu có cấu trúc để xác định degree/certificate bắt buộc; không suy từ headline/bio. Migration/DTO cụ thể chưa có trong runtime.
+
+### Bảng tutor\_profile\_revisions — target BR-16, chưa có migration
+
+id — bigint; NOT NULL; PK.
+
+tutor\_profile\_id — bigint; NOT NULL; FK tutor\_profiles.id.
+
+revision\_no — integer; NOT NULL; tăng trong phạm vi một Tutor Profile.
+
+status — varchar(20); NOT NULL DEFAULT draft; enum: TutorProfileRevisionStatus.
+
+payload — jsonb; NOT NULL; snapshot allow-list của field Profile/specialization đang sửa, gồm `qualification_claims` có cấu trúc; không sao chép nội dung File.
+
+version — integer; NOT NULL DEFAULT 1; kiểm `expected_version` khi sửa/duyệt.
+
+submitted\_at — timestamptz; NULL.
+
+reviewed\_by — bigint; NULL; FK users.id.
+
+reviewed\_at — timestamptz; NULL.
+
+review\_reason — text; NULL; bắt buộc khi request-changes/reject.
+
+created\_at — timestamptz; NOT NULL.
+
+updated\_at — timestamptz; NOT NULL.
+
+UNIQUE(tutor\_profile\_id,revision\_no); partial UNIQUE(tutor\_profile\_id) WHERE status IN (draft,submitted,changes_requested). Chỉ một revision chưa đóng cho mỗi Profile approved. `approved`/`rejected` là terminal cho revision đó; approved copy snapshot đã duyệt sang Profile cùng transaction, giữ bản công khai cũ trong lúc chờ.
 
 # 02 · Danh mục và marketplace
 
@@ -401,6 +441,8 @@ message\_type — varchar(20); NOT NULL; mặc định: text; enum: MessageType.
 body — text; NULL.
 
 client\_message\_id — uuid; NOT NULL.
+
+request\_hash — char(64); NULL cho message lịch sử; bắt buộc với message mới; SHA-256 payload message canonical đã validation để phân biệt retry cùng key với payload khác theo BR-21. Không tự tạo hash giả cho bản ghi cũ khi migration.
 
 metadata — jsonb; NULL.
 
@@ -796,6 +838,14 @@ reason — varchar(100); NOT NULL; enum: ReportReasonCode.
 
 details — text; NULL. API Report dùng tên trường `description` và ánh xạ vào cột này; không đổi tên cột dữ liệu.
 
+assigned\_admin\_id — bigint; NULL; FK users.id; Admin hiện được giao xử lý.
+
+assigned\_by — bigint; NULL; FK users.id; Admin đổi assignment gần nhất.
+
+assigned\_at — timestamptz; NULL.
+
+assignment\_version — integer; NOT NULL DEFAULT 0; tăng khi giao/chuyển/thu hồi.
+
 status — varchar(20); NOT NULL; mặc định: open; enum: ReportStatus; cần điều chỉnh.
 
 handled\_by — bigint; NULL; FK; tham chiếu users.id.
@@ -846,19 +896,25 @@ event\_key — varchar(191); NOT NULL; đề xuất thêm.
 
 ### attempt\_count — integer; NOT NULL; mặc định: 0\.
 
+### retry\_started\_at — timestamptz; NOT NULL; đặt bằng created\_at lúc insert; bắt đầu cửa sổ retry 60 phút, đặt lại khi operator cho phép replay.
+
 ### available\_at — timestamptz; NOT NULL; thời điểm worker được thử lại.
 
 ### processed\_at — timestamptz; NULL.
 
 ### failed\_at — timestamptz; NULL.
 
+### replay\_requested\_at — timestamptz; NULL; operator cho phép thử lại row đã failed, giữ event\_key cũ.
+
+### resolved\_at — timestamptz; NULL; thời điểm xử lý xong row đã failed, kể cả quyết định không gửi lại.
+
 ### last\_error\_code — varchar(80); NULL; mã an toàn, không lưu raw exception.
 
 ### created\_at — timestamptz; NOT NULL.
 
-### Khóa ghép / unique: notification\_outbox: UNIQUE(user\_id,type,event\_key); index partial(available\_at,id) WHERE processed\_at IS NULL AND failed\_at IS NULL.
+### Khóa ghép / unique: notification\_outbox: UNIQUE(user\_id,type,event\_key); index partial(available\_at,id) WHERE processed\_at IS NULL AND resolved\_at IS NULL AND (failed\_at IS NULL OR replay\_requested\_at > failed\_at). Operator ghi replay\_requested\_at, đặt lại attempt\_count/retry\_started\_at/available\_at trong transaction cùng audit; worker chỉ chọn lại row failed có mốc replay mới, không tạo row/event\_key mới.
 
-### Ghi một outbox row mỗi recipient cùng transaction mutation/audit. Worker trong Docker lấy row đã đến hạn bằng FOR UPDATE SKIP LOCKED; insert notifications và đặt processed\_at trong cùng transaction. Khi lỗi, rollback lần tạo notification rồi ghi attempt\_count, last\_error\_code và available\_at với backoff tăng dần. Ngưỡng tối đa 10 lần hoặc 60 phút hiện là đề xuất cần nhóm chốt; sau ngưỡng, ghi failed\_at để vận hành kiểm tra/replay.
+### Ghi một outbox row mỗi recipient cùng transaction mutation/audit. Worker trong Docker lấy row đã đến hạn bằng FOR UPDATE SKIP LOCKED; insert notifications và đặt processed_at trong cùng transaction. Khi lỗi, rollback lần tạo notification rồi ghi attempt_count, last_error_code và available_at với backoff tăng dần. Dừng retry sau 10 lần hoặc 60 phút từ retry_started_at, tùy mốc nào đến trước; ghi failed_at, cảnh báo failed hoặc pending quá 5 phút. Replay vận hành giữ event_key cũ, cần quyền/reason/audit; nếu replay lại thất bại thì ghi failed_at mới và yêu cầu một replay_requested_at mới. Khi đã failed rồi xử lý xong, ghi resolved_at; giữ row tới resolved_at +90 ngày. Row chỉ processed, chưa từng failed giữ 30 ngày từ processed_at. Notification giữ 180 ngày; Audit giữ 24 tháng. Purge có kiểm soát và audit.
 
 ### Bảng audit\_logs
 
@@ -1034,6 +1090,32 @@ batch — integer; NOT NULL.
 
 # 13 · Quy tắc liên kết và toàn vẹn
 
+## Idempotency receipts dùng chung — target BR-23
+
+### Bảng idempotency\_receipts — target, chưa có migration
+
+id — uuid; NOT NULL; PK.
+
+actor\_id — bigint; NOT NULL; FK users.id.
+
+idempotency\_key — uuid; NOT NULL.
+
+method — varchar(10); NOT NULL; HTTP method chuẩn hóa.
+
+canonical\_path — varchar(512); NOT NULL; path chuẩn hóa, không gồm query biến thiên.
+
+request\_hash — char(64); NOT NULL; SHA-256 của payload đã canonicalize theo BR-23 hoặc BR-22.
+
+response\_status — smallint; NOT NULL.
+
+response\_snapshot — jsonb; NOT NULL; allow-list response đã trả, không chứa bí mật.
+
+created\_at — timestamptz; NOT NULL.
+
+expires\_at — timestamptz; NULL; command BR-23 có hạn 30 ngày, Fee Record theo BR-22 có thể NULL đến khi đủ điều kiện purge.
+
+UNIQUE(actor\_id,idempotency\_key). Ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Fee Record dùng cùng bảng nhưng tính hash/replay theo BR-22 và giữ receipt cho tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
+
 ## Tham chiếu đa hình
 
 file\_links.resource\_type \+ resource\_id trỏ logic tới messages, tasks, task\_submissions, announcements hoặc verification\_documents. reports dùng tutor\_profile/listing/message/program/review. audit\_logs tham chiếu tài nguyên lịch sử. Những cặp này không thể đặt một FK SQL chung; service phải kiểm tra đúng type, row tồn tại và quyền truy cập, rồi xử lý gắn/xóa trong transaction. Không vẽ chúng thành FK thật.
@@ -1042,19 +1124,19 @@ file\_links.resource\_type \+ resource\_id trỏ logic tới messages, tasks, ta
 
 UNIQUE pending Invitation chỉ theo program\_id. Giữ UNIQUE(program\_id,user\_id) và đổi unique Customer membership thành UNIQUE(program\_id) WHERE member\_role=customer, để một Program không có nhiều Customer lịch sử. Kiểm Customer đích/Customer member trùng programs.customer\_id; Tutor member trùng chủ Program. Cột role/status phải có CHECK đúng enum, không còn observer, pending Program hoặc expired Conversation.
 
-Giá và số lượng không âm; version ≥1; rating 1..5; weekday 0..6; end\_time\>start\_time; planned\_ends\_at\>planned\_starts\_at. Chỉ VND; amount\_minor/price\_from\_minor/agreed\_fee\_minor là số nguyên đồng. expires\_at giấy tờ NULL khi không có hạn. Fee voided phải có voided\_at/voided\_by/void\_reason; hồ sơ suspended phải có status\_before\_suspension/suspended\_at/suspension\_reason hợp lệ.
+Giá và số lượng không âm; version ≥1; rating 1..5; weekday 0..6; end\_time\>start\_time; planned\_ends\_at\>planned\_starts\_at. Review comment nếu có phải không trắng và tối đa 2.000 ký tự; Report details tối đa 2.000 ký tự, reason=`other` thì details bắt buộc không trắng. Chỉ VND; amount\_minor/price\_from\_minor/agreed\_fee\_minor là số nguyên đồng. expires\_at giấy tờ NULL khi không có hạn. Fee voided phải có voided\_at/voided\_by/void\_reason; hồ sơ suspended phải có status\_before\_suspension/suspended\_at/suspension\_reason hợp lệ.
 
 Chỉ FK program\_id từ Invitation/Session tới programs.id; program\_version và snapshot là dữ liệu lịch sử bất biến. Không dùng FK(program\_id,program\_version) tới row Program hiện tại vì version của Program có thể tăng. Kiểm version tại thời điểm gửi/accept bằng khóa transaction.
 
 ## Chỉ mục và xóa dữ liệu
 
-Giữ các index marketplace(status,specialization\_id,delivery\_mode,city,price\_from\_minor); inbox(invitee\_user\_id,status,expires\_at); message(conversation\_id,created\_at,id); task(program\_id,due\_at,status); notification(user\_id,read\_at,created\_at); report(status,created\_at); audit(resource\_type,resource\_id,created\_at). Đề xuất index mọi FK chưa được index bởi PK/UK; thêm submission(task\_id,submission\_version DESC), fee(program\_id,period\_start).
+Giữ các index marketplace(status,specialization\_id,delivery\_mode,city,price\_from\_minor); inbox(invitee\_user\_id,status,expires\_at); message(conversation\_id,created\_at,id); task(program\_id,due\_at,status); notification(user\_id,read\_at,created\_at); report(status,created\_at); audit(resource\_type,resource\_id,created\_at). Đề xuất index mọi FK chưa được index bởi PK/UK; thêm submission(task\_id,submission\_version DESC), fee(program\_id,period\_start). Partial UNIQUE(reporter_id,resource_type,resource_id) trên reports WHERE status='open' bảo vệ một Report open mỗi reporter/resource; index review(tutor_profile_id,visibility,created_at DESC,id DESC), tutor_profile_revisions(tutor_profile_id,revision_no) UNIQUE và partial UNIQUE cho revision chưa đóng, idempotency_receipts(expires_at) để purge receipt có TTL.
 
-Giữ lịch sử Program, Invitation, Submission, Fee, Review và Audit; không cascade hard delete vào các bảng này. Tài khoản ưu tiên status/soft delete. FK reviewer/actor có thể SET NULL khi chính sách xóa thật cho phép. File chỉ xóa object khi không còn liên kết và đã hết thời hạn lưu; một file\_links row không trao quyền đọc cho mọi người dùng. Audit lưu lại reason/time cho thay đổi dấu thanh toán, đình chỉ, khôi phục và quyết định Admin.
+Giữ lịch sử Program, Invitation, Submission, Fee, Review và Audit; không cascade hard delete vào các bảng này. Report/decision giữ 24 tháng từ handled_at; Report còn open không purge. Audit giữ 24 tháng từ created_at; Notification 180 ngày. Tài khoản ưu tiên status/soft delete. FK reviewer/actor có thể SET NULL khi chính sách xóa thật cho phép. File chỉ xóa object khi không còn liên kết và đã hết thời hạn lưu; một file\_links row không trao quyền đọc cho mọi người dùng. Audit lưu lại reason/time cho thay đổi dấu thanh toán, đình chỉ, khôi phục, truy cập evidence, replay outbox và quyết định Admin; payload audit không chứa nội dung riêng tư đầy đủ.
 
 ## Phạm vi triển khai
 
-Không tạo bảng Order/Payment riêng: Program là thỏa thuận dịch vụ, fee\_records là phí tự khai báo và dấu đã/chưa thu do Tutor đặt; không có thanh toán qua cổng, hoàn tiền hoặc đối soát ngân hàng. Listing moderation hold đã chốt nghiệp vụ tại BR-15/M03-F10 nhưng chưa có migration; không tạo support-ticket/appeal route trong MVP, còn Admin users/metrics cần quyết định riêng. Không tự thêm giá trị `hidden` vào ListingStatus.
+Không tạo bảng Order/Payment riêng: Program là thỏa thuận dịch vụ, fee\_records là phí tự khai báo và dấu đã/chưa thu do Tutor đặt; không có thanh toán qua cổng, hoàn tiền hoặc đối soát ngân hàng. Listing moderation hold đã chốt nghiệp vụ tại BR-15/M03-F10 nhưng chưa có migration; không tạo support-ticket/appeal route trong MVP. Admin users/metrics có policy tại BR-27; các route vẫn Dự kiến. Không tự thêm giá trị `hidden` vào ListingStatus.
 
 ## Tài liệu nguồn
 
@@ -1065,4 +1147,4 @@ Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL
 Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs
 
 F03 — Cột phân công Admin (thiết kế đích)  
-Thêm vào tutor\_profiles và reports: assigned\_admin\_id — bigint NULL FK users.id (Admin hiện phụ trách); assigned\_by — bigint NULL FK users.id (Admin đã giao/chuyển/thu hồi gần nhất); assigned\_at — timestamptz NULL (thời điểm thay đổi assignment gần nhất); assignment\_version — integer NOT NULL DEFAULT 0 (tăng 1 mỗi lần giao, chuyển hoặc thu hồi; dùng optimistic concurrency). NULL assignee biểu thị chưa phân công. reviewed\_by và handled\_by tiếp tục chỉ người ra quyết định, không thay thế assigned\_admin\_id. Dùng audit\_logs hiện có để ghi before/after assignee, actor\_id, reason, resource, version và created\_at trong cùng transaction; không thêm bảng assignment riêng. Bổ sung index hàng đợi theo (status, assigned\_admin\_id, submitted\_at) cho tutor\_profiles và (status, assigned\_admin\_id, created\_at) cho reports. Đây là thiết kế tài liệu, chưa phải migration đã chạy.
+Các cột assignment đã được đưa vào bảng tutor\_profiles và reports ở trên. NULL assignee biểu thị chưa phân công; reviewed\_by và handled\_by tiếp tục chỉ người ra quyết định. Assignment đổi cùng audit, tăng assignment\_version; không thêm bảng lịch sử assignment riêng. Index hàng đợi theo (status, assigned\_admin\_id, submitted\_at) cho tutor\_profiles và (status, assigned\_admin\_id, created\_at) cho reports. Đây là thiết kế tài liệu, chưa phải migration đã chạy.
