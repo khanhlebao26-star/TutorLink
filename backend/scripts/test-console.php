@@ -13,6 +13,7 @@ $allowedCommands = [
     'migrate',
     'migrate:fresh',
     'db:seed',
+    'openapi:export',
 ];
 
 if (
@@ -22,7 +23,7 @@ if (
     fwrite(
         STDERR,
         'Usage: php scripts/test-console.php '
-        ."[check|migrate|migrate:fresh|db:seed]\n",
+        ."[check|migrate|migrate:fresh|db:seed|openapi:export]\n",
     );
 
     exit(2);
@@ -47,14 +48,41 @@ try {
         exit(0);
     }
 
-    $exitCode = $kernel->call($command, [
-        '--force' => true,
-        '--no-interaction' => true,
-    ]);
+    if (
+        $command === 'openapi:export'
+        && (
+            $app['config']->get('database.default') !== 'sqlite'
+            || $app['config']->get(
+                'database.connections.sqlite.database',
+            ) !== ':memory:'
+        )
+    ) {
+        throw new RuntimeException(
+            'OpenAPI export requires SQLite :memory:.',
+        );
+    }
 
-    fwrite(STDOUT, $kernel->output());
+    $commands = $command === 'openapi:export'
+        ? ['migrate', 'scramble:export']
+        : [$command];
 
-    exit($exitCode);
+    foreach ($commands as $artisanCommand) {
+        $options = ['--no-interaction' => true];
+
+        if ($artisanCommand !== 'scramble:export') {
+            $options['--force'] = true;
+        }
+
+        $exitCode = $kernel->call($artisanCommand, $options);
+
+        fwrite(STDOUT, $kernel->output());
+
+        if ($exitCode !== 0) {
+            exit($exitCode);
+        }
+    }
+
+    exit(0);
 } catch (Throwable $error) {
     fwrite(STDERR, $error->getMessage().PHP_EOL);
 
