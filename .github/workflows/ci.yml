@@ -45,8 +45,8 @@ jobs:
       APP_URL: http://localhost:8000
       FRONTEND_URL: http://localhost:3000
 
-      APP_CONFIG_CACHE: ${{ runner.temp }}/tutorlink-ci-config.php
-      TEST_CONFIG_CACHE: ${{ runner.temp }}/tutorlink-ci-config.php
+      APP_CONFIG_CACHE: /tmp/tutorlink-ci-config.php
+      TEST_CONFIG_CACHE: /tmp/tutorlink-ci-config.php
 
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
