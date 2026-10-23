@@ -141,7 +141,7 @@ return new class extends Migration
     private function addPostgresConstraints(): void
     {
         DB::statement("ALTER TABLE programs ALTER COLUMN status SET DEFAULT 'draft'");
-        DB::statement("ALTER TABLE programs ALTER COLUMN customer_id SET NOT NULL");
+        DB::statement('ALTER TABLE programs ALTER COLUMN customer_id SET NOT NULL');
         DB::statement("ALTER TABLE programs ADD CONSTRAINT programs_status_check CHECK (status IN ('draft', 'active', 'paused', 'completed', 'cancelled'))");
 
         DB::statement("ALTER TABLE program_invitations ADD CONSTRAINT program_invitations_status_check CHECK (status IN ('pending', 'accepted', 'rejected', 'cancelled', 'expired'))");

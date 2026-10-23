@@ -5,7 +5,7 @@ namespace Tests;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use RuntimeException;
+use Tests\Support\TestDatabaseGuard;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -43,20 +43,7 @@ abstract class TestCase extends BaseTestCase
         $this->traitsUsedByTest = class_uses_recursive(static::class);
 
         $app->afterBootstrapping(LoadConfiguration::class, function ($app): void {
-            $connection = $app['config']->get('database.default');
-            $database = $app['config']->get("database.connections.{$connection}", []);
-            $safeTarget = ($connection === 'sqlite' && ($database['database'] ?? null) === ':memory:')
-                || ($connection === 'pgsql' && in_array($database['database'] ?? null, [
-                    'tutorlink_test',
-                    'tutorlink_phase2_test',
-                ], true));
-
-            if (
-                $app['config']->get('app.env') !== 'testing' || ! $safeTarget
-                || ! empty($database['url']) || ! empty($database['read']) || ! empty($database['write'])
-            ) {
-                throw new RuntimeException('Unsafe test database configuration. Use SQLite :memory: or an explicitly isolated tutorlink_test/tutorlink_phase2_test database.');
-            }
+            TestDatabaseGuard::assertSafe($app['config']);
         });
         $app->make(Kernel::class)->bootstrap();
 

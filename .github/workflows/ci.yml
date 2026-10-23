@@ -1,9 +1,12 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
-    branches: [main]
+    branches:
+      - main
+      - codex/2w-be-h01
 
 permissions:
   contents: read
@@ -12,9 +15,11 @@ jobs:
   backend:
     name: Backend migration and tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     services:
       postgres:
-        image: postgres:16
+        image: postgres:16-alpine
         env:
           POSTGRES_DB: tutorlink_test
           POSTGRES_USER: tutorlink
@@ -26,89 +31,158 @@ jobs:
           --health-interval=5s
           --health-timeout=5s
           --health-retries=10
+
     defaults:
       run:
         working-directory: backend
+        shell: bash
+
     env:
       APP_NAME: TutorLink
-      SESSION_COOKIE: tutorlink-session
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      APP_URL: http://localhost:8000
+      FRONTEND_URL: http://localhost:3000
+
+      APP_CONFIG_CACHE: ${{ runner.temp }}/tutorlink-ci-config.php
+      TEST_CONFIG_CACHE: ${{ runner.temp }}/tutorlink-ci-config.php
+
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
-      DB_PORT: 5432
+      DB_PORT: "5432"
       DB_DATABASE: tutorlink_test
       DB_USERNAME: tutorlink
       DB_PASSWORD: tutorlink_ci_password
-      APP_ENV: testing
-      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      DB_URL: ""
+
       CACHE_STORE: array
-      SESSION_DRIVER: array
+      SESSION_DRIVER: database
+      SESSION_COOKIE: tutorlink-session
       QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      BROADCAST_CONNECTION: "null"
+
     steps:
       - uses: actions/checkout@v4
-      - name: Set up PHP
+
+      - name: Set up PHP with PCOV
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
           extensions: mbstring, pdo_pgsql, pdo_sqlite
-          coverage: none
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
-      - name: Backend lint
-        run: vendor/bin/pint --test
-      - name: Prepare Laravel runtime directories
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Prepare runtime and evidence directories
         run: |
           mkdir -p storage/framework/cache \
-                  storage/framework/sessions \
-                  storage/framework/views \
-                  bootstrap/cache
+                   storage/framework/sessions \
+                   storage/framework/views \
+                   bootstrap/cache \
+                   build/reports
           chmod -R ug+rw storage bootstrap/cache
+          touch .env
 
-      - name: Prepare Laravel
+      - name: Record runtime and commit
         run: |
-          cp .env.example .env
-          php artisan key:generate
-      - name: Validate PostgreSQL migrations
-        run: php artisan migrate --force
-      - name: Export OpenAPI from the migrated SQLite schema
+          git rev-parse HEAD > build/reports/commit.txt
+          php -v > build/reports/runtime.txt
+          composer --version >> build/reports/runtime.txt
+          php --ri pcov >> build/reports/runtime.txt
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+          composer show --locked > build/reports/dependencies.txt
+
+      - name: Backend lint
+        run: |
+          vendor/bin/pint --test 2>&1 | tee build/reports/format.txt
+
+      - name: Validate test database guard and migrations
+        run: |
+          php scripts/test-console.php check \
+            2>&1 | tee build/reports/database-guard.txt
+          php scripts/test-console.php migrate \
+            2>&1 | tee build/reports/migrations.txt
+
+      - name: Run backend tests with coverage
+        run: |
+          php \
+            -d pcov.enabled=1 \
+            -d pcov.directory="$PWD/app" \
+            vendor/bin/pest \
+            --display-warnings \
+            --fail-on-warning \
+            --coverage \
+            --coverage-clover build/reports/clover.xml \
+            --coverage-html build/reports/html \
+            --coverage-text=build/reports/coverage.txt \
+            --log-junit build/reports/junit.xml \
+            2>&1 | tee build/reports/tests.txt
+
+          test -s build/reports/clover.xml
+          test -s build/reports/junit.xml
+          test -s build/reports/coverage.txt
+
+      - name: Export OpenAPI from guarded SQLite memory schema
         env:
           DB_CONNECTION: sqlite
-          DB_DATABASE: /tmp/tutorlink-openapi.sqlite
-        run: |
-          touch "$DB_DATABASE"
-          php artisan migrate --force --no-interaction
-          php artisan scramble:export --no-interaction
+          DB_DATABASE: ":memory:"
+        run: php scripts/test-console.php openapi:export
+
       - name: Set up Node for OpenAPI validation
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+
       - name: Lint OpenAPI contract
-        run: npx --yes @redocly/cli@2.60.0 lint ../docs/api/openapi.json --config ../.redocly.yaml
+        run: |
+          npx --yes @redocly/cli@2.60.0 lint \
+            ../docs/api/openapi.json \
+            --config ../.redocly.yaml
+
       - name: Verify OpenAPI matches registered routes
         run: php scripts/verify-openapi-routes.php
+
       - name: Check committed OpenAPI is current
         run: |
           git ls-files --error-unmatch ../docs/api/openapi.json
           git diff --exit-code -- ../docs/api/openapi.json
-      - name: Run backend tests
-        run: php artisan test
+
+      - name: Upload backend evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: backend/build/reports/
+          retention-days: 14
+          if-no-files-found: warn
 
   frontend:
     name: Frontend lint and build
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: frontend
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
+
       - name: Install dependencies
         run: npm ci
+
       - name: Lint
         run: npm run lint
+
       - name: Build
         run: npm run build
