@@ -1,0 +1,79 @@
+services:
+  test-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tutorlink_test
+      POSTGRES_USER: tutorlink_test_runner
+      POSTGRES_PASSWORD: tutorlink_test_password
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U tutorlink_test_runner -d tutorlink_test"
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    networks:
+      - testing
+
+  backend-test:
+    image : tutorlink-h01-backend-test:local
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.testing
+    working_dir: /var/www/html
+    environment:
+      APP_NAME: TutorLink
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: "base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      APP_URL: http://localhost:8000
+      FRONTEND_URL: http://localhost:3000
+      APP_CONFIG_CACHE: /tmp/tutorlink-testing-config.php
+      TEST_CONFIG_CACHE: /tmp/tutorlink-testing-config.php
+
+      DB_CONNECTION: pgsql
+      DB_HOST: test-db
+      DB_PORT: "5432"
+      DB_DATABASE: tutorlink_test
+      DB_USERNAME: tutorlink_test_runner
+      DB_PASSWORD: tutorlink_test_password
+      DB_URL: ""
+
+      CACHE_STORE: array
+      SESSION_DRIVER: database
+      SESSION_COOKIE: tutorlink-session
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      BROADCAST_CONNECTION: "null"
+    volumes:
+      - ./outputs/be-h01:/evidence
+    depends_on:
+      test-db:
+        condition: service_healthy
+    networks:
+      - testing
+    command:
+      - sh
+      - -c
+      - |
+          touch .env
+          mkdir -p /evidence/coverage
+          exec php \
+            -d pcov.enabled=1 \
+            -d pcov.directory=/var/www/html/app \
+            vendor/bin/pest \
+            --display-warnings \
+            --fail-on-warning \
+            --coverage \
+            --coverage-clover /evidence/coverage/clover.xml \
+            --coverage-html /evidence/coverage/html \
+            --coverage-text=/evidence/coverage/summary.txt \
+            --log-junit /evidence/coverage/junit.xml
+
+networks:
+  testing:
+    internal: true
