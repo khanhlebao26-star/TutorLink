@@ -39,6 +39,7 @@ class IdentitySessionTest extends TestCase
     public function test_login_and_logout_use_real_session_cookies(): void
     {
         $user = $this->createUser();
+        $pat = $user->createToken('logout-does-not-revoke-pat', ['account:read']);
         $cookies = $this->loginBrowser($user);
         $oldCookies = $cookies;
 
@@ -57,11 +58,17 @@ class IdentitySessionTest extends TestCase
 
         $this->browserRequest($oldCookies, 'GET', '/api/v1/me')
             ->assertUnauthorized();
+
+        $this->withToken($pat->plainTextToken)
+            ->getJson('/api/v1/me')
+            ->assertOk()
+            ->assertJsonPath('data.id', $user->id);
     }
 
     public function test_password_change_keeps_a_and_revokes_b_and_old_a(): void
     {
         $user = $this->createUser();
+        $pat = $user->createToken('password-change-test', ['account:read']);
         $other = $this->createUser();
 
         $a = $this->loginBrowser($user, remember: true);
@@ -90,6 +97,9 @@ class IdentitySessionTest extends TestCase
             ),
         );
         $this->assertNotSame($oldToken, $user->remember_token);
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'id' => $pat->accessToken->id,
+        ]);
 
         $this->browserRequest($a, 'GET', '/api/v1/me')
             ->assertOk()
@@ -112,6 +122,7 @@ class IdentitySessionTest extends TestCase
     public function test_password_reset_revokes_current_and_other_sessions(): void
     {
         $user = $this->createUser();
+        $pat = $user->createToken('password-reset-test', ['account:read']);
         $a = $this->loginBrowser($user, remember: true);
         $b = $this->loginBrowser($user, remember: true);
 
@@ -131,6 +142,9 @@ class IdentitySessionTest extends TestCase
             $oldToken,
             $user->refresh()->remember_token,
         );
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'id' => $pat->accessToken->id,
+        ]);
 
         $this->assertDatabaseMissing('sessions', [
             'user_id' => $user->id,
@@ -179,6 +193,7 @@ class IdentitySessionTest extends TestCase
             'password_hash' => self::OLD_PASSWORD,
         ]);
         $user = $this->createUser();
+        $pat = $user->createToken('account-suspension-test', ['account:read']);
 
         $adminCookies = $this->loginBrowser($admin);
         $a = $this->loginBrowser($user, remember: true);
@@ -196,6 +211,9 @@ class IdentitySessionTest extends TestCase
 
         $this->assertSame('suspended', $user->refresh()->status);
         $this->assertNotSame($oldToken, $user->remember_token);
+        $this->assertDatabaseMissing('personal_access_tokens', [
+            'id' => $pat->accessToken->id,
+        ]);
 
         $this->assertDatabaseMissing('sessions', [
             'user_id' => $user->id,

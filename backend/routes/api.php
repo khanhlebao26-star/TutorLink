@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\ListingController;
+use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
@@ -32,7 +33,7 @@ Route::prefix('v1')->group(function () {
             ->middleware(['signed', 'throttle:6,1'])
             ->name('verification.verify');
 
-        Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware('auth:web')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout'])
                 ->name('auth.logout');
 
@@ -55,12 +56,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/tutors/{slug}/reviews', [PublicTutorReviewController::class, 'index'])
         ->where('slug', '[a-z0-9-]+');
 
-    Route::middleware(['auth:sanctum', EnsureActiveAccount::class])->group(function () {
-        Route::get('/me/listings', [ListingController::class, 'myIndex']);
-        Route::post('/me/listings', [ListingController::class, 'store']);
-        Route::get('/me/listings/{listing}', [ListingController::class, 'myShow']);
-        Route::patch('/me/listings/{listing}', [ListingController::class, 'update']);
-        Route::delete('/me/listings/{listing}', [ListingController::class, 'destroy']);
+    Route::middleware(['auth:web', EnsureActiveAccount::class])->group(function () {
         Route::get('/me/availability-rules', [
             AvailabilityRuleController::class,
             'index',
@@ -91,9 +87,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/users/{user}/restore', [AdminController::class, 'restoreAccount'])
                 ->name('admin.users.restore');
         });
-
-        Route::get('/me', [AuthController::class, 'me'])
-            ->name('auth.me');
 
         Route::patch('/me', [AuthController::class, 'updateMe'])
             ->name('auth.update-me');
@@ -128,8 +121,40 @@ Route::prefix('v1')->group(function () {
         ])->name('tutor.profile.verification-documents');
     });
 
+    Route::middleware([
+        'auth:sanctum',
+        EnsureActiveAccount::class,
+        'abilities:account:read',
+    ])->get('/me', [AuthController::class, 'me'])
+        ->name('auth.me');
+
+    Route::middleware(['auth:sanctum', EnsureActiveAccount::class])->group(function () {
+        Route::get('/me/listings', [ListingController::class, 'myIndex'])
+            ->middleware('abilities:my-listings:read');
+
+        Route::get('/me/listings/{listing}', [ListingController::class, 'myShow'])
+            ->middleware('abilities:my-listings:read');
+
+        Route::post('/me/listings', [ListingController::class, 'store'])
+            ->middleware('abilities:my-listings:write');
+
+        Route::patch('/me/listings/{listing}', [ListingController::class, 'update'])
+            ->middleware('abilities:my-listings:write');
+
+        Route::delete('/me/listings/{listing}', [ListingController::class, 'destroy'])
+            ->middleware('abilities:my-listings:write');
+    });
+
     Route::get('/catalog/categories', [CatalogController::class, 'categories'])
         ->name('catalog.categories');
     Route::get('/catalog/specializations', [CatalogController::class, 'specializations'])
         ->name('catalog.specializations');
+
+    Route::middleware(['auth:web', EnsureActiveAccount::class])->group(function () {
+        Route::post('/me/tokens', [PersonalAccessTokenController::class, 'store']);
+        Route::get('/me/tokens', [PersonalAccessTokenController::class, 'index']);
+        Route::delete('/me/tokens/{tokenId}', [PersonalAccessTokenController::class, 'destroy'])
+            ->whereNumber('tokenId');
+    });
+
 });

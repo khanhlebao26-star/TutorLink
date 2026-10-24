@@ -32,6 +32,8 @@ class ResetUserPassword implements ResetsUserPasswords
                 'remember_token' => str()->random(60),
             ])->save();
 
+            $user->tokens()->delete();
+
             app(RevokeUserSessions::class)->handle($user);
         });
     }

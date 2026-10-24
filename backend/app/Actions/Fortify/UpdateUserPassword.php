@@ -54,6 +54,8 @@ class UpdateUserPassword implements UpdatesUserPasswords
                 'remember_token' => str()->random(60),
             ])->save();
 
+            $user->tokens()->delete();
+
             app(RevokeUserSessions::class)->handle(
                 $user,
                 $currentSessionId,

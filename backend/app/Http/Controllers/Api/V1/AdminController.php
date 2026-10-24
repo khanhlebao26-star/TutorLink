@@ -216,6 +216,7 @@ class AdminController extends Controller
             $target->forceFill($updateData)->save();
 
             if ($status === 'suspended') {
+                $target->tokens()->delete();
                 app(RevokeUserSessions::class)->handle($target);
             }
 

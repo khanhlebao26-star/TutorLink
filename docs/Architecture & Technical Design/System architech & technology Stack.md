@@ -72,7 +72,7 @@ M01–M10 dưới đây là ranh giới logic trong cùng ứng dụng và cùng
 
 Next.js hiển thị form xác thực; Laravel Fortify cung cấp các luồng đăng nhập, đăng ký, đăng xuất, quên/reset mật khẩu và xác minh email khi được bật. Sanctum nhận diện phiên người dùng khi gọi API. Fortify/Sanctum là package chính thức của Laravel; nhóm vẫn chịu trách nhiệm cấu hình, tích hợp, kiểm thử và nghiệp vụ riêng. Chưa cài Fortify trong checkout được rà soát. \[T1, T2\]
 
-Client trình duyệt khởi tạo CSRF qua /sanctum/csrf-cookie, gửi cookie phiên và X-XSRF-TOKEN cho mutation theo luồng xác thực. Fortify dùng web guard phối hợp Sanctum; giao diện Next.js tiếp tục được sử dụng. Tên miền, CORS/stateful domain, cookie, response và chuyển tiếp phiên khi render phía server cần được chốt khi tích hợp. Contract TutorLink hiện chỉ mô tả xác thực bằng cookie phiên và CSRF; không phát hành personal access token cho client từ luồng M01. \[P2, T1, T2\]
+Client trình duyệt khởi tạo CSRF qua /sanctum/csrf-cookie, gửi cookie phiên và X-XSRF-TOKEN cho mutation theo luồng xác thực SPA. Fortify dùng web guard phối hợp Sanctum; giao diện Next.js tiếp tục được sử dụng. PAT là credential riêng cho CLI/server-to-server, được quản lý bằng session cookie + CSRF; không dùng PAT làm cơ chế đăng nhập SPA hoặc lưu trong localStorage. \[P2, T1, T2\]
 
 Filament là panel nội bộ dùng cùng nguồn User của Laravel; chỉ Admin active có quyền mới được truy cập. Mỗi resource/action/query và tải bằng chứng phải kiểm permission cùng assignment hiện tại. Quyền vào panel không cấp quyền đọc mọi dữ liệu. API Admin hiện có chưa chứng minh đáp ứng đầy đủ assignment scope; panel dùng cùng nghiệp vụ/Policy, không sao chép quy tắc riêng.
 
