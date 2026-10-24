@@ -7,6 +7,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class DatabaseSchemaTest extends TestCase
@@ -308,7 +309,7 @@ class DatabaseSchemaTest extends TestCase
             'invited_by' => $tutorId,
             'status' => 'pending',
             'offer_snapshot' => json_encode(['title' => 'Schema test program']),
-            'idempotency_key' => (string) \Illuminate\Support\Str::uuid(),
+            'idempotency_key' => (string) Str::uuid(),
             'expires_at' => now()->addDay(),
             'created_at' => now(),
             'updated_at' => now(),
