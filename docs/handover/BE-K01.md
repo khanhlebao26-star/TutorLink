@@ -15,7 +15,9 @@
 - Email có quy trình thay đổi riêng, không sửa qua `/me`.
 - Người dùng không tự sửa role, status, permissions hoặc `email_verified_at`.
 - UserStatus và TutorProfileStatus độc lập.
-- PAT, token abilities và expiry PAT được hoãn khỏi MVP theo quyết định team. Các yêu cầu PAT trong issue gốc không được tính là đã triển khai.
+- PAT là follow-up riêng trên branch `codex/2w-be-k01-token-followup`, theo quyết định đã thống nhất với reviewer: chỉ dùng CLI/server-to-server; SPA tiếp tục dùng session cookie + CSRF.
+- PAT có ba endpoint quản lý bằng session + CSRF, allow-list `account:read`, `my-listings:read`, `my-listings:write`, expiry mặc định 30 ngày/tối đa 90 ngày, secret chỉ trả một lần; đổi/reset mật khẩu hoặc suspend account thu hồi PAT. Ability vẫn đi cùng ownership và trạng thái.
+- Không gộp follow-up PAT vào trạng thái nghiệm thu branch gốc cho tới khi PR/CI/evidence riêng được reviewer chấp nhận.
 
 ## 2. Tóm tắt thay đổi code
 
@@ -216,16 +218,16 @@ Lệnh export/parity trên dùng database SQLite tạm đã migrate và thư m�
 
 ## 7. Known limitations
 
-- PAT, ability và expiry PAT ngoài MVP; không tuyên bố đã đạt các acceptance criteria PAT của issue gốc.
+- Follow-up PAT đã có code/tests/OpenAPI trên branch `codex/2w-be-k01-token-followup`; cần CI PostgreSQL/PR và reviewer sign-off trước khi xem là bàn giao hoàn tất.
 - Chưa xây workflow deactivated; đã có trạng thái và kiểm tra từ chối truy cập.
 - Migration không hỗ trợ rollback tự động; cần backup hoặc reverse migration được review.
 - SQLite chưa áp dụng constraint enum tương đương PostgreSQL.
 - Hai test W3 được skip do phần Program lifecycle chưa hỗ trợ fixture completed; không tính là pass.
 - Hai migration 2FA/passkey sinh từ Fortify còn cần review phạm vi và lịch sử áp dụng; không coi là tính năng đã bàn giao.
 - Test CSRF middleware không thay thế kiểm tra frontend gửi X-XSRF-TOKEN thực tế.
-- Cần nghiệm thu riêng register không auto-login và bearer token đơn lẻ bị từ chối nếu chưa có evidence tương ứng.
-- OpenAPI lint hiện có 49 warnings; chưa xử lý hết chất lượng mô tả API.
-- Response 204 của `/me/password` vẫn sinh `content: application/json` trong OpenAPI; cần sửa khai báo response ở source/cấu hình Scramble và export lại để mô tả đúng response không có body.
+- Regression auth + PAT: 45 tests passed (286 assertions) trên PostgreSQL `tutorlink_test` cô lập; gồm register/login/logout/reset/verify/CSRF, phát hành/list/revoke/ownership, ability, expiry và thu hồi sau password change/reset hoặc account suspend.
+- OpenAPI export sau follow-up: 46 operations, route parity đạt; Redocly hợp lệ với 49 warnings còn lại, chủ yếu summary/metadata API cũ.
+- `PUT /me/password` 204 hiện được sinh không có content trong OpenAPI.
 
 ## 8. Việc còn lại trước khi Ready for review
 
@@ -233,7 +235,7 @@ Lệnh export/parity trên dùng database SQLite tạm đã migrate và thư m�
 - [x] Chạy IdentitySecurityTest và toàn bộ regression tại mốc kết quả mới nhất.
 - [x] Kiểm tra ESLint và TypeScript.
 - [x] Export lại OpenAPI sau thay đổi request; lint hợp lệ với 49 warnings, route parity đạt 43 operations.
-- [ ] Sửa mô tả response 204 không có body và export/kiểm tra lại OpenAPI.
+- [x] Sửa mô tả response 204 không có body; OpenAPI parity 46 operations, lint hợp lệ với 49 warnings.
 - [ ] Hoàn thiện evidence migration và trình duyệt.
 - [ ] Review migration ngoài scope và diff trước commit.
 - [ ] Commit/push trên be-k01.

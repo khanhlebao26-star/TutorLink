@@ -22,6 +22,7 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Fortify\Contracts\ResetsUserPasswords;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
@@ -127,10 +128,10 @@ class AuthController extends Controller
     public function updatePassword(
         UpdatePasswordRequest $request,
         UpdatesUserPasswords $updater,
-    ): JsonResponse {
+    ): Response {
         $updater->update($request->user(), $request->validated());
 
-        return response()->json(status: 204);
+        return response()->noContent();
     }
 
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse

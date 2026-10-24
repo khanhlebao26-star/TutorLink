@@ -12,13 +12,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['full_name', 'email', 'password_hash', 'role', 'status', 'permissions', 'date_of_birth', 'terms_version'])]
 #[Hidden(['password_hash', 'remember_token', 'permissions'])]
 class User extends Authenticatable implements MustVerifyEmailContract
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, MustVerifyEmailTrait, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, MustVerifyEmailTrait, Notifiable, SoftDeletes;
 
     /**
      * Laravel authentication should read the renamed credential column.

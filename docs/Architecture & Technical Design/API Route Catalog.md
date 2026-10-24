@@ -26,6 +26,9 @@ Các route mutation Session, Task, Fee Record và Announcement tuân version gua
 | POST /api/v1/auth/email/verification-notification | Gửi lại email xác minh cho tài khoản unverified, phản hồi trung tính và rate limit; runtime vẫn yêu cầu session. Quyền đích: Public | Đã đăng ký |
 | GET /api/v1/me | Đọc User/role/trạng thái của mình; Customer Profile đọc qua route riêng Quyền: Chủ tài khoản | Đã đăng ký |
 | PATCH /api/v1/me | Sửa full_name/ngày sinh từ màn hình hồ sơ; tuổi Customer ≥15, Tutor ≥18. Runtime hiện áp tuổi 18 cho cả hai. Quyền: Chủ tài khoản | Đã đăng ký |
+| POST /api/v1/me/tokens | Tạo PAT cho CLI/server-to-server; chỉ lộ plaintext một lần, abilities allow-list, hết hạn 1–90 ngày. Session cookie + CSRF. Quyền: Chủ tài khoản active | Đã đăng ký |
+| GET /api/v1/me/tokens | Liệt kê metadata PAT của chính chủ, không gồm secret. Chỉ session cookie. Quyền: Chủ tài khoản active | Đã đăng ký |
+| DELETE /api/v1/me/tokens/{tokenId} | Thu hồi PAT thuộc chính chủ; không cho PAT khác quản lý token. Chỉ session cookie + CSRF. Quyền: Chủ tài khoản active | Đã đăng ký |
 | GET /api/v1/customer/profile | Đọc Customer Profile riêng; chưa có row trả `profile: null` và không tạo row. Quyền: Customer active, owner | Dự kiến |
 | PUT /api/v1/customer/profile | Upsert field tùy chọn; omission giữ nguyên, `null` gỡ field/avatar nullable; avatar là File complete đúng owner/purpose. Quyền: Customer active, owner; cookie + CSRF | Dự kiến |
 | **02 Hồ sơ Tutor và xét duyệt** |  |  |
