@@ -33,7 +33,7 @@ it('issues a one-time token and only lists metadata for its owner', function () 
     $this->assertEquals(
         30,
         Carbon::parse($created['data']['expires_at'])
-            ->diffInDays(Carbon::parse($created['data']['created_at'])),
+            ->diffInDays(Carbon::parse($created['data']['created_at']), true),
     );
     $this->assertDatabaseHas('personal_access_tokens', [
         'id' => $tokenId,
