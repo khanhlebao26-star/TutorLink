@@ -68,9 +68,9 @@ Không chỉ dựa vào unit test khi middleware CSRF hoặc các lớp bảo v�
 ### **Yêu cầu**
 
 * Rate limiting là cơ chế giới hạn số request trong một khoảng thời gian. Mục đích là giảm việc thử mật khẩu hàng loạt, gửi spam và lạm dụng API.  
-* Các giới hạn dưới đây là **quota khởi điểm**, chưa được coi là chính sách Product đã chốt.
+* Các quota mục tiêu trong bảng được Product/nhóm chốt ngày 21/10/2026 để đặc tả D07 và kiểm thử. Thay đổi sau này phải có quyết định mới; runtime cần chia sẻ counter giữa worker và chưa được xác nhận đã triển khai.
 
-| Chức năng | Giới hạn đề xuất |
+| Chức năng | Quota mục tiêu đã chốt |
 | ----- | ----- |
 | Đăng nhập | Tối đa 5 lần sai trong 15 phút cho mỗi cặp email chuẩn hóa \+ IP |
 | Đăng nhập | Tối đa 20 lần sai cho mỗi email trong 15 phút |
@@ -79,7 +79,8 @@ Không chỉ dựa vào unit test khi middleware CSRF hoặc các lớp bảo v�
 | Quên mật khẩu | Tối đa 3 lần cho mỗi email trong 1 giờ và 20 lần cho mỗi IP trong 1 giờ |
 | Đặt lại mật khẩu | Tối đa 10 lần cho mỗi cặp email \+ IP trong 15 phút và 100 lần cho mỗi IP trong 15 phút |
 | Gửi lại email xác minh | Tối đa 3 lần cho mỗi user trong 1 giờ, đồng thời không được nới lỏng giới hạn hiện có |
-| Gửi tin nhắn | Tối đa 30 lần cho mỗi user trong mỗi Conversation trong 1 phút và 120 lần cho mỗi user trong 1 phút |
+| Gửi tin nhắn mới | Tối đa 30 tin/phút cho mỗi user trên tất cả Conversation; retry idempotent không tính quota (BR-21) |
+| Gửi Report | Tối đa 10 lần/giờ và 30 lần/ngày cho mỗi reporter (BR-24) |
 | Upload tệp | Tối đa 10 lần cho mỗi user trong 1 phút |
 
 Các giới hạn trên phải được áp dụng theo đúng cách tính đã thống nhất. Ví dụ, một lần gửi tin nhắn cần được tính nhất quán ở cả giới hạn theo Conversation và giới hạn tổng của user.
@@ -92,7 +93,7 @@ Các giới hạn trên phải được áp dụng theo đúng cách tính đã 
 ### **Cách kiểm chứng**
 
 * Gửi nhiều request liên tiếp để kiểm tra giới hạn, thử thay session và kiểm tra nhiều worker cùng xử lý request.  
-* Trước khi phát hành, các quota phải được đồng bộ với D07 và OpenAPI.
+* Quota D07 đã chốt; Scramble/OpenAPI chỉ phản ánh giới hạn khi route đã được đăng ký trong code.
 
 ## SP-05 · Không tiết lộ danh sách tài khoản
 
@@ -139,7 +140,7 @@ Các quy tắc bổ sung:
 * Khi assignment bị thu hồi hoặc chuyển cho người khác, người không còn được phân quyền phải mất quyền truy cập từ request tiếp theo.  
 * `allowed_actions` chỉ giúp frontend hiển thị những thao tác phù hợp. Server vẫn phải kiểm tra quyền khi nhận request.  
 * Nếu thao tác đình chỉ hồ sơ Tutor đồng thời giữ tài khoản ở trạng thái active hoặc thay đổi trạng thái tài khoản, phải kiểm tra đủ hai permission theo chính sách và thực hiện các thay đổi liên quan trong cùng transaction.  
-* Theo BR-11, chỉ Admin active có `admin.reports.view` và assignment hiện tại được đọc evidence khi Report còn `open`; Report đóng hoặc assignment đổi/thu hồi chặn từ request tiếp theo. Với message, giới hạn message bị báo cáo cùng tối đa 10 tin trước/5 tin sau; mỗi lần đọc phải audit. Endpoint Admin directory vẫn cần chốt phạm vi quyền riêng trước khi triển khai.
+* Theo BR-11, chỉ Admin active có `admin.reports.view` và assignment hiện tại được đọc evidence khi Report còn `open`; Report đóng hoặc assignment đổi/thu hồi chặn từ request tiếp theo. Với message, giới hạn message bị báo cáo cùng tối đa 10 tin trước/5 tin sau; mỗi lần đọc phải audit. BR-27 đã chốt exact lookup, allow-list DTO và quyền riêng cho Admin directory; runtime chưa triển khai.
 
 ### **Cách kiểm chứng**
 
@@ -203,10 +204,7 @@ Chỉ cung cấp dữ liệu cần thiết cho đúng người và đúng mục 
 * **Không ghi thông tin bí mật vào log:** Không ghi mật khẩu, reset/signature token, cookie, header Authorization, nội dung riêng tư đầy đủ hoặc toàn bộ evidence vào log vận hành hay audit log.  
 * **Quản lý secret:** Secret phải được cung cấp từ cấu hình môi trường hoặc hệ thống quản lý secret phù hợp, không hard-code trong source code hoặc Docker image. Các môi trường development, staging và production phải sử dụng secret riêng.  
 * **Bảo vệ backup và storage:** Backup và private storage phải được mã hóa phù hợp, giới hạn quyền truy cập và có quy trình khôi phục được kiểm tra.  
-* **Thời gian lưu log đề xuất:**  
-  * Log vận hành: 30 ngày.  
-  * Audit log: tối thiểu 180 ngày.  
-* Hai thời hạn trên là baseline đề xuất, chưa phải chính sách lưu trữ cuối cùng. Không được tự động xóa dữ liệu đang cần cho một vụ việc hoặc phải được giữ theo chính sách đã chốt.  
+* **Thời hạn lưu:** Audit nghiệp vụ 24 tháng theo BR-25. Log vận hành 30 ngày là baseline đề xuất riêng, cần cấu hình theo môi trường. Không tự động xóa dữ liệu đang cần cho một vụ việc hoặc phải giữ theo chính sách resource.
 * **Lịch xóa dữ liệu:** Trước production, phải xác nhận thời gian lưu và quy trình xóa dữ liệu thực tế cho từng loại dữ liệu.
 
 ### **Cách kiểm chứng**
@@ -264,13 +262,13 @@ Kiểm tra quyền truy cập Program, Task, file đính kèm, giấy tờ xác 
 
 Kiểm tra HTTPS, cookie, log, backup, secret và dependency trên đúng bản build dự kiến phát hành.
 
-# 3\. Phụ thuộc và điểm chưa chốt
+# 3. Implementation gaps và policy độc lập còn lại
 
-| Điểm chưa chốt | Yêu cầu cần giải quyết |
+| Hạng mục | Trạng thái |
 | ----- | ----- |
 | Public allow-list | Xác định chính xác field nào được phép xuất hiện trong Public Tutor Profile và Listing. |
-| Report evidence | BR-11 đã chốt actor, permission, assignment, cửa sổ chat và chặn evidence sau khi Report đóng; còn cần chốt field masking, retention dữ liệu và DTO evidence cho resource khác message. |
-| Admin directory | Xác định phạm vi dữ liệu Admin được phép tìm kiếm và xem. |
-| Retention dữ liệu thật | Chốt thời gian lưu, điều kiện giữ lại và quy trình xóa dữ liệu. |
-| Rate limiting | Xác nhận quota và đồng bộ với D07/OpenAPI. |
-| Thu hồi session sau reset | Xác nhận chính sách với Product và đồng bộ D04/M01-F06 Đồng bộ trạng thái NFR 18/10/2026: mục ghi Nguồn giữ quyết định đã có; mọi Bổ sung NFR/đề xuất chưa có xác nhận vẫn Proposed, chưa dùng đơn lẻ để pass/fail G4. Trước khi áp dụng, ghi mã yêu cầu, giá trị, owner/approver, ngày xác nhận, test/evidence và phụ thuộc Dxx trong chính phần yêu cầu hoặc Lịch sử làm việc hiện có. Nếu thiếu xác nhận thì giữ Pending; không suy phê duyệt từ từ “phải” trong mục nghiệm thu, không dùng NFR mới để tự mở lại quyết định đã chốt. Chỉ nghiệm thu phạm vi và môi trường đã được duyệt; không đồng nhất G4 trình diễn với production thực tế. . |
+| Report evidence | BR-11 và BR-24 chốt actor, permission, assignment, cửa sổ, allow-list, retention 24 tháng và DTO theo loại resource. Runtime chưa triển khai. |
+| Admin directory | BR-27 đã chốt exact lookup, allow-list DTO và permission; runtime chưa triển khai. |
+| Retention dữ liệu thật | BR-24/BR-25 chốt Report, Audit, Outbox và Notification; các loại dữ liệu nguồn khác vẫn theo policy resource riêng. |
+| Rate limiting | Quota mục tiêu đã chốt tại SP-04/BR-21/BR-24; cấu hình runtime và test đa worker chưa triển khai/xác minh. |
+| Thu hồi session sau reset | Đã chốt tại BR-12; runtime còn phải triển khai và kiểm chứng cùng M01-F06. |

@@ -7,7 +7,7 @@ Tài liệu này quy định mục tiêu về tốc độ, khả năng chịu t�
 Trong tài liệu có hai loại yêu cầu:
 
 * **Yêu cầu đã có trong Documents:** các mục tiêu được ghi nhận trong tài liệu dự án.  
-* **Bổ sung NFR:** các con số và cách kiểm thử được đề xuất thêm trong tài liệu này. Chúng chưa được xem là yêu cầu chính thức cho đến khi được xác nhận.
+* **Bổ sung NFR:** các con số/cách kiểm thử được đề xuất thêm. Trạng thái phê duyệt hiện hành được ghi ở BR-26 và mục 4; được duyệt làm target không đồng nghĩa hệ thống đã đạt.
 
 Nếu một quy tắc nghiệp vụ trong OpenAPI vẫn đang chờ quyết định hoặc chỉ được áp dụng khi đáp ứng điều kiện nhất định, không được tự xem quy tắc đó là đã được phê duyệt.
 
@@ -193,7 +193,7 @@ API không được trả về danh sách không giới hạn số lượng bả
 * Nếu sử dụng cache cho dữ liệu riêng tư, khóa cache phải phân biệt đúng người dùng hoặc phạm vi truy cập.  
 * Thay đổi quyền do đình chỉ tài khoản hoặc thu hồi assignment phải có hiệu lực theo quy tắc phân quyền, không phụ thuộc vào việc cache hết hạn.
 
-Số bản ghi mặc định mỗi trang là đề xuất mới. Cần đồng bộ giá trị này vào D07 và hợp đồng API trước khi release.
+Phân trang mặc định 20, tối đa 50 đã chốt tại BR-26; ngoại lệ route-specific nằm trong API Route Catalog. Runtime chưa đồng bộ toàn bộ.
 
 ## PC-06 · Polling, backlog và tài nguyên
 
@@ -203,7 +203,7 @@ Số bản ghi mặc định mỗi trang là đề xuất mới. Cần đồng b
 
 Phương án cơ bản của MVP là dùng REST API để polling và đồng bộ lại dữ liệu khi kết nối được khôi phục. Reverb không bắt buộc phải được triển khai để đáp ứng yêu cầu này.
 
-Bổ sung NFR: tần suất polling đề xuất:
+Tần suất polling đã chốt tại BR-26:
 
 * Chat đang mở: mỗi 5 giây.  
 * Inbox và notification: mỗi 15 giây.
@@ -221,7 +221,7 @@ Khi tab trình duyệt bị ẩn, frontend nên giảm tần suất polling. Khi
 * Dừng polling khi người dùng đăng xuất hoặc component giao diện không còn được sử dụng.  
 * Tần suất polling được cấu hình thống nhất và có thể điều chỉnh.
 
-Các khoảng thời gian trên là đề xuất cho D07, chưa phải giá trị đã được phê duyệt. Không được xem yêu cầu này là lý do bắt buộc phải bổ sung Reverb hoặc Redis vào kiến trúc MVP.
+Các khoảng thời gian trên là target đã chốt cho D07/BR-26. Không bắt buộc bổ sung Reverb hoặc Redis vào kiến trúc MVP.
 
 ## **PC-07 · Tệp tải lên và giới hạn tài nguyên**
 
@@ -256,9 +256,9 @@ Bổ sung NFR:
 
 ### **Yêu cầu**
 
-Bổ sung NFR: thiết lập cảnh báo khi dung lượng database hoặc private storage đạt 80%. Cần chủ động xử lý trước khi dung lượng đạt 90%.
+Đã chốt ngày 21/10/2026: cảnh báo khi dung lượng database hoặc private storage đạt 80%; chủ động xử lý trước khi đạt 90%.
 
-Đối với worker xử lý outbox, mục tiêu đề xuất là 95% notification được đưa vào inbox và có thể đọc được trong vòng 30 giây sau khi giao dịch ban đầu được commit, trong điều kiện tải chuẩn.
+Target đã chốt ngày 21/10/2026: 95% notification được đưa vào inbox và đọc được trong vòng 30 giây sau commit, dưới tải chuẩn. Cảnh báo outbox pending quá 5 phút theo BR-25.
 
 Thời gian này phải được đo đến khi bản ghi notification thực sự đọc được từ inbox, không chỉ đến lúc công việc được đưa vào hàng đợi.
 
@@ -282,24 +282,8 @@ Việc kiểm tra hiệu năng được chia thành bốn giai đoạn:
 
 Mỗi lần nghiệm thu cần lưu lại script kiểm thử, dữ liệu seed, cấu hình môi trường và kết quả đo thô kèm thời điểm thực hiện. Nhờ đó, nhóm có thể chạy lại và so sánh kết quả sau khi thay đổi code hoặc cấu hình.
 
-# 4\. Phụ thuộc và điểm chưa chốt
+# 4. Trạng thái quyết định và implementation gaps
 
-Các mục tiêu quy mô, API p95 và thời gian tìm kiếm là những yêu cầu gốc được ghi nhận trong tài liệu dự án.
+Các target PC-01–PC-08 được Product chốt ngày 21/10/2026 làm tiêu chí nghiệm thu cho môi trường MVP, không phải bằng chứng hệ thống hiện đã đạt. Bao gồm profile/dataset và tải kiểm thử đã nêu ở phần trên; API p95 <2 giây, search p95 <3 giây; Web Vitals p75 LCP ≤2.5 giây, INP ≤200 ms, CLS ≤0.1; polling chat 5 giây, inbox/notification 15 giây; backoff 5→10→20→30 giây và tôn trọng Retry-After; page mặc định 20, tối đa 50; tối đa 2 upload đồng thời; cảnh báo storage 80%, hành động trước 90%; 95% notification sẵn sàng trong 30 giây dưới tải chuẩn.
 
-Các giá trị sau là đề xuất bổ sung, cần được xác nhận trước khi trở thành yêu cầu chính thức:
-
-* Số lượng dữ liệu tối thiểu dùng trong kiểm thử.  
-* Thời gian và cách phân bổ tải kiểm thử.  
-* Các mục tiêu LCP, INP và CLS.  
-* Tần suất polling của chat và notification.  
-* Số bản ghi mặc định mỗi trang.  
-* Ngưỡng cảnh báo dung lượng.  
-* Giới hạn upload đồng thời và thời gian xử lý notification.
-
-Sau khi được thống nhất, các giá trị cần được cập nhật vào cấu hình hệ thống và tài liệu liên quan, bao gồm D07 hoặc hợp đồng API khi phù hợp.
-
-Không được xem một con số xuất hiện trong bản NFR đề xuất là cam kết đã có trong OpenAPI draft hoặc là bằng chứng hệ thống đã đạt mục tiêu hiệu năng
-
-Đồng bộ trạng thái NFR 18/10/2026: mục ghi Nguồn giữ quyết định đã có; mọi Bổ sung NFR/đề xuất chưa có xác nhận vẫn Proposed, chưa dùng đơn lẻ để pass/fail G4. Trước khi áp dụng, ghi mã yêu cầu, giá trị, owner/approver, ngày xác nhận, test/evidence và phụ thuộc Dxx trong chính phần yêu cầu hoặc Lịch sử làm việc hiện có. Nếu thiếu xác nhận thì giữ Pending; không suy phê duyệt từ từ “phải” trong mục nghiệm thu, không dùng NFR mới để tự mở lại quyết định đã chốt. Chỉ nghiệm thu phạm vi và môi trường đã được duyệt; không đồng nhất G4 trình diễn với production thực tế.
-
-.
+Implementation gaps: cần đo trên build/môi trường nghiệm thu đã thống nhất, lưu dataset/script/kết quả và đối chiếu từng target. Không ghi “đạt” nếu chưa có kết quả đo.

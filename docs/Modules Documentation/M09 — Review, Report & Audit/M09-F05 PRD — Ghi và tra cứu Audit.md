@@ -13,6 +13,9 @@ Lưu dấu vết bất biến cho các quyết định/moderation quan trọng v
 * Audit là append-only: API không sửa/xóa sự kiện lịch sử.  
 * admin.audit\_logs.view chỉ đọc theo scope; quyền Admin chung không cấp toàn bộ log.  
 * Không đưa secret, object key hoặc toàn bộ private content vào audit payload.
+* Action catalog MVP: `report.create/resolve/dismiss`, `review.create/hide/restore`, `listing.hide/restore`, `tutor_profile.approve/request_changes/reject/suspend/restore`, `account.suspend/restore`, `assignment.change`, `announcement.publish`, `fee_record.create/update/mark/void`, `session.complete/cancel`, `task.create/update/start/cancel/review`, `file.link/unlink`, `evidence.read`, `audit.read`, `outbox.replay/resolve/purge`. Mở rộng action phải cập nhật catalog và kiểm thử tương ứng.
+* `admin.audit_logs.view` cho phép operator nội bộ đọc trong scope được giao. DTO allow-list gồm actor, action, resource type/id, status/version trước/sau khi phù hợp, reason, request ID và timestamp; không trả raw JSONB, nội dung message, file hay credentials. Ghi `audit.read` khi truy vấn audit.
+* Giữ audit 24 tháng từ `created_at`, sau đó purge theo job có quyền kiểm soát; purge phải tự được audit. Không xóa/sửa thủ công qua API.
 
 # 3\. Tiêu chí chấp nhận
 
@@ -24,7 +27,7 @@ Lưu dấu vết bất biến cho các quyết định/moderation quan trọng v
 # 4\. Chênh lệch/câu hỏi mở
 
 * Admin approval audit đã có; Report/Review audit API và scoped log reader chưa có.  
-* Chốt action catalog, masking, retention, pagination và cross-module audit schema.
+* Action catalog, masking, retention và scope đã được chốt ngày 21/10/2026. API audit chưa triển khai; pagination tuân mặc định API chung và cần kiểm chứng khi có code.
 
 # 5\. Nguồn
 

@@ -5,9 +5,11 @@ Danh mục **method/path chuẩn cho API đích** của TutorLink. Giữ toàn b
 Trạng thái đối chiếu ngày 20/10/2026 với `docs/api/openapi.json`:
 
 - **Đã đăng ký:** method/path xuất hiện trong OpenAPI sinh từ code. Riêng `GET /sanctum/csrf-cookie` do Sanctum đăng ký ngoài `/api/v1`, nên không nằm trong artifact Scramble. Trạng thái này không xác nhận hành vi, quyền hay dữ liệu đã đạt PRD.
-- **Dự kiến:** method/path thuộc phạm vi API đích nhưng chưa xuất hiện trong OpenAPI sinh từ code; có thể còn quyền, dữ liệu hoặc hành vi cần chốt trước khi triển khai. Nhãn này không có nghĩa là hoãn route.
+- **Dự kiến:** method/path thuộc phạm vi API đích nhưng chưa xuất hiện trong OpenAPI sinh từ code; đã được mô tả theo quyết định hiện hành ở Business Rules/PRD. Nhãn này không có nghĩa là hoãn route.
 
 Khi triển khai, kiểm quyền và quy tắc trong code, thêm kiểm thử phù hợp, sinh lại OpenAPI bằng Scramble, rồi đối chiếu method/path để cập nhật cột trạng thái. Không sửa JSON sinh ra bằng tay. Quy tắc Announcement khi Program Paused đã được chốt tại [BR-10](../Domain%20Documentation/Business%20Rules.md): Tutor owner được tạo, sửa Draft và publish khi Active/Paused; các route bên dưới vẫn **Dự kiến** cho đến khi backend triển khai.
+
+Chuẩn mặc định đã chốt tại BR-26: JSON error `{code,message,request_id,errors?}`, `X-Request-ID`, timestamp UTC RFC 3339, tiền VND integer; page 20, tối đa 50. Cursor opaque/scoped áp dụng cho Message và Notification; ngoại lệ được ghi tại route. Không phát hành một response DTO chung thay cho allow-list theo resource.
 
 Các route mutation Session, Task, Fee Record và Announcement tuân version guard của [BR-19](../Domain%20Documentation/Business%20Rules.md): response chứa `version`; PATCH/action POST gửi `expected_version`; stale trả 409 mà không ghi một phần. PUT Submission tiếp tục dùng `expected_submission_version` cùng Idempotency-Key theo D13.
 
@@ -151,16 +153,16 @@ Các route mutation Session, Task, Fee Record và Announcement tuân version gua
 | POST /api/v1/notifications/read-all | Đánh dấu toàn bộ đã đọc Quyền: Chủ notification | Dự kiến |
 | GET /api/v1/admin/audit-logs | Tra cứu audit theo scope Quyền: Admin audit viewer | Dự kiến |
 | GET /api/v1/admin/audit-logs/{auditLog} | Chi tiết audit, không sửa/xóa Quyền: Admin audit viewer | Dự kiến |
-| **14 API Admin cần chốt chi tiết quyền** |  |  |
+| **14 API Admin** |  |  |
 | POST /api/v1/admin/listings/{listing}/hide | Đặt hold; active → inactive do Admin, reason_code/reason/audit, thông báo Tutor sau commit. Quyền: Admin active có admin.listings.moderate, toàn bộ Listing MVP | Dự kiến |
 | POST /api/v1/admin/listings/{listing}/restore-visibility | Gỡ hold; inactive do Admin → active khi đủ gate, thiếu gate 409 giữ hold; Tutor tự pause thì giữ inactive. Reason_code/reason/audit, thông báo Tutor. Quyền: Admin active có admin.listings.moderate, toàn bộ Listing MVP | Dự kiến |
-| GET /api/v1/admin/users | Tra cứu user hỗ trợ có giới hạn; cần chốt scope/DTO Quyền: Admin được cấp quyền tương ứng | Dự kiến |
-| GET /api/v1/admin/users/{user} | Đọc dữ liệu hỗ trợ trong scope; cần chốt field allow-list Quyền: Admin được cấp quyền tương ứng | Dự kiến |
-| PATCH /api/v1/admin/users/{user} | Sửa field hỗ trợ allow-list; không role/credentials; cần chốt audit Quyền: Admin được cấp quyền tương ứng | Dự kiến |
-| GET /api/v1/admin/metrics | Chỉ số tổng hợp, không lộ private content; cần chốt scope Quyền: Admin được cấp quyền tương ứng | Dự kiến |
+| GET /api/v1/admin/users | `admin.users.view`; hỗ trợ exact `user_id` hoặc email chuẩn hóa chính xác; danh sách chỉ Admin active đủ quyền giao việc, DTO tối thiểu id/display_name; không directory browse hàng loạt | Dự kiến |
+| GET /api/v1/admin/users/{user} | `admin.users.view`; allow-list id/full_name/role/status/email_verified_at/created_at; email chỉ hiện trong kết quả exact lookup phục vụ hỗ trợ | Dự kiến |
+| PATCH /api/v1/admin/users/{user} | `admin.users.update`; chỉ sửa full_name, reason bắt buộc + audit; cấm role/email/DOB/password/status | Dự kiến |
+| GET /api/v1/admin/metrics | `admin.metrics.view`; aggregate theo role/status/Profile/Listing/Program/Report/outbox; không trả individual row hay private content | Dự kiến |
 
 ## Nguồn và phạm vi
 
 - PRD theo module: [M01](<../Modules Documentation/M01 — Identity & Access/M01 — Identity & Access — Mục lục PRD.md>), [M02](<../Modules Documentation/M02 — Tutor Profile & Approval/M02 — Tutor Profile & Approval — Mục lục PRD.md>), [M03](<../Modules Documentation/M03 — Catalog & Marketplace/M03 — Catalog & Marketplace — PRD Index.md>), [M04](<../Modules Documentation/M04 — Messaging/M04 — Messaging — PRD Index.md>), [M05](<../Modules Documentation/M05 — Program & Invitation/M05 — Program & Invitation — PRD Index.md>), [M06](<../Modules Documentation/M06 — Session & Workspace/M06 — Session & Workspace — PRD Index.md>), [M07](<../Modules Documentation/M07 — Task & Progress/M07 — Task & Progress — PRD Index.md>), [M08](<../Modules Documentation/M08 — Fee, Announcement & Notification/M08 — Fee, Announcement & Notification — PRD Index.md>), [M09](<../Modules Documentation/M09 — Review, Report & Audit/M09 — Review, Report & Audit — PRD Index.md>), [M10](<../Modules Documentation/M10 — Files/M10 — Files — PRD Index.md>).
-- [Business Rules](<../Domain Documentation/Business Rules.md>) và [State Lifecycles](<../Domain Documentation/State Lifecycles.md>) quyết định điều kiện nghiệp vụ. Những câu hỏi chưa chốt vẫn nằm trong PRD/guide quyết định; toàn bộ method/path trong Catalog đã giữ phạm vi, nhưng nhãn **Dự kiến** không đồng nghĩa chi tiết nghiệp vụ đã được duyệt hoặc route đã được đăng ký.
+- [Business Rules](<../Domain Documentation/Business Rules.md>) và [State Lifecycles](<../Domain Documentation/State Lifecycles.md>) quyết định điều kiện nghiệp vụ. Quyết định nghiệp vụ hiện hành nằm trong PRD/Business Rules/UNRESOLVED_DECISIONS; nhãn **Dự kiến** chỉ có nghĩa route chưa được đăng ký, không đồng nghĩa hoãn route.
 - Bản OpenAPI 0.2.0 draft được mô tả trong [hướng dẫn lịch sử](<TutorLink — OpenAPI 0.2.0 draft - hướng dẫn, thay đổi và điểm cần chốt.md>). Nó không phải contract triển khai hiện tại.

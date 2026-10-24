@@ -13,6 +13,8 @@ Hiển thị đánh giá hợp lệ cho công chúng và cho Admin có quyền m
 * Admin chỉ hide/show khi có permission admin.reviews.moderate; lưu audit actor, old/new visibility, reason/time.  
 * ReviewVisibility: visible ↔ hidden; hide không xóa Review hoặc thay Program history.  
 * Public payload không tiết lộ reporter, private files, moderation notes hay verification documents.
+* Public list và aggregate chỉ tính Review `visible`; hidden không xuất hiện trong hồ sơ Tutor hoặc thống kê. Customer chỉ xem Review của chính mình và trạng thái hidden; không thấy moderation reason. Admin moderator được xem nội dung Review cùng reason/audit trong phạm vi tác vụ.
+* Danh sách public sort theo `(created_at,id)` giảm dần; mặc định 20, tối đa 50 mỗi trang. Không trả identity hoặc contact của Customer; hiển thị nhãn trung tính `Customer đã xác minh`.
 
 # 3\. Tiêu chí chấp nhận
 
@@ -23,8 +25,7 @@ Hiển thị đánh giá hợp lệ cho công chúng và cho Admin có quyền m
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Chốt public sorting/pagination và body visibility khi Review bị hidden.  
-* Enum permission có trong Domain, nhưng Review API/UI và public aggregate chưa có baseline.
+* Sorting, pagination, hiển thị hidden Review và identity đã chốt ngày 21/10/2026; Review API/UI và public aggregate chưa triển khai.
 
 # 5\. Nguồn
 

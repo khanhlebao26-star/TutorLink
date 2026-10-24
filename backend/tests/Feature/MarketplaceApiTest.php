@@ -605,8 +605,10 @@ class MarketplaceApiTest extends TestCase
             'price_unit' => 'session',
         ];
 
+        $customer = User::factory()->create(['role' => 'customer']);
         $programId = DB::table('programs')->insertGetId([
             'owner_tutor_profile_id' => $profile->id,
+            'customer_id' => $customer->id,
             'source_listing_id' => $listing->id,
             'version' => 1,
             'title' => 'Test Program',
@@ -614,7 +616,7 @@ class MarketplaceApiTest extends TestCase
             'agreed_fee_minor' => 200000,
             'currency' => 'VND',
             'fee_unit' => 'session',
-            'status' => 'pending',
+            'status' => 'draft',
             'offer_snapshot' => json_encode($snapshot),
             'created_at' => now(),
             'updated_at' => now(),
