@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\PublicTutorReviewController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\NotificationOutboxController;
 
 Route::prefix('v1')->group(function () {
     Route::prefix('auth')->group(function () {
@@ -86,6 +87,16 @@ Route::prefix('v1')->group(function () {
                 ->name('admin.users.suspend');
             Route::post('/users/{user}/restore', [AdminController::class, 'restoreAccount'])
                 ->name('admin.users.restore');
+            Route::get('/notification-outbox', [
+                NotificationOutboxController::class,
+                'index',
+            ])->name('admin.notification-outbox.index');
+
+            Route::post('/notification-outbox/{outbox}/replay', [
+                NotificationOutboxController::class,
+                'replay',
+            ])->whereUuid('outbox')
+                ->name('admin.notification-outbox.replay');
         });
 
         Route::patch('/me', [AuthController::class, 'updateMe'])

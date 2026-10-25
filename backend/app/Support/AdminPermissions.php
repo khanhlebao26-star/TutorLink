@@ -14,6 +14,9 @@ final class AdminPermissions
 
     public const SUSPEND_ACCOUNTS = 'admin.accounts.suspend';
 
+    public const VIEW_NOTIFICATION_OUTBOX = 'admin.notification_outbox.view';
+
+    public const REPLAY_NOTIFICATION_OUTBOX = 'admin.notification_outbox.replay';
     /**
      * @return list<string>
      */
@@ -25,6 +28,8 @@ final class AdminPermissions
             self::DOWNLOAD_VERIFICATION_DOCUMENTS,
             self::SUSPEND_TUTOR_PROFILES,
             self::SUSPEND_ACCOUNTS,
+            self::VIEW_NOTIFICATION_OUTBOX,
+            self::REPLAY_NOTIFICATION_OUTBOX,
         ];
     }
 }

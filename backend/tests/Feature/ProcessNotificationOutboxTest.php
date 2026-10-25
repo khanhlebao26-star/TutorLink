@@ -3,12 +3,14 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\AdminPermissions;
 use App\Support\NotificationOutboxWriter;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Connection;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use LogicException;
 use RuntimeException;
 use Tests\Support\PostgresConnections;
 use Tests\TestCase;
@@ -172,16 +174,15 @@ class ProcessNotificationOutboxTest extends TestCase
             ),
         ]);
 
-        try {
-            $this->runWorker();
+        $this->runWorker();
 
-            $this->fail('Expected a notification conflict.');
-        } catch (LogicException $exception) {
-            $this->assertSame(
-                'Notification key conflicts with existing data.',
-                $exception->getMessage(),
-            );
-        }
+        $this->assertDatabaseHas('notification_outbox', [
+            'id' => $outbox->id,
+            'attempt_count' => 1,
+            'processed_at' => null,
+            'failed_at' => null,
+            'last_error_code' => 'notification_key_conflict',
+        ]);
 
         $this->assertDatabaseCount('notifications', 1);
 
@@ -322,6 +323,485 @@ class ProcessNotificationOutboxTest extends TestCase
                     ->value('processed_at'),
             );
         });
+    }
+
+    public function test_retry_window_expires_without_another_delivery_attempt(): void
+    {
+        $recipient = User::factory()->create();
+        $outbox = $this->recordOutbox($recipient);
+
+        DB::table('notification_outbox')
+            ->where('id', $outbox->id)
+            ->update([
+                'attempt_count' => 1,
+                'retry_started_at' => DB::raw(
+                    "CURRENT_TIMESTAMP - INTERVAL '61 minutes'"
+                ),
+                'available_at' => DB::raw(
+                    "CURRENT_TIMESTAMP + INTERVAL '1 hour'"
+                ),
+            ]);
+
+        $this->runWorker();
+
+        $this->assertDatabaseCount('notifications', 0);
+
+        $this->assertDatabaseHas('notification_outbox', [
+            'id' => $outbox->id,
+            'attempt_count' => 1,
+            'processed_at' => null,
+            'last_error_code' => 'retry_window_expired',
+        ]);
+
+        $this->assertNotNull(
+            DB::table('notification_outbox')
+                ->where('id', $outbox->id)
+                ->value('failed_at'),
+        );
+    }
+
+    public function test_failed_processing_rolls_back_notification_and_can_retry(): void
+    {
+        $recipient = User::factory()->create();
+        $outbox = $this->recordOutbox($recipient);
+
+        DB::statement(
+            'ALTER TABLE notification_outbox
+         ADD CONSTRAINT k02_test_block_processed
+         CHECK (processed_at IS NULL)'
+        );
+
+        try {
+            $this->runWorker();
+        } finally {
+            DB::statement(
+                'ALTER TABLE notification_outbox
+             DROP CONSTRAINT k02_test_block_processed'
+            );
+        }
+
+        $this->assertDatabaseCount('notifications', 0);
+
+        $this->assertDatabaseHas('notification_outbox', [
+            'id' => $outbox->id,
+            'attempt_count' => 1,
+            'processed_at' => null,
+            'failed_at' => null,
+            'last_error_code' => 'notification_write_failed',
+        ]);
+
+        $retry = DB::table('notification_outbox')
+            ->where('id', $outbox->id)
+            ->first();
+
+        $this->assertTrue(
+            \Carbon\CarbonImmutable::parse($retry->available_at)
+                ->greaterThan(
+                    \Carbon\CarbonImmutable::parse($retry->retry_started_at)
+                ),
+        );
+
+        DB::table('notification_outbox')
+            ->where('id', $outbox->id)
+            ->update([
+                'available_at' => DB::raw(
+                    "CURRENT_TIMESTAMP - INTERVAL '1 second'"
+                ),
+            ]);
+
+        $this->runWorker();
+
+        $this->assertDatabaseCount('notifications', 1);
+
+        $this->assertDatabaseHas('notification_outbox', [
+            'id' => $outbox->id,
+            'attempt_count' => 2,
+            'last_error_code' => null,
+        ]);
+
+        $this->assertNotNull(
+            DB::table('notification_outbox')
+                ->where('id', $outbox->id)
+                ->value('processed_at'),
+        );
+    }
+
+    public function test_tenth_failure_stops_automatic_retries(): void
+    {
+        $outbox = $this->recordOutbox(User::factory()->create());
+        $this->insertConflictingNotification($outbox);
+
+        DB::table('notification_outbox')->where('id', $outbox->id)->update([
+            'attempt_count' => 9,
+            'retry_started_at' => DB::raw("clock_timestamp() - INTERVAL '5 minutes'"),
+        ]);
+
+        $this->runWorker();
+
+        $failed = $this->freshOutbox($outbox->id);
+        $this->assertSame(10, (int) $failed->attempt_count);
+        $this->assertNotNull($failed->failed_at);
+        $this->assertNull($failed->processed_at);
+        $this->assertSame('notification_key_conflict', $failed->last_error_code);
+        $this->assertDatabaseCount('notifications', 1);
+
+        $this->runWorker();
+
+        $this->assertSame((array) $failed, (array) $this->freshOutbox($outbox->id));
+    }
+
+    public function test_retry_backoff_is_at_most_five_minutes(): void
+    {
+        $outbox = $this->recordOutbox(User::factory()->create());
+        $this->insertConflictingNotification($outbox);
+
+        DB::table('notification_outbox')->where('id', $outbox->id)->update([
+            'attempt_count' => 8,
+            'retry_started_at' => DB::raw("clock_timestamp() - INTERVAL '5 minutes'"),
+        ]);
+
+        $before = CarbonImmutable::parse(
+            DB::selectOne('SELECT clock_timestamp() AS value')->value,
+        );
+
+        $this->runWorker();
+
+        $after = CarbonImmutable::parse(
+            DB::selectOne('SELECT clock_timestamp() AS value')->value,
+        );
+        $retry = $this->freshOutbox($outbox->id);
+        $availableAt = CarbonImmutable::parse($retry->available_at);
+
+        $this->assertSame(9, (int) $retry->attempt_count);
+        $this->assertNull($retry->failed_at);
+        $this->assertNull($retry->processed_at);
+        $this->assertTrue($availableAt->greaterThan($before));
+        $this->assertTrue($availableAt->lessThanOrEqualTo($after->addSeconds(300)));
+    }
+
+    public function test_authorized_replay_preserves_event_and_writes_audit(): void
+    {
+        $outbox = $this->makeFailedOutbox();
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+
+        $this->postJson("/api/v1/admin/notification-outbox/{$outbox->id}/replay", [
+            'reason' => 'Fixed the cause and requested replay.',
+        ])->assertStatus(202)
+            ->assertJsonPath('data.id', $outbox->id)
+            ->assertJsonPath('data.status', 'replay_pending');
+
+        $replayed = $this->freshOutbox($outbox->id);
+
+        $this->assertSame(0, (int) $replayed->attempt_count);
+        $this->assertNull($replayed->processed_at);
+        $this->assertNull($replayed->resolved_at);
+        $this->assertNull($replayed->last_error_code);
+        $this->assertSame($outbox->failed_at, $replayed->failed_at);
+        $this->assertTrue(
+            CarbonImmutable::parse($replayed->replay_requested_at)
+                ->greaterThan(CarbonImmutable::parse($replayed->failed_at)),
+        );
+
+        foreach (['id', 'user_id', 'type', 'event_key', 'payload', 'resource_type', 'resource_id'] as $field) {
+            $this->assertSame($outbox->{$field}, $replayed->{$field});
+        }
+
+        $this->assertDatabaseCount('notification_outbox', 1);
+        $this->assertDatabaseCount('notifications', 0);
+        $this->assertDatabaseCount('audit_logs', 1);
+        $this->assertDatabaseHas('audit_logs', [
+            'actor_id' => $operator->id,
+            'action' => 'outbox.replay',
+            'resource_type' => $outbox->resource_type,
+            'resource_id' => $outbox->resource_id,
+            'reason' => 'Fixed the cause and requested replay.',
+        ]);
+
+        $audit = DB::table('audit_logs')->where('action', 'outbox.replay')->first();
+        $before = json_decode($audit->before, true, 512, JSON_THROW_ON_ERROR);
+        $after = json_decode($audit->after, true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame($outbox->id, $before['outbox_id']);
+        $this->assertSame($outbox->id, $after['outbox_id']);
+        $this->assertSame(10, $before['attempt_count']);
+        $this->assertSame(0, $after['attempt_count']);
+        $this->assertArrayNotHasKey('payload', $before);
+        $this->assertArrayNotHasKey('payload', $after);
+    }
+
+    public function test_successful_replay_resolves_failure_without_duplicate_notification(): void
+    {
+        $outbox = $this->makeFailedOutbox();
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+
+        $this->postJson("/api/v1/admin/notification-outbox/{$outbox->id}/replay", [
+            'reason' => 'The underlying failure has been fixed.',
+        ])->assertStatus(202);
+
+        $this->runWorker();
+
+        $processed = $this->freshOutbox($outbox->id);
+
+        $this->assertSame(1, (int) $processed->attempt_count);
+        $this->assertNotNull($processed->processed_at);
+        $this->assertNotNull($processed->resolved_at);
+        $this->assertSame($outbox->failed_at, $processed->failed_at);
+        $this->assertSame($outbox->event_key, $processed->event_key);
+        $this->assertSame($outbox->payload, $processed->payload);
+        $this->assertNull($processed->last_error_code);
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $outbox->user_id,
+            'type' => $outbox->type,
+            'event_key' => $outbox->event_key,
+        ]);
+
+        $this->runWorker();
+
+        $this->assertDatabaseCount('notifications', 1);
+        $this->assertDatabaseCount('notification_outbox', 1);
+        $this->assertDatabaseCount('audit_logs', 1);
+        $this->assertSame((array) $processed, (array) $this->freshOutbox($outbox->id));
+    }
+
+    public function test_failed_replay_requires_a_new_replay_request(): void
+    {
+        $outbox = $this->makeFailedOutbox();
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+
+        $this->postJson("/api/v1/admin/notification-outbox/{$outbox->id}/replay", [
+            'reason' => 'Retry the failed delivery.',
+        ])->assertStatus(202);
+
+        $this->insertConflictingNotification($outbox);
+
+        DB::table('notification_outbox')->where('id', $outbox->id)->update([
+            'attempt_count' => 9,
+            'retry_started_at' => DB::raw("clock_timestamp() - INTERVAL '5 minutes'"),
+            'available_at' => DB::raw("clock_timestamp() - INTERVAL '1 second'"),
+        ]);
+
+        $this->runWorker();
+
+        $failed = $this->freshOutbox($outbox->id);
+        $this->assertSame(10, (int) $failed->attempt_count);
+        $this->assertNull($failed->processed_at);
+        $this->assertNull($failed->resolved_at);
+        $this->assertTrue(
+            CarbonImmutable::parse($failed->failed_at)
+                ->greaterThan(CarbonImmutable::parse($failed->replay_requested_at)),
+        );
+
+        $this->runWorker();
+
+        $this->assertSame((array) $failed, (array) $this->freshOutbox($outbox->id));
+        $this->assertDatabaseCount('audit_logs', 1);
+    }
+
+    public function test_outbox_apis_require_explicit_permissions(): void
+    {
+        $outbox = $this->makeFailedOutbox();
+
+        foreach (['customer', 'admin'] as $role) {
+            $user = User::factory()->create([
+                'role' => $role,
+                'status' => 'active',
+                'permissions' => [],
+            ]);
+            $this->actingAs($user, 'web');
+
+            $this->getJson('/api/v1/admin/notification-outbox?status=failed')
+                ->assertForbidden();
+
+            $this->postJson("/api/v1/admin/notification-outbox/{$outbox->id}/replay", [
+                'reason' => 'Unauthorized replay attempt.',
+            ])->assertForbidden();
+
+            $this->assertSame((array) $outbox, (array) $this->freshOutbox($outbox->id));
+        }
+
+        $this->assertDatabaseCount('audit_logs', 0);
+    }
+
+    public function test_replay_requires_a_nonblank_reason(): void
+    {
+        $outbox = $this->makeFailedOutbox();
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+
+        foreach ([[], ['reason' => '   ']] as $body) {
+            $this->postJson("/api/v1/admin/notification-outbox/{$outbox->id}/replay", $body)
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('reason');
+
+            $this->assertSame((array) $outbox, (array) $this->freshOutbox($outbox->id));
+        }
+
+        $this->assertDatabaseCount('audit_logs', 0);
+    }
+
+    public function test_a_second_pending_replay_is_rejected_without_another_audit(): void
+    {
+        $outbox = $this->makeFailedOutbox();
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+        $url = "/api/v1/admin/notification-outbox/{$outbox->id}/replay";
+
+        $this->postJson($url, ['reason' => 'First replay request.'])
+            ->assertStatus(202);
+
+        $pending = $this->freshOutbox($outbox->id);
+
+        $this->postJson($url, ['reason' => 'Repeated replay request.'])
+            ->assertStatus(409);
+
+        $this->assertSame((array) $pending, (array) $this->freshOutbox($outbox->id));
+        $this->assertDatabaseCount('audit_logs', 1);
+    }
+
+    public function test_processed_or_resolved_outbox_cannot_be_replayed(): void
+    {
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+
+        foreach (['processed_at', 'resolved_at'] as $column) {
+            $outbox = $this->makeFailedOutbox();
+
+            DB::table('notification_outbox')->where('id', $outbox->id)->update([
+                $column => DB::raw('clock_timestamp()'),
+            ]);
+
+            $before = $this->freshOutbox($outbox->id);
+
+            $this->postJson("/api/v1/admin/notification-outbox/{$outbox->id}/replay", [
+                'reason' => 'Try to replay a completed event.',
+            ])->assertStatus(409);
+
+            $this->assertSame((array) $before, (array) $this->freshOutbox($outbox->id));
+        }
+
+        $this->assertDatabaseCount('audit_logs', 0);
+    }
+
+    public function test_audit_failure_rolls_back_replay_state(): void
+    {
+        $outbox = $this->makeFailedOutbox();
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+        $this->withoutExceptionHandling();
+
+        DB::statement(
+            "ALTER TABLE audit_logs ADD CONSTRAINT k02_test_block_replay_audit
+             CHECK (action <> 'outbox.replay')"
+        );
+
+        try {
+            try {
+                $this->postJson("/api/v1/admin/notification-outbox/{$outbox->id}/replay", [
+                    'reason' => 'Replay must fail if its audit cannot be written.',
+                ]);
+
+                $this->fail('Expected the audit constraint to reject the insert.');
+            } catch (QueryException $exception) {
+                $this->assertSame('23514', $exception->errorInfo[0] ?? null);
+            }
+        } finally {
+            DB::statement('ALTER TABLE audit_logs DROP CONSTRAINT k02_test_block_replay_audit');
+        }
+
+        $this->assertSame((array) $outbox, (array) $this->freshOutbox($outbox->id));
+        $this->assertDatabaseCount('audit_logs', 0);
+        $this->assertDatabaseCount('notifications', 0);
+    }
+
+    public function test_listing_classifies_outbox_states_and_excludes_payload(): void
+    {
+        $pending = $this->recordOutbox(User::factory()->create());
+        $failed = $this->makeFailedOutbox();
+        $replaying = $this->makeFailedOutbox();
+        $completed = $this->recordOutbox(User::factory()->create());
+        $resolved = $this->makeFailedOutbox();
+
+        DB::table('notification_outbox')->where('id', $completed->id)->update([
+            'processed_at' => DB::raw('clock_timestamp()'),
+        ]);
+        DB::table('notification_outbox')->where('id', $resolved->id)->update([
+            'resolved_at' => DB::raw('clock_timestamp()'),
+        ]);
+
+        $operator = $this->makeOutboxOperator();
+        $this->actingAs($operator, 'web');
+
+        $this->postJson("/api/v1/admin/notification-outbox/{$replaying->id}/replay", [
+            'reason' => 'Queue a replay for listing verification.',
+        ])->assertStatus(202);
+
+        $pendingRows = $this->getJson('/api/v1/admin/notification-outbox?status=pending')
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->json('data');
+
+        $failedRows = $this->getJson('/api/v1/admin/notification-outbox?status=failed')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->json('data');
+
+        $this->assertEqualsCanonicalizing(
+            [$pending->id, $replaying->id],
+            array_column($pendingRows, 'id'),
+        );
+        $this->assertSame([$failed->id], array_column($failedRows, 'id'));
+
+        foreach (array_merge($pendingRows, $failedRows) as $row) {
+            $this->assertArrayNotHasKey('payload', $row);
+        }
+    }
+
+    private function makeOutboxOperator(): User
+    {
+        return User::factory()->create([
+            'role' => 'admin',
+            'status' => 'active',
+            'permissions' => [
+                AdminPermissions::VIEW_NOTIFICATION_OUTBOX,
+                AdminPermissions::REPLAY_NOTIFICATION_OUTBOX,
+            ],
+        ]);
+    }
+
+    private function makeFailedOutbox(): object
+    {
+        $outbox = $this->recordOutbox(User::factory()->create());
+
+        DB::table('notification_outbox')->where('id', $outbox->id)->update([
+            'attempt_count' => 10,
+            'retry_started_at' => DB::raw("clock_timestamp() - INTERVAL '5 minutes'"),
+            'failed_at' => DB::raw("clock_timestamp() - INTERVAL '1 minute'"),
+            'last_error_code' => 'notification_write_failed',
+        ]);
+
+        return $this->freshOutbox($outbox->id);
+    }
+
+    private function insertConflictingNotification(object $outbox): void
+    {
+        DB::table('notifications')->insert([
+            'id' => (string) Str::uuid(),
+            'user_id' => $outbox->user_id,
+            'type' => $outbox->type,
+            'event_key' => $outbox->event_key,
+            'payload' => json_encode(
+                ['deep_link' => '/different-page'],
+                JSON_THROW_ON_ERROR,
+            ),
+        ]);
+    }
+
+    private function freshOutbox(string $id): object
+    {
+        return DB::table('notification_outbox')->where('id', $id)->first();
     }
 
     private function recordOutbox(
