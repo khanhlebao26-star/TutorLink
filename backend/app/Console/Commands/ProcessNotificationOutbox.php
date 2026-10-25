@@ -133,7 +133,7 @@ class ProcessNotificationOutbox extends Command
                 $connection->transaction(function () use ($connection, $outbox): void {
                     $this->createNotification($connection, $outbox);
                 });
-            } catch (QueryException | LogicException $exception) {
+            } catch (QueryException|LogicException $exception) {
                 if (
                     $exception instanceof QueryException
                     && str_starts_with(
@@ -206,7 +206,7 @@ class ProcessNotificationOutbox extends Command
                 ->whereRaw('payload = CAST(? AS jsonb)', [$outbox->payload])
                 ->exists();
 
-            if (!$matches) {
+            if (! $matches) {
                 throw new LogicException(
                     'Notification key conflicts with existing data.'
                 );

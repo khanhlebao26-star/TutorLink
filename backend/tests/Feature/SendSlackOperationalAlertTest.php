@@ -48,10 +48,10 @@ class SendSlackOperationalAlertTest extends TestCase
         Http::assertSentCount(1);
         Http::assertSent(function (Request $request): bool {
             return $request->url() === self::URL
-                && $request->hasHeader('Authorization', 'Bearer ' . self::TOKEN)
+                && $request->hasHeader('Authorization', 'Bearer '.self::TOKEN)
                 && $request['channel'] === 'C12345678'
                 && str_contains($request['text'], 'outbox_failed')
-                && !str_contains($request['text'], self::TOKEN)
+                && ! str_contains($request['text'], self::TOKEN)
                 && $request['mrkdwn'] === false;
         });
     }
@@ -77,13 +77,13 @@ class SendSlackOperationalAlertTest extends TestCase
         $pending->assertNotFailed();
         $worker->assertNotFailed();
         Http::assertSentCount(2);
-        Http::assertSent(fn(Request $request): bool => str_contains($request['text'], 'pending_count=3'));
-        Http::assertSent(fn(Request $request): bool => str_contains($request['text'], 'last_heartbeat_at=unknown'));
+        Http::assertSent(fn (Request $request): bool => str_contains($request['text'], 'pending_count=3'));
+        Http::assertSent(fn (Request $request): bool => str_contains($request['text'], 'last_heartbeat_at=unknown'));
     }
 
     public function test_connection_timeout_releases_job_without_inline_retry(): void
     {
-        Http::fake([self::URL => Http::failedConnection('Timed out: ' . self::TOKEN)]);
+        Http::fake([self::URL => Http::failedConnection('Timed out: '.self::TOKEN)]);
         $job = $this->alert()->withFakeQueueInteractions();
 
         $job->handle();
@@ -171,7 +171,7 @@ class SendSlackOperationalAlertTest extends TestCase
                 ['ok' => false, 'error' => 'ratelimited'],
                 200,
                 ['Retry-After' => '30'],
-            )
+            ),
         ]);
         $job = $this->alert()->withFakeQueueInteractions();
 
@@ -188,7 +188,7 @@ class SendSlackOperationalAlertTest extends TestCase
 
         $job->handle();
 
-        $job->assertFailedWith(new RuntimeException('slack_' . $error))
+        $job->assertFailedWith(new RuntimeException('slack_'.$error))
             ->assertNotReleased();
     }
 
@@ -238,7 +238,7 @@ class SendSlackOperationalAlertTest extends TestCase
 
     public function test_tenth_temporary_failure_stops_retry_with_safe_exception(): void
     {
-        Http::fake([self::URL => Http::failedConnection('Secret connection error: ' . self::TOKEN)]);
+        Http::fake([self::URL => Http::failedConnection('Secret connection error: '.self::TOKEN)]);
         $job = $this->alert()->withFakeQueueInteractions();
         $job->job->attempts = 10;
 
@@ -267,8 +267,8 @@ class SendSlackOperationalAlertTest extends TestCase
         Http::fake([
             self::URL => Http::response([
                 'ok' => false,
-                'error' => $private . self::TOKEN,
-            ], 200)
+                'error' => $private.self::TOKEN,
+            ], 200),
         ]);
         $job = $this->alert()->withFakeQueueInteractions();
 

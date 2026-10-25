@@ -21,6 +21,7 @@ final class AdminPermissions
     public const PURGE_NOTIFICATION_DATA = 'admin.notification_outbox.purge';
 
     public const PURGE_AUDIT_LOGS = 'admin.audit_logs.purge';
+
     /**
      * @return list<string>
      */

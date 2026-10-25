@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Symfony\Component\Process\Process;
 use App\Models\User;
 use App\Support\AdminPermissions;
 use App\Support\NotificationOutboxWriter;
@@ -13,6 +12,7 @@ use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Symfony\Component\Process\Process;
 use Tests\Support\PostgresConnections;
 use Tests\TestCase;
 
@@ -197,18 +197,18 @@ class ProcessNotificationOutboxTest extends TestCase
     {
         $recipient = User::factory()->create();
 
-        PostgresConnections::run(function (Connection $connectionA, Connection $connectionB, ) use ($recipient): void {
+        PostgresConnections::run(function (Connection $connectionA, Connection $connectionB) use ($recipient): void {
             $connectionA->beginTransaction();
 
             try {
                 $this->usingConnection(
                     $connectionA,
-                    fn() => $this->recordOutbox($recipient),
+                    fn () => $this->recordOutbox($recipient),
                 );
 
                 $this->usingConnection(
                     $connectionB,
-                    fn() => $this->runWorker(),
+                    fn () => $this->runWorker(),
                 );
 
                 $this->assertDatabaseCount('notifications', 0);
@@ -217,7 +217,7 @@ class ProcessNotificationOutboxTest extends TestCase
 
                 $this->usingConnection(
                     $connectionB,
-                    fn() => $this->runWorker(),
+                    fn () => $this->runWorker(),
                 );
 
                 $this->assertDatabaseCount('notifications', 1);
@@ -239,7 +239,7 @@ class ProcessNotificationOutboxTest extends TestCase
             'profile:17:approve:124',
         );
 
-        PostgresConnections::run(function (Connection $connectionA, Connection $connectionB, ) use ($first, $second): void {
+        PostgresConnections::run(function (Connection $connectionA, Connection $connectionB) use ($first, $second): void {
             $connectionA->beginTransaction();
 
             try {
@@ -250,7 +250,7 @@ class ProcessNotificationOutboxTest extends TestCase
 
                 $this->usingConnection(
                     $connectionB,
-                    fn() => $this->runWorker(),
+                    fn () => $this->runWorker(),
                 );
 
                 $this->assertDatabaseCount('notifications', 1);
@@ -273,7 +273,7 @@ class ProcessNotificationOutboxTest extends TestCase
 
             $this->usingConnection(
                 $connectionB,
-                fn() => $this->runWorker(),
+                fn () => $this->runWorker(),
             );
 
             $this->assertDatabaseCount('notifications', 2);
@@ -285,13 +285,13 @@ class ProcessNotificationOutboxTest extends TestCase
         $recipient = User::factory()->create();
         $outbox = $this->recordOutbox($recipient);
 
-        PostgresConnections::run(function (Connection $connectionA, Connection $connectionB, ) use ($outbox): void {
+        PostgresConnections::run(function (Connection $connectionA, Connection $connectionB) use ($outbox): void {
             $connectionA->beginTransaction();
 
             try {
                 $this->usingConnection(
                     $connectionA,
-                    fn() => $this->runWorker(),
+                    fn () => $this->runWorker(),
                 );
 
                 $this->assertSame(
@@ -313,7 +313,7 @@ class ProcessNotificationOutboxTest extends TestCase
 
             $this->usingConnection(
                 $connectionB,
-                fn() => $this->runWorker(),
+                fn () => $this->runWorker(),
             );
 
             $this->assertDatabaseCount('notifications', 1);
@@ -396,9 +396,9 @@ class ProcessNotificationOutboxTest extends TestCase
             ->first();
 
         $this->assertTrue(
-            \Carbon\CarbonImmutable::parse($retry->available_at)
+            CarbonImmutable::parse($retry->available_at)
                 ->greaterThan(
-                    \Carbon\CarbonImmutable::parse($retry->retry_started_at)
+                    CarbonImmutable::parse($retry->retry_started_at)
                 ),
         );
 
@@ -823,7 +823,7 @@ PHP;
 
             while (
                 $process->isRunning()
-                && !str_contains(
+                && ! str_contains(
                     $process->getOutput(),
                     'K02_INSERTED_BEFORE_COMMIT',
                 )

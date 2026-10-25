@@ -1,0 +1,30 @@
+scheduler-1  |   2026-10-25 13:23:00 Running ['artisan' outbox:monitor] ....... 339.88ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:24:00 Running ['artisan' outbox:monitor] ....... 369.64ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:25:00 Running ['artisan' outbox:monitor] ....... 307.73ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:26:00 Running ['artisan' outbox:monitor] ....... 465.96ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |
+scheduler-1  |    INFO  Running scheduled tasks.
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:42:00 Running ['artisan' outbox:monitor] ....... 323.56ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:43:00 Running ['artisan' outbox:monitor] ....... 339.84ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:44:00 Running ['artisan' outbox:monitor] ....... 386.76ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:45:00 Running ['artisan' outbox:monitor] ....... 358.34ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |
+scheduler-1  |   2026-10-25 13:46:00 Running ['artisan' outbox:monitor] ....... 326.68ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1
+scheduler-1  |

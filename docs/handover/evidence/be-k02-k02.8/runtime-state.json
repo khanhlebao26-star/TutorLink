@@ -1,0 +1,16 @@
+{
+    "observed_at": "2026-10-25T13:47:14+00:00",
+    "source": "Fresh read-only verification after user-operated Slack demo",
+    "outbox": {
+        "id": "67e77d46-3367-4f3f-baeb-2530d6153fec",
+        "user_id": 62,
+        "type": "tutor_profile_changes_requested",
+        "event_key": "profile:27:changes-requested:18",
+        "created_at": "2026-10-25 13:28:54+00",
+        "processed_at": "2026-10-25 13:41:53.639865+00",
+        "failed_at": null
+    },
+    "notification_count": 1,
+    "token_configured": true,
+    "channel": "C0C8BM660TB"
+}

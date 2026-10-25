@@ -76,7 +76,7 @@ final class NotificationOutboxAlerts
 
         return $this->enqueue(
             $connection,
-            'failed:' . $outbox->id . ':' . $outbox->failed_at,
+            'failed:'.$outbox->id.':'.$outbox->failed_at,
             86400,
             $job,
         );
@@ -150,9 +150,9 @@ final class NotificationOutboxAlerts
             );
         }
 
-        $marker = 'notification-alert:' . hash('sha256', $key);
+        $marker = 'notification-alert:'.hash('sha256', $key);
 
-        if (!$cache->add($marker, true, $seconds)) {
+        if (! $cache->add($marker, true, $seconds)) {
             return false;
         }
 

@@ -9,7 +9,6 @@ use LogicException;
 
 final class NotificationOutboxWriter
 {
-
     private const TYPES = [
         'listing_moderation_hidden',
         'listing_moderation_restored',
@@ -37,6 +36,7 @@ final class NotificationOutboxWriter
         'report_resolved',
         'report_dismissed',
     ];
+
     public function record(
         string $type,
         string $resourceType,
@@ -51,7 +51,7 @@ final class NotificationOutboxWriter
             );
         }
 
-        if (!in_array($type, self::TYPES, true)) {
+        if (! in_array($type, self::TYPES, true)) {
             throw new InvalidArgumentException('Unsupported notification type.');
         }
 
@@ -75,7 +75,7 @@ final class NotificationOutboxWriter
         $uniqueRecipientIds = [];
 
         foreach ($recipientIds as $recipientId) {
-            if (!is_int($recipientId) || $recipientId <= 0) {
+            if (! is_int($recipientId) || $recipientId <= 0) {
                 throw new InvalidArgumentException('Invalid recipient ID.');
             }
 
@@ -101,8 +101,8 @@ final class NotificationOutboxWriter
         $deepLink = $payload['deep_link'] ?? null;
 
         if (
-            !is_string($deepLink)
-            || !str_starts_with($deepLink, '/')
+            ! is_string($deepLink)
+            || ! str_starts_with($deepLink, '/')
             || str_starts_with($deepLink, '//')
             || str_contains($deepLink, '\\')
             || preg_match('/[\x00-\x1F\x7F]/', $deepLink) === 1
@@ -124,7 +124,7 @@ final class NotificationOutboxWriter
 
         if (
             $type === 'listing_moderation_restored'
-            && !in_array($payload['result_status'] ?? null, ['active', 'inactive'], true)
+            && ! in_array($payload['result_status'] ?? null, ['active', 'inactive'], true)
         ) {
             throw new InvalidArgumentException('Invalid listing result status.');
         }
@@ -132,7 +132,7 @@ final class NotificationOutboxWriter
         if (
             $type === 'fee_record_changed'
             && (
-                !is_string($payload['period'] ?? null)
+                ! is_string($payload['period'] ?? null)
                 || preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $payload['period']) !== 1
             )
         ) {
@@ -173,7 +173,7 @@ final class NotificationOutboxWriter
                 JSON_THROW_ON_ERROR
             );
 
-            if (!is_array($existingPayload)) {
+            if (! is_array($existingPayload)) {
                 throw new LogicException('Existing outbox payload is invalid.');
             }
 

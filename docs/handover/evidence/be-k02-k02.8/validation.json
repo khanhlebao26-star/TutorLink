@@ -1,0 +1,14 @@
+{
+  "local_links": "pass",
+  "tests": 74,
+  "assertions": 463,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "openapi_operations": 48,
+  "openapi_lint_exit_code": 0,
+  "openapi_warnings": 51,
+  "source_commit": "ef3cfa5",
+  "screenshot_sha256": "4b370207a29442c058b9576db5465048cab4c7341aa8a182bc8163dff17a98bc",
+  "publication": "Local uncommitted files; no push/PR/issue mutation"
+}

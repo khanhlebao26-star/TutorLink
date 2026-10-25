@@ -27,7 +27,7 @@ class AdminApprovalAuditTest extends TestCase
             $file = File::create([
                 'owner_id' => $tutor->id,
                 'disk' => 'local',
-                'object_key' => 'fixtures/' . $purpose,
+                'object_key' => 'fixtures/'.$purpose,
                 'original_name' => 'fixture.pdf',
                 'mime_type' => 'application/pdf',
                 'size_bytes' => 5,
@@ -155,7 +155,7 @@ class AdminApprovalAuditTest extends TestCase
 
         foreach (['pending', 'active', 'cancelled', 'expired'] as $status) {
             $this->actingAs($admin)
-                ->getJson('/api/v1/admin/tutor-profiles?status=' . $status)
+                ->getJson('/api/v1/admin/tutor-profiles?status='.$status)
                 ->assertUnprocessable()
                 ->assertJsonPath('message', 'Invalid tutor profile status.');
         }
@@ -176,7 +176,7 @@ class AdminApprovalAuditTest extends TestCase
         $file = File::create([
             'owner_id' => $tutor->id,
             'disk' => 'local',
-            'object_key' => 'uploads/' . $tutor->id . '/certificate.pdf',
+            'object_key' => 'uploads/'.$tutor->id.'/certificate.pdf',
             'original_name' => 'certificate.pdf',
             'mime_type' => 'application/pdf',
             'size_bytes' => 7,

@@ -65,8 +65,8 @@ class SendSlackOperationalAlert implements ShouldQueue
         $channel = config('services.slack.notifications.channel');
 
         if (
-            !is_string($token) || trim($token) === ''
-            || !is_string($channel)
+            ! is_string($token) || trim($token) === ''
+            || ! is_string($channel)
             || preg_match('/^[CG][A-Z0-9]{8,}$/D', $channel) !== 1
         ) {
             $this->failSafely('slack_configuration_invalid');
@@ -126,15 +126,15 @@ class SendSlackOperationalAlert implements ShouldQueue
             return;
         }
 
-        if (!$response->successful()) {
-            $this->failSafely('slack_http_' . $response->status());
+        if (! $response->successful()) {
+            $this->failSafely('slack_http_'.$response->status());
 
             return;
         }
 
         $body = $response->json();
 
-        if (!is_array($body) || !is_bool($body['ok'] ?? null)) {
+        if (! is_array($body) || ! is_bool($body['ok'] ?? null)) {
             $this->retryOrFail('slack_invalid_response');
 
             return;
@@ -149,7 +149,7 @@ class SendSlackOperationalAlert implements ShouldQueue
         $error = $body['error'] ?? null;
 
         if (in_array($error, self::PERMANENT_ERRORS, true)) {
-            $this->failSafely('slack_' . $error);
+            $this->failSafely('slack_'.$error);
 
             return;
         }
@@ -213,7 +213,7 @@ class SendSlackOperationalAlert implements ShouldQueue
         };
 
         if (
-            !Str::isUuid($this->alertId)
+            ! Str::isUuid($this->alertId)
             || array_diff(array_keys($this->context), $required) !== []
             || array_diff($required, array_keys($this->context)) !== []
         ) {
@@ -221,7 +221,7 @@ class SendSlackOperationalAlert implements ShouldQueue
         }
 
         foreach (['failed_count', 'pending_count', 'oldest_pending_seconds', 'failed_at', 'checked_at', 'detected_at', 'last_heartbeat_at'] as $field) {
-            if (!array_key_exists($field, $this->context)) {
+            if (! array_key_exists($field, $this->context)) {
                 continue;
             }
 
@@ -229,7 +229,7 @@ class SendSlackOperationalAlert implements ShouldQueue
                 continue;
             }
 
-            if (!is_int($this->context[$field]) || $this->context[$field] < 0) {
+            if (! is_int($this->context[$field]) || $this->context[$field] < 0) {
                 throw new InvalidArgumentException('Invalid operational alert number.');
             }
         }
@@ -243,11 +243,11 @@ class SendSlackOperationalAlert implements ShouldQueue
         if ($this->kind === 'outbox_failed') {
             if (
                 $this->context['failed_count'] < 1
-                || !is_string($this->context['outbox_id'])
-                || !Str::isUuid($this->context['outbox_id'])
-                || !is_string($this->context['event_type'])
+                || ! is_string($this->context['outbox_id'])
+                || ! Str::isUuid($this->context['outbox_id'])
+                || ! is_string($this->context['event_type'])
                 || preg_match('/^[a-z][a-z_]{0,99}$/D', $this->context['event_type']) !== 1
-                || !in_array($this->context['error_code'], [
+                || ! in_array($this->context['error_code'], [
                     'notification_key_conflict',
                     'notification_write_failed',
                     'retry_attempts_exhausted',
@@ -257,11 +257,11 @@ class SendSlackOperationalAlert implements ShouldQueue
                 throw new InvalidArgumentException('Invalid failed outbox summary.');
             }
 
-            return $prefix . "\nfailed_count={$this->context['failed_count']}"
-                . "\noutbox_id={$this->context['outbox_id']}"
-                . "\nevent_type={$this->context['event_type']}"
-                . "\nerror_code={$this->context['error_code']}"
-                . "\nfailed_at=" . gmdate('Y-m-d\TH:i:s\Z', $this->context['failed_at']);
+            return $prefix."\nfailed_count={$this->context['failed_count']}"
+                ."\noutbox_id={$this->context['outbox_id']}"
+                ."\nevent_type={$this->context['event_type']}"
+                ."\nerror_code={$this->context['error_code']}"
+                ."\nfailed_at=".gmdate('Y-m-d\TH:i:s\Z', $this->context['failed_at']);
         }
 
         if ($this->kind === 'outbox_pending') {
@@ -269,12 +269,12 @@ class SendSlackOperationalAlert implements ShouldQueue
                 throw new InvalidArgumentException('Invalid pending outbox summary.');
             }
 
-            return $prefix . "\npending_count={$this->context['pending_count']}"
-                . "\noldest_pending_seconds={$this->context['oldest_pending_seconds']}"
-                . "\nchecked_at=" . gmdate('Y-m-d\TH:i:s\Z', $this->context['checked_at']);
+            return $prefix."\npending_count={$this->context['pending_count']}"
+                ."\noldest_pending_seconds={$this->context['oldest_pending_seconds']}"
+                ."\nchecked_at=".gmdate('Y-m-d\TH:i:s\Z', $this->context['checked_at']);
         }
 
-        if (!in_array($this->context['process'], ['outbox-worker', 'slack-worker', 'scheduler'], true)) {
+        if (! in_array($this->context['process'], ['outbox-worker', 'slack-worker', 'scheduler'], true)) {
             throw new InvalidArgumentException('Invalid worker summary.');
         }
 
@@ -282,8 +282,8 @@ class SendSlackOperationalAlert implements ShouldQueue
             ? 'unknown'
             : gmdate('Y-m-d\TH:i:s\Z', $this->context['last_heartbeat_at']);
 
-        return $prefix . "\nprocess={$this->context['process']}"
-            . "\ndetected_at=" . gmdate('Y-m-d\TH:i:s\Z', $this->context['detected_at'])
-            . "\nlast_heartbeat_at={$heartbeat}";
+        return $prefix."\nprocess={$this->context['process']}"
+            ."\ndetected_at=".gmdate('Y-m-d\TH:i:s\Z', $this->context['detected_at'])
+            ."\nlast_heartbeat_at={$heartbeat}";
     }
 }

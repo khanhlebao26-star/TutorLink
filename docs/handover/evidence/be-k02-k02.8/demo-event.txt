@@ -1,0 +1,21 @@
+Source: user-provided terminal transcript and Slack screenshot, 2026-10-25.
+This is a factual summary, not a fresh execution of the demo.
+
+Outbox ID: 67e77d46-3367-4f3f-baeb-2530d6153fec
+Recipient user_id: 62
+Resource: tutor_profile 27
+Type: tutor_profile_changes_requested
+Event key: profile:27:changes-requested:18
+created_at: 2026-10-25 13:28:54+00
+Before worker: processed_at null; failed_at null; notification count 0.
+Monitor: Queued 1 operational alert(s).
+Database jobs: id 1; queue slack; attempts 0; created_at 1792935448.
+Slack alert ID: bc6b9a95-3438-4480-a784-e6155a364cf6
+Channel: C0C8BM660TB (#new-channel)
+Screenshot message: [local] outbox_pending; pending_count=1;
+oldest_pending_seconds=515; checked_at=2026-10-25T13:37:28Z.
+App log: sent/slack_sent; attempt 1; at 2026-10-25T13:37:56.744431Z.
+After all workers started: processed_at 2026-10-25 13:41:53.639865+00;
+failed_at null; notification count 1.
+Slack permalink: not supplied; screenshot saved as slack-demo.png.
+Fresh independent read-only DB verification: see runtime-state.json.

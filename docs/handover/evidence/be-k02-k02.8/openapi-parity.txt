@@ -1,0 +1,4 @@
+time="2026-10-25T20:50:26+07:00" level=warning msg="Found orphan containers (tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-backend-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-backend-test-run-ef8ab0565188 Creating
+ Container tutorlink-src-backend-test-run-ef8ab0565188 Created
+OpenAPI route parity passed (48 operations).

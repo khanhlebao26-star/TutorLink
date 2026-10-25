@@ -2,7 +2,7 @@
 
 Danh mục **method/path chuẩn cho API đích** của TutorLink. Giữ toàn bộ route trong bảng, gồm 7 route D23; không hoãn hoặc loại route nào khỏi phạm vi. Khi PRD mô tả API đích hoặc code triển khai route mới, dùng method/path tại Catalog. Cột “Mục đích” chỉ tóm tắt chức năng; điều kiện nghiệp vụ nằm trong PRD và Business Rules. [OpenAPI sinh bởi Scramble](../api/README.md) là contract của API hiện được đăng ký trong code, dùng để tích hợp. Catalog không phải contract request/response và không tự trở thành API khả dụng.
 
-Trạng thái đối chiếu ngày 20/10/2026 với `docs/api/openapi.json`:
+Trạng thái nền đối chiếu ngày 20/10/2026 với `docs/api/openapi.json`; bổ sung hai route vận hành outbox BE-K02 ngày 25/10/2026 sau khi xuất lại Scramble (48 operations):
 
 - **Đã đăng ký:** method/path xuất hiện trong OpenAPI sinh từ code. Riêng `GET /sanctum/csrf-cookie` do Sanctum đăng ký ngoài `/api/v1`, nên không nằm trong artifact Scramble. Trạng thái này không xác nhận hành vi, quyền hay dữ liệu đã đạt PRD.
 - **Dự kiến:** method/path thuộc phạm vi API đích nhưng chưa xuất hiện trong OpenAPI sinh từ code; đã được mô tả theo quyết định hiện hành ở Business Rules/PRD. Nhãn này không có nghĩa là hoãn route.
@@ -157,6 +157,8 @@ Các route mutation Session, Task, Fee Record và Announcement tuân version gua
 | GET /api/v1/admin/audit-logs | Tra cứu audit theo scope Quyền: Admin audit viewer | Dự kiến |
 | GET /api/v1/admin/audit-logs/{auditLog} | Chi tiết audit, không sửa/xóa Quyền: Admin audit viewer | Dự kiến |
 | **14 API Admin** |  |  |
+| GET /api/v1/admin/notification-outbox | Danh sách pending/failed, phân trang 20, không trả payload; quyền admin.notification_outbox.view | Đã đăng ký |
+| POST /api/v1/admin/notification-outbox/{outbox}/replay | UUID outbox; reason bắt buộc; replay failed chưa resolved, giữ event_key/payload, audit outbox.replay; quyền admin.notification_outbox.replay | Đã đăng ký |
 | POST /api/v1/admin/listings/{listing}/hide | Đặt hold; active → inactive do Admin, reason_code/reason/audit, thông báo Tutor sau commit. Quyền: Admin active có admin.listings.moderate, toàn bộ Listing MVP | Dự kiến |
 | POST /api/v1/admin/listings/{listing}/restore-visibility | Gỡ hold; inactive do Admin → active khi đủ gate, thiếu gate 409 giữ hold; Tutor tự pause thì giữ inactive. Reason_code/reason/audit, thông báo Tutor. Quyền: Admin active có admin.listings.moderate, toàn bộ Listing MVP | Dự kiến |
 | GET /api/v1/admin/users | `admin.users.view`; hỗ trợ exact `user_id` hoặc email chuẩn hóa chính xác; danh sách chỉ Admin active đủ quyền giao việc, DTO tối thiểu id/display_name; không directory browse hàng loạt | Dự kiến |
