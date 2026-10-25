@@ -27,7 +27,7 @@ class AdminApprovalAuditTest extends TestCase
             $file = File::create([
                 'owner_id' => $tutor->id,
                 'disk' => 'local',
-                'object_key' => 'fixtures/'.$purpose,
+                'object_key' => 'fixtures/' . $purpose,
                 'original_name' => 'fixture.pdf',
                 'mime_type' => 'application/pdf',
                 'size_bytes' => 5,
@@ -85,6 +85,35 @@ class AdminApprovalAuditTest extends TestCase
             'reason' => 'Đã kiểm tra và hồ sơ hợp lệ.',
         ]);
         $this->assertSame(2, DB::table('audit_logs')->where('resource_id', $profile->id)->count());
+
+        foreach ([
+            'tutor_profile_changes_requested' => 'changes-requested',
+            'tutor_profile_approved' => 'approve',
+        ] as $type => $verb) {
+            $auditId = DB::table('audit_logs')
+                ->where('action', $type)
+                ->where('resource_type', 'tutor_profile')
+                ->where('resource_id', $profile->id)
+                ->value('id');
+
+            $this->assertNotNull($auditId);
+            $this->assertDatabaseHas('notification_outbox', [
+                'user_id' => $tutor->id,
+                'type' => $type,
+                'resource_type' => 'tutor_profile',
+                'resource_id' => $profile->id,
+                'event_key' => "profile:{$profile->id}:{$verb}:{$auditId}",
+            ]);
+
+            $row = DB::table('notification_outbox')->where('type', $type)->first();
+            $this->assertSame(
+                ['deep_link' => '/profile'],
+                json_decode($row->payload, true, 512, JSON_THROW_ON_ERROR),
+            );
+        }
+
+        $this->assertDatabaseCount('notification_outbox', 2);
+        $this->assertDatabaseCount('notifications', 0);
     }
 
     public function test_approval_decisions_require_a_reason(): void
@@ -99,6 +128,7 @@ class AdminApprovalAuditTest extends TestCase
                 ->assertUnprocessable()
                 ->assertJsonValidationErrors('reason');
         }
+        $this->assertDatabaseCount('notification_outbox', 0);
     }
 
     public function test_admin_without_permission_and_non_admin_cannot_review_profiles(): void
@@ -125,7 +155,7 @@ class AdminApprovalAuditTest extends TestCase
 
         foreach (['pending', 'active', 'cancelled', 'expired'] as $status) {
             $this->actingAs($admin)
-                ->getJson('/api/v1/admin/tutor-profiles?status='.$status)
+                ->getJson('/api/v1/admin/tutor-profiles?status=' . $status)
                 ->assertUnprocessable()
                 ->assertJsonPath('message', 'Invalid tutor profile status.');
         }
@@ -146,7 +176,7 @@ class AdminApprovalAuditTest extends TestCase
         $file = File::create([
             'owner_id' => $tutor->id,
             'disk' => 'local',
-            'object_key' => 'uploads/'.$tutor->id.'/certificate.pdf',
+            'object_key' => 'uploads/' . $tutor->id . '/certificate.pdf',
             'original_name' => 'certificate.pdf',
             'mime_type' => 'application/pdf',
             'size_bytes' => 7,
@@ -223,6 +253,29 @@ class AdminApprovalAuditTest extends TestCase
             'resource_type' => 'user',
             'resource_id' => $tutor->id,
         ]);
+
+        foreach ([
+            'tutor_profile_suspended' => 'suspend',
+            'tutor_profile_restored' => 'restore',
+        ] as $type => $verb) {
+            $auditId = DB::table('audit_logs')
+                ->where('action', $type)
+                ->where('resource_type', 'tutor_profile')
+                ->where('resource_id', $profile->id)
+                ->value('id');
+
+            $this->assertNotNull($auditId);
+            $this->assertDatabaseHas('notification_outbox', [
+                'user_id' => $tutor->id,
+                'type' => $type,
+                'resource_type' => 'tutor_profile',
+                'resource_id' => $profile->id,
+                'event_key' => "profile:{$profile->id}:{$verb}:{$auditId}",
+            ]);
+        }
+
+        $this->assertDatabaseCount('notification_outbox', 2);
+        $this->assertDatabaseCount('notifications', 0);
     }
 
     private function createSubmittedProfile(User $tutor): TutorProfile

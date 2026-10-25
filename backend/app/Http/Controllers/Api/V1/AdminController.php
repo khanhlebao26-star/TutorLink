@@ -10,6 +10,7 @@ use App\Http\Resources\UserResource;
 use App\Models\TutorProfile;
 use App\Models\User;
 use App\Support\AdminPermissions;
+use App\Support\NotificationOutboxWriter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ class AdminController extends Controller
         $status = $request->query('status', 'submitted');
         $allowedStatuses = ['submitted', 'changes_requested', 'approved', 'rejected', 'suspended'];
 
-        if (! in_array($status, $allowedStatuses, true)) {
+        if (!in_array($status, $allowedStatuses, true)) {
             return response()->json(['message' => 'Invalid tutor profile status.'], 422);
         }
 
@@ -32,7 +33,7 @@ class AdminController extends Controller
             ->where('status', $status)
             ->orderByDesc('submitted_at')
             ->get()
-            ->map(fn (TutorProfile $profile): array => $this->profilePayload($profile));
+            ->map(fn(TutorProfile $profile): array => $this->profilePayload($profile));
 
         return response()->json(['data' => $profiles]);
     }
@@ -100,14 +101,29 @@ class AdminController extends Controller
                 'suspended_at' => $suspend ? now() : null,
                 'suspension_reason' => $suspend ? $data['reason'] : null,
             ])->save();
-            $this->writeAudit(
+            $notificationType = $suspend
+                ? 'tutor_profile_suspended'
+                : 'tutor_profile_restored';
+
+            $auditId = $this->writeAudit(
                 $actor,
-                $suspend ? 'tutor_profile_suspended' : 'tutor_profile_restored',
+                $notificationType,
                 'tutor_profile',
                 $profile->id,
                 $before,
                 $this->profileState($profile),
                 $data['reason'],
+            );
+
+            $verb = $suspend ? 'suspend' : 'restore';
+
+            app(NotificationOutboxWriter::class)->record(
+                $notificationType,
+                'tutor_profile',
+                $profile->id,
+                "profile:{$profile->id}:{$verb}:{$auditId}",
+                [$profile->user_id],
+                ['deep_link' => '/profile'],
             );
 
             return $profile->refresh()->load('user');
@@ -161,7 +177,30 @@ class AdminController extends Controller
                 'reviewed_at' => now(),
                 'review_reason' => $data['reason'],
             ])->save();
-            $this->writeAudit($actor, $action, 'tutor_profile', $profile->id, $before, $this->profileState($profile), $data['reason']);
+            $auditId = $this->writeAudit(
+                $actor,
+                $action,
+                'tutor_profile',
+                $profile->id,
+                $before,
+                $this->profileState($profile),
+                $data['reason'],
+            );
+
+            $verb = match ($action) {
+                'tutor_profile_approved' => 'approve',
+                'tutor_profile_changes_requested' => 'changes-requested',
+                'tutor_profile_rejected' => 'reject',
+            };
+
+            app(NotificationOutboxWriter::class)->record(
+                $action,
+                'tutor_profile',
+                $profile->id,
+                "profile:{$profile->id}:{$verb}:{$auditId}",
+                [$profile->user_id],
+                ['deep_link' => '/profile'],
+            );
 
             return $profile->refresh()->load('user');
         });
@@ -195,7 +234,7 @@ class AdminController extends Controller
                 default => false,
             };
 
-            if (! $canTransition) {
+            if (!$canTransition) {
                 abort(409, 'The requested account status transition is not allowed.');
             }
 
@@ -269,7 +308,7 @@ class AdminController extends Controller
                     'files.size_bytes',
                     'files.scan_status',
                 ])
-                ->map(fn (object $document): array => [
+                ->map(fn(object $document): array => [
                     'id' => (int) $document->id,
                     'tutor_profile_id' => $profile->id,
                     'file_id' => (int) $document->file_id,
@@ -354,8 +393,8 @@ class AdminController extends Controller
         array $before,
         array $after,
         string $reason,
-    ): void {
-        DB::table('audit_logs')->insert([
+    ): int {
+        return DB::table('audit_logs')->insertGetId([
             'actor_id' => $actor->id,
             'action' => $action,
             'resource_type' => $resourceType,
