@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\NotificationOutboxAlerts;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Database\Connection;
@@ -246,6 +247,15 @@ class ProcessNotificationOutbox extends Command
                 'failed_at' => $this->stamp($now),
                 'last_error_code' => $errorCode,
             ]);
+
+        $failed = $connection->table('notification_outbox')
+            ->where('id', $outbox->id)
+            ->first();
+
+        app(NotificationOutboxAlerts::class)->failed(
+            $connection,
+            $failed,
+        );
     }
 
     private function databaseNow(Connection $connection): CarbonImmutable

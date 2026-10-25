@@ -1,0 +1,24 @@
+time="2026-10-25T16:48:36+07:00" level=warning msg="Found orphan containers (tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-backend-1, tutorlink-src-slack-worker-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running 
+ Container tutorlink-src-test-db-1 Waiting 
+ Container tutorlink-src-test-db-1 Healthy 
+ Container tutorlink-src-backend-test-run-effbac5d742d Creating 
+ Container tutorlink-src-backend-test-run-effbac5d742d Created 
+
+   PASS  Tests\Feature\NotificationOutboxRuntimeTest
+  ✓ worker command processes committed events without duplicate          2.05s  
+  ✓ failure queues one alert and monitor does not duplicate it           0.22s  
+  ✓ failed handoff rolls back failure marker and job together            0.18s  
+  ✓ monitor backfills legacy failures and throttles reminders            0.18s  
+  ✓ pending alerts are aggregated and limited to once per ten minutes    0.16s  
+  ✓ pending alert handoff rollback does not consume throttle slot        0.16s  
+  ✓ queue on an independent connection is rejected                       0.16s  
+  ✓ retention preview does not delete any data                           0.17s  
+  ✓ executing retention requires both permissions                        0.18s  
+  ✓ retention preserves unresolved failures and audits each batch        0.20s  
+  ✓ failed retention audit rolls back deletion                           0.19s  
+  ✓ scheduler has monitor and controlled retention tasks                 0.14s  
+
+  Tests:    12 passed (82 assertions)
+  Duration: 4.25s
+

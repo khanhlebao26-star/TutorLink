@@ -1,0 +1,17 @@
+Source: User-provided Tinker output in the K02.6 demo conversation, before starting outbox-worker.
+The exact observation timestamp was not supplied. This is a retained transcript, not a new query.
+
+> DB::table('notification_outbox')->orderByDesc('created_at')->limit(5)->get(['id', 'type', 'resource_id', 'event_key', 'processed_at', 'failed_at']);
+
+= Illuminate\Support\Collection {
+    all: [
+      {
+        +"id": "2d0fb74e-70ac-46f9-a9ce-56a8a4e58bdf",
+        +"type": "tutor_profile_changes_requested",
+        +"resource_id": 26,
+        +"event_key": "profile:26:changes-requested:17",
+        +"processed_at": null,
+        +"failed_at": null,
+      },
+    ],
+  }

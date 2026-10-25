@@ -17,6 +17,10 @@ final class AdminPermissions
     public const VIEW_NOTIFICATION_OUTBOX = 'admin.notification_outbox.view';
 
     public const REPLAY_NOTIFICATION_OUTBOX = 'admin.notification_outbox.replay';
+
+    public const PURGE_NOTIFICATION_DATA = 'admin.notification_outbox.purge';
+
+    public const PURGE_AUDIT_LOGS = 'admin.audit_logs.purge';
     /**
      * @return list<string>
      */
@@ -30,6 +34,8 @@ final class AdminPermissions
             self::SUSPEND_ACCOUNTS,
             self::VIEW_NOTIFICATION_OUTBOX,
             self::REPLAY_NOTIFICATION_OUTBOX,
+            self::PURGE_NOTIFICATION_DATA,
+            self::PURGE_AUDIT_LOGS,
         ];
     }
 }

@@ -1,0 +1,20 @@
+{
+    "verified_at_utc": "2026-10-25T09:49:32+00:00",
+    "source": "read-only scheduler container query",
+    "purge_actor_configured": true,
+    "purge_actor_active_admin": true,
+    "can_purge_notifications": true,
+    "can_purge_audit": true,
+    "queue_same_connection": true,
+    "marker_same_connection": true,
+    "pcntl_loaded": true,
+    "demo_outbox": {
+        "id": "2d0fb74e-70ac-46f9-a9ce-56a8a4e58bdf",
+        "user_id": 61,
+        "type": "tutor_profile_changes_requested",
+        "event_key": "profile:26:changes-requested:17",
+        "processed_at": "2026-10-25 09:39:42.583422+00",
+        "failed_at": null
+    },
+    "demo_notification_count": 1
+}
