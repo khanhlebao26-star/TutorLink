@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Symfony\Component\Process\Process;
 use App\Models\User;
 use App\Support\AdminPermissions;
 use App\Support\NotificationOutboxWriter;
@@ -756,6 +757,145 @@ class ProcessNotificationOutboxTest extends TestCase
 
         foreach (array_merge($pendingRows, $failedRows) as $row) {
             $this->assertArrayNotHasKey('payload', $row);
+        }
+    }
+
+    public function test_killed_worker_before_commit_can_be_retried(): void
+    {
+        $outbox = $this->recordOutbox(User::factory()->create());
+
+        // This child runs the real command. Its listener pauses immediately
+        // after notification INSERT, while the transaction is still open.
+        $script = <<<'PHP'
+require 'vendor/autoload.php';
+
+$app = require 'bootstrap/app.php';
+
+$kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
+
+\Tests\Support\TestDatabaseGuard::assertSafe($app['config']);
+
+$connection = \Illuminate\Support\Facades\DB::connection();
+
+if (
+    $connection->getDriverName() !== 'pgsql'
+    || $connection->getDatabaseName() !== $argv[1]
+) {
+    exit(2);
+}
+
+\Illuminate\Support\Facades\DB::listen(
+    function (\Illuminate\Database\Events\QueryExecuted $query): void {
+        $sql = strtolower(ltrim($query->sql));
+
+        if (str_starts_with($sql, 'insert into "notifications"')) {
+            fwrite(STDOUT, "K02_INSERTED_BEFORE_COMMIT\n");
+            fflush(STDOUT);
+
+            while (true) {
+                usleep(100000);
+            }
+        }
+    }
+);
+
+exit($kernel->call('outbox:process', ['--limit' => 1]));
+PHP;
+
+        $process = new Process(
+            [
+                PHP_BINARY,
+                '-r',
+                $script,
+                DB::connection()->getDatabaseName(),
+            ],
+            base_path(),
+            ['APP_ENV' => 'testing'],
+        );
+
+        $process->setTimeout(15);
+
+        try {
+            $process->start();
+
+            $deadline = microtime(true) + 10;
+
+            while (
+                $process->isRunning()
+                && !str_contains(
+                    $process->getOutput(),
+                    'K02_INSERTED_BEFORE_COMMIT',
+                )
+                && microtime(true) < $deadline
+            ) {
+                usleep(50000);
+            }
+
+            $this->assertTrue(
+                str_contains(
+                    $process->getOutput(),
+                    'K02_INSERTED_BEFORE_COMMIT',
+                ),
+                'Worker did not reach the point before commit.',
+            );
+
+            $this->assertTrue($process->isRunning());
+
+            // The parent connection cannot see the uncommitted INSERT.
+            $this->assertDatabaseCount('notifications', 0);
+
+            $this->assertDatabaseHas('notification_outbox', [
+                'id' => $outbox->id,
+                'processed_at' => null,
+            ]);
+
+            // Linux signal 9: terminate without graceful transaction cleanup.
+            $process->stop(0, 9);
+
+            $this->assertFalse($process->isRunning());
+
+            // Wait for PostgreSQL to release the dead connection's row lock.
+            DB::transaction(function () use ($outbox): void {
+                DB::statement("SET LOCAL lock_timeout = '5s'");
+
+                $row = DB::table('notification_outbox')
+                    ->where('id', $outbox->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                $this->assertNotNull($row);
+                $this->assertNull($row->processed_at);
+                $this->assertSame(0, (int) $row->attempt_count);
+            });
+
+            $this->assertDatabaseCount('notifications', 0);
+
+            // A new worker must recover the same event.
+            $this->runWorker();
+
+            $processed = $this->freshOutbox($outbox->id);
+
+            $this->assertNotNull($processed->processed_at);
+            $this->assertNull($processed->failed_at);
+            $this->assertSame($outbox->event_key, $processed->event_key);
+
+            $this->assertDatabaseCount('notifications', 1);
+
+            $this->assertDatabaseHas('notifications', [
+                'user_id' => $outbox->user_id,
+                'type' => $outbox->type,
+                'event_key' => $outbox->event_key,
+            ]);
+
+            // Another pass must not create a duplicate.
+            $this->runWorker();
+
+            $this->assertDatabaseCount('notifications', 1);
+        } finally {
+            if ($process->isRunning()) {
+                $process->stop(0, 9);
+            }
         }
     }
 

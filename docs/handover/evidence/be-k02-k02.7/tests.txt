@@ -1,0 +1,94 @@
+time="2026-10-25T20:17:19+07:00" level=warning msg="Found orphan containers (tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-backend-1, tutorlink-src-slack-worker-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running 
+ Container tutorlink-src-test-db-1 Waiting 
+ Container tutorlink-src-test-db-1 Healthy 
+ Container tutorlink-src-backend-test-run-3783e38c815d Creating 
+ Container tutorlink-src-backend-test-run-3783e38c815d Created 
+
+   PASS  Tests\Feature\NotificationOutboxWriterTest
+  ✓ commit records once per recipient without creating notifications     1.14s  
+  ✓ rollback removes the outbox event                                    0.03s  
+  ✓ replay does not create a second outbox event                         0.03s  
+  ✓ reusing an event key with different payload is rejected              0.03s  
+  ✓ payload outside the allow list is rejected                           0.03s  
+
+   PASS  Tests\Feature\AdminApprovalAuditTest
+  ✓ request changes resubmit and approve records every decision          0.20s  
+  ✓ approval decisions require a reason                                  0.05s  
+  ✓ admin without permission and non admin cannot review profiles        0.05s  
+  ✓ invalid tutor profile status filters are rejected                    0.03s  
+  ✓ only reviewer with permission can download verification document     0.09s  
+  ✓ account and profile suspension are separate and audited              0.12s  
+
+   PASS  Tests\Feature\ProcessNotificationOutboxTest
+  ✓ committed outbox creates notification and is marked processed        0.09s  
+  ✓ running command again does not duplicate notification                0.12s  
+  ✓ future outbox is not processed                                       0.13s  
+  ✓ business rollback leaves nothing for worker                          0.12s  
+  ✓ existing matching notification is not duplicated                     0.12s  
+  ✓ conflicting notification does not mark outbox processed              0.13s  
+  ✓ uncommitted outbox is invisible to another worker                    0.15s  
+  ✓ worker skips row locked by another connection                        0.16s  
+  ✓ rolled back processing can be retried                                0.18s  
+  ✓ retry window expires without another delivery attempt                0.15s  
+  ✓ failed processing rolls back notification and can retry              0.15s  
+  ✓ tenth failure stops automatic retries                                0.13s  
+  ✓ retry backoff is at most five minutes                                0.13s  
+  ✓ authorized replay preserves event and writes audit                   0.12s  
+  ✓ successful replay resolves failure without duplicate notification    0.16s  
+  ✓ failed replay requires a new replay request                          0.16s  
+  ✓ outbox apis require explicit permissions                             0.15s  
+  ✓ replay requires a nonblank reason                                    0.13s  
+  ✓ a second pending replay is rejected without another audit            0.12s  
+  ✓ processed or resolved outbox cannot be replayed                      0.14s  
+  ✓ audit failure rolls back replay state                                0.15s  
+  ✓ listing classifies outbox states and excludes payload                0.15s  
+  ✓ killed worker before commit can be retried                           0.39s  
+
+   PASS  Tests\Feature\SendSlackOperationalAlertTest
+  ✓ success uses backend token and safe operational message              0.18s  
+  ✓ pending and worker alerts have only operational fields               0.06s  
+  ✓ connection timeout releases job without inline retry                 0.06s  
+  ✓ rate limit respects retry after                                      0.06s  
+  ✓ retry after is not shortened to normal backoff cap                   0.06s  
+  ✓ invalid retry after uses bounded backoff                             0.06s  
+  ✓ retry after beyond retry window fails without early retry            0.06s  
+  ✓ temporary http error releases job with data set #0                   0.06s  
+  ✓ temporary http error releases job with data set #1                   0.07s  
+  ✓ temporary http error releases job with data set #2                   0.06s  
+  ✓ http 200 with temporary api error is retried                         0.06s  
+  ✓ http 200 with api rate limit respects retry after                    0.07s  
+  ✓ permanent api error fails without retry with data set #0             0.05s  
+  ✓ permanent api error fails without retry with data set #1             0.06s  
+  ✓ permanent api error fails without retry with data set #2             0.05s  
+  ✓ permanent api error fails without retry with data set #3             0.06s  
+  ✓ permanent api error fails without retry with data set #4             0.06s  
+  ✓ permanent api error fails without retry with data set #5             0.06s  
+  ✓ http auth error fails without retry                                  0.06s  
+  ✓ invalid json response is not treated as success                      0.06s  
+  ✓ missing configuration fails without http request                     0.05s  
+  ✓ tenth temporary failure stops retry with safe exception              0.05s  
+  ✓ expired job does not send to slack                                   0.06s  
+  ✓ unknown response content and token are not logged or serialized      0.06s  
+  ✓ private fields are rejected before queue serialization               0.06s  
+  ✓ slack failure does not rollback committed business or notification   0.10s  
+  ✓ permanent failure is stored in failed jobs without token             0.15s  
+  ✓ rolled back enqueue does not send any slack request                  0.07s  
+
+   PASS  Tests\Feature\NotificationOutboxRuntimeTest
+  ✓ worker command processes committed events without duplicate          0.10s  
+  ✓ failure queues one alert and monitor does not duplicate it           0.16s  
+  ✓ failed handoff rolls back failure marker and job together            0.16s  
+  ✓ monitor backfills legacy failures and throttles reminders            0.15s  
+  ✓ pending alerts are aggregated and limited to once per ten minutes    0.14s  
+  ✓ pending alert handoff rollback does not consume throttle slot        0.12s  
+  ✓ queue on an independent connection is rejected                       0.13s  
+  ✓ retention preview does not delete any data                           0.13s  
+  ✓ executing retention requires both permissions                        0.14s  
+  ✓ retention preserves unresolved failures and audits each batch        0.15s  
+  ✓ failed retention audit rolls back deletion                           0.15s  
+  ✓ scheduler has monitor and controlled retention tasks                 0.13s  
+
+  Tests:    74 passed (463 assertions)
+  Duration: 8.88s
+
