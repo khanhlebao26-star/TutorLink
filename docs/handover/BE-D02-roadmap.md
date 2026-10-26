@@ -2,7 +2,7 @@
 
 ## Mục đích và cách dùng
 
-Tài liệu này chia việc làm lại BE-D02 thành hai giai đoạn: **A — đọc và duyệt quyết định trước khi viết code**; **B — thực hiện và kiểm chứng sau khi quyết định đã được duyệt**. Đây là lộ trình, không phải xác nhận rằng bất kỳ bước nào đã được thực hiện.
+Tài liệu này chia BE-D02 thành hai giai đoạn: **A — đọc và duyệt quyết định trước khi viết code**; **B — thực hiện và kiểm chứng sau khi quyết định đã được duyệt**. Mỗi bước ghi riêng đầu ra dự kiến và checkpoint đã đạt để phân biệt kế hoạch với evidence thực tế.
 
 Các nhãn nguồn:
 
@@ -59,7 +59,7 @@ Issue gốc ghi phụ thuộc BE-D01 và yêu cầu API fields/state/lock phải
 - **Nguồn:** **[Issue]** task về create/read/update và danh sách của owner. **[PRD/BR/Catalog]** [M05-F01 — Draft](../Modules%20Documentation/M05%20%E2%80%94%20Program%20%26%20Invitation/M05-F01%20PRD%20%E2%80%94%20T%E1%BA%A1o%20v%C3%A0%20ch%E1%BB%89nh%20s%E1%BB%ADa%20Program%20Draft.md), [API Route Catalog](../Architecture%20%26%20Technical%20Design/API%20Route%20Catalog.md).
 - **Kết quả cần có:** Các thao tác Program thuộc phạm vi đã duyệt hoạt động; response trả đúng status/version và field mapping.
 - **Tự kiểm tra:** Đối chiếu với ma trận A3 và field map A2; thử owner, Tutor khác, Customer và outsider trên từng thao tác.
-- **Kết quả hiện tại (27/10/2026):** Đã đăng ký đủ bốn route create/list/detail/update. `ProgramApiTest`, `InvitationAcceptTest` và `NotificationOutboxWriterTest` cùng pass 33 test/169 assertion; kiểm thử PostgreSQL concurrency vẫn thuộc B3 và chưa được thực hiện.
+- **Kết quả tại checkpoint B1 (27/10/2026):** Đã đăng ký đủ bốn route create/list/detail/update. `ProgramApiTest`, `InvitationAcceptTest` và `NotificationOutboxWriterTest` cùng pass 33 test/169 assertion; kiểm thử PostgreSQL concurrency được chuyển sang B3.
 
 ### B2. Triển khai snapshot, khóa offer, lifecycle và Accept action
 
@@ -86,6 +86,8 @@ Issue gốc ghi phụ thuộc BE-D01 và yêu cầu API fields/state/lock phải
 - **Nguồn:** **[Issue]** yêu cầu PR/commit, API/schema delta nếu có, test report/evidence, known limitations. **[PRD/BR/Catalog]** [API Route Catalog](../Architecture%20%26%20Technical%20Design/API%20Route%20Catalog.md), [hướng dẫn OpenAPI](../api/README.md), [Database Design](../Architecture%20%26%20Technical%20Design/Database%20Design%20%E2%80%94%20TutorLink.md).
 - **Kết quả cần có:** PR/commit; API/schema delta nếu có; test report/evidence; known limitations; cập nhật tiến độ, bước tiếp theo và blocker trên issue. Nếu thay đổi route, sinh OpenAPI từ code theo hướng dẫn và đối chiếu method/path với Catalog.
 - **Tự kiểm tra:** Reviewer truy được từ acceptance criterion đến test/evidence và code tương ứng; status Catalog không được coi là “Đã đăng ký” nếu method/path chưa xuất hiện trong OpenAPI sinh từ code.
+- **Kết quả hiện tại (27/10/2026):** OpenAPI được sinh từ Scramble và đối chiếu khớp 60 operations; 12 method/path Program, Invitation và lifecycle hiển thị đúng trạng thái trong Catalog. Database Design đã cập nhật theo migration BE-D02. `php scripts/verify-openapi-routes.php` và `git diff --check` đạt. Redocly lint chưa chạy được do môi trường không phân giải `registry.npmjs.org` (`EAI_AGAIN`); không ghi nhận lint pass. Bằng chứng kiểm thử BE-D02 nằm trong [B3 test report](BE-D02-B3-test-report.md); chi tiết API/schema, giới hạn và bước tiếp theo nằm trong [B4 handoff](BE-D02-B4-handover.md).
+- **Bàn giao issue:** Bản nháp comment tóm tắt đã được lưu trong B4 handoff để người phụ trách kiểm duyệt. Issue #69 chưa được comment/cập nhật; đăng comment do người dùng thực hiện sau khi duyệt. Chưa có PR mở.
 
 ## Giới hạn phạm vi
 

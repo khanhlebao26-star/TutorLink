@@ -242,7 +242,7 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-### Bảng listing\_moderation\_holds — target, chưa có migration
+### Bảng listing\_moderation\_holds — migration BE-D02
 
 Bản ghi hold riêng giữ nguồn `inactive` để Admin restore không ghi đè quyết định của Tutor. Tối đa một hold còn hiệu lực trên mỗi Listing; lịch sử hide/restore và audit không bị xóa khi gỡ hold.
 
@@ -268,7 +268,7 @@ restore\_reason — text; NULL khi hold còn hiệu lực, bắt buộc khi rest
 
 restore\_reason\_code — varchar(40); NULL khi hold còn hiệu lực, bắt buộc khi restore.
 
-Migration cần ràng buộc duy nhất cho hold còn hiệu lực theo listing\_id. Không cần bảng assignment/scope Listing: Admin active có `admin.listings.moderate` được xử lý toàn bộ Listing trong MVP, audit ghi scope `all_listings`. Hide/restore, đổi ListingStatus, audit và notification outbox được ghi nguyên tử theo Business Rules/M03-F10; runtime hiện chưa có bảng hoặc hai route Admin này.
+Migration có partial UNIQUE cho hold còn hiệu lực theo listing\_id. Không cần bảng assignment/scope Listing: Admin active có `admin.listings.moderate` được xử lý toàn bộ Listing trong MVP, audit ghi scope `all_listings`. Hide/restore, đổi ListingStatus, audit và notification outbox được ghi nguyên tử theo Business Rules/M03-F10; runtime vẫn chưa có hai route Admin này.
 
 ### Bảng availability\_rules
 
@@ -344,7 +344,7 @@ file\_id — bigint; NOT NULL; FK; tham chiếu files.id.
 
 document\_type — varchar(50); NOT NULL; enum: VerificationDocumentType.
 
-status — varchar(20); NOT NULL; mặc định: pending; enum: VerificationDocumentStatus; cần điều chỉnh.
+status — varchar(20); NOT NULL; mặc định: pending; enum: VerificationDocumentStatus. Migration BE-D02 chuyển legacy `active` sang `approved` và giới hạn trạng thái theo enum đích.
 
 reviewed\_by — bigint; NULL; FK; tham chiếu users.id.
 
@@ -354,15 +354,15 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-expires\_at — timestamptz; NULL; đề xuất thêm.
+expires\_at — timestamptz; NULL; được thêm trong migration BE-D02; NULL nghĩa là không có ngày hết hạn.
 
 review\_reason — text; NULL; cần lưu khi từ chối.
 
 Khóa ghép / unique: verification\_documents: UNIQUE(tutor\_profile\_id,file\_id).
 
-files chỉ lưu metadata, nội dung nằm ở object storage. purpose bắt buộc với upload mới; visibility chỉ private/public. Chỉ file scan\_status=clean và đúng owner/purpose mới được gắn vào tài nguyên. expires\_at được đề xuất để xác định giấy tờ hết hiệu lực. Avatar tham chiếu trực tiếp bằng avatar\_file\_id; profile\_document không tự bổ sung FileResourceType mới.
+files chỉ lưu metadata, nội dung nằm ở object storage. purpose bắt buộc với upload mới; visibility chỉ private/public. Chỉ file scan\_status=clean và đúng owner/purpose mới được gắn vào tài nguyên. `expires_at` dùng để xác định giấy tờ hết hiệu lực. Avatar tham chiếu trực tiếp bằng avatar\_file\_id; profile\_document không tự bổ sung FileResourceType mới.
 
-BR-16: thay file tạo hàng VerificationDocument mới để giữ quyết định cũ. Có thể có nhiều hàng cùng `document_type`; gate chọn giấy tờ hiện hành approved, chưa expired, đúng owner/File hợp lệ. Identity yêu cầu ít nhất một `identity_card` hoặc `passport`; `other` không thay thế. Degree/certificate chỉ là yêu cầu nếu có qualification claim cấu trúc tương ứng. Document bắt buộc expired làm mất eligibility public/tạo dịch vụ mới nhưng không tự đổi TutorProfileStatus/UserStatus; khi bản thay thế approved, kiểm lại public gate. Các cột/constraint và job expiry cần migration/test trước khi xem là đã triển khai.
+BR-16: thay file tạo hàng VerificationDocument mới để giữ quyết định cũ. Có thể có nhiều hàng cùng `document_type`; gate chọn giấy tờ hiện hành approved, chưa expired, đúng owner/File hợp lệ. Identity yêu cầu ít nhất một `identity_card` hoặc `passport`; `other` không thay thế. Degree/certificate chỉ là yêu cầu nếu có qualification claim cấu trúc tương ứng. Document bắt buộc expired làm mất eligibility public/tạo dịch vụ mới nhưng không tự đổi TutorProfileStatus/UserStatus; khi bản thay thế approved, kiểm lại public gate. Migration BE-D02 bổ sung `expires_at` và vocabulary trạng thái đích; job expiry chưa được triển khai.
 
 # 03 · Tệp và xác minh (tiếp)
 
@@ -1090,9 +1090,9 @@ batch — integer; NOT NULL.
 
 # 13 · Quy tắc liên kết và toàn vẹn
 
-## Idempotency receipts dùng chung — target BR-23
+## Idempotency receipts dùng chung — schema BR-23, runtime Accept Invitation
 
-### Bảng idempotency\_receipts — target, chưa có migration
+### Bảng idempotency\_receipts — migration BE-D02
 
 id — uuid; NOT NULL; PK.
 
@@ -1114,7 +1114,7 @@ created\_at — timestamptz; NOT NULL.
 
 expires\_at — timestamptz; NULL; command BR-23 có hạn 30 ngày, Fee Record theo BR-22 có thể NULL đến khi đủ điều kiện purge.
 
-UNIQUE(actor\_id,idempotency\_key). Ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Fee Record dùng cùng bảng nhưng tính hash/replay theo BR-22 và giữ receipt cho tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
+UNIQUE(actor\_id,idempotency\_key). Accept Invitation ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa tích hợp bảng này. Fee Record cần tính hash/replay theo BR-22 và giữ receipt tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
 
 ## Tham chiếu đa hình
 
@@ -1130,21 +1130,21 @@ Chỉ FK program\_id từ Invitation/Session tới programs.id; program\_version
 
 ## Chỉ mục và xóa dữ liệu
 
-Giữ các index marketplace(status,specialization\_id,delivery\_mode,city,price\_from\_minor); inbox(invitee\_user\_id,status,expires\_at); message(conversation\_id,created\_at,id); task(program\_id,due\_at,status); notification(user\_id,read\_at,created\_at); report(status,created\_at); audit(resource\_type,resource\_id,created\_at). Đề xuất index mọi FK chưa được index bởi PK/UK; thêm submission(task\_id,submission\_version DESC), fee(program\_id,period\_start). Partial UNIQUE(reporter_id,resource_type,resource_id) trên reports WHERE status='open' bảo vệ một Report open mỗi reporter/resource; index review(tutor_profile_id,visibility,created_at DESC,id DESC), tutor_profile_revisions(tutor_profile_id,revision_no) UNIQUE và partial UNIQUE cho revision chưa đóng, idempotency_receipts(expires_at) để purge receipt có TTL.
+Giữ các index marketplace(status,specialization\_id,delivery\_mode,city,price\_from\_minor); inbox(invitee\_user\_id,status,expires\_at); message(conversation\_id,created\_at,id); task(program\_id,due\_at,status); notification(user\_id,read\_at,created\_at); report(status,created\_at); audit(resource\_type,resource\_id,created\_at). Đề xuất index mọi FK chưa được index bởi PK/UK; thêm submission(task\_id,submission\_version DESC), fee(program\_id,period\_start). Partial UNIQUE(reporter_id,resource_type,resource_id) trên reports WHERE status='open' bảo vệ một Report open mỗi reporter/resource; index review(tutor_profile_id,visibility,created_at DESC,id DESC), tutor_profile_revisions(tutor_profile_id,revision_no) UNIQUE và partial UNIQUE cho revision chưa đóng; idempotency_receipts(expires_at) đã được tạo để purge receipt có TTL.
 
 Giữ lịch sử Program, Invitation, Submission, Fee, Review và Audit; không cascade hard delete vào các bảng này. Report/decision giữ 24 tháng từ handled_at; Report còn open không purge. Audit giữ 24 tháng từ created_at; Notification 180 ngày. Tài khoản ưu tiên status/soft delete. FK reviewer/actor có thể SET NULL khi chính sách xóa thật cho phép. File chỉ xóa object khi không còn liên kết và đã hết thời hạn lưu; một file\_links row không trao quyền đọc cho mọi người dùng. Audit lưu lại reason/time cho thay đổi dấu thanh toán, đình chỉ, khôi phục, truy cập evidence, replay outbox và quyết định Admin; payload audit không chứa nội dung riêng tư đầy đủ.
 
 ## Phạm vi triển khai
 
-Không tạo bảng Order/Payment riêng: Program là thỏa thuận dịch vụ, fee\_records là phí tự khai báo và dấu đã/chưa thu do Tutor đặt; không có thanh toán qua cổng, hoàn tiền hoặc đối soát ngân hàng. Listing moderation hold đã chốt nghiệp vụ tại BR-15/M03-F10 nhưng chưa có migration; không tạo support-ticket/appeal route trong MVP. Admin users/metrics có policy tại BR-27; các route vẫn Dự kiến. Không tự thêm giá trị `hidden` vào ListingStatus.
+Không tạo bảng Order/Payment riêng: Program là thỏa thuận dịch vụ, fee\_records là phí tự khai báo và dấu đã/chưa thu do Tutor đặt; không có thanh toán qua cổng, hoàn tiền hoặc đối soát ngân hàng. Listing moderation hold đã có migration theo BR-15/M03-F10; hide/restore và support-ticket/appeal routes chưa triển khai. Admin users/metrics có policy tại BR-27; các route vẫn Dự kiến. Không tự thêm giá trị `hidden` vào ListingStatus.
 
 ## Tài liệu nguồn
 
-Domain Model: https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw
+Domain Model: [Domain Model](<../Domain Documentation/Domain Model.md>)
 
-Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY
+Enum Catalog: [Enum Catalog](<../Domain Documentation/Enum Catalog.md>)
 
-Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs
+Business Rules: [Business Rules](<../Domain Documentation/Business Rules.md>)
 
 F03 — Cột phân công Admin (thiết kế đích)  
 Các cột assignment đã được đưa vào bảng tutor\_profiles và reports ở trên. NULL assignee biểu thị chưa phân công; reviewed\_by và handled\_by tiếp tục chỉ người ra quyết định. Assignment đổi cùng audit, tăng assignment\_version; không thêm bảng lịch sử assignment riêng. Index hàng đợi theo (status, assigned\_admin\_id, submitted\_at) cho tutor\_profiles và (status, assigned\_admin\_id, created\_at) cho reports. Đây là thiết kế tài liệu, chưa phải migration đã chạy.
