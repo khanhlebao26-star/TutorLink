@@ -39,7 +39,7 @@ it('returns Session and Task blockers without completing the Program', function 
     $programId = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
     ProgramApiFixtures::addMember($programId, $tutor, 'tutor');
     ProgramApiFixtures::addMember($programId, $customer, 'customer');
-    $now = now('UTC');
+    $now = now('UTC')->toImmutable();
     $programSessionId = DB::table('program_sessions')->insertGetId([
         'program_id' => $programId,
         'program_version' => 1,
@@ -100,6 +100,21 @@ it('returns 404 when another Tutor attempts a Program lifecycle action', functio
 
     $this->assertDatabaseHas('programs', ['id' => $programId, 'status' => 'active']);
     $this->assertDatabaseCount('audit_logs', 0);
+});
+
+it('rejects a transition outside the allowed state without side effects', function () {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $programId = ProgramApiFixtures::draft($tutor, $customer);
+
+    $this->actingAs($tutor, 'web')
+        ->postJson("/api/v1/programs/{$programId}/pause")
+        ->assertConflict()
+        ->assertJsonPath('code', 'program_transition_invalid');
+
+    $this->assertDatabaseHas('programs', ['id' => $programId, 'status' => 'draft']);
+    $this->assertDatabaseCount('audit_logs', 0);
+    $this->assertDatabaseCount('notification_outbox', 0);
 });
 
 it('cancels a Draft and its unexpired Invitation in one transaction', function () {
