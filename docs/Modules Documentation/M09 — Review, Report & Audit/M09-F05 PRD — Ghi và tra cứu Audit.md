@@ -13,7 +13,7 @@ Lưu dấu vết bất biến cho các quyết định/moderation quan trọng v
 - Audit là append-only: API không sửa/xóa sự kiện lịch sử.
 - admin.audit_logs.view chỉ đọc theo scope; quyền Admin chung không cấp toàn bộ log.
 - Không đưa secret, object key hoặc toàn bộ private content vào audit payload.
-- Action catalog MVP: `report.create/resolve/dismiss`, `review.create/hide/restore`, `listing.hide/restore`, `tutor_profile.approve/request_changes/reject/suspend/restore`, `account.suspend/restore`, `assignment.change`, `announcement.publish`, `fee_record.create/update/mark/void`, `session.complete/cancel`, `task.create/update/start/cancel/review`, `file.link/unlink`, `evidence.read`, `audit.read`, `outbox.replay/resolve/purge`, `audit.purge`. Mở rộng action phải cập nhật catalog và kiểm thử tương ứng.
+- Action catalog MVP: `report.create/resolve/dismiss`, `review.create/hide/restore`, `listing.hide/restore`, `tutor_profile.approve/request_changes/reject/suspend/restore`, `account.suspend/restore`, `program.create/update`, `invitation.accept/expire`, `assignment.change`, `announcement.publish`, `fee_record.create/update/mark/void`, `session.complete/cancel`, `task.create/update/start/cancel/review`, `file.link/unlink`, `evidence.read`, `audit.read`, `outbox.replay/resolve/purge`, `audit.purge`. Mở rộng action phải cập nhật catalog và kiểm thử tương ứng.
 - `admin.audit_logs.view` cho phép operator nội bộ đọc trong scope được giao. DTO allow-list gồm actor, action, resource type/id, status/version trước/sau khi phù hợp, reason, request ID và timestamp; không trả raw JSONB, nội dung message, file hay credentials. Ghi `audit.read` khi truy vấn audit.
 - Giữ audit 24 tháng từ `created_at`, sau đó purge theo job có quyền kiểm soát; purge phải tự được audit. Không xóa/sửa thủ công qua API.
 
@@ -31,7 +31,7 @@ Lưu dấu vết bất biến cho các quyết định/moderation quan trọng v
 
 # 5\. Nguồn
 
-Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-06 Review và moderation. Link nguồn: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf_JJkUguJvhS2dNBa4/edit · https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK_rN0_ZOXIx0Pw4XodHjvXs/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07_tWOh8Va3dmJn8g-po5vsw/edit · https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit · https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit
+Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-06 Review và moderation. Link nguồn: [Project Overview](<../../Product Document/Project Overview.md>) · [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)
 
 F03 — Audit assignment  
 Mỗi lần giao, chuyển hoặc thu hồi Tutor Profile/Report tạo audit_logs row append-only trong cùng transaction với cập nhật assignment. Ghi resource_type/id, actor_id, action, before/after tối thiểu gồm assigned_admin_id và assignment_version, reason và created_at; không chép nội dung hồ sơ, tin nhắn hoặc file riêng tư vào audit. Assignment history không được sửa/xóa.

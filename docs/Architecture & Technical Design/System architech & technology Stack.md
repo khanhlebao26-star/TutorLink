@@ -143,39 +143,39 @@ Container Node hiện mount ./frontend để chạy Next.js; backend PHP không 
 4. Bổ sung Pulse và hoàn thiện tiến trình nền cần thiết; triển khai các module còn thiếu theo phụ thuộc G1–G3. Phân biệt công việc chuyển công nghệ với công việc xây mới tính năng.  
 5. Kiểm thử xuyên suốt, quyền/assignment, PostgreSQL race/retry, hiệu năng và restore; bàn giao trước nghiệm thu G4. Mỗi phần chỉ hoàn tất khi có bằng chứng tương ứng.
 
-[Kế hoạch chuyển giao tổng quan — phạm vi, thứ tự và tiêu chí hoàn tất](https://docs.google.com/document/d/1y_Hyt10PfaBjOyO5vsNUXiPoWfak-ecC00Epk0UEPSw/edit)
+[Kế hoạch chuyển giao tổng quan — phạm vi, thứ tự và tiêu chí hoàn tất](<System architech & technology Stack.md>)
 
 # 9\. Tài liệu tham chiếu
 
 Nguồn nghiệp vụ và yêu cầu quyết định hệ thống cần làm gì; mã/config cho biết hiện đang khai báo hoặc có triển khai gì; nguồn công nghệ xác định điều kiện tích hợp. Khi nguồn mâu thuẫn, giữ chênh lệch trong backlog và đồng bộ contract trước triển khai.
 
-[\[P1\] Project Overview](https://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf_JJkUguJvhS2dNBa4/edit)
+[\[P1\] Project Overview]([Project Overview](<../Product Document/Project Overview.md>))
 
-[Goals & Non-goals — phạm vi và tiêu chí MVP](https://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b_bgOs_UcHw/edit)
+[Goals & Non-goals — phạm vi và tiêu chí MVP](<../Product Document/Goals & Non-goals.md>)
 
-[\[P2\] Roles & Actors](https://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit)
+[\[P2\] Roles & Actors]([Roles & Actors](<../Product Document/Roles & Actors.md>))
 
-[\[D1\] Business Rules](https://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK_rN0_ZOXIx0Pw4XodHjvXs/edit)
+[\[D1\] Business Rules]([Business Rules](<../Domain Documentation/Business Rules.md>))
 
-[State Lifecycles — chi tiết vòng đời](https://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit)
+[State Lifecycles — chi tiết vòng đời](<../Domain Documentation/State Lifecycles.md>)
 
-[\[M1\] Modules Documentation — PRD M01–M10](https://drive.google.com/drive/folders/1T_d6ESJJUN5acqykfmrM1B9f3_-SMxxf)
+[\[M1\] Modules Documentation — PRD M01–M10](<../Modules Documentation>)
 
-[Workflow — WF01–WF06](https://drive.google.com/drive/folders/1k-yDi5blMbdVc2vUlklc-m7t4l8b1TJB)
+[Workflow — WF01–WF06](<../Workflow>)
 
-[\[A1\] OpenAPI 0.2.0 draft — trạng thái, thay đổi, D01–D24](https://docs.google.com/document/d/1Li7buMBJb84sSB0Sm1sHkDSEQ5jU76QxmN1b_ikHbzk/edit)
+[\[A1\] OpenAPI 0.2.0 draft — trạng thái, thay đổi, D01–D24]([TutorLink — OpenAPI 0.2.0 draft - hướng dẫn, thay đổi và điểm cần chốt](<TutorLink — OpenAPI 0.2.0 draft - hướng dẫn, thay đổi và điểm cần chốt.md>))
 
-[Database Design — thiết kế đích, gồm các mục đề xuất](https://docs.google.com/document/d/1eTL_0wGystutQ3YLIMK2GTlIPKDiCZbMrNekNTTHvJQ/edit)
+[Database Design — thiết kế đích, gồm các mục đề xuất](<Database Design — TutorLink.md>)
 
-[\[N1\] Performance & Capacity](https://docs.google.com/document/d/1oWu8Fa9wltGPnf89W-LOEYj8jHHocjITuuEmJrKEJ1U/edit)
+[\[N1\] Performance & Capacity]([Performance & Capacity](<../Non-functional Requirements/Performance & Capacity.md>))
 
-[\[N2\] Reliability & Recovery](https://docs.google.com/document/d/11Heol0HnT6fpBcFNNt8CES_2aLb-Ak8hr-jsOFcT4nc/edit)
+[\[N2\] Reliability & Recovery]([Reliability & Recovery](<../Non-functional Requirements/Reliability & Recovery.md>))
 
-[\[N3\] Observability](https://docs.google.com/document/d/1CmhetKTwfAAm3qAQaTmgCD08e5FMRgnnc218dQ9wwZY/edit)
+[\[N3\] Observability]([Observability](<../Non-functional Requirements/Observability.md>))
 
-[Security & Privacy — NFR đề xuất và phần đã xác nhận](https://docs.google.com/document/d/15g7J9QG-IYxE0h7zSBXXtE_NDyu6dGqRZJPROYJSzTA/edit)
+[Security & Privacy — NFR đề xuất và phần đã xác nhận](<../Non-functional Requirements/Security & Privacy.md>)
 
-[\[N4\] Deployment & Environment Requirements](https://docs.google.com/document/d/1o24l7O6g6_okOPmJNttz2q8uEMWV3W5dJlEH0M0IwOU/edit)
+[\[N4\] Deployment & Environment Requirements]([Deployment & Environment Requirements](<../Non-functional Requirements/Deployment & Environment Requirements.md>))
 
 [\[T1\] Laravel Sanctum — xác thực SPA/cookie và API token](https://laravel.com/docs/13.x/sanctum)
 

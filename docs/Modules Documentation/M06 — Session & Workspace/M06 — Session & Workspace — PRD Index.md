@@ -8,9 +8,9 @@ Tổ chức Workspace của Program và điều phối Session, với quyền đ
 
 # PRD chức năng
 
-[M06-F01 PRD — Workspace Overview và capability](https://docs.google.com/document/d/1tuaX_rejlPeYChOhhdfUDPmGIRwF5k-Y1PlMr1BGNL0/edit)  
-[M06-F02 PRD — Lập và quản lý Session](https://docs.google.com/document/d/1jL7DG9Jlpz2eT3zMgMEuLHE4IdtBBUiPCUCrCtYvepM/edit)  
-[M06-F03 PRD — Hoàn tất hoặc hủy Session](https://docs.google.com/document/d/1Ui26-CxN6yjeBKtRguDx1eTpg7KIOnvABylsBEdqCOY/edit)
+[M06-F01 PRD — Workspace Overview và capability](<M06-F01 PRD — Workspace Overview và capability.md>)  
+[M06-F02 PRD — Lập và quản lý Session](<M06-F02 PRD — Lập và quản lý Session.md>)  
+[M06-F03 PRD — Hoàn tất hoặc hủy Session](<M06-F03 PRD — Hoàn tất hoặc hủy Session.md>)
 
 # Quy tắc đích
 
@@ -31,10 +31,10 @@ F19 — Bằng chứng current-state (18/10/2026): nội dung mục này là bas
 Product & Domain docs hoàn tất; xem danh sách nguồn trong từng PRD.
 
 Nguồn Product/Domain đã hoàn tất:  
-Project Overview: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit  
-Roles & Actors: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit  
-Goals & Non-goals: https\://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b\_bgOs\_UcHw/edit  
-Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit  
-State Lifecycles: https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit  
-Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit  
-Domain Model: https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit
+Project Overview: [Project Overview](<../../Product Document/Project Overview.md>)  
+Roles & Actors: [Roles & Actors](<../../Product Document/Roles & Actors.md>)  
+Goals & Non-goals: [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>)  
+Business Rules: [Business Rules](<../../Domain Documentation/Business Rules.md>)  
+State Lifecycles: [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>)  
+Enum Catalog: [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)  
+Domain Model: [Domain Model](<../../Domain Documentation/Domain Model.md>)

@@ -8,11 +8,11 @@ Quản lý vòng đời File từ upload, complete, resource attachment, authori
 
 # PRD chức năng
 
-[M10-F01 PRD — Upload File](https://docs.google.com/document/d/1kEG6PVvmTOXgfOpZSIDPCZS7zAl1Jvet4UngvURU3Ew/edit)  
-[M10-F02 PRD — Complete và xác thực File](https://docs.google.com/document/d/1THxZ7uEwytDs6Af2hUGk9HcVZJqSFVe8fS9IlQ0pC7I/edit)  
-[M10-F03 PRD — Gắn File vào resource](https://docs.google.com/document/d/1B7g6pahZQkRk6oWB0F4b0nFuNQooML_XG-gTgmPDInE/edit)  
-[M10-F04 PRD — Xem metadata và tải File](https://docs.google.com/document/d/1x7v5cRAeci3LcxkrW_UxSN2ix89UrHybG2PjlM8a0gQ/edit)  
-[M10-F05 PRD — Xóa File chưa liên kết](https://docs.google.com/document/d/1vBIwwaAJm5xJl19NGICTn9wutHx_XG4xJz94BaKbyfo/edit)
+[M10-F01 PRD — Upload File](<M10-F01 PRD — Upload File.md>)  
+[M10-F02 PRD — Complete và xác thực File](<M10-F02 PRD — Complete và xác thực File.md>)  
+[M10-F03 PRD — Gắn File vào resource](<M10-F03 PRD — Gắn File vào resource.md>)  
+[M10-F04 PRD — Xem metadata và tải File](<M10-F04 PRD — Xem metadata và tải File.md>)  
+[M10-F05 PRD — Xóa File chưa liên kết](<M10-F05 PRD — Xóa File chưa liên kết.md>)
 
 # Quy tắc đích
 
@@ -32,10 +32,10 @@ Quản lý vòng đời File từ upload, complete, resource attachment, authori
 Product/Domain docs hoàn tất, Security Design và M04/M07/M08/M02 policies; nguồn cụ thể trong từng PRD.
 
 Nguồn Product/Domain đã hoàn tất:  
-Project Overview: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit  
-Roles & Actors: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit  
-Goals & Non-goals: https\://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b\_bgOs\_UcHw/edit  
-Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit  
-State Lifecycles: https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit  
-Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit  
-Domain Model: https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit
+Project Overview: [Project Overview](<../../Product Document/Project Overview.md>)  
+Roles & Actors: [Roles & Actors](<../../Product Document/Roles & Actors.md>)  
+Goals & Non-goals: [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>)  
+Business Rules: [Business Rules](<../../Domain Documentation/Business Rules.md>)  
+State Lifecycles: [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>)  
+Enum Catalog: [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)  
+Domain Model: [Domain Model](<../../Domain Documentation/Domain Model.md>)

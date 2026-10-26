@@ -8,11 +8,11 @@ Tạo Review đủ điều kiện sau Program Completed, hiển thị Review tin
 
 # PRD chức năng
 
-[M09-F01 PRD — Tạo Review sau Program](https://docs.google.com/document/d/1Scoyodvny48odQj3ofgsrk0Oa7ok4G6iSr5lmhzS78E/edit)
-[M09-F02 PRD — Hiển thị và kiểm duyệt Review](https://docs.google.com/document/d/1zGbxUtlkQNO0vcOZytDXUvs-ActcxsPKr5UFikmcEB4/edit)
-[M09-F03 PRD — Gửi Report](https://docs.google.com/document/d/1s1mglr_5mrI4gTj9vafrtZNkfXPeRbrvSGVczozwey4/edit)
-[M09-F04 PRD — Admin xử lý Report và evidence](https://docs.google.com/document/d/1y8To6rzVW2iF8JMyPVHDdcEhovRVxFOibVlWtqcxoPo/edit)
-[M09-F05 PRD — Ghi và tra cứu Audit](https://docs.google.com/document/d/1sr_FGZNzMeF-ogrA9Be0Dnse_NjQoOcCHWhTt6A6W-U/edit)
+[M09-F01 PRD — Tạo Review sau Program](<M09-F01 PRD — Tạo Review sau Program.md>)
+[M09-F02 PRD — Hiển thị và kiểm duyệt Review](<M09-F02 PRD — Hiển thị và kiểm duyệt Review.md>)
+[M09-F03 PRD — Gửi Report](<M09-F03 PRD — Gửi Report.md>)
+[M09-F04 PRD — Admin xử lý Report và evidence](<M09-F04 PRD — Admin xử lý Report và evidence.md>)
+[M09-F05 PRD — Ghi và tra cứu Audit](<M09-F05 PRD — Ghi và tra cứu Audit.md>)
 
 # Quy tắc đích
 
@@ -32,10 +32,10 @@ Tạo Review đủ điều kiện sau Program Completed, hiển thị Review tin
 Product/Domain docs hoàn tất và WF-06; nguồn cụ thể trong từng PRD.
 
 Nguồn Product/Domain đã hoàn tất:
-Project Overview: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit
-Roles & Actors: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit
-Goals & Non-goals: https\://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b\_bgOs\_UcHw/edit
-Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit
-State Lifecycles: https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit
-Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit
-Domain Model: https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit
+Project Overview: [Project Overview](<../../Product Document/Project Overview.md>)
+Roles & Actors: [Roles & Actors](<../../Product Document/Roles & Actors.md>)
+Goals & Non-goals: [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>)
+Business Rules: [Business Rules](<../../Domain Documentation/Business Rules.md>)
+State Lifecycles: [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>)
+Enum Catalog: [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)
+Domain Model: [Domain Model](<../../Domain Documentation/Domain Model.md>)

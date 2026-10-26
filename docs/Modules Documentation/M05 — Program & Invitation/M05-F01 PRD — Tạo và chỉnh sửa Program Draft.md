@@ -27,11 +27,12 @@ Tutor đủ điều kiện tạo một Program Draft nhắm tới đúng một C
 * Sai role, amount, currency, delivery\_mode hoặc target bị từ chối bằng lỗi validation.  
 * Thay Listing/Profile sau này không thay đổi các giá trị đã lưu trong Draft; snapshot sẽ khóa ở thời điểm gửi.
 
-# 5\. Chênh lệch/câu hỏi mở
+# 5\. Trạng thái triển khai
 
-* OpenAPI draft dùng customer\_id làm wire name cho target\_customer\_id. Database Design đề xuất programs.customer\_id (bigint NOT NULL FK users.id), nên migration/mapping DB vẫn cần trước triển khai; chưa có migration.  
-* BR-18 đã chốt versioning/khóa Draft. Wire name customer\_id đã được map trong OpenAPI guide; request DTO `expected_version` cần đồng bộ khi triển khai.
+* B1 đã đăng ký `GET|POST /api/v1/programs` và `GET|PATCH /api/v1/programs/{program}`. API dùng `customer_id` cho Customer đích, không nhận owner/status/version do client quyết định; Draft bắt đầu ở version 1 và PATCH thành công tăng version sau khi kiểm `expected_version`.
+* Danh sách/chi tiết giới hạn theo Tutor owner hoặc Customer member active. Customer chưa là member không đọc được Draft. PATCH kiểm eligibility, trạng thái Draft và Invitation pending; Invitation quá hạn được expire trong cùng transaction, và lỗi PATCH sẽ rollback transition đó.
+* Đây là phạm vi B1; gửi/đọc Invitation và Program lifecycle còn thuộc các bước khác của BE-D02.
 
 # 6\. Nguồn
 
-Product: Project Overview, Roles & Actors, Business Rules, Goals & Non-goals. Domain: State Lifecycles, Enum Catalog, Domain Model, Domain Overview & Glossary. Link nguồn: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit · https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit · https\://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b\_bgOs\_UcHw/edit · https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit · https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit · https\://docs.google.com/document/d/1RKRVvidOXFZh4KrbxF5csnqj5Od7-SqdtWg7KdoG554/edit
+Product: Project Overview, Roles & Actors, Business Rules, Goals & Non-goals. Domain: State Lifecycles, Enum Catalog, Domain Model, Domain Overview & Glossary. Link nguồn: [Project Overview](<../../Product Document/Project Overview.md>) · [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [Domain Overview & Glossary](<../../Domain Documentation/Domain Overview & Glossary.md>)

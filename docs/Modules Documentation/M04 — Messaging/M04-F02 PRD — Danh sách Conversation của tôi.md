@@ -32,4 +32,4 @@ Danh sách cần định danh Conversation, peer participant, status, ngữ cả
 
 # 6\. Nguồn
 
-Product: Roles & Actors, Project Overview. Domain: Domain Model, State Lifecycles. Thiết kế: PRD Messaging nội bộ, WF-03. Link nguồn: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit · https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit
+Product: Roles & Actors, Project Overview. Domain: Domain Model, State Lifecycles. Thiết kế: PRD Messaging nội bộ, WF-03. Link nguồn: [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Project Overview](<../../Product Document/Project Overview.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>)

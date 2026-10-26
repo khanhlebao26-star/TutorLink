@@ -8,10 +8,10 @@ Quản lý bài tập và submission có version, feedback chống race, cùng t
 
 # PRD chức năng
 
-[M07-F01 PRD — Tạo và giao Task](https://docs.google.com/document/d/1ZmHvf7sdgHVEh_jnB_8KTkljgivKl_PhYhLdhde1MD0/edit)  
-[M07-F02 PRD — Nộp và cập nhật bài](https://docs.google.com/document/d/150i_NzJlO_LBbgftBd5vo_uVfVDGYUVq_GtUVEHvm0U/edit)  
-[M07-F03 PRD — Feedback và quyết định bài nộp](https://docs.google.com/document/d/1jwNnQmZ24mgBTjjF-cb_Ui2nNTY_oGLlfB7icrnzJjQ/edit)  
-[M07-F04 PRD — Ghi và xem Progress](https://docs.google.com/document/d/1GmsES_DznNX-hYzAHfZWVpvt2-O-UFk9bDroyTrkxpg/edit)
+[M07-F01 PRD — Tạo và giao Task](<M07-F01 PRD — Tạo và giao Task.md>)  
+[M07-F02 PRD — Nộp và cập nhật bài](<M07-F02 PRD — Nộp và cập nhật bài.md>)  
+[M07-F03 PRD — Feedback và quyết định bài nộp](<M07-F03 PRD — Feedback và quyết định bài nộp.md>)  
+[M07-F04 PRD — Ghi và xem Progress](<M07-F04 PRD — Ghi và xem Progress.md>)
 
 # Quy tắc đích
 
@@ -32,10 +32,10 @@ F19 — Bằng chứng current-state (18/10/2026): nội dung mục này là bas
 Product/Domain docs hoàn tất và WF-05; xem nguồn cụ thể trong từng PRD.
 
 Nguồn Product/Domain đã hoàn tất:  
-Project Overview: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit  
-Roles & Actors: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit  
-Goals & Non-goals: https\://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b\_bgOs\_UcHw/edit  
-Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit  
-State Lifecycles: https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit  
-Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit  
-Domain Model: https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit
+Project Overview: [Project Overview](<../../Product Document/Project Overview.md>)  
+Roles & Actors: [Roles & Actors](<../../Product Document/Roles & Actors.md>)  
+Goals & Non-goals: [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>)  
+Business Rules: [Business Rules](<../../Domain Documentation/Business Rules.md>)  
+State Lifecycles: [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>)  
+Enum Catalog: [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)  
+Domain Model: [Domain Model](<../../Domain Documentation/Domain Model.md>)
