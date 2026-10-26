@@ -34,7 +34,7 @@ Tạo Invitation mới với `expected_version`, snapshot và hạn mới; khôn
 
 **![Sơ đồ image6](assets/wf04-program-va-invitation-image6.png)**
 
-Hệ thống/scheduler đánh expired tại `server_time >= expires_at`, không có expire API public. Accept tự kiểm biên này dù scheduler trễ. Customer đọc Invitation; Tutor owner đọc Draft và gửi lời mời mới.
+Hệ thống/scheduler đánh expired tại `server_time >= expires_at`, không có expire API public. Khi scheduler trễ, GET Invitation trả effective status expired mà không ghi DB; request PATCH Draft hoặc gửi Invitation mới hợp lệ của Tutor owner đánh expired trong cùng transaction trước khi tiếp tục. Accept tự kiểm biên này dù scheduler trễ. Customer đọc Invitation; Tutor owner đọc Draft và gửi lời mời mới.
 
 ## 07 Đọc danh sách Program
 
