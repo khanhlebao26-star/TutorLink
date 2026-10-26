@@ -112,6 +112,25 @@ class NotificationOutboxWriterTest extends TestCase
         $this->assertDatabaseCount('notification_outbox', 0);
     }
 
+    public function test_accepted_invitation_requires_the_program_deep_link_to_match_its_id(): void
+    {
+        try {
+            DB::transaction(fn () => app(NotificationOutboxWriter::class)->record(
+                'invitation_accepted',
+                'program_invitation',
+                17,
+                'invitation:17:accepted',
+                [],
+                ['deep_link' => '/programs/17', 'program_id' => 18],
+            ));
+            $this->fail('Expected a mismatched Program deep link to be rejected.');
+        } catch (InvalidArgumentException $exception) {
+            $this->assertSame('Invalid accepted Program deep link.', $exception->getMessage());
+        }
+
+        $this->assertDatabaseCount('notification_outbox', 0);
+    }
+
     private function record(array $recipientIds, array $payload = self::PAYLOAD): void
     {
         app(NotificationOutboxWriter::class)->record(

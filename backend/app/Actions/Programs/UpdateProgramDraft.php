@@ -5,7 +5,7 @@ namespace App\Actions\Programs;
 use App\Exceptions\ProgramActionException;
 use App\Models\Program;
 use App\Models\User;
-use App\Support\NotificationOutboxWriter;
+use App\Support\InvitationTransitionWriter;
 use App\Support\TutorEligibility;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -99,39 +99,7 @@ class UpdateProgramDraft
                     );
                 }
 
-                $timestamp = $now->format('Y-m-d H:i:s.uP');
-                $expiredAt = $expiresAt->format('Y-m-d H:i:s.uP');
-
-                DB::table('program_invitations')
-                    ->where('id', $invitation->id)
-                    ->update([
-                        'status' => 'expired',
-                        'responded_at' => $expiredAt,
-                        'updated_at' => $timestamp,
-                    ]);
-
-                DB::table('audit_logs')->insert([
-                    'actor_id' => $actor->id,
-                    'action' => 'invitation.expire',
-                    'resource_type' => 'program_invitation',
-                    'resource_id' => $invitation->id,
-                    'before' => json_encode(['status' => 'pending'], JSON_THROW_ON_ERROR),
-                    'after' => json_encode([
-                        'status' => 'expired',
-                        'responded_at' => $expiresAt->setTimezone('UTC')->format('Y-m-d\TH:i:s.u\Z'),
-                    ], JSON_THROW_ON_ERROR),
-                    'request_id' => $requestId,
-                    'created_at' => $timestamp,
-                ]);
-
-                app(NotificationOutboxWriter::class)->record(
-                    'invitation_expired',
-                    'program_invitation',
-                    (int) $invitation->id,
-                    "invitation:{$invitation->id}:expired",
-                    [$actor->id],
-                    ['deep_link' => "/programs/{$programId}"],
-                );
+                app(InvitationTransitionWriter::class)->expire($invitation, $actor->id, $requestId, $now);
             }
 
             if ((int) $program->version !== (int) $data['expected_version']) {
@@ -152,6 +120,8 @@ class UpdateProgramDraft
                 ->update([
                     ...$changes,
                     'version' => $nextVersion,
+                    'offer_snapshot' => null,
+                    'snapshot_locked_at' => null,
                     'updated_at' => $timestamp,
                 ]);
 

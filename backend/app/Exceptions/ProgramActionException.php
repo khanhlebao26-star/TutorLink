@@ -6,7 +6,7 @@ use RuntimeException;
 
 final class ProgramActionException extends RuntimeException
 {
-    /** @param array<string, list<string>> $errors */
+    /** @param array<string, mixed> $errors */
     public function __construct(
         public readonly int $httpStatus,
         public readonly string $errorCode,

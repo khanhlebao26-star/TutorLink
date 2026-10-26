@@ -90,6 +90,7 @@ final class NotificationOutboxWriter
                 'support_hint',
             ],
             'listing_moderation_restored' => ['deep_link', 'result_status'],
+            'invitation_accepted' => ['deep_link', 'program_id'],
             'fee_record_changed' => ['deep_link', 'period'],
             default => ['deep_link'],
         };
@@ -120,6 +121,17 @@ final class NotificationOutboxWriter
 
         if (in_array($type, $ownerProfileTypes, true) && $deepLink !== '/profile') {
             throw new InvalidArgumentException('Invalid tutor profile deep link.');
+        }
+
+        if (
+            $type === 'invitation_accepted'
+            && (
+                ! is_int($payload['program_id'] ?? null)
+                || $payload['program_id'] <= 0
+                || $deepLink !== '/programs/'.$payload['program_id']
+            )
+        ) {
+            throw new InvalidArgumentException('Invalid accepted Program deep link.');
         }
 
         if (

@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\FileController;
+use App\Http\Controllers\Api\V1\InvitationAcceptController;
+use App\Http\Controllers\Api\V1\InvitationController;
 use App\Http\Controllers\Api\V1\ListingController;
 use App\Http\Controllers\Api\V1\NotificationOutboxController;
 use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
@@ -28,6 +30,29 @@ Route::prefix('v1')->group(function () {
         Route::patch('/programs/{program}', [ProgramController::class, 'update'])
             ->whereNumber('program')
             ->name('programs.update');
+        Route::post('/programs/{program}/pause', [ProgramController::class, 'pause'])
+            ->whereNumber('program')
+            ->name('programs.pause');
+        Route::post('/programs/{program}/resume', [ProgramController::class, 'resume'])
+            ->whereNumber('program')
+            ->name('programs.resume');
+        Route::post('/programs/{program}/complete', [ProgramController::class, 'complete'])
+            ->whereNumber('program')
+            ->name('programs.complete');
+        Route::post('/programs/{program}/cancel', [ProgramController::class, 'cancel'])
+            ->whereNumber('program')
+            ->name('programs.cancel');
+        Route::post('/programs/{program}/invitations', [InvitationController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.invitations.store');
+        Route::get('/invitations', [InvitationController::class, 'index'])
+            ->name('invitations.index');
+        Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])
+            ->whereNumber('invitation')
+            ->name('invitations.show');
+        Route::post('/invitations/{invitation}/accept', InvitationAcceptController::class)
+            ->whereNumber('invitation')
+            ->name('invitations.accept');
     });
 
     Route::prefix('auth')->group(function () {

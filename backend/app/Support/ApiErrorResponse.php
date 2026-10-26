@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 
 final class ApiErrorResponse
 {
-    /** @param array<string, list<string>> $errors */
+    /** @param array<string, mixed> $errors */
     public static function make(
         int $status,
         string $code,

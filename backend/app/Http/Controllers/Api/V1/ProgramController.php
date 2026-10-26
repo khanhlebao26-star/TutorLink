@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Programs\CreateProgramDraft;
+use App\Actions\Programs\TransitionProgram;
 use App\Actions\Programs\UpdateProgramDraft;
 use App\Exceptions\ProgramActionException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateProgramRequest;
+use App\Http\Requests\ProgramActionRequest;
 use App\Http\Requests\ProgramIndexRequest;
 use App\Http\Requests\UpdateProgramRequest;
 use App\Http\Resources\ProgramResource;
@@ -23,7 +25,7 @@ use Illuminate\Http\Request;
 
 class ProgramController extends Controller
 {
-    private const ERROR_RESPONSE_TYPE = 'array{code: string, message: string, request_id: string, errors: array<string, list<string>>}';
+    private const ERROR_RESPONSE_TYPE = 'array{code: string, message: string, request_id: string, errors: array<string, mixed>}';
 
     /** List Programs visible to the current actor. */
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
@@ -50,7 +52,7 @@ class ProgramController extends Controller
             ->paginate($request->validated('per_page', 20));
 
         $programs->getCollection()->each(
-            fn (Program $program) => $this->setEditCapability($program, $canEditDraft),
+            fn (Program $program) => $this->setCapabilities($program, $canEditDraft, $actor->role === 'tutor'),
         );
 
         return ProgramResource::collection($programs)->response();
@@ -87,7 +89,7 @@ class ProgramController extends Controller
             return $this->actionError($request, $exception);
         }
 
-        $this->setEditCapability($program, true);
+        $this->setCapabilities($program, true, true);
 
         return (new ProgramResource($program))
             ->response()
@@ -115,7 +117,7 @@ class ProgramController extends Controller
             return $this->error($request, 404, 'program_not_found', 'Program not found.');
         }
 
-        $this->setEditCapability($record, $this->canEditDraft($actor));
+        $this->setCapabilities($record, $this->canEditDraft($actor), $actor->role === 'tutor');
 
         return (new ProgramResource($record))->response();
     }
@@ -162,9 +164,45 @@ class ProgramController extends Controller
             return $this->actionError($request, $exception);
         }
 
-        $this->setEditCapability($updated, $this->canEditDraft($actor));
+        $this->setCapabilities($updated, $this->canEditDraft($actor), true);
 
         return (new ProgramResource($updated))->response();
+    }
+
+    /** Pause an active Program. */
+    #[OpenApiResponse(200, description: 'Program paused.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'The Program cannot be paused from its current status.', type: self::ERROR_RESPONSE_TYPE)]
+    public function pause(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse
+    {
+        return $this->transition($request, $program, 'pause', $transition);
+    }
+
+    /** Resume a paused Program. */
+    #[OpenApiResponse(200, description: 'Program resumed.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'The Program cannot be resumed from its current status.', type: self::ERROR_RESPONSE_TYPE)]
+    public function resume(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse
+    {
+        return $this->transition($request, $program, 'resume', $transition);
+    }
+
+    /** Complete a Program after all Sessions and Tasks are terminal. */
+    #[OpenApiResponse(200, description: 'Program completed.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'The Program cannot be completed yet.', type: self::ERROR_RESPONSE_TYPE)]
+    public function complete(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse
+    {
+        return $this->transition($request, $program, 'complete', $transition);
+    }
+
+    /** Cancel a Draft, Active, or Paused Program. */
+    #[OpenApiResponse(200, description: 'Program cancelled.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'The Program cannot be cancelled from its current state or still has blockers.', type: self::ERROR_RESPONSE_TYPE)]
+    public function cancel(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse
+    {
+        return $this->transition($request, $program, 'cancel', $transition);
     }
 
     private function canEditDraft(User $actor): bool
@@ -178,9 +216,38 @@ class ProgramController extends Controller
         );
     }
 
-    private function setEditCapability(Program $program, bool $canEdit): void
+    private function setCapabilities(Program $program, bool $canEdit, bool $isTutorOwner): void
     {
         $program->setAttribute('can_edit_draft', $canEdit);
+        $program->setAttribute('is_tutor_owner', $isTutorOwner);
+    }
+
+    private function transition(
+        ProgramActionRequest $request,
+        int $programId,
+        string $action,
+        TransitionProgram $transition,
+    ): JsonResponse {
+        $actor = $request->user();
+
+        if (! $actor instanceof User) {
+            return $this->error($request, 401, 'unauthenticated', 'Authentication is required.');
+        }
+
+        try {
+            $record = $transition->execute(
+                $actor,
+                $programId,
+                $action,
+                (string) $request->attributes->get('request_id'),
+            );
+        } catch (ProgramActionException $exception) {
+            return $this->actionError($request, $exception);
+        }
+
+        $this->setCapabilities($record, $this->canEditDraft($actor), true);
+
+        return (new ProgramResource($record))->response();
     }
 
     private function actionError(Request $request, ProgramActionException $exception): JsonResponse
@@ -194,7 +261,7 @@ class ProgramController extends Controller
         );
     }
 
-    /** @param array<string, list<string>> $errors */
+    /** @param array<string, mixed> $errors */
     private function error(
         Request $request,
         int $status,

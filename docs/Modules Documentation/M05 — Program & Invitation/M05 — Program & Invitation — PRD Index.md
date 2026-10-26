@@ -25,7 +25,7 @@ Tạo thỏa thuận riêng giữa Tutor và một Customer, gửi Invitation c�
 
 # Implementation gaps
 
-* B1 Program create/list/detail/update và Accept đã đăng ký. Send/read/reject/cancel Invitation, Program lifecycle, expiry worker/scheduler và moderation hold writer chưa được triển khai.
+* B1 Program create/list/detail/update và B2 send/read Invitation, Program lifecycle, Accept đã đăng ký. Public reject/cancel Invitation API, expiry worker/scheduler và moderation hold writer chưa được triển khai.
 * `ProgramApiTest`, `InvitationAcceptTest` và `NotificationOutboxWriterTest` đã chạy cùng nhau: 33 test, 169 assertion pass trên môi trường test hiện tại. Chưa có bằng chứng kiểm thử cạnh tranh PostgreSQL cho accept-vs-expire/cancel/suspend/hold hoặc complete/cancel-vs-child-write.
 
 Kiểm tra trạng thái repository ngày 27/10/2026: B1 và Accept có route, controller/action, request/resource và feature test trong backend. Việc route được đăng ký không xác nhận các luồng Invitation/lifecycle còn lại hoặc kiểm thử concurrency PostgreSQL đã hoàn tất.

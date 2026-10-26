@@ -38,14 +38,21 @@ class ProgramResource extends JsonResource
     /** @return list<string> */
     private function allowedActions(): array
     {
-        if (
-            ! $this->can_edit_draft
-            || $this->status !== 'draft'
-            || (bool) $this->has_unexpired_pending_invitation
-        ) {
+        if (! $this->is_tutor_owner) {
             return [];
         }
 
-        return ['edit'];
+        return match ($this->status) {
+            'draft' => (bool) $this->has_unexpired_pending_invitation
+                ? ['cancel']
+                : array_values(array_filter([
+                    $this->can_edit_draft ? 'edit' : null,
+                    $this->can_edit_draft ? 'send_invitation' : null,
+                    'cancel',
+                ])),
+            'active' => ['pause', 'complete', 'cancel'],
+            'paused' => ['resume', 'complete', 'cancel'],
+            default => [],
+        };
     }
 }

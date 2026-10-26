@@ -207,7 +207,7 @@ it('creates a Draft for an active Customer and records an audit entry', function
         ->assertJsonPath('data.customer_id', $customer->id)
         ->assertJsonPath('data.currency', 'VND')
         ->assertJsonPath('data.timezone', 'Asia/Ho_Chi_Minh')
-        ->assertJsonPath('data.allowed_actions', ['edit']);
+        ->assertJsonPath('data.allowed_actions', ['edit', 'send_invitation', 'cancel']);
 
     $this->assertDatabaseHas('programs', [
         'id' => $response->json('data.id'),
@@ -298,7 +298,7 @@ it('lists and shows only Programs visible to the actor', function () {
     $list->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('meta.per_page', 1)
-        ->assertJsonPath('data.0.allowed_actions', ['edit']);
+        ->assertJsonPath('data.0.allowed_actions', ['edit', 'send_invitation', 'cancel']);
 
     $this->getJson("/api/v1/programs/{$owned['program_id']}")
         ->assertOk()
@@ -437,6 +437,10 @@ it('expires an overdue Invitation and edits the Draft in one transaction', funct
     $tutor = makeProgramApiTutor();
     $customer = TestActors::customer();
     $fixture = makeProgramApiDraft($tutor, $customer);
+    DB::table('programs')->where('id', $fixture['program_id'])->update([
+        'offer_snapshot' => json_encode(['program_id' => $fixture['program_id']], JSON_THROW_ON_ERROR),
+        'snapshot_locked_at' => now('UTC')->subDay(),
+    ]);
     $invitationId = addPendingProgramApiInvitation($fixture, now('UTC')->subSecond());
 
     $response = postProgramApiRequest(
@@ -457,6 +461,11 @@ it('expires an overdue Invitation and edits the Draft in one transaction', funct
         'user_id' => $tutor->id,
         'type' => 'invitation_expired',
         'event_key' => "invitation:{$invitationId}:expired",
+    ]);
+    $this->assertDatabaseHas('programs', [
+        'id' => $fixture['program_id'],
+        'offer_snapshot' => null,
+        'snapshot_locked_at' => null,
     ]);
     $this->assertDatabaseCount('audit_logs', 2);
 });
