@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureActiveApiActor;
 use Dedoc\Scramble\OpenApiVersion;
 use Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -19,6 +20,7 @@ return [
     'security_strategy' => [
         MiddlewareAuthSecurityStrategy::class,
         [
+            'middleware' => ['auth', 'auth:*', EnsureActiveApiActor::class],
             'scheme' => SecurityScheme::apiKey('cookie', env('SESSION_COOKIE', Str::slug((string) env('APP_NAME', 'laravel')).'-session'))
                 ->as('sessionCookie')
                 ->setDescription('Sanctum session cookie. Browser mutations also require X-XSRF-TOKEN after GET /sanctum/csrf-cookie.'),

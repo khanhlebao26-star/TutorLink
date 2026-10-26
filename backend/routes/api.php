@@ -8,13 +8,28 @@ use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\ListingController;
 use App\Http\Controllers\Api\V1\NotificationOutboxController;
 use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
+use App\Http\Controllers\Api\V1\ProgramController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
+use App\Http\Middleware\EnsureActiveApiActor;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    Route::middleware(EnsureActiveApiActor::class)->group(function () {
+        Route::get('/programs', [ProgramController::class, 'index'])
+            ->name('programs.index');
+        Route::post('/programs', [ProgramController::class, 'store'])
+            ->name('programs.store');
+        Route::get('/programs/{program}', [ProgramController::class, 'show'])
+            ->whereNumber('program')
+            ->name('programs.show');
+        Route::patch('/programs/{program}', [ProgramController::class, 'update'])
+            ->whereNumber('program')
+            ->name('programs.update');
+    });
+
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register'])
             ->middleware('throttle:register')
