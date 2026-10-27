@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\TutorProfiles\SubmitTutorProfile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AttachTutorAvatarRequest;
 use App\Http\Requests\TutorProfileRequest;
@@ -10,11 +11,10 @@ use App\Http\Resources\TutorProfileResource;
 use App\Models\File;
 use App\Models\TutorProfile;
 use App\Models\VerificationDocument;
+use App\Support\TutorProfileRevisions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class TutorProfileController extends Controller
 {
@@ -38,6 +38,12 @@ class TutorProfileController extends Controller
         return DB::transaction(function () use ($request): TutorProfileResource {
             $profile = $this->editableProfile($request);
             $data = $request->validated();
+            if ($profile?->status === 'approved') {
+                app(TutorProfileRevisions::class)->save($profile, $data, $data['expected_version'] ?? null);
+
+                return new TutorProfileResource($profile);
+            }
+            unset($data['expected_version']);
             $specializationId = $data['specialization_id'];
             unset($data['specialization_id']);
 
@@ -53,60 +59,12 @@ class TutorProfileController extends Controller
 
     public function submit(Request $request): TutorProfileResource|JsonResponse
     {
-        return DB::transaction(function () use ($request): TutorProfileResource {
-            $user = $request->user()->newQuery()->lockForUpdate()->findOrFail($request->user()->id);
-            abort_unless($user->role === 'tutor' && $user->status === 'active', 403, 'Only active tutors can use onboarding.');
-            abort_unless($user->hasVerifiedEmail(), 403, 'Email verification is required.');
-            $profile = $user->tutorProfile()->lockForUpdate()->first();
-            abort_unless($profile, 422, 'Create a draft profile first.');
-            abort_if(
-                $profile->status === 'suspended',
-                403,
-                'Suspended tutor profiles cannot be submitted.',
-            );
+        abort_unless($request->user()->role === 'tutor', 403, 'Only tutors can access onboarding.');
+        $profile = $request->user()->tutorProfile;
+        abort_unless($profile, 422, 'Create a draft profile first.');
+        $profile = app(SubmitTutorProfile::class)->execute($request->user(), $profile->id);
 
-            // Retry gửi hồ sơ đang chờ không tạo lần gửi mới.
-            if ($profile->status === 'submitted') {
-                return new TutorProfileResource(
-                    $profile->load(['specializations', 'verificationDocuments']),
-                );
-            }
-
-            abort_unless(
-                in_array($profile->status, ['draft', 'changes_requested'], true),
-                409,
-                'Only draft or changes-requested profiles can be submitted.',
-            );
-
-            $avatar = $profile->avatarFile;
-            $hasDocument = $profile->verificationDocuments()->whereHas('file', fn ($query) => $query
-                ->where('owner_id', $user->id)->where('purpose', 'verification_document')
-                ->where('scan_status', 'clean'))->get()->contains(fn ($document) => Storage::disk($document->file->disk)->exists($document->file->object_key));
-            Validator::make([
-                'headline' => trim($profile->headline),
-                'bio' => trim($profile->bio ?? ''),
-                'specialization_id' => $profile->specializations()->where('status', 'active')->value('specializations.id'),
-                'avatar_file_id' => $avatar && $avatar->owner_id === $user->id && $avatar->purpose === 'avatar'
-                    && $avatar->isComplete() && Storage::disk($avatar->disk)->exists($avatar->object_key) ? $avatar->id : null,
-                'verification_document_file_id' => $hasDocument ? 1 : null,
-            ], [
-                'headline' => ['required'],
-                'bio' => ['required'],
-                'specialization_id' => ['required'],
-                'avatar_file_id' => ['required'],
-                'verification_document_file_id' => ['nullable'],
-            ])->validate();
-
-            $profile->forceFill([
-                'submitted_at' => now(),
-                'status' => 'submitted',
-                'review_reason' => null,
-                'reviewed_by' => null,
-                'reviewed_at' => null,
-            ])->save();
-
-            return new TutorProfileResource($profile->refresh()->load(['specializations', 'verificationDocuments']));
-        });
+        return new TutorProfileResource($profile->load(['specializations', 'verificationDocuments']));
     }
 
     public function attachAvatar(AttachTutorAvatarRequest $request): TutorProfileResource|JsonResponse
@@ -129,7 +87,11 @@ class TutorProfileController extends Controller
                 return response()->json(['message' => 'File must be complete before it can be attached.'], 409);
             }
 
-            $profile->update(['avatar_file_id' => $file->id]);
+            if ($profile->status === 'approved') {
+                app(TutorProfileRevisions::class)->save($profile, ['avatar_file_id' => $file->id], $request->validated('expected_version'));
+            } else {
+                $profile->update(['avatar_file_id' => $file->id]);
+            }
 
             return new TutorProfileResource($profile->load([
                 'specializations',
@@ -160,12 +122,12 @@ class TutorProfileController extends Controller
                 return response()->json(['message' => 'File must be complete before it can be attached.'], 409);
             }
 
-            $document = VerificationDocument::updateOrCreate(
+            $document = VerificationDocument::firstOrCreate(
                 [
                     'tutor_profile_id' => $profile->id,
                     'file_id' => $file->id,
                 ],
-                ['document_type' => $data['document_type']],
+                ['document_type' => $data['document_type'], 'expires_at' => $data['expires_at'] ?? null],
             );
 
             return response()->json([
@@ -193,9 +155,9 @@ class TutorProfileController extends Controller
 
         if ($profile !== null) {
             abort_unless(
-                in_array($profile->status, ['draft', 'changes_requested'], true),
+                in_array($profile->status, ['draft', 'changes_requested', 'approved'], true),
                 409,
-                'Only draft or changes-requested profiles can be edited.',
+                'Only draft, changes-requested or approved profiles can be edited.',
             );
         }
 

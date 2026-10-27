@@ -39,13 +39,14 @@ class AdminApprovalAuditTest extends TestCase
             if ($purpose === 'avatar') {
                 $profile->update(['avatar_file_id' => $file->id]);
             } else {
-                $profile->verificationDocuments()->create(['file_id' => $file->id, 'document_type' => 'certificate']);
+                $profile->verificationDocuments()->create(['file_id' => $file->id, 'document_type' => 'identity_card', 'status' => 'approved']);
             }
         }
         $this->seed(CatalogSeeder::class);
         $specializationId = Specialization::query()->value('id');
 
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/request-changes", [
+            'assignment_version' => 0,
             'reason' => 'Bổ sung chứng chỉ giảng dạy.',
         ])->assertOk()->assertJsonPath('data.profile.status', 'changes_requested');
 
@@ -61,6 +62,7 @@ class AdminApprovalAuditTest extends TestCase
             ->assertJsonPath('data.status', 'submitted');
 
         $this->actingAs($admin)->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", [
+            'assignment_version' => 0,
             'reason' => 'Đã kiểm tra và hồ sơ hợp lệ.',
         ])->assertOk()->assertJsonPath('data.profile.status', 'approved');
 
@@ -84,7 +86,7 @@ class AdminApprovalAuditTest extends TestCase
             'resource_id' => $profile->id,
             'reason' => 'Đã kiểm tra và hồ sơ hợp lệ.',
         ]);
-        $this->assertSame(2, DB::table('audit_logs')->where('resource_id', $profile->id)->count());
+        $this->assertSame(2, DB::table('audit_logs')->where('resource_id', $profile->id)->whereIn('action', ['tutor_profile_changes_requested', 'tutor_profile_approved'])->count());
 
         foreach ([
             'tutor_profile_changes_requested' => 'changes-requested',
@@ -145,7 +147,7 @@ class AdminApprovalAuditTest extends TestCase
             ->getJson('/api/v1/admin/tutor-profiles')
             ->assertForbidden();
         $this->actingAs($adminWithoutPermission)
-            ->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", ['reason' => 'Không có quyền.'])
+            ->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", ['reason' => 'Không có quyền.', 'assignment_version' => 0])
             ->assertForbidden();
     }
 
@@ -188,16 +190,18 @@ class AdminApprovalAuditTest extends TestCase
         DB::table('verification_documents')->insert([
             'tutor_profile_id' => $profile->id,
             'file_id' => $file->id,
-            'document_type' => 'certificate',
+            'document_type' => 'identity_card',
             'status' => 'pending',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
+        $profile->update(['assigned_admin_id' => $profileViewer->id]);
         $this->actingAs($profileViewer)
             ->getJson("/api/v1/admin/tutor-profiles/{$profile->id}")
             ->assertOk()
             ->assertJsonPath('data.verification_documents', null);
+        $profile->update(['assigned_admin_id' => $admin->id]);
         $this->actingAs($admin)
             ->getJson("/api/v1/admin/tutor-profiles/{$profile->id}")
             ->assertOk()
@@ -224,7 +228,7 @@ class AdminApprovalAuditTest extends TestCase
         ])->assertOk();
         $this->assertDatabaseHas('users', [
             'id' => $tutor->id,
-            'status' => 'active',
+            'status' => 'suspended',
         ]);
 
         $this->assertSame('suspended', $profile->refresh()->status);
@@ -237,6 +241,8 @@ class AdminApprovalAuditTest extends TestCase
         $this->assertSame('approved', $profile->refresh()->status);
         $this->assertNull($profile->suspended_at);
 
+        $this->assertSame('suspended', $tutor->refresh()->status);
+        $this->actingAs($admin)->postJson("/api/v1/admin/users/{$tutor->id}/restore", ['reason' => 'Restore separately'])->assertOk();
         $this->actingAs($admin)->postJson("/api/v1/admin/users/{$tutor->id}/suspend", [
             'reason' => 'Tạm dừng tài khoản theo chính sách.',
         ])->assertOk();
@@ -281,6 +287,7 @@ class AdminApprovalAuditTest extends TestCase
     private function createSubmittedProfile(User $tutor): TutorProfile
     {
         return $tutor->tutorProfile()->create([
+            'assigned_admin_id' => User::where('role', 'admin')->first()?->id,
             'headline' => 'English tutor',
             'bio' => 'Experienced tutor.',
             'experience_years' => 5,

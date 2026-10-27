@@ -19,6 +19,7 @@
         "/admin/tutor-profiles": {
             "get": {
                 "operationId": "admin.tutor-profiles.index",
+                "summary": "List assigned profiles, or minimal assignment queue metadata for coordinators",
                 "tags": [
                     "Admin"
                 ],
@@ -30,11 +31,18 @@
                             "type": "string",
                             "default": "submitted"
                         }
+                    },
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "List assigned profiles, or minimal assignment queue metadata for coordinators.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -44,49 +52,32 @@
                                             "type": "array",
                                             "items": {
                                                 "type": "object",
-                                                "properties": {
-                                                    "user": {
-                                                        "type": "array",
-                                                        "items": {}
-                                                    },
-                                                    "allowed_actions": {
-                                                        "type": "array",
-                                                        "prefixItems": [
-                                                            {
-                                                                "type": "string",
-                                                                "const": "account-restore"
-                                                            },
-                                                            {
-                                                                "type": "string",
-                                                                "const": "request-changes"
-                                                            },
-                                                            {
-                                                                "type": "string",
-                                                                "const": "reject"
-                                                            }
-                                                        ],
-                                                        "minItems": 3,
-                                                        "maxItems": 3
-                                                    },
-                                                    "profile": {
-                                                        "type": "array",
-                                                        "items": {}
-                                                    },
-                                                    "verification_documents": {
-                                                        "type": "null"
-                                                    }
-                                                },
-                                                "required": [
-                                                    "user",
-                                                    "allowed_actions",
-                                                    "profile",
-                                                    "verification_documents"
-                                                ]
+                                                "additionalProperties": {}
                                             }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "total",
+                                                "per_page"
+                                            ]
                                         }
                                     },
                                     "required": [
-                                        "data"
+                                        "data",
+                                        "meta"
                                     ]
                                 }
                             }
@@ -113,6 +104,37 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -120,6 +142,7 @@
         "/admin/tutor-profiles/{tutorProfile}": {
             "get": {
                 "operationId": "admin.tutor-profiles.show",
+                "summary": "Read a profile within the current assignment scope",
                 "tags": [
                     "Admin"
                 ],
@@ -136,7 +159,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Read a profile within the current assignment scope.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -146,40 +169,47 @@
                                             "type": "object",
                                             "properties": {
                                                 "user": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
                                                 },
                                                 "allowed_actions": {
                                                     "type": "array",
-                                                    "prefixItems": [
-                                                        {
-                                                            "type": "string",
-                                                            "const": "account-restore"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "request-changes"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "reject"
-                                                        }
-                                                    ],
-                                                    "minItems": 3,
-                                                    "maxItems": 3
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
                                                 },
                                                 "profile": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "assignment": {
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "revision": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "additionalProperties": {}
                                                 },
                                                 "verification_documents": {
-                                                    "type": "null"
+                                                    "type": [
+                                                        "array",
+                                                        "null"
+                                                    ],
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
                                                 }
                                             },
                                             "required": [
                                                 "user",
                                                 "allowed_actions",
                                                 "profile",
+                                                "assignment",
+                                                "revision",
                                                 "verification_documents"
                                             ]
                                         }
@@ -196,6 +226,521 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/tutor-profiles/{tutorProfile}/assignment": {
+            "put": {
+                "operationId": "admin.tutor-profiles.assignment",
+                "summary": "Assign, reassign or revoke the reviewer using the current assignment version",
+                "tags": [
+                    "Admin"
+                ],
+                "parameters": [
+                    {
+                        "name": "tutorProfile",
+                        "in": "path",
+                        "required": true,
+                        "description": "The tutor profile ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AssignTutorProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assign, reassign or revoke the reviewer using the current assignment version.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "assigned_admin_id": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "assigned_by": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "assigned_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "assignment_version": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "assigned_admin_id",
+                                                "assigned_by",
+                                                "assigned_at",
+                                                "assignment_version"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/verification-documents/{document}/approve": {
+            "post": {
+                "operationId": "admin.verification-documents.approve",
+                "summary": "Approve one complete and unexpired pending verification document",
+                "tags": [
+                    "Admin"
+                ],
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "description": "The document ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerificationDocumentDecisionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Approve one complete and unexpired pending verification document.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "tutor_profile_id": {
+                                                    "type": "integer"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_by": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reviewed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "review_reason": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "expires_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "tutor_profile_id",
+                                                "status",
+                                                "reviewed_by",
+                                                "reviewed_at",
+                                                "review_reason",
+                                                "expires_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/verification-documents/{document}/reject": {
+            "post": {
+                "operationId": "admin.verification-documents.reject",
+                "summary": "Reject one pending verification document with a reason",
+                "tags": [
+                    "Admin"
+                ],
+                "parameters": [
+                    {
+                        "name": "document",
+                        "in": "path",
+                        "required": true,
+                        "description": "The document ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerificationDocumentDecisionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reject one pending verification document with a reason.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "tutor_profile_id": {
+                                                    "type": "integer"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_by": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "reviewed_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "review_reason": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "expires_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "tutor_profile_id",
+                                                "status",
+                                                "reviewed_by",
+                                                "reviewed_at",
+                                                "review_reason",
+                                                "expires_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -203,6 +748,7 @@
         "/admin/tutor-profiles/{tutorProfile}/approve": {
             "post": {
                 "operationId": "admin.tutor-profiles.approve",
+                "summary": "Approve a submitted profile or a versioned revision after document checks",
                 "tags": [
                     "Admin"
                 ],
@@ -222,14 +768,14 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/AdminDecisionRequest"
+                                "$ref": "#/components/schemas/TutorProfileDecisionRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Approve a submitted profile or a versioned revision after document checks.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -239,40 +785,47 @@
                                             "type": "object",
                                             "properties": {
                                                 "user": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
                                                 },
                                                 "allowed_actions": {
                                                     "type": "array",
-                                                    "prefixItems": [
-                                                        {
-                                                            "type": "string",
-                                                            "const": "account-restore"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "request-changes"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "reject"
-                                                        }
-                                                    ],
-                                                    "minItems": 3,
-                                                    "maxItems": 3
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
                                                 },
                                                 "profile": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "assignment": {
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "revision": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "additionalProperties": {}
                                                 },
                                                 "verification_documents": {
-                                                    "type": "null"
+                                                    "type": [
+                                                        "array",
+                                                        "null"
+                                                    ],
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
                                                 }
                                             },
                                             "required": [
                                                 "user",
                                                 "allowed_actions",
                                                 "profile",
+                                                "assignment",
+                                                "revision",
                                                 "verification_documents"
                                             ]
                                         }
@@ -292,6 +845,68 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -299,6 +914,7 @@
         "/admin/tutor-profiles/{tutorProfile}/request-changes": {
             "post": {
                 "operationId": "admin.tutor-profiles.request-changes",
+                "summary": "Request changes to a submitted profile or revision, preserving approved content",
                 "tags": [
                     "Admin"
                 ],
@@ -318,14 +934,14 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/AdminDecisionRequest"
+                                "$ref": "#/components/schemas/TutorProfileDecisionRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Request changes to a submitted profile or revision, preserving approved content.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -335,40 +951,47 @@
                                             "type": "object",
                                             "properties": {
                                                 "user": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
                                                 },
                                                 "allowed_actions": {
                                                     "type": "array",
-                                                    "prefixItems": [
-                                                        {
-                                                            "type": "string",
-                                                            "const": "account-restore"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "request-changes"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "reject"
-                                                        }
-                                                    ],
-                                                    "minItems": 3,
-                                                    "maxItems": 3
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
                                                 },
                                                 "profile": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "assignment": {
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "revision": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "additionalProperties": {}
                                                 },
                                                 "verification_documents": {
-                                                    "type": "null"
+                                                    "type": [
+                                                        "array",
+                                                        "null"
+                                                    ],
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
                                                 }
                                             },
                                             "required": [
                                                 "user",
                                                 "allowed_actions",
                                                 "profile",
+                                                "assignment",
+                                                "revision",
                                                 "verification_documents"
                                             ]
                                         }
@@ -388,6 +1011,68 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -395,6 +1080,7 @@
         "/admin/tutor-profiles/{tutorProfile}/reject": {
             "post": {
                 "operationId": "admin.tutor-profiles.reject",
+                "summary": "Reject a submitted profile or revision without allowing self-resubmission",
                 "tags": [
                     "Admin"
                 ],
@@ -414,14 +1100,14 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/AdminDecisionRequest"
+                                "$ref": "#/components/schemas/TutorProfileDecisionRequest"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Reject a submitted profile or revision without allowing self-resubmission.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -431,40 +1117,47 @@
                                             "type": "object",
                                             "properties": {
                                                 "user": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
                                                 },
                                                 "allowed_actions": {
                                                     "type": "array",
-                                                    "prefixItems": [
-                                                        {
-                                                            "type": "string",
-                                                            "const": "account-restore"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "request-changes"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "reject"
-                                                        }
-                                                    ],
-                                                    "minItems": 3,
-                                                    "maxItems": 3
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
                                                 },
                                                 "profile": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "assignment": {
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "revision": {
+                                                    "type": [
+                                                        "object",
+                                                        "null"
+                                                    ],
+                                                    "additionalProperties": {}
                                                 },
                                                 "verification_documents": {
-                                                    "type": "null"
+                                                    "type": [
+                                                        "array",
+                                                        "null"
+                                                    ],
+                                                    "items": {
+                                                        "type": "object",
+                                                        "additionalProperties": {}
+                                                    }
                                                 }
                                             },
                                             "required": [
                                                 "user",
                                                 "allowed_actions",
                                                 "profile",
+                                                "assignment",
+                                                "revision",
                                                 "verification_documents"
                                             ]
                                         }
@@ -484,6 +1177,68 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -491,6 +1246,7 @@
         "/admin/tutor-profiles/{tutorProfile}/suspend": {
             "post": {
                 "operationId": "admin.tutor-profiles.suspend",
+                "summary": "Suspend a profile and its active account atomically with both required permissions",
                 "tags": [
                     "Admin"
                 ],
@@ -517,7 +1273,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Suspend a profile and its active account atomically with both required permissions.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -526,42 +1282,54 @@
                                         "data": {
                                             "type": "object",
                                             "properties": {
-                                                "user": {
-                                                    "type": "array",
-                                                    "items": {}
-                                                },
-                                                "allowed_actions": {
-                                                    "type": "array",
-                                                    "prefixItems": [
-                                                        {
-                                                            "type": "string",
-                                                            "const": "account-restore"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "request-changes"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "reject"
-                                                        }
-                                                    ],
-                                                    "minItems": 3,
-                                                    "maxItems": 3
-                                                },
                                                 "profile": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "status_before_suspension": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "suspended_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "status",
+                                                        "status_before_suspension",
+                                                        "suspended_at"
+                                                    ]
                                                 },
-                                                "verification_documents": {
-                                                    "type": "null"
+                                                "user": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "status"
+                                                    ]
                                                 }
                                             },
                                             "required": [
-                                                "user",
-                                                "allowed_actions",
                                                 "profile",
-                                                "verification_documents"
+                                                "user"
                                             ]
                                         }
                                     },
@@ -580,6 +1348,68 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -587,6 +1417,7 @@
         "/admin/tutor-profiles/{tutorProfile}/restore": {
             "post": {
                 "operationId": "admin.tutor-profiles.restore",
+                "summary": "Restore the saved profile state while keeping account restoration separate",
                 "tags": [
                     "Admin"
                 ],
@@ -613,7 +1444,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "",
+                        "description": "Restore the saved profile state while keeping account restoration separate.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -622,42 +1453,54 @@
                                         "data": {
                                             "type": "object",
                                             "properties": {
-                                                "user": {
-                                                    "type": "array",
-                                                    "items": {}
-                                                },
-                                                "allowed_actions": {
-                                                    "type": "array",
-                                                    "prefixItems": [
-                                                        {
-                                                            "type": "string",
-                                                            "const": "account-restore"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "request-changes"
-                                                        },
-                                                        {
-                                                            "type": "string",
-                                                            "const": "reject"
-                                                        }
-                                                    ],
-                                                    "minItems": 3,
-                                                    "maxItems": 3
-                                                },
                                                 "profile": {
-                                                    "type": "array",
-                                                    "items": {}
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "status_before_suspension": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        },
+                                                        "suspended_at": {
+                                                            "type": [
+                                                                "string",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "status",
+                                                        "status_before_suspension",
+                                                        "suspended_at"
+                                                    ]
                                                 },
-                                                "verification_documents": {
-                                                    "type": "null"
+                                                "user": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "status"
+                                                    ]
                                                 }
                                             },
                                             "required": [
-                                                "user",
-                                                "allowed_actions",
                                                 "profile",
-                                                "verification_documents"
+                                                "user"
                                             ]
                                         }
                                     },
@@ -676,6 +1519,68 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "409": {
+                        "description": "The assignment, revision version or resource state has changed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The actor lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {}
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1869,44 +2774,6 @@
                                     "type": "string",
                                     "enum": [
                                         "chunked"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "409": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "const": "File is not complete."
-                                        }
-                                    },
-                                    "required": [
-                                        "message"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "const": "Forbidden."
-                                        }
-                                    },
-                                    "required": [
-                                        "message"
                                     ]
                                 }
                             }
@@ -5544,6 +6411,50 @@
                             }
                         }
                     },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                "Only tutors can access onboarding."
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                "Create a draft profile first."
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
                     }
@@ -5681,7 +6592,7 @@
                 "type": "apiKey",
                 "description": "Sanctum session cookie. Browser mutations also require X-XSRF-TOKEN after GET /sanctum/csrf-cookie.",
                 "in": "cookie",
-                "name": "laravel-session"
+                "name": "tutorlink-session"
             }
         },
         "schemas": {
@@ -5699,9 +6610,39 @@
                 ],
                 "title": "AdminDecisionRequest"
             },
+            "AssignTutorProfileRequest": {
+                "type": "object",
+                "properties": {
+                    "assigned_admin_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "assignment_version": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "reason": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 2000
+                    }
+                },
+                "required": [
+                    "assigned_admin_id",
+                    "assignment_version",
+                    "reason"
+                ],
+                "title": "AssignTutorProfileRequest"
+            },
             "AttachTutorAvatarRequest": {
                 "type": "object",
                 "properties": {
+                    "expected_version": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
                     "file_id": {
                         "type": "integer"
                     }
@@ -7036,9 +7977,60 @@
                 ],
                 "title": "Specialization"
             },
+            "TutorProfileDecisionRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 2000
+                    },
+                    "assignment_version": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "expected_version": {
+                        "type": "integer",
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "reason",
+                    "assignment_version"
+                ],
+                "title": "TutorProfileDecisionRequest"
+            },
             "TutorProfileRequest": {
                 "type": "object",
                 "properties": {
+                    "expected_version": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "qualification_claims": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "degree",
+                                        "certificate"
+                                    ]
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "maxLength": 160
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "name"
+                            ]
+                        },
+                        "maxItems": 20
+                    },
                     "headline": {
                         "type": "string",
                         "maxLength": 160
@@ -7090,6 +8082,13 @@
                             "integer",
                             "null"
                         ]
+                    },
+                    "qualification_claims": {
+                        "type": "array",
+                        "items": {}
+                    },
+                    "revision": {
+                        "type": "string"
                     },
                     "headline": {
                         "type": "string"
@@ -7161,6 +8160,8 @@
                     "specialization_id",
                     "avatar_file_id",
                     "verification_document_file_id",
+                    "qualification_claims",
+                    "revision",
                     "headline",
                     "bio",
                     "experience_years",
@@ -7418,15 +8419,47 @@
                 ],
                 "title": "UserResource"
             },
+            "VerificationDocumentDecisionRequest": {
+                "type": "object",
+                "properties": {
+                    "reason": {
+                        "type": "string",
+                        "minLength": 2,
+                        "maxLength": 2000
+                    },
+                    "assignment_version": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
+                },
+                "required": [
+                    "reason",
+                    "assignment_version"
+                ],
+                "title": "VerificationDocumentDecisionRequest"
+            },
             "VerificationDocumentRequest": {
                 "type": "object",
                 "properties": {
                     "file_id": {
                         "type": "integer"
                     },
+                    "expires_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
                     "document_type": {
                         "type": "string",
-                        "maxLength": 50
+                        "enum": [
+                            "identity_card",
+                            "passport",
+                            "degree",
+                            "certificate",
+                            "other"
+                        ]
                     }
                 },
                 "required": [

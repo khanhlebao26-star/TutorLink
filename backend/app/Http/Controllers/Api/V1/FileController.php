@@ -9,7 +9,8 @@ use App\Http\Resources\FileResource;
 use App\Models\File;
 use App\Models\TutorProfile;
 use App\Models\VerificationDocument;
-use App\Support\AdminPermissions;
+use App\Policies\TutorProfilePolicy;
+use App\Support\TutorProfileWorkflow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -125,25 +126,21 @@ class FileController extends Controller
 
     public function download(Request $request, File $file)
     {
-        $isOwner = $file->owner_id === $request->user()->id;
-        $isVerificationDocument = DB::table('verification_documents')
-            ->where('file_id', $file->id)
-            ->exists();
-        $isAuthorizedReviewer = $request->user()->hasPermission(
-            AdminPermissions::DOWNLOAD_VERIFICATION_DOCUMENTS,
-        );
+        return DB::transaction(function () use ($request, $file) {
+            $isOwner = $file->owner_id === $request->user()->id;
+            if (! $isOwner) {
+                $document = VerificationDocument::where('file_id', $file->id)->first();
+                abort_unless($document, 403, 'Forbidden.');
+                [$actor, $profile] = app(TutorProfileWorkflow::class)->lock($request->user(), $document->tutor_profile_id);
+                abort_unless(app(TutorProfilePolicy::class)->download($actor, $profile), 403, 'Forbidden.');
+                app(TutorProfileWorkflow::class)->audit($actor, 'verification_document.download', 'verification_document',
+                    $document->id, [], ['file_id' => $file->id, 'tutor_profile_id' => $profile->id]);
+            }
+            abort_unless($file->isComplete(), 409, 'File is not complete.');
+            abort_unless(Storage::disk($file->disk)->exists($file->object_key), 404);
 
-        if (! $isOwner && ! ($isVerificationDocument && $isAuthorizedReviewer)) {
-            return response()->json(['message' => 'Forbidden.'], 403);
-        }
-
-        if (! $file->isComplete()) {
-            return response()->json(['message' => 'File is not complete.'], 409);
-        }
-
-        abort_unless(Storage::disk($file->disk)->exists($file->object_key), 404);
-
-        return Storage::disk($file->disk)->download($file->object_key, $file->original_name);
+            return Storage::disk($file->disk)->download($file->object_key, $file->original_name);
+        });
     }
 
     public function destroy(Request $request, File $file): JsonResponse
@@ -158,6 +155,7 @@ class FileController extends Controller
                 DB::table('file_links')->where('file_id', $file->id)->exists()
                 || DB::table('verification_documents')->where('file_id', $file->id)->exists()
                 || DB::table('tutor_profiles')->where('avatar_file_id', $file->id)->exists()
+                || DB::table('tutor_profile_revisions')->where('avatar_file_id', $file->id)->exists()
                 || DB::table('customer_profiles')->where('avatar_file_id', $file->id)->exists()
             ) {
                 return response()->json(['message' => 'Linked files cannot be deleted.'], 409);

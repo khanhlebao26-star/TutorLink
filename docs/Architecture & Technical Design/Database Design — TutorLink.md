@@ -96,7 +96,7 @@ avatar\_file\_id — bigint; NULL; FK; tham chiếu files.id.
 
 public\_slug — varchar(180); NULL; UK.
 
-status\_before\_suspension — varchar(20); NULL; đề xuất thêm.
+status\_before\_suspension — varchar(20); NULL; migration H02 lưu trạng thái trước đình chỉ, backfill legacy suspended thành approved theo hành vi endpoint cũ.
 
 qualification\_claims — jsonb; NOT NULL; mặc định: []; danh sách claim có cấu trúc `type` (`degree`/`certificate`), tên claim và thông tin hiển thị được allow-list; không chứa file hoặc nội dung giấy tờ.
 
@@ -110,9 +110,9 @@ assignment\_version — integer; NOT NULL DEFAULT 0; tăng khi giao/chuyển/thu
 
 Quy tắc D06 đã chốt: server tạo `public_slug` một lần khi tạo Tutor Profile từ tên và hậu tố ID duy nhất; đổi tên hiển thị không đổi slug. Không cần bảng alias/redirect slug trong MVP. Unique constraint ngăn trùng; chỉ hồ sơ đủ public gate mới được tra cứu qua slug.
 
-BR-16 yêu cầu lưu bản sửa của Profile approved tách khỏi dữ liệu công khai. Duyệt revision phải kiểm version và thay dữ liệu công khai cùng transaction; request-changes/reject giữ bản approved cũ. `qualification_claims` là dữ liệu có cấu trúc để xác định degree/certificate bắt buộc; không suy từ headline/bio. Migration/DTO cụ thể chưa có trong runtime.
+BR-16 yêu cầu lưu bản sửa của Profile approved tách khỏi dữ liệu công khai. Duyệt revision phải kiểm version và thay dữ liệu công khai cùng transaction; request-changes/reject giữ bản approved cũ. `qualification_claims` là dữ liệu có cấu trúc để xác định degree/certificate bắt buộc; không suy từ headline/bio. Migration H02 bổ sung qualification claims và revision; DTO trả latest revision cho owner/Admin đúng scope. Việc áp dụng migration trên từng môi trường cần evidence riêng.
 
-### Bảng tutor\_profile\_revisions — target BR-16, chưa có migration
+### Bảng tutor\_profile\_revisions — BR-16, migration BE-H02
 
 id — bigint; NOT NULL; PK.
 
@@ -121,6 +121,8 @@ tutor\_profile\_id — bigint; NOT NULL; FK tutor\_profiles.id.
 revision\_no — integer; NOT NULL; tăng trong phạm vi một Tutor Profile.
 
 status — varchar(20); NOT NULL DEFAULT draft; enum: TutorProfileRevisionStatus.
+
+avatar\_file\_id — bigint; NULL; FK files.id RESTRICT, giữ tệp avatar của revision khỏi bị xóa.
 
 payload — jsonb; NOT NULL; snapshot allow-list của field Profile/specialization đang sửa, gồm `qualification_claims` có cấu trúc; không sao chép nội dung File.
 
@@ -356,7 +358,7 @@ updated\_at — timestamptz; NULL.
 
 expires\_at — timestamptz; NULL; được thêm trong migration BE-D02; NULL nghĩa là không có ngày hết hạn.
 
-review\_reason — text; NULL; cần lưu khi từ chối.
+review\_reason — text; NULL; migration H02 lưu khi quyết định giấy tờ.
 
 Khóa ghép / unique: verification\_documents: UNIQUE(tutor\_profile\_id,file\_id).
 

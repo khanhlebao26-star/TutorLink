@@ -35,3 +35,8 @@ Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model,
 
 F03 — Audit assignment  
 Mỗi lần giao, chuyển hoặc thu hồi Tutor Profile/Report tạo audit_logs row append-only trong cùng transaction với cập nhật assignment. Ghi resource_type/id, actor_id, action, before/after tối thiểu gồm assigned_admin_id và assignment_version, reason và created_at; không chép nội dung hồ sơ, tin nhắn hoặc file riêng tư vào audit. Assignment history không được sửa/xóa.
+
+
+## H02 runtime audit mapping
+
+H02 keeps the existing profile notification/audit identifiers `tutor_profile_approved`, `tutor_profile_changes_requested`, `tutor_profile_rejected`, `tutor_profile_suspended`, `tutor_profile_restored` and the existing `account_suspended`/`account_restored` identifiers for compatibility. Assignment changes use `tutor_profile.assignment`; submit uses `tutor_profile.submit`; per-document decisions use `verification_document.approve`/`verification_document.reject`; reviewer access uses `verification_document.view`/`verification_document.download`. These map to the profile/account/assignment/evidence categories above. Audit payloads contain state, assignment/revision identifiers, version or accessed file identifiers; they never copy document contents or uploaded file names. Request IDs are UUIDs. Existing retention and scoped audit-read rules remain applicable.

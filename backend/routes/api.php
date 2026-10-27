@@ -108,11 +108,17 @@ Route::prefix('v1')->group(function () {
             'replace',
         ]);
 
-        Route::prefix('admin')->group(function () {
+        Route::prefix('admin')->middleware(EnsureActiveApiActor::class)->group(function () {
             Route::get('/tutor-profiles', [AdminController::class, 'index'])
                 ->name('admin.tutor-profiles.index');
             Route::get('/tutor-profiles/{tutorProfile}', [AdminController::class, 'show'])
                 ->name('admin.tutor-profiles.show');
+            Route::put('/tutor-profiles/{tutorProfile}/assignment', [AdminController::class, 'assign'])
+                ->name('admin.tutor-profiles.assignment');
+            Route::post('/verification-documents/{document}/approve', [AdminController::class, 'approveDocument'])
+                ->name('admin.verification-documents.approve');
+            Route::post('/verification-documents/{document}/reject', [AdminController::class, 'rejectDocument'])
+                ->name('admin.verification-documents.reject');
             Route::post('/tutor-profiles/{tutorProfile}/approve', [AdminController::class, 'approve'])
                 ->name('admin.tutor-profiles.approve');
             Route::post('/tutor-profiles/{tutorProfile}/request-changes', [AdminController::class, 'requestChanges'])

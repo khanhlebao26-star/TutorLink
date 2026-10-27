@@ -190,6 +190,51 @@ class InvitationAcceptConcurrencyTest extends TestCase
         }
     }
 
+    public function test_accept_and_atomic_profile_suspension_preserve_a_consistent_outcome(): void
+    {
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $admin = TestActors::admin();
+        $profileId = $tutor->tutorProfile->id;
+        $programId = ProgramApiFixtures::draft($tutor, $customer);
+        $invitationId = ProgramApiFixtures::invitation($programId, $tutor, $customer, now('UTC')->addHours(72)->format('Y-m-d H:i:s.uP'));
+        $processes = $this->runBehindUserLocks([$customer->id, $tutor->id], [
+            ['operation' => 'profile_suspend', 'actor_id' => $admin->id, 'program_id' => $programId, 'invitation_id' => $invitationId, 'target_id' => $profileId],
+            ['operation' => 'accept', 'actor_id' => $customer->id, 'program_id' => $programId, 'invitation_id' => $invitationId],
+        ]);
+        $statuses = array_map(fn (Process $process): int => $this->resultStatus($process), $processes);
+        sort($statuses);
+        $this->assertContains($statuses, [[200, 200], [200, 409]]);
+        $this->assertDatabaseHas('users', ['id' => $tutor->id, 'status' => 'suspended']);
+        $this->assertDatabaseHas('tutor_profiles', ['id' => $profileId, 'status' => 'suspended', 'status_before_suspension' => 'approved']);
+        $accepted = DB::table('program_invitations')->where('id', $invitationId)->value('status') === 'accepted';
+        $this->assertDatabaseCount('program_members', $accepted ? 2 : 0);
+        $this->assertDatabaseCount('audit_logs', $accepted ? 3 : 2);
+        $this->assertDatabaseCount('notification_outbox', $accepted ? 2 : 1);
+        $this->assertDatabaseHas('programs', ['id' => $programId, 'status' => $accepted ? 'active' : 'draft']);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'account_suspended', 'resource_id' => $tutor->id]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'tutor_profile_suspended', 'resource_id' => $profileId]);
+    }
+
+    public function test_concurrent_assignment_changes_cannot_overwrite_the_same_version(): void
+    {
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $admin = TestActors::admin();
+        $reviewer = TestActors::admin();
+        $profileId = $tutor->tutorProfile->id;
+        $processes = $this->runBehindUserLocks([$admin->id, $reviewer->id, $tutor->id], [
+            ['operation' => 'assign', 'actor_id' => $admin->id, 'program_id' => $reviewer->id, 'invitation_id' => 0, 'target_id' => $profileId],
+            ['operation' => 'assign', 'actor_id' => $admin->id, 'program_id' => $reviewer->id, 'invitation_id' => 0, 'target_id' => $profileId],
+        ]);
+        $statuses = array_map(fn (Process $process): int => $this->resultStatus($process), $processes);
+        sort($statuses);
+        $this->assertSame([200, 409], $statuses);
+        $this->assertDatabaseHas('tutor_profiles', ['id' => $profileId, 'assigned_admin_id' => $reviewer->id, 'assignment_version' => 1]);
+        $this->assertDatabaseCount('audit_logs', 1);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'tutor_profile.assignment', 'resource_id' => $profileId]);
+        $this->assertDatabaseCount('notification_outbox', 0);
+    }
+
     /** @param list<int> $userIds
      * @param  list<array{operation: string, actor_id: int, program_id: int, invitation_id: int, target_id?: int}>  $actions
      * @return list<Process>
@@ -275,6 +320,12 @@ class InvitationAcceptConcurrencyTest extends TestCase
                         ['expected_version' => 1, 'title' => 'Edited after expiry'],
                         $argv[7],
                     );
+                } elseif ($argv[2] === 'profile_suspend') {
+                    app(\App\Actions\TutorProfiles\SuspendTutorProfile::class)->execute($actor, (int) $argv[8], true, 'H02 race suspension');
+                } elseif ($argv[2] === 'assign') {
+                    app(\App\Actions\TutorProfiles\AssignTutorProfile::class)->execute($actor, (int) $argv[8], [
+                        'assigned_admin_id' => (int) $argv[4], 'assignment_version' => 0, 'reason' => 'H02 concurrent assignment',
+                    ]);
                 } elseif ($argv[2] === 'suspend') {
                     $request = \Illuminate\Http\Request::create(
                         '/api/v1/admin/users/'.$argv[8].'/suspend',
@@ -294,6 +345,8 @@ class InvitationAcceptConcurrencyTest extends TestCase
                     exit(3);
                 }
                 fwrite(STDOUT, "RESULT:200\n");
+            } catch (\Illuminate\Http\Exceptions\HttpResponseException $exception) {
+                fwrite(STDOUT, "RESULT:{$exception->getResponse()->getStatusCode()}\n");
             } catch (\App\Exceptions\InvitationAcceptException $exception) {
                 fwrite(STDOUT, "RESULT:{$exception->httpStatus}\n");
             } catch (\App\Exceptions\ProgramActionException $exception) {

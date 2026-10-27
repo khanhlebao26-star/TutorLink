@@ -4,6 +4,10 @@ namespace App\Support;
 
 final class AdminPermissions
 {
+    public const ASSIGN_TUTOR_PROFILES = 'admin.tutor_profiles.assign';
+
+    public const DECIDE_VERIFICATION_DOCUMENTS = 'admin.verification_documents.decide';
+
     public const VIEW_TUTOR_PROFILES = 'admin.tutor_profiles.view';
 
     public const DECIDE_TUTOR_PROFILES = 'admin.tutor_profiles.decide';
@@ -28,6 +32,8 @@ final class AdminPermissions
     public static function all(): array
     {
         return [
+            self::ASSIGN_TUTOR_PROFILES,
+            self::DECIDE_VERIFICATION_DOCUMENTS,
             self::VIEW_TUTOR_PROFILES,
             self::DECIDE_TUTOR_PROFILES,
             self::DOWNLOAD_VERIFICATION_DOCUMENTS,

@@ -351,7 +351,7 @@ class AuthFileProfileTest extends TestCase
             if ($purpose === 'avatar') {
                 $profile->update(['avatar_file_id' => $file->id]);
             } else {
-                $profile->verificationDocuments()->create(['file_id' => $file->id, 'document_type' => 'certificate']);
+                $profile->verificationDocuments()->create(['file_id' => $file->id, 'document_type' => 'identity_card']);
             }
         }
 
@@ -420,7 +420,7 @@ class AuthFileProfileTest extends TestCase
         $fileId = $upload->json('data.id');
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/verification-documents', [
             'file_id' => $fileId,
-            'document_type' => 'teaching_certificate',
+            'document_type' => 'certificate',
         ])->assertConflict();
 
         $this->actingAs($tutor)->postJson("/api/v1/files/{$fileId}/complete")
@@ -428,10 +428,10 @@ class AuthFileProfileTest extends TestCase
 
         $this->actingAs($tutor)->postJson('/api/v1/tutor/profile/verification-documents', [
             'file_id' => $fileId,
-            'document_type' => 'teaching_certificate',
+            'document_type' => 'certificate',
         ])->assertCreated()
             ->assertJsonPath('data.file_id', $fileId)
-            ->assertJsonPath('data.document_type', 'teaching_certificate');
+            ->assertJsonPath('data.document_type', 'certificate');
 
         $this->actingAs($tutor)->getJson('/api/v1/tutor/profile')
             ->assertOk()

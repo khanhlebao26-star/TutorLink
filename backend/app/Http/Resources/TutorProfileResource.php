@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Support\TutorProfileRevisions;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,6 +16,8 @@ class TutorProfileResource extends JsonResource
             'specialization_id' => $this->specializations->first()?->id,
             'avatar_file_id' => $this->avatar_file_id,
             'verification_document_file_id' => $this->verificationDocuments->first()?->file_id,
+            'qualification_claims' => $this->qualification_claims ?? [],
+            'revision' => app(TutorProfileRevisions::class)->latest($this->resource),
             'headline' => $this->headline,
             'bio' => $this->bio,
             'experience_years' => $this->experience_years,
