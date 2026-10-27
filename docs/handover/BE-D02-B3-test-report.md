@@ -84,6 +84,8 @@ Vì hai nhóm writer ở mục 1–2 chưa tồn tại, báo cáo không xem cá
 
 ## Tài liệu liên quan
 
+**Cập nhật sau checkpoint (27/10/2026):** [Full backend suite và đồng bộ Docker local](BE-D02-full-suite-and-local-sync-report.md) ghi nhận 238 test/1.398 assertion/0 warning pass sau khi sửa cô lập dữ liệu test. Các giới hạn ở mục 7 mô tả trạng thái tại thời điểm report B3; xem report mới cho trạng thái kiểm thử và migration hiện tại.
+
 - [BE-D02 phase-A contract](BE-D02-phase-A-contract.md), đặc biệt mục 6 về Accept và quy tắc lock.
 - [BE-D02 roadmap](BE-D02-roadmap.md), B3 và các giới hạn phạm vi.
 - [Business Rules](../Domain%20Documentation/Business%20Rules.md), BR-18, BR-25 và BR-26.

@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
+use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Tests\Support\TestDatabaseGuard;
 
@@ -46,6 +47,10 @@ abstract class TestCase extends BaseTestCase
             TestDatabaseGuard::assertSafe($app['config']);
         });
         $app->make(Kernel::class)->bootstrap();
+
+        if (isset($this->traitsUsedByTest[DatabaseTruncation::class])) {
+            $this->beforeApplicationDestroyed(fn () => $this->truncateTablesForAllConnections());
+        }
 
         return $app;
     }

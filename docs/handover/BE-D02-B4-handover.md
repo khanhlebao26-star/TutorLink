@@ -6,13 +6,13 @@
 
 **Nhánh:** `be-d02`
 
-**Trạng thái:** Implementation và evidence B1–B3 đã có; B4 hoàn tất đối chiếu tài liệu và chuẩn bị bàn giao. Issue chưa được comment/cập nhật và chưa có PR.
+**Trạng thái:** Implementation, evidence B1–B3 và full backend suite đã có; PostgreSQL Docker Compose local đã được migrate. Issue chưa được comment/cập nhật và chưa có PR.
 
 ## 1. Tóm tắt bàn giao
 
 BE-D02 hiện có API tạo, liệt kê, đọc, sửa Program Draft; gửi và đọc Invitation; Accept Invitation; và quản lý lifecycle Program. Contract OpenAPI được sinh từ Scramble, khớp các route Laravel đã đăng ký; Catalog và Database Design đã được đồng bộ với implementation/migration.
 
-Bằng chứng kiểm thử chi tiết nằm trong [B3 test report](BE-D02-B3-test-report.md). Report đó ghi nhận 50 test/325 assertion pass trên PostgreSQL, gồm bốn race test; SQLite có 46 test/272 assertion pass và skip bốn race test chỉ chạy trên PostgreSQL. Hai nhóm race phụ thuộc writer ngoài BE-D02 vẫn là release gate; toàn bộ backend suite chưa chạy.
+Bằng chứng kiểm thử BE-D02 tại checkpoint nằm trong [B3 test report](BE-D02-B3-test-report.md): 50 test/325 assertion pass trên PostgreSQL, gồm bốn race test; SQLite có 46 test/272 assertion pass và skip bốn race test chỉ chạy trên PostgreSQL. [Report full suite và đồng bộ Docker local](BE-D02-full-suite-and-local-sync-report.md) ghi nhận 238 test/1.398 assertion/0 warning pass trên PostgreSQL test riêng và ba migration local đã chạy. Hai nhóm race phụ thuộc writer ngoài BE-D02 vẫn là release gate.
 
 ## 2. Thay đổi API
 
@@ -60,7 +60,8 @@ Không có migration mới ở B4. Migration BE-D02 [2026_10_26_212524_add_invit
 | OpenAPI so với routes Laravel | **Pass — 60 operations** | Chạy trong `backend/`: `php scripts/verify-openapi-routes.php`. |
 | Artifact OpenAPI | **Khớp export Scramble** | Export vào file tạm từ code và schema đã migrate, so sánh byte với `docs/api/openapi.json`. |
 | `git diff --check` | **Pass** | Không có whitespace error trong các thay đổi đang xét. |
-| Redocly lint | **Chưa xác nhận** | `npx` không truy cập được `registry.npmjs.org` (`EAI_AGAIN`); không có kết quả lint để báo pass/fail. |
+| Full backend suite | **238 pass / 1.398 assertions / 0 warning** | PostgreSQL test riêng; xem [report full suite](BE-D02-full-suite-and-local-sync-report.md). |
+| Redocly lint | **Mô tả API hợp lệ; 52 warning** | CLI chạy qua Docker, [log đầy đủ](evidence/be-d02-full-suite/redocly-lint.txt). |
 
 Ma trận tiêu chí → test/assertion, command chạy nhóm test và cách tạo race fixture nằm trong [B3 test report](BE-D02-B3-test-report.md). Nhóm test ở đó chưa phải toàn bộ backend suite.
 
@@ -69,13 +70,19 @@ Ma trận tiêu chí → test/assertion, command chạy nhóm test và cách t�
 1. **Accept-vs-moderation-hold:** BE-D02 kiểm tra và từ chối khi hold đã tồn tại; chưa có moderation-hold writer để kiểm chứng cạnh tranh hai writer.
 2. **Complete/cancel-vs-Session/Task write:** lifecycle chặn khi blocker đã tồn tại; writer Session/Task chưa thuộc phạm vi BE-D02 nên race này chưa được kiểm chứng.
 3. **Các API chưa nằm trong implementation:** public Invitation reject/cancel và worker tự expire chưa được triển khai. GET trả trạng thái hết hạn hiệu lực; PATCH/send chốt Invitation quá hạn trong transaction.
-4. **Môi trường triển khai:** chưa xác nhận migration đã chạy trên staging/production.
-5. **Kiểm thử phát hành:** chưa chạy toàn bộ backend suite; chạy `php artisan test --compact` trước khi merge/release theo quy trình repo. Hai nhóm race ở mục 1–2 cần được đóng khi writer tương ứng được triển khai.
+4. **Môi trường triển khai:** migration đã chạy trên PostgreSQL Docker Compose local sau backup; chưa xác nhận staging/production.
+5. **Kiểm thử phát hành:** full backend suite đã pass trên PostgreSQL test riêng. Hai nhóm race ở mục 1–2 cần được đóng khi writer tương ứng được triển khai; Redocly còn 52 warning tài liệu.
 6. **PR và issue:** hiện chưa có PR. Các commit B1–B3 trên nhánh `be-d02` là `3c07f79`, `b272d2c`, `3e582f9`. Issue #69 chưa được cập nhật; draft comment dưới đây chỉ để review và người dùng sẽ tự đăng.
 
 ## 6. Draft comment cho Issue #69 — CHƯA ĐĂNG
 
-> BE-D02 đã triển khai Program CRUD (create/list/detail/update), gửi và đọc Invitation, Accept Invitation cùng các transition pause/resume/complete/cancel. OpenAPI được sinh từ Scramble và route parity đạt 60 operations; API Route Catalog và Database Design đã được đồng bộ. Bằng chứng B3: 50 test/325 assertion pass trên PostgreSQL (gồm 4 race test); SQLite 46 test/272 assertion pass, 4 race test PostgreSQL-only được skip. Chi tiết: `docs/handover/BE-D02-B3-test-report.md`; bàn giao API/schema và giới hạn: `docs/handover/BE-D02-B4-handover.md`. Còn release gate: full backend suite chưa chạy; race Accept-vs-moderation-hold và complete/cancel-vs-Session/Task write cần writer ngoài BE-D02; migration trên staging/production chưa xác nhận. Chưa có PR; comment này được chuẩn bị để review trước khi đăng.
+> @DungGiaIT @khanhlebao26-star @Hoang271205
+>
+> BE-D02 đã triển khai Program CRUD (create/list/detail/update), gửi và đọc Invitation, Accept Invitation cùng các transition pause/resume/complete/cancel. OpenAPI route parity đạt 60 operations; API Route Catalog và Database Design đã đồng bộ.
+>
+> Full backend suite trên PostgreSQL test riêng đạt **238 test, 1.398 assertions, 0 warning**. Redocly xác nhận OpenAPI hợp lệ, còn 52 warning tài liệu. PostgreSQL Docker Compose local đã chạy ba migration còn thiếu sau khi sao lưu; backend đang healthy. Báo cáo và log kiểm thử: `docs/handover/BE-D02-full-suite-and-local-sync-report.md`.
+>
+> **Bàn giao cho Hoàng:** endpoint `POST /api/v1/invitations/{invitation}/accept` và contract đã sẵn sàng để FE tích hợp. Còn hai race cần kiểm tra khi writer liên quan có mặt: Accept-vs-moderation-hold và complete/cancel-vs-Session/Task. Chưa xác nhận staging/production; chưa có PR. Comment này là bản nháp để duyệt, chưa đăng.
 
 ## 7. Tài liệu tham chiếu
 
