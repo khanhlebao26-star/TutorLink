@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái:** K03.1 đã được team thống nhất; các task còn lại chờ triển khai và evidence.
+- **Trạng thái:** K03.1 đã được team thống nhất; K03.2 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.3–K03.14 chờ triển khai và evidence.
 
 ## Nguyên tắc triển khai
 
@@ -22,7 +22,7 @@
 | Giai đoạn | Task | Nội dung | Trạng thái |
 |---|---|---|---|
 | A — Lõi API | K03.1 | Thống nhất contract | Đã thống nhất |
-| A — Lõi API | K03.2 | Kiểm tra schema và tạo model | Chưa nghiệm thu |
+| A — Lõi API | K03.2 | Kiểm tra schema và tạo model | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.3 | Tạo/dùng lại Conversation và membership | Chưa nghiệm thu |
 | A — Lõi API | K03.4 | Inbox, detail, history và polling | Chưa nghiệm thu |
 | A — Lõi API | K03.5 | Gửi text, idempotency và quota | Chưa nghiệm thu |
@@ -47,13 +47,17 @@
 
 ### K03.2 — Kiểm tra schema và tạo model
 
-- [ ] Dùng lại các bảng conversations, conversation_members, messages, files và file_links.
-- [ ] Tạo model Conversation/Message; bổ sung quan hệ và index (conversation_id, created_at, id).
-- [ ] Giữ unique direct_key và unique (sender_id, client_message_id).
-- [ ] Kiểm tra dữ liệu/trạng thái legacy pending, expired, type=program trước khi quyết định migration.
-- [ ] Bổ sung cách lưu canonical payload/hash nếu cần.
+- [x] Dùng lại các bảng conversations, conversation_members, messages, files và file_links.
+- [x] Tạo model Conversation/Message; bổ sung quan hệ và index (conversation_id, created_at, id).
+- [x] Giữ unique direct_key và unique (sender_id, client_message_id).
+- [x] Kiểm tra dữ liệu/trạng thái legacy pending, expired, type=program trước khi quyết định migration; database local chưa có dữ liệu chat, migration dừng nếu gặp dữ liệu cần mapping/backfill ở môi trường khác.
+- [x] Bổ sung payload_hash CHAR(64), nullable; tính hash và đối chiếu payload khi gửi/replay tiếp tục ở K03.5.
 
 **Xong khi:** Migration áp dụng được, dữ liệu cũ có mapping rõ ràng và không tạo schema trùng.
+
+**Kết quả:** Đã kiểm tra kỹ thuật trên PostgreSQL test riêng: **23 test pass, 108 assertions**, gồm quan hệ model, attachment resource scope, constraint/index và guard bảo toàn dữ liệu legacy. Chờ Hoàng review; chưa xác nhận migration chuyển đổi được dữ liệu legacy thực tế.
+
+**Evidence:** [Báo cáo K03.2](BE-K03-K03.2-test-report.md). Tiếp theo: commit phần K03.2 và triển khai K03.3.
 
 ### K03.3 — Tạo/dùng lại Conversation và membership
 

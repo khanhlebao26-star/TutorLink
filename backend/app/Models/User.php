@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -58,5 +59,19 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function tutorProfile(): HasOne
     {
         return $this->hasOne(TutorProfile::class);
+    }
+
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Conversation::class,
+            'conversation_members',
+            'user_id',
+            'conversation_id',
+        )->withPivot([
+            'last_read_message_id',
+            'last_read_at',
+            'joined_at',
+        ]);
     }
 }
