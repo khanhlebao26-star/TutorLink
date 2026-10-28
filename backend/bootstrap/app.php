@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        $isMessageSend = fn (Request $request): bool => $request->isMethod('POST')
+            && $request->is('api/v1/conversations/*/messages');
+        $middleware->trimStrings(except: [$isMessageSend]);
+        $middleware->convertEmptyStringsToNull(except: [$isMessageSend]);
         $middleware->redirectGuestsTo(
             fn (Request $request) => $request->is('api/*') ? null : route('login'),
         );

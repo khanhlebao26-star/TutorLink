@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Messaging\OpenConversation;
 use App\Actions\Messaging\ReadConversations;
+use App\Actions\Messaging\SendTextMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OpenConversationRequest;
+use App\Http\Requests\SendTextMessageRequest;
 use App\Http\Resources\ConversationReadResource;
 use App\Http\Resources\ConversationResource;
 use App\Http\Resources\MessageResource;
@@ -202,5 +204,29 @@ class ConversationController extends Controller
         }
 
         return $validator->validated();
+    }
+
+    /** Send a new text message or replay the current sender's idempotency key. */
+    #[OpenApiResponse(200, description: 'Same key and canonical payload: existing message, no new side effects or quota charge.', type: 'array{data:MessageResource}')]
+    #[OpenApiResponse(201, description: 'New text message persisted atomically.', type: 'array{data:MessageResource}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The actor is inactive or is not an allowed participant role.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Conversation not found in the actor membership.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Idempotency payload conflict or new-message state/relationship conflict.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Invalid text payload or forbidden client-controlled fields.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(429, description: '30 new messages per sender in the last 60 seconds. Retry-After is an integer number of seconds.', type: self::ERROR_RESPONSE_TYPE)]
+    #[HeaderParameter('X-Request-ID', 'Optional UUID for request tracing.', required: false, type: 'string', format: 'uuid')]
+    public function sendMessage(SendTextMessageRequest $request, int $conversation, SendTextMessage $send): JsonResponse
+    {
+        $result = $send->execute(
+            $request->user(),
+            $conversation,
+            $request->validated(),
+            (string) $request->attributes->get('request_id'),
+        );
+
+        return (new MessageResource($result['message']))->response()
+            ->setStatusCode($result['created'] ? 201 : 200)
+            ->header('Cache-Control', 'private, no-store');
     }
 }

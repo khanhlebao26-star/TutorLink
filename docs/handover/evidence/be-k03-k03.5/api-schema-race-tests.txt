@@ -1,0 +1,19 @@
+Started: 2026-10-28 14:20:50 +07:00
+Command: docker compose -f compose.testing.yml run --rm -T backend-test php artisan test --compact --filter="SendTextMessageApiTest|SendTextMessageConcurrencyTest|ReadConversationApiTest|OpenConversationApiTest|OpenConversationConcurrencyTest|MessagingSchemaTest|DatabaseSchemaTest" --display-warnings --fail-on-warning --no-ansi
+
+time="2026-10-28T14:20:50+07:00" level=warning msg="Found orphan containers (tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-backend-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running 
+ Container tutorlink-src-test-db-1 Waiting 
+ Container tutorlink-src-test-db-1 Healthy 
+ Container tutorlink-src-backend-test-run-0d6356e3332e Creating 
+ Container tutorlink-src-backend-test-run-0d6356e3332e Created 
+
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+
+  [90mTests:[39m    [32;1m85 passed[39;22m[90m (590 assertions)[39m
+  [90mDuration:[39m [39m10.80s[39m
+
+
+Finished: 2026-10-28 14:21:03 +07:00
+Exit code: 0

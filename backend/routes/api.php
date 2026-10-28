@@ -66,6 +66,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/conversations/{conversation}/messages', [ConversationController::class, 'messages'])
             ->whereNumber('conversation')
             ->name('conversations.messages.index');
+        Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage'])
+            ->whereNumber('conversation')
+            ->name('conversations.messages.store');
     });
 
     Route::prefix('auth')->group(function () {

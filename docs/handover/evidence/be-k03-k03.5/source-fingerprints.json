@@ -1,0 +1,88 @@
+{
+  "base_head": "4c13afedecbb66dd49734012c299c299d2a6aced",
+  "branch": "be-k03",
+  "tested_state": "Working tree; K03.5 changes uncommitted",
+  "checked_at": "2026-10-28 14:24:25 +07:00",
+  "files": [
+    {
+      "path": "backend/app/Actions/Messaging/SendTextMessage.php",
+      "sha256": "57316cbbea004bd35d3bf539ac0f40df786db2253f9a9c0ec3d6633415416783"
+    },
+    {
+      "path": "backend/app/Http/Requests/SendTextMessageRequest.php",
+      "sha256": "8cd243e22f9431126c707da4bb97270c8b55aa69c28213be332367888514f9c8"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ConversationController.php",
+      "sha256": "97918bba147c27ec94568cde7874d58f05dc28e0f6c0eddaf7dc825e4cf2aaf2"
+    },
+    {
+      "path": "backend/app/Http/Resources/MessageResource.php",
+      "sha256": "d298c2e41f581577100e60a9b8f45846f2bf0c92f89e2dca8fe81566f922fcfb"
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureActiveApiActor.php",
+      "sha256": "19d3c60299f20fa8564a8708c17f957eb951e96faec641d1523475b853d4b535"
+    },
+    {
+      "path": "backend/bootstrap/app.php",
+      "sha256": "a67c79004befb21656524c65dfc5a0fbfb2ccdee3ca4a04dfc48d9cd4ee04cda"
+    },
+    {
+      "path": "backend/routes/api.php",
+      "sha256": "d167e7702209c2dcaa2ee49d5fa108357e49b4f7893c24540bebc87effc2cd5e"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_28_140000_prepare_message_sending.php",
+      "sha256": "d9136af11d5d37b078cac686d161d8914b8c40bfee13ae9083f1b945554de59b"
+    },
+    {
+      "path": "backend/tests/Feature/SendTextMessageApiTest.php",
+      "sha256": "b4917faabe083c8b7976b9b6fc63162eee02fc384c1798bb6264a67092cb5c70"
+    },
+    {
+      "path": "backend/tests/Feature/SendTextMessageConcurrencyTest.php",
+      "sha256": "67326373cdc95ce60563e759f830c1ac32579e2ec97198677afe1ed751b243cc"
+    },
+    {
+      "path": "backend/tests/Support/MessageSendFixtures.php",
+      "sha256": "f0bae1b17b7c562d597fb7f8bc4361226c53439fcbfdd8bce9605ef9f1ed50e3"
+    },
+    {
+      "path": "backend/tests/Feature/ReadConversationApiTest.php",
+      "sha256": "4b41dabc61a33cf7a220c57d57345372227e23f6d1729e9d2a2b789b013904bc"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationApiTest.php",
+      "sha256": "3a813f24076894e6b1758eb4808204241f0b9f9e6304a65080929e2768db57b2"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationConcurrencyTest.php",
+      "sha256": "209bf8be1534beaa80e75b2408543ca053e718cd21ee3f87c594254df7e938e7"
+    },
+    {
+      "path": "backend/tests/Feature/MessagingSchemaTest.php",
+      "sha256": "59ac3ab2cef93d701215073f74c5fbfabb3151db037cdbe8aefb32f0d66988b4"
+    },
+    {
+      "path": "backend/tests/Feature/DatabaseSchemaTest.php",
+      "sha256": "b4006f661b7505e43cd0c7bb8f1ad7c4177d708b45b7d8d88e334b0d4b2c1b71"
+    },
+    {
+      "path": "backend/app/Actions/TutorProfiles/SuspendTutorProfile.php",
+      "sha256": "f0be8a61a16190214e731a7f979a334b0def120a3a17389f3fc45ef9029348d3"
+    },
+    {
+      "path": "backend/app/Support/TutorProfileWorkflow.php",
+      "sha256": "a0c6da908edd303e491814c2a91ef72f9aca984b01bbe47b0529db9bb9846301"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "0f83f73a2259b373ef25b1c64c6087884f1bf9254ebfbacf97ba5b681bcc2c2a"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "a0fbf7e7fb73ae31c45c684d740c17e54b51eb99714042bdc9bcee56e2344f04"
+    }
+  ]
+}

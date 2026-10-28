@@ -3220,6 +3220,338 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "operationId": "conversations.messages.store",
+                "summary": "Send a new text message or replay the current sender's idempotency key",
+                "tags": [
+                    "Conversation"
+                ],
+                "parameters": [
+                    {
+                        "name": "conversation",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "X-Request-ID",
+                        "in": "header",
+                        "description": "Optional UUID for request tracing.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendTextMessageRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Same key and canonical payload: existing message, no new side effects or quota charge.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MessageResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid text payload or forbidden client-controlled fields.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "New text message persisted atomically.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MessageResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication is required.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The actor is inactive or is not an allowed participant role.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Conversation not found in the actor membership.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Idempotency payload conflict or new-message state/relationship conflict.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "30 new messages per sender in the last 60 seconds. Retry-After is an integer number of seconds.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/files": {
@@ -9002,6 +9334,40 @@
                     "expected_version"
                 ],
                 "title": "SendInvitationRequest"
+            },
+            "SendTextMessageRequest": {
+                "type": "object",
+                "properties": {
+                    "client_message_id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "message_type": {
+                        "type": "string",
+                        "enum": [
+                            "text"
+                        ]
+                    },
+                    "body": {
+                        "type": "string",
+                        "pattern": "[^\\s\\p{Z}]",
+                        "maxLength": 4000
+                    },
+                    "file_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 0,
+                        "maxItems": 0
+                    }
+                },
+                "required": [
+                    "client_message_id",
+                    "message_type",
+                    "body"
+                ],
+                "title": "SendTextMessageRequest"
             },
             "Specialization": {
                 "type": "object",

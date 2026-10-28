@@ -1,0 +1,55 @@
+{
+  "checked_at": "2026-10-28 14:24:25 +07:00",
+  "operation_count": 68,
+  "method": "POST",
+  "path": "/api/v1/conversations/{conversation}/messages",
+  "operation_id": "conversations.messages.store",
+  "request_schema": {
+    "type": "object",
+    "properties": {
+      "client_message_id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "message_type": {
+        "type": "string",
+        "enum": [
+          "text"
+        ]
+      },
+      "body": {
+        "type": "string",
+        "pattern": "[^\\s\\p{Z}]",
+        "maxLength": 4000
+      },
+      "file_ids": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "minItems": 0,
+        "maxItems": 0
+      }
+    },
+    "required": [
+      "client_message_id",
+      "message_type",
+      "body"
+    ],
+    "title": "SendTextMessageRequest"
+  },
+  "response_codes": [
+    "200",
+    "422",
+    "201",
+    "401",
+    "403",
+    "404",
+    "409",
+    "429"
+  ],
+  "success_dto": "MessageResource for both 200 and 201",
+  "authentication": "Inherited document sessionCookie",
+  "rate_limit_description": "30 new messages per sender in the last 60 seconds. Retry-After is an integer number of seconds.",
+  "result": "PASS"
+}

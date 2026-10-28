@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.4 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.5–K03.14 chờ triển khai và evidence.
+- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.5 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.6–K03.14 chờ triển khai và evidence.
 
 ## Nguyên tắc triển khai
 
@@ -25,7 +25,7 @@
 | A — Lõi API | K03.2 | Kiểm tra schema và tạo model | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.3 | Tạo/dùng lại Conversation và membership | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.4 | Inbox, detail, history và polling | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.5 | Gửi text, idempotency và quota | Chưa nghiệm thu |
+| A — Lõi API | K03.5 | Gửi text, idempotency và quota | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Chưa nghiệm thu |
 | A — Lõi API | K03.7 | Scanner và complete File | Chưa nghiệm thu |
 | A — Lõi API | K03.8 | Attachment, download và bảo toàn lịch sử | Chưa nghiệm thu |
@@ -87,18 +87,24 @@
 
 **Evidence:** [Báo cáo K03.4](BE-K03-K03.4-test-report.md), kèm log test/parity, lint, kiểm contract và SHA-256 nguồn đã kiểm tra. Chưa ghi nhận blocker kỹ thuật trong phạm vi K03.4; các giới hạn và phụ thuộc tiếp theo được ghi trong báo cáo.
 
-**Tiếp theo:** Commit phần K03.4 và gửi Hoàng review; triển khai K03.5 — Gửi text, idempotency và quota. K03.5 cần giữ thứ tự ghi/commit phù hợp với cursor khi có gửi đồng thời; attachment, PATCH read và realtime tiếp tục theo các task tương ứng.
+**Tiếp nối:** K03.4 đã có commit `4c13afe`; K03.5 bên dưới bổ sung luồng gửi text phù hợp với cursor. Attachment, PATCH read và realtime tiếp tục theo các task tương ứng.
 
 ### K03.5 — Gửi text, idempotency và quota
 
-- [ ] Triển khai POST /api/v1/conversations/{conversation}/messages.
-- [ ] Lấy sender từ session, chuẩn hóa newline, kiểm giới hạn nội dung và trạng thái trong transaction.
-- [ ] Cùng sender/key/payload trả message cũ; khác payload trả 409.
-- [ ] Replay không reopen chat, không tạo side effect và không tiêu quota.
-- [ ] Áp dụng 30 tin mới/phút/người dùng; vượt hạn trả 429 và Retry-After.
-- [ ] Chặn client giả system message.
+- [x] Triển khai POST /api/v1/conversations/{conversation}/messages cho text; đã sinh OpenAPI và đối chiếu route parity.
+- [x] Lấy sender từ session, giữ khoảng trắng, chỉ chuẩn hóa newline, kiểm giới hạn 4.000 ký tự; đọc lại account dưới khóa và kiểm trạng thái trong transaction.
+- [x] Cùng sender/key/payload trả message cũ; khác payload hoặc Conversation trả 409; giữ unique toàn sender và lưu canonical payload_hash.
+- [x] Replay kiểm actor active/membership, không reopen chat, không tạo side effect và không tiêu quota; vẫn dùng được khi peer suspended hoặc chat cancelled.
+- [x] Áp dụng 30 tin mới trong cửa sổ trượt 60 giây/người dùng trên mọi Conversation, dưới User lock; vượt hạn trả 429 và Retry-After.
+- [x] Chặn client giả system message, sender/created_at/metadata và file message chưa thuộc K03.5.
 
 **Xong khi:** Retry và concurrent send không tạo trùng; gửi-vs-suspend có kết quả nhất quán.
+
+**Kết quả:** **85 test pass / 590 assertions / exit 0** trên PostgreSQL test riêng: 21 test API/schema/middleware mới, 7 race test mới và 57 test K03.2–K03.4. Đã kiểm retry/conflict, quota cạnh tranh giữa hai chat, send-vs-H02 suspend ở cả hai thứ tự và sender object cũ. OpenAPI có **68 operations**, route parity pass; Redocly hợp lệ với **45 warnings** cũ. Schema bổ sung precision 6 cho timestamp message và index `(sender_id,created_at,id)`; local đã áp dụng, có evidence đọc schema. Chờ Hoàng review; K03.5 chưa commit tại thời điểm kiểm tra.
+
+**Evidence:** [Báo cáo K03.5](BE-K03-K03.5-test-report.md), kèm log test/race, export/parity, lint, schema local và SHA-256 nguồn. Chưa ghi nhận blocker kỹ thuật trong phạm vi gửi text; chưa chạy full backend suite, browser end-to-end hoặc nghiệm thu attachment/realtime.
+
+**Tiếp theo:** Commit phần K03.5 và gửi Hoàng review; triển khai K03.6 — Read cursor tăng đơn điệu. Khi bổ sung writer file/system/lifecycle, giữ thứ tự khóa và thứ tự timestamp/commit tương thích polling; K03.8 tiếp tục attachment và K03.11–K03.13 tiếp tục realtime.
 
 ### K03.6 — Read cursor tăng đơn điệu
 
