@@ -1,0 +1,153 @@
+{
+  "checked_at": "2026-10-28 13:43:55 +07:00",
+  "operation_count": 67,
+  "peer_fields": [
+    "id",
+    "display_name"
+  ],
+  "checks": [
+    {
+      "method": "GET",
+      "path": "/conversations",
+      "operation_id": "conversations.index",
+      "parameters": [
+        "per_page",
+        "cursor"
+      ],
+      "response_codes": [
+        "200",
+        "401",
+        "403",
+        "422"
+      ],
+      "success_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConversationReadResource"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "per_page": {
+                "type": "integer"
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_cursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "per_page",
+              "has_more",
+              "next_cursor"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "authentication": "Inherited document sessionCookie"
+    },
+    {
+      "method": "GET",
+      "path": "/conversations/{conversation}",
+      "operation_id": "conversations.show",
+      "parameters": [
+        "conversation"
+      ],
+      "response_codes": [
+        "200",
+        "401",
+        "403",
+        "404"
+      ],
+      "success_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ConversationReadResource"
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "authentication": "Inherited document sessionCookie"
+    },
+    {
+      "method": "GET",
+      "path": "/conversations/{conversation}/messages",
+      "operation_id": "conversations.messages.index",
+      "parameters": [
+        "conversation",
+        "per_page",
+        "before",
+        "after"
+      ],
+      "response_codes": [
+        "200",
+        "401",
+        "403",
+        "404",
+        "422"
+      ],
+      "success_schema": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageResource"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "per_page": {
+                "type": "integer"
+              },
+              "has_more": {
+                "type": "boolean"
+              },
+              "next_cursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "polling_cursor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "per_page",
+              "has_more",
+              "next_cursor",
+              "polling_cursor"
+            ]
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ]
+      },
+      "authentication": "Inherited document sessionCookie"
+    }
+  ],
+  "result": "PASS"
+}

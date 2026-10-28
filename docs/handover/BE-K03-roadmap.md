@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.3 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.4–K03.14 chờ triển khai và evidence.
+- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.4 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.5–K03.14 chờ triển khai và evidence.
 
 ## Nguyên tắc triển khai
 
@@ -24,7 +24,7 @@
 | A — Lõi API | K03.1 | Thống nhất contract | Đã thống nhất |
 | A — Lõi API | K03.2 | Kiểm tra schema và tạo model | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.3 | Tạo/dùng lại Conversation và membership | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.4 | Inbox, detail, history và polling | Chưa nghiệm thu |
+| A — Lõi API | K03.4 | Inbox, detail, history và polling | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.5 | Gửi text, idempotency và quota | Chưa nghiệm thu |
 | A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Chưa nghiệm thu |
 | A — Lõi API | K03.7 | Scanner và complete File | Chưa nghiệm thu |
@@ -70,18 +70,24 @@
 
 **Kết quả:** **38 test pass / 201 assertions / exit 0** trên PostgreSQL test riêng, gồm 14 test API K03.3, 1 race test hai process và 23 test schema/model trước đó. OpenAPI có **64 operations**, route parity pass; Redocly xác nhận hợp lệ với **45 warnings** còn tồn tại. Chờ Hoàng review.
 
-**Evidence:** [Báo cáo K03.3](BE-K03-K03.3-test-report.md). Tiếp theo: commit phần K03.3 và triển khai K03.4 — Inbox, detail, history và polling.
+**Evidence:** [Báo cáo K03.3](BE-K03-K03.3-test-report.md). K03.3 đã có commit `97748f5`; K03.4 bên dưới tiếp nối phần tạo/dùng lại Conversation.
 
 ### K03.4 — Inbox, detail, history và polling
 
-- [ ] Triển khai GET /api/v1/conversations.
-- [ ] Triển khai GET /api/v1/conversations/{conversation}.
-- [ ] Triển khai GET /api/v1/conversations/{conversation}/messages.
-- [ ] Scope theo membership trước khi trả dữ liệu; có inbox preview, unread count và peer tối thiểu.
-- [ ] History dùng before; polling dùng after; thứ tự ổn định (created_at, id), trang mặc định 20/tối đa 50.
-- [ ] Conversation cancelled và peer suspended áp dụng đúng quyền đọc.
+- [x] Triển khai GET /api/v1/conversations; inbox phân trang cursor scoped theo actor.
+- [x] Triển khai GET /api/v1/conversations/{conversation}.
+- [x] Triển khai GET /api/v1/conversations/{conversation}/messages; các GET đã có trong OpenAPI và khớp route Laravel.
+- [x] Scope theo membership trước khi trả dữ liệu/kiểm cursor; có inbox preview, unread count theo tuple và peer tối thiểu.
+- [x] History dùng before; polling dùng after; thứ tự ổn định (created_at, id), trang mặc định 20/tối đa 50; giữ checkpoint polling riêng, hỗ trợ chat rỗng và lấy đủ nhiều trang.
+- [x] Conversation cancelled và peer suspended áp dụng đúng quyền đọc; actor suspended bị chặn; GET không reopen hoặc cập nhật read cursor.
 
 **Xong khi:** Outsider không đọc được; tin trùng timestamp vẫn được phân trang đầy đủ.
+
+**Kết quả:** **57 test pass / 364 assertions / exit 0** trên PostgreSQL test riêng, gồm 19 test API K03.4 và 38 test K03.2–K03.3. Đã kiểm quyền, unread, 55 tin trùng timestamp, polling nhiều trang, cursor sai scope và timestamp có phần thập phân. OpenAPI có **67 operations**, route parity pass; Redocly hợp lệ, còn **45 warnings** cũ. Không có schema delta. Chờ Hoàng review; K03.4 chưa commit tại thời điểm kiểm tra.
+
+**Evidence:** [Báo cáo K03.4](BE-K03-K03.4-test-report.md), kèm log test/parity, lint, kiểm contract và SHA-256 nguồn đã kiểm tra. Chưa ghi nhận blocker kỹ thuật trong phạm vi K03.4; các giới hạn và phụ thuộc tiếp theo được ghi trong báo cáo.
+
+**Tiếp theo:** Commit phần K03.4 và gửi Hoàng review; triển khai K03.5 — Gửi text, idempotency và quota. K03.5 cần giữ thứ tự ghi/commit phù hợp với cursor khi có gửi đồng thời; attachment, PATCH read và realtime tiếp tục theo các task tương ứng.
 
 ### K03.5 — Gửi text, idempotency và quota
 

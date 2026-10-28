@@ -56,6 +56,16 @@ Route::prefix('v1')->group(function () {
             ->name('invitations.accept');
         Route::post('/conversations', [ConversationController::class, 'store'])
             ->name('conversations.store');
+        Route::get('/conversations', [ConversationController::class, 'index'])
+            ->name('conversations.index');
+
+        Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])
+            ->whereNumber('conversation')
+            ->name('conversations.show');
+
+        Route::get('/conversations/{conversation}/messages', [ConversationController::class, 'messages'])
+            ->whereNumber('conversation')
+            ->name('conversations.messages.index');
     });
 
     Route::prefix('auth')->group(function () {
