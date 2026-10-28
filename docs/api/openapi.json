@@ -2327,6 +2327,247 @@
                 "security": []
             }
         },
+        "/conversations": {
+            "post": {
+                "operationId": "conversations.store",
+                "description": "Only peer_user_id and optional context_listing_id are accepted. The stored\ncontext is preserved on reuse/reopen. Requires a session and the SPA CSRF\nflow; responses include X-Request-ID.",
+                "summary": "Create, reuse or reopen one Customer\u2013Tutor Conversation",
+                "tags": [
+                    "Conversation"
+                ],
+                "parameters": [
+                    {
+                        "name": "X-Request-ID",
+                        "in": "header",
+                        "description": "Optional UUID for tracing; generated when omitted or invalid.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OpenConversationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Existing Conversation reused or reopened; original context preserved.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ConversationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Input, peer or Listing context is invalid; unknown fields are rejected.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Conversation created atomically with exactly two members.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/ConversationResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication is required.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The actor or Tutor is not eligible to open contact.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "The peer is unavailable, Listing is held, or existing Conversation membership/state conflicts.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "anyOf": [
+                                                {
+                                                    "type": "object"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/files": {
             "post": {
                 "operationId": "files.store",
@@ -6783,6 +7024,45 @@
                 ],
                 "title": "Category"
             },
+            "ConversationResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "peer": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "display_name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "display_name"
+                        ]
+                    },
+                    "context_listing_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "status",
+                    "peer",
+                    "context_listing_id"
+                ],
+                "title": "ConversationResource"
+            },
             "CreateListingRequest": {
                 "type": "object",
                 "properties": {
@@ -7584,6 +7864,26 @@
                     "password"
                 ],
                 "title": "LoginRequest"
+            },
+            "OpenConversationRequest": {
+                "type": "object",
+                "properties": {
+                    "peer_user_id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "context_listing_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "minimum": 1
+                    }
+                },
+                "required": [
+                    "peer_user_id"
+                ],
+                "title": "OpenConversationRequest"
             },
             "ProgramResource": {
                 "type": "object",

@@ -74,7 +74,7 @@ Các route mutation Session, Task, Fee Record và Announcement tuân version gua
 | GET /api/v1/files/{file}/download | Tải theo quyền tài nguyên Quyền: Người được phép | Đã đăng ký |
 | DELETE /api/v1/files/{file} | Xóa tệp chưa liên kết, không phá lịch sử Quyền: Chủ upload | Đã đăng ký |
 | **06 Chat** |  |  |
-| POST /api/v1/conversations | Find-or-create cặp Customer–Tutor theo `peer_user_id`, `context_listing_id` tùy chọn; response peer tối thiểu, context lần tạo đầu tiên bất biến theo BR-17 Quyền: Customer/Tutor đủ gate M04-F01 | Dự kiến |
+| POST /api/v1/conversations | Find-or-create cặp Customer–Tutor theo `peer_user_id`, `context_listing_id` tùy chọn; response peer tối thiểu, context lần tạo đầu tiên bất biến theo BR-17; 201 khi tạo, 200 khi dùng lại/reopen. [Evidence K03.3](../handover/BE-K03-K03.3-test-report.md). Quyền: Customer/Tutor đủ gate M04-F01 | Đã đăng ký |
 | GET /api/v1/conversations | Theo membership; sort message mới nhất `(created_at,id)` giảm dần, chat rỗng theo `(created_at,id)`; preview allow-list, unread đếm message peer sau read cursor (không tính system), read receipt chỉ ở mức Conversation; phân trang cursor ổn định. Member active vẫn đọc lịch sử khi peer bị đình chỉ Quyền: Thành viên active | Dự kiến |
 | GET /api/v1/conversations/{conversation} | Chi tiết/peer/context gốc trong quyền, cancelled chỉ đọc Quyền: Thành viên active | Dự kiến |
 | GET /api/v1/conversations/{conversation}/messages | Đọc/poll theo cursor; member active đọc lịch sử khi peer bị đình chỉ hoặc chat cancelled Quyền: Thành viên active | Dự kiến |

@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái:** K03.1 đã được team thống nhất; K03.2 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.3–K03.14 chờ triển khai và evidence.
+- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.3 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.4–K03.14 chờ triển khai và evidence.
 
 ## Nguyên tắc triển khai
 
@@ -23,7 +23,7 @@
 |---|---|---|---|
 | A — Lõi API | K03.1 | Thống nhất contract | Đã thống nhất |
 | A — Lõi API | K03.2 | Kiểm tra schema và tạo model | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.3 | Tạo/dùng lại Conversation và membership | Chưa nghiệm thu |
+| A — Lõi API | K03.3 | Tạo/dùng lại Conversation và membership | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.4 | Inbox, detail, history và polling | Chưa nghiệm thu |
 | A — Lõi API | K03.5 | Gửi text, idempotency và quota | Chưa nghiệm thu |
 | A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Chưa nghiệm thu |
@@ -57,16 +57,20 @@
 
 **Kết quả:** Đã kiểm tra kỹ thuật trên PostgreSQL test riêng: **23 test pass, 108 assertions**, gồm quan hệ model, attachment resource scope, constraint/index và guard bảo toàn dữ liệu legacy. Chờ Hoàng review; chưa xác nhận migration chuyển đổi được dữ liệu legacy thực tế.
 
-**Evidence:** [Báo cáo K03.2](BE-K03-K03.2-test-report.md). Tiếp theo: commit phần K03.2 và triển khai K03.3.
+**Evidence:** [Báo cáo K03.2](BE-K03-K03.2-test-report.md). Phần schema/model này làm nền cho K03.3.
 
 ### K03.3 — Tạo/dùng lại Conversation và membership
 
-- [ ] Triển khai POST /api/v1/conversations.
-- [ ] Kiểm actor/peer, vai trò, Tutor eligibility và Listing context.
-- [ ] Find-or-create nguyên tử theo cặp; tạo đúng hai member; giữ context gốc; reopen đúng Conversation khi đủ gate.
-- [ ] Thống nhất thứ tự khóa User/Profile với BE-H02 và BE-D02.
+- [x] Triển khai POST /api/v1/conversations; đã xuất trong OpenAPI và khớp route Laravel.
+- [x] Kiểm actor/peer, vai trò, Tutor eligibility và Listing context, kể cả context được truyền khi dùng lại chat.
+- [x] Find-or-create nguyên tử theo cặp; tạo đúng hai member; giữ context gốc; reopen đúng Conversation khi đủ gate, không mất history/read cursor.
+- [x] Dùng thứ tự khóa User theo ID tăng dần → TutorProfile → Listing tùy chọn → Conversation → member theo User ID, khớp tiền tố khóa User/Profile của BE-H02 và BE-D02.
 
 **Xong khi:** Cùng cặp luôn trả cùng Conversation; context không bị ghi đè; lỗi không để dữ liệu dở dang.
+
+**Kết quả:** **38 test pass / 201 assertions / exit 0** trên PostgreSQL test riêng, gồm 14 test API K03.3, 1 race test hai process và 23 test schema/model trước đó. OpenAPI có **64 operations**, route parity pass; Redocly xác nhận hợp lệ với **45 warnings** còn tồn tại. Chờ Hoàng review.
+
+**Evidence:** [Báo cáo K03.3](BE-K03-K03.3-test-report.md). Tiếp theo: commit phần K03.3 và triển khai K03.4 — Inbox, detail, history và polling.
 
 ### K03.4 — Inbox, detail, history và polling
 

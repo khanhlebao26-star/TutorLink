@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AdminController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
+use App\Http\Controllers\Api\V1\ConversationController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
@@ -53,6 +54,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/invitations/{invitation}/accept', InvitationAcceptController::class)
             ->whereNumber('invitation')
             ->name('invitations.accept');
+        Route::post('/conversations', [ConversationController::class, 'store'])
+            ->name('conversations.store');
     });
 
     Route::prefix('auth')->group(function () {
