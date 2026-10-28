@@ -1,0 +1,198 @@
+# BE-K03 — Messaging API, file theo Conversation và realtime
+
+- **Owner backend:** Khanh
+- **Reviewer:** Hoàng
+- **Frontend:** Phối hợp người phụ trách FE
+- **Branch:** be-k03
+- **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
+- **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
+- **Trạng thái:** K03.1 đã được team thống nhất; các task còn lại chờ triển khai và evidence.
+
+## Nguyên tắc triển khai
+
+- REST API chịu trách nhiệm ghi dữ liệu, kiểm quyền, idempotency, history và resync.
+- PostgreSQL là nguồn dữ liệu chính.
+- WebSocket thông báo thay đổi sau khi transaction commit.
+- Frontend dùng cursor API để đồng bộ tin mới, phục hồi khi mất kết nối và dedupe theo server message ID.
+- Hoàn thành và kiểm thử phần lõi trước khi tích hợp realtime.
+- K03.1 đã thống nhất; các task còn lại chỉ đánh dấu hoàn tất khi có code và evidence.
+
+## Bảng kế hoạch
+
+| Giai đoạn | Task | Nội dung | Trạng thái |
+|---|---|---|---|
+| A — Lõi API | K03.1 | Thống nhất contract | Đã thống nhất |
+| A — Lõi API | K03.2 | Kiểm tra schema và tạo model | Chưa nghiệm thu |
+| A — Lõi API | K03.3 | Tạo/dùng lại Conversation và membership | Chưa nghiệm thu |
+| A — Lõi API | K03.4 | Inbox, detail, history và polling | Chưa nghiệm thu |
+| A — Lõi API | K03.5 | Gửi text, idempotency và quota | Chưa nghiệm thu |
+| A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Chưa nghiệm thu |
+| A — Lõi API | K03.7 | Scanner và complete File | Chưa nghiệm thu |
+| A — Lõi API | K03.8 | Attachment, download và bảo toàn lịch sử | Chưa nghiệm thu |
+| A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Chưa nghiệm thu |
+| A — Lõi API | K03.10 | Nghiệm thu phần lõi | Chưa nghiệm thu |
+| B — Realtime | K03.11 | Backend broadcasting và Reverb | Chưa nghiệm thu |
+| B — Realtime | K03.12 | Frontend Laravel Echo và resync | Chưa nghiệm thu |
+| B — Realtime | K03.13 | Thu hồi quyền và nghiệm thu realtime | Chưa nghiệm thu |
+| C — Bàn giao | K03.14 | API/schema delta, evidence và PR | Chưa nghiệm thu |
+
+## Giai đoạn A — Lõi Messaging API
+
+### K03.1 — Thống nhất contract
+
+- [x] Thống nhất Conversation theo cặp, context bất biến, quyền đọc/gửi, request/response, cursor, retry, quota, read cursor và scanner.
+- [x] Bổ sung định hướng triển khai: dùng Reverb/Echo để thông báo realtime; giữ REST API làm luồng ghi và phục hồi dữ liệu.
+
+**Đầu ra:** [Contract K03.1](BE-K03-K03.1-contract.md) làm căn cứ triển khai và review.
+
+### K03.2 — Kiểm tra schema và tạo model
+
+- [ ] Dùng lại các bảng conversations, conversation_members, messages, files và file_links.
+- [ ] Tạo model Conversation/Message; bổ sung quan hệ và index (conversation_id, created_at, id).
+- [ ] Giữ unique direct_key và unique (sender_id, client_message_id).
+- [ ] Kiểm tra dữ liệu/trạng thái legacy pending, expired, type=program trước khi quyết định migration.
+- [ ] Bổ sung cách lưu canonical payload/hash nếu cần.
+
+**Xong khi:** Migration áp dụng được, dữ liệu cũ có mapping rõ ràng và không tạo schema trùng.
+
+### K03.3 — Tạo/dùng lại Conversation và membership
+
+- [ ] Triển khai POST /api/v1/conversations.
+- [ ] Kiểm actor/peer, vai trò, Tutor eligibility và Listing context.
+- [ ] Find-or-create nguyên tử theo cặp; tạo đúng hai member; giữ context gốc; reopen đúng Conversation khi đủ gate.
+- [ ] Thống nhất thứ tự khóa User/Profile với BE-H02 và BE-D02.
+
+**Xong khi:** Cùng cặp luôn trả cùng Conversation; context không bị ghi đè; lỗi không để dữ liệu dở dang.
+
+### K03.4 — Inbox, detail, history và polling
+
+- [ ] Triển khai GET /api/v1/conversations.
+- [ ] Triển khai GET /api/v1/conversations/{conversation}.
+- [ ] Triển khai GET /api/v1/conversations/{conversation}/messages.
+- [ ] Scope theo membership trước khi trả dữ liệu; có inbox preview, unread count và peer tối thiểu.
+- [ ] History dùng before; polling dùng after; thứ tự ổn định (created_at, id), trang mặc định 20/tối đa 50.
+- [ ] Conversation cancelled và peer suspended áp dụng đúng quyền đọc.
+
+**Xong khi:** Outsider không đọc được; tin trùng timestamp vẫn được phân trang đầy đủ.
+
+### K03.5 — Gửi text, idempotency và quota
+
+- [ ] Triển khai POST /api/v1/conversations/{conversation}/messages.
+- [ ] Lấy sender từ session, chuẩn hóa newline, kiểm giới hạn nội dung và trạng thái trong transaction.
+- [ ] Cùng sender/key/payload trả message cũ; khác payload trả 409.
+- [ ] Replay không reopen chat, không tạo side effect và không tiêu quota.
+- [ ] Áp dụng 30 tin mới/phút/người dùng; vượt hạn trả 429 và Retry-After.
+- [ ] Chặn client giả system message.
+
+**Xong khi:** Retry và concurrent send không tạo trùng; gửi-vs-suspend có kết quả nhất quán.
+
+### K03.6 — Read cursor tăng đơn điệu
+
+- [ ] Triển khai PATCH /api/v1/conversations/{conversation}/read.
+- [ ] Chỉ cập nhật member hiện tại, kiểm message thuộc đúng Conversation và khóa/cập nhật nguyên tử.
+- [ ] Mốc cũ/bằng giữ nguyên, trả cursor hiệu lực.
+- [ ] Không cho reset bằng null hoặc đánh dấu thay người khác.
+
+**Xong khi:** Cursor không lùi và hai cập nhật cạnh tranh giữ mốc xa nhất.
+
+### K03.7 — Scanner và complete File
+
+- [ ] Tích hợp ClamAV service trong Docker Compose; backend gọi INSTREAM tại complete.
+- [ ] Kiểm object thật, size, MIME/chữ ký và checksum.
+- [ ] Scanner sạch mới ghi clean; malware/vi phạm chuyển rejected; scanner lỗi giữ pending.
+- [ ] Áp dụng timeout và lỗi theo contract; xử lý record clean cũ chưa có bằng chứng quét.
+
+**Xong khi:** Có evidence scanner thật, scanner lỗi không cho sử dụng file và không diễn giải checksum thành antivirus scan.
+
+### K03.8 — Attachment, download và bảo toàn lịch sử
+
+- [ ] Mở rộng purpose message_attachment: một file/message, tối đa 5 MiB, allow-list theo contract.
+- [ ] Tạo Message và FileLink trong cùng transaction; kiểm owner/purpose/trạng thái.
+- [ ] Không cho endpoint link chung bỏ qua policy gửi hoặc sửa attachment đã gửi.
+- [ ] Download kiểm quyền trên Conversation.
+- [ ] Delete không phá file đang được dùng trong lịch sử; kiểm race link-vs-delete.
+- [ ] Giữ các policy verification document hiện có.
+- [ ] Ghi rõ phụ thuộc orphan cleanup/storage compensation nếu chưa được triển khai trong phần File dùng chung.
+
+**Xong khi:** Participant hợp lệ tải được; outsider không tải được; rollback không để message/link dở dang.
+
+### K03.9 — Đồng bộ Conversation lifecycle
+
+- [ ] Tích hợp vào transaction Program/Invitation liên quan.
+- [ ] Chỉ đóng chat khi đạt điều kiện lifecycle và không còn quan hệ tiếp diễn.
+- [ ] Reopen chỉ qua yêu cầu mở liên hệ hợp lệ.
+- [ ] Suspend không đổi membership/status chat; không tự tạo system message.
+
+**Xong khi:** Hoàn tất một Program không đóng chat nếu còn Program active/paused hoặc Invitation pending còn hiệu lực.
+
+### K03.10 — Nghiệm thu phần lõi
+
+- [ ] Tổng hợp test API, quyền, cursor, quota, retry, read cursor, file và lifecycle.
+- [ ] Chạy race test PostgreSQL bằng process/kết nối độc lập: create-vs-create.
+- [ ] Chạy race send-vs-send cùng key.
+- [ ] Chạy race read-vs-read.
+- [ ] Chạy race send-vs-suspend.
+- [ ] Chạy race link-vs-delete.
+- [ ] Chạy regression các phần bị ảnh hưởng: File, Tutor suspension và Program/Invitation.
+
+**Xong khi:** Các tiêu chí lõi có test/evidence, kết quả và phần còn thiếu được ghi rõ.
+
+## Giai đoạn B — Realtime với Reverb/Echo
+
+### K03.11 — Backend broadcasting và Reverb
+
+- [ ] Cài/cấu hình Laravel Reverb, service Docker và broadcast worker phù hợp.
+- [ ] Tạo private channel theo Conversation; kiểm session, account và membership khi subscribe.
+- [ ] Phát sự kiện báo có tin mới sau commit.
+- [ ] Payload tối thiểu để frontend biết cần đồng bộ; không phát nội dung/file metadata riêng tư không cần thiết.
+- [ ] Retry message không phát thêm sự kiện nghiệp vụ.
+- [ ] Broadcast lỗi không làm mất message đã lưu.
+
+**Xong khi:** Chỉ người đủ quyền subscribe được; rollback không phát sự kiện; message đã commit có thể được thông báo realtime.
+
+### K03.12 — Frontend Laravel Echo và resync
+
+- [ ] Tích hợp Echo trong Next.js; quản lý một kết nối phù hợp với phiên đăng nhập.
+- [ ] Khi mở chat, subscribe private channel.
+- [ ] Nhận sự kiện thì đồng bộ bằng API after cursor và dedupe theo message ID.
+- [ ] Khi reconnect, resync từ mốc đã xử lý.
+- [ ] Giữ polling fallback có kiểm soát khi realtime không hoạt động.
+- [ ] Cleanup subscription khi đổi chat/logout; không tạo nhiều poll hoặc listener trùng nhau.
+
+**Xong khi:** Người nhận thấy tin mới mà không refresh; reconnect không mất hoặc nhân đôi tin.
+
+### K03.13 — Thu hồi quyền và nghiệm thu realtime
+
+- [ ] Xử lý trường hợp người dùng bị suspend/logout khi socket đang mở; xác thực lúc subscribe không phải kiểm tra quyền duy nhất.
+- [ ] Outsider không subscribe.
+- [ ] Người mất quyền không tiếp tục nhận dữ liệu.
+- [ ] Disconnect/reconnect vẫn lấy đủ tin.
+- [ ] Replay không tạo tin trùng trên UI.
+- [ ] Reverb/worker lỗi, REST và resync vẫn hoạt động.
+- [ ] Broadcast và API đến khác thứ tự không làm UI nhân đôi message.
+
+**Xong khi:** Có evidence tích hợp hai tài khoản, test quyền và phục hồi kết nối.
+
+## Giai đoạn C — Bàn giao
+
+### K03.14 — API/schema delta, evidence và PR
+
+- [ ] Sinh lại OpenAPI bằng Scramble, kiểm route parity/lint và cập nhật Catalog đúng trạng thái thực tế.
+- [ ] Bàn giao PR/commit và hướng dẫn chạy.
+- [ ] Bàn giao API/schema delta.
+- [ ] Bàn giao cấu hình/service scanner và realtime.
+- [ ] Bàn giao test report, log và demo hai tài khoản.
+- [ ] Bàn giao known limitations và blocker chưa giải quyết.
+- [ ] Cập nhật issue theo từng mốc: đã xong gì, evidence ở đâu, việc tiếp theo và blocker.
+
+## Điều kiện hoàn tất issue
+
+- [ ] Các tiêu chí Messaging API và file ban đầu đều đạt.
+- [ ] Không tạo trùng Conversation hoặc message khi cạnh tranh/retry.
+- [ ] Outsider không đọc/gửi/tải file hoặc subscribe realtime.
+- [ ] Read cursor và lịch sử đồng bộ đúng sau reconnect.
+- [ ] Suspend/logout được áp dụng cho cả REST và kết nối đang mở.
+- [ ] Không tuyên bố file đã antivirus-scan khi chưa có kết quả quét thực tế.
+- [ ] API/schema, test evidence và known limitations khớp với code bàn giao.
+
+Nếu team chỉ nghiệm thu phần lõi trước, ghi rõ Giai đoạn B chưa hoàn tất; không đánh dấu toàn issue hoàn tất khi realtime vẫn nằm trong phạm vi.
