@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/** @mixin File */
 class FileResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -18,6 +20,10 @@ class FileResource extends JsonResource
             'purpose' => $this->purpose,
             'scan_status' => $this->scan_status,
             'complete' => $this->isComplete(),
+            'antivirus_scanned' => $this->hasScanEvidence(),
+            'scanned_at' => $this->hasScanEvidence()
+                ? $this->scanned_at?->utc()->toISOString()
+                : null,
             'created_at' => $this->created_at?->toISOString(),
         ];
     }

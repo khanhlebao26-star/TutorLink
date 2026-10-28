@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.6 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.7–K03.14 chờ triển khai và evidence.
+- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.7 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.8–K03.14 chờ triển khai và evidence. Legacy K03.7 đã có inventory/chính sách, 8 avatar local chưa lưu rescan qua owner.
 
 ## Nguyên tắc triển khai
 
@@ -27,7 +27,7 @@
 | A — Lõi API | K03.4 | Inbox, detail, history và polling | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.5 | Gửi text, idempotency và quota | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.7 | Scanner và complete File | Chưa nghiệm thu |
+| A — Lõi API | K03.7 | Scanner và complete File | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.8 | Attachment, download và bảo toàn lịch sử | Chưa nghiệm thu |
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Chưa nghiệm thu |
 | A — Lõi API | K03.10 | Nghiệm thu phần lõi | Chưa nghiệm thu |
@@ -119,16 +119,23 @@
 
 **Báo cáo/evidence:** [Báo cáo K03.6](BE-K03-K03.6-test-report.md) và [log kiểm thử](evidence/be-k03-k03.6/api-schema-race-tests.txt).
 
-**Tiếp theo:** Commit phần K03.6 và gửi Hoàng review; triển khai K03.7 — Scanner và complete File. Chưa có blocker kỹ thuật trong phạm vi read cursor; dữ liệu legacy sai cần review riêng, full backend regression và browser/FE chưa nằm trong lượt kiểm này. Chưa hoàn tất toàn BE-K03 hoặc realtime.
+**Tiếp theo:** K03.6 đã commit tại `c97cb08`; gửi Hoàng review cùng evidence. K03.7 bên dưới bổ sung scanner và đã chạy full backend; các giới hạn của lượt K03.6 được giữ trong báo cáo lịch sử. Chưa hoàn tất toàn BE-K03 hoặc realtime.
 
 ### K03.7 — Scanner và complete File
 
-- [ ] Tích hợp ClamAV service trong Docker Compose; backend gọi INSTREAM tại complete.
-- [ ] Kiểm object thật, size, MIME/chữ ký và checksum.
-- [ ] Scanner sạch mới ghi clean; malware/vi phạm chuyển rejected; scanner lỗi giữ pending.
-- [ ] Áp dụng timeout và lỗi theo contract; xử lý record clean cũ chưa có bằng chứng quét.
+- [x] Tích hợp ClamAV service trong Docker Compose; backend gọi INSTREAM tại complete.
+- [x] Kiểm object private local thật, purpose/size/extension/MIME/magic bytes/SHA-256 và hash không đổi trong lượt scan.
+- [x] Scanner sạch mới ghi clean kèm engine/version/hash/time; malware/metadata vi phạm rejected; scanner/storage lỗi giữ pending, lỗi HTTP sau khi commit trạng thái.
+- [x] Áp dụng deadline socket tối đa 10 giây và Retry-After 10; bổ sung ZIP/DOCX guard, không chấp nhận clean khi guard từ chối.
+- [x] Phân biệt lifecycle clean cũ với scan evidence; kiểm kê 8 avatar, chốt policy/quy trình rescan qua owner, không backfill giả. **Chưa hoàn tất rescan persisted 8 file.**
 
 **Xong khi:** Có evidence scanner thật, scanner lỗi không cho sử dụng file và không diễn giải checksum thành antivirus scan.
+
+**Kết quả:** Full backend **396 pass / 2.412 assertions / exit 0** với ClamAV thật bật; riêng integration source cuối **4 pass / 18 assertions**. Regression storage thiếu/tamper đã khớp 503/pending và 422/rejected. Pint pass; OpenAPI **69 operations**, parity pass, lint hợp lệ với **44 warnings** còn lại. Schema thêm 4 cột nullable lưu evidence; migration local đã được người dùng áp dụng. **Đã kiểm tra kỹ thuật — chờ Hoàng review.**
+
+**Báo cáo/evidence:** [K03.7 report](BE-K03-K03.7-test-report.md), [legacy policy](BE-K03-K03.7-legacy-policy.md), [full tests](evidence/be-k03-k03.7/full-backend-tests.txt) và [ClamAV thật](evidence/be-k03-k03.7/real-clamav-tests.txt).
+
+**Giới hạn/tiếp theo:** 8 avatar vẫn chưa có evidence persisted; lượt quét chỉ đọc không phải owner HTTP complete. Container nhúng chưa hỗ trợ giữ pending; chưa chứng nhận browser end-to-end/NFR hoặc mọi định dạng tài liệu. Người dùng tự push/gửi review; K03.8 triển khai hasVerifiedScan + owner/purpose/Conversation policy, attachment và bảo toàn lịch sử. Không đánh dấu toàn issue hoàn tất.
 
 ### K03.8 — Attachment, download và bảo toàn lịch sử
 

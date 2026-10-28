@@ -1,0 +1,15 @@
+services:
+  backend-test:
+    environment:
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: 3310
+      CLAMAV_TIMEOUT_SECONDS: 10
+      TEST_REAL_CLAMAV: "1"
+    networks:
+      - testing
+      - scanner-dev
+
+networks:
+  scanner-dev:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-tutorlink-src}_default

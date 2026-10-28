@@ -53,6 +53,9 @@ services:
       MAIL_HOST: mailpit
       MAIL_PORT: 1025
       FRONTEND_URL: http://localhost:3000
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: 3310
+      CLAMAV_TIMEOUT_SECONDS: 10
     volumes:
       - ./backend:/var/www/html
       - ./backend/.env.docker:/var/www/html/.env:ro
@@ -70,6 +73,28 @@ services:
       db:
         condition: service_healthy
     command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000", "--no-reload"]
+
+  clamav:
+    image: clamav/clamav:1.4
+    restart: unless-stopped
+    environment:
+      CLAMD_CONF_StreamMaxLength: "10M"
+      CLAMD_CONF_MaxFileSize: "25M"
+      CLAMD_CONF_MaxScanSize: "50M"
+      CLAMD_CONF_MaxFiles: "1000"
+      CLAMD_CONF_MaxRecursion: "10"
+      CLAMD_CONF_MaxScanTime: "8000"
+      CLAMD_CONF_AlertExceedsMax: "yes"
+      CLAMD_CONF_AlertEncrypted: "yes"
+      CLAMD_CONF_ScanArchive: "yes"
+      CLAMD_CONF_ScanOLE2: "yes"
+      CLAMD_CONF_ScanPDF: "yes"
+      CLAMD_CONF_ScanXMLDOCS: "yes"
+      CLAMD_CONF_ConcurrentDatabaseReload: "no"
+      CLAMD_CONF_MaxThreads: "2"
+    volumes:
+      - clamav_data:/var/lib/clamav
+    mem_limit: 4g
 
   frontend:
     image: node:22-bookworm-slim
@@ -90,3 +115,4 @@ volumes:
   backend_vendor:
   backend_storage:
   frontend_node_modules:
+  clamav_data:

@@ -1,0 +1,102 @@
+{
+  "checked_at": "2026-10-28 21:39:49 +07:00",
+  "operation_count": 69,
+  "method": "POST",
+  "path": "/api/v1/files/{file}/complete",
+  "operation_id": "files.complete",
+  "response_codes": [
+    "200",
+    "404",
+    "401",
+    "403",
+    "422",
+    "503"
+  ],
+  "file_resource": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "owner_id": {
+        "type": "integer"
+      },
+      "original_name": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "mime_type": {
+        "type": "string"
+      },
+      "size_bytes": {
+        "type": "integer"
+      },
+      "purpose": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "scan_status": {
+        "type": "string"
+      },
+      "complete": {
+        "type": "boolean"
+      },
+      "antivirus_scanned": {
+        "type": "boolean"
+      },
+      "scanned_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "created_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "required": [
+      "id",
+      "owner_id",
+      "original_name",
+      "mime_type",
+      "size_bytes",
+      "purpose",
+      "scan_status",
+      "complete",
+      "antivirus_scanned",
+      "scanned_at",
+      "created_at"
+    ],
+    "title": "FileResource"
+  },
+  "forbidden_schema": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string"
+      },
+      "code": {
+        "type": "string"
+      },
+      "request_id": {
+        "type": "string"
+      },
+      "errors": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "message"
+    ]
+  },
+  "authentication": "Inherited sessionCookie; SPA mutation uses CSRF",
+  "retry_after": "503 describes Retry-After: 10; actual header is covered by HTTP tests",
+  "result": "PASS"
+}

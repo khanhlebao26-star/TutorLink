@@ -1,0 +1,24 @@
+Started: 2026-10-28 21:30:42 +07:00
+Database: PostgreSQL tutorlink_test; real ClamAV enabled via compose.clamav-testing.yml
+Command: php artisan test --compact --display-warnings --fail-on-warning --no-ansi
+time="2026-10-28T21:30:42+07:00" level=warning msg="Found orphan containers (tutorlink-src-backend-1, tutorlink-src-clamav-1, tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running
+ Container tutorlink-src-test-db-1 Waiting
+ Container tutorlink-src-test-db-1 Healthy
+ Container tutorlink-src-backend-test-run-99a3a9f75ea7 Creating
+ Container tutorlink-src-backend-test-run-99a3a9f75ea7 Created
+
+  ........................................REAL CLAMAV VERSION: ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026; clean=clean; EICAR=rejected
+BACKEND ZIP GUARD: 26 MiB entry refused before scanner acceptance; not clean
+REAL CLAMAV: ordinary ZIP passed preflight and daemon scan; ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026
+....................................
+  ............................................................................
+  ............................................................................
+  ............................................................................
+  ............................................................................
+  ................
+
+  Tests:    396 passed (2412 assertions)
+  Duration: 45.05s
+
+Exit code: 0

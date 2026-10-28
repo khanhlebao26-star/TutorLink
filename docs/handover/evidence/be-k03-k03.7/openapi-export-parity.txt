@@ -1,0 +1,115 @@
+Started: 2026-10-28 21:38:08 +07:00
+Final export after source metadata clarification; SQLite :memory: only.
+time="2026-10-28T21:38:08+07:00" level=warning msg="Found orphan containers (tutorlink-src-backend-1, tutorlink-src-clamav-1, tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Image tutorlink-h01-backend-test:local Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 DONE 1.9s
+
+#4 [internal] load metadata for docker.io/library/php:8.3-cli
+#4 DONE 2.6s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 FROM docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc
+#6 resolve docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919
+#7 resolve docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 29.33kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 6/9] COPY composer.json composer.lock ./
+#9 CACHED
+
+#10 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#10 CACHED
+
+#11 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#11 CACHED
+
+#12 [stage-0 5/9] WORKDIR /var/www/html
+#12 CACHED
+
+#13 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#14 CACHED
+
+#15 [stage-0 8/9] COPY . .
+#15 DONE 0.1s
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 DONE 0.3s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 0.2s done
+#17 exporting manifest sha256:77fc65f85feab39c4629cf6a68882974f193eee36d2fedd4006a97a4c1392f8e 0.0s done
+#17 exporting config sha256:a004587367a49b22be6a04fa3639a0f941bb0c50805b88d7b8e74a9331311f7f 0.0s done
+#17 exporting attestation manifest sha256:eb4903ca66eb441aadc78e5a1fca55e892cd0fd0b56ab139c7f1ab312693b961 0.0s done
+#17 exporting manifest list sha256:a6cbd47e83ae167e6784a64cd8be09ffc6cb6992d4663090f40f385fac543b71 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local 0.1s done
+#17 DONE 0.5s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built
+ Container tutorlink-src-backend-test-run-c3baf15a8e7b Creating
+ Container tutorlink-src-backend-test-run-c3baf15a8e7b Created
+
+   INFO  Preparing database.
+
+  Creating migration table ....................................... 3.47ms DONE
+
+   INFO  Running migrations.
+
+  0001_01_01_000000_create_users_table ........................... 1.43ms DONE
+  0001_01_01_000001_create_cache_table ........................... 0.56ms DONE
+  0001_01_01_000002_create_jobs_table ............................ 1.28ms DONE
+  2026_10_06_155651_create_personal_access_tokens_table .......... 0.61ms DONE
+  2026_10_07_000050_create_sessions_table ........................ 0.11ms DONE
+  2026_10_07_000100_extend_users_and_create_files_table .......... 3.94ms DONE
+  2026_10_07_000200_create_identity_and_catalog_tables ........... 8.25ms DONE
+  2026_10_07_000300_create_messaging_tables ...................... 3.81ms DONE
+  2026_10_07_000400_create_program_and_learning_tables ........... 4.24ms DONE
+  2026_10_07_000500_create_operations_and_trust_tables ........... 3.14ms DONE
+  2026_10_07_000600_add_purpose_to_files_table ................... 0.69ms DONE
+  2026_10_07_000700_add_admin_approval_fields .................... 2.04ms DONE
+  2026_10_07_000700_add_tutor_onboarding_file_links .............. 3.58ms DONE
+  2026_10_12_000800_align_identity_status_constraints ............ 0.06ms DONE
+  2026_10_13_162057_add_public_slug_to_tutor_profiles_table ...... 0.92ms DONE
+  2026_10_20_075315_align_user_and_tutor_profile_statuses ........ 1.91ms DONE
+  2026_10_20_101959_add_two_factor_columns_to_users_table ........ 1.92ms DONE
+  2026_10_20_102000_create_passkeys_table ........................ 5.59ms DONE
+  2026_10_22_000000_align_program_schema_with_domain_design ...... 5.29ms DONE
+  2026_10_22_073014_add_admin_assignment_columns_to_tutor_profiles_and_reports  15.09ms DONE
+  2026_10_22_073015_create_notification_outbox_and_add_event_key_to_notifications  4.12ms DONE
+  2026_10_22_073016_add_submission_versioning_and_idempotency .... 8.85ms DONE
+  2026_10_22_080000_enforce_utc_timestamps_and_vnd_currency ...... 0.06ms DONE
+  2026_10_25_000000_preserve_outbox_timestamp_precision .......... 3.39ms DONE
+  2026_10_26_212524_add_invitation_acceptance_support_tables ..... 2.02ms DONE
+  2026_10_27_074546_add_h02_approval_support ..................... 2.66ms DONE
+  2026_10_28_034616_align_messaging_contract ..................... 3.77ms DONE
+  2026_10_28_140000_prepare_message_sending ...................... 0.25ms DONE
+  2026_10_28_200000_add_file_scan_evidence ....................... 2.40ms DONE
+
+OpenAPI document exported to ../docs/api/openapi.json.
+OpenAPI route parity passed (69 operations).
+Exit code: 0

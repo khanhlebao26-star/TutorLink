@@ -38,10 +38,18 @@ class PhaseTwoAcceptanceTest extends TestCase
         $file = $this->file($user, 'verification_document');
         $file->update(['scan_status' => 'pending']);
         Storage::disk('local')->delete($file->object_key);
-        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")->assertConflict();
-        Storage::disk('local')->put($file->object_key, 'tampered');
-        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")->assertConflict();
+        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")
+            ->assertStatus(503)
+            ->assertHeader('Retry-After', '10')
+            ->assertJsonPath('code', 'file_storage_unavailable');
         $this->assertSame('pending', $file->refresh()->scan_status);
+
+        Storage::disk('local')->put($file->object_key, 'tampered');
+        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'file_rejected');
+        $this->assertSame('rejected', $file->refresh()->scan_status);
+        $this->actingAs($user)->get("/api/v1/files/{$file->id}/download")->assertConflict();
     }
 
     public function test_attached_files_cannot_be_deleted_and_storage_is_preserved(): void

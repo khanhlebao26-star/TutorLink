@@ -1,0 +1,142 @@
+{
+  "checked_at_utc": "2026-10-28T21:36:22+07:00",
+  "source": "Read-only CLI content scan of local legacy avatars; not owner-authenticated HTTP complete; no database writes",
+  "files": [
+    {
+      "id": 5,
+      "owner_id": 47,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    },
+    {
+      "id": 6,
+      "owner_id": 50,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    },
+    {
+      "id": 7,
+      "owner_id": 51,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    },
+    {
+      "id": 8,
+      "owner_id": 57,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    },
+    {
+      "id": 9,
+      "owner_id": 58,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    },
+    {
+      "id": 10,
+      "owner_id": 60,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    },
+    {
+      "id": 11,
+      "owner_id": 61,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    },
+    {
+      "id": 12,
+      "owner_id": 62,
+      "purpose": "avatar",
+      "persisted_scan_status": "clean",
+      "persisted_antivirus_evidence": false,
+      "scanned_at": null,
+      "object_exists": true,
+      "actual_size": 66753,
+      "hash_matches_metadata": true,
+      "readonly_scan": {
+        "status": "clean",
+        "version": "ClamAV 1.4.6/28164/Sun Oct 25 06:24:12 2026",
+        "reason": "ok"
+      },
+      "evidence_written": false
+    }
+  ]
+}

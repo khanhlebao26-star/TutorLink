@@ -4053,6 +4053,7 @@
         "/files/{file}/complete": {
             "post": {
                 "operationId": "files.complete",
+                "summary": "Complete a private file after metadata checks and a conclusive ClamAV scan",
                 "tags": [
                     "File"
                 ],
@@ -4069,7 +4070,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "`FileResource`",
+                        "description": "Complete file with scan evidence bound to its SHA-256.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4086,16 +4087,30 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
                     "403": {
-                        "description": "",
+                        "description": "Actor is inactive or does not own the file; legacy account middleware may return message only.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "string",
-                                            "const": "Forbidden."
+                                            "type": "string"
+                                        },
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
                                         }
                                     },
                                     "required": [
@@ -4105,11 +4120,65 @@
                             }
                         }
                     },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
+                    "422": {
+                        "description": "File rejected by metadata policy or malware scan; rejection is persisted.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
+                    "503": {
+                        "description": "Scanner or storage unavailable; file remains pending. Retry-After: 10.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -8719,6 +8788,15 @@
                     "complete": {
                         "type": "boolean"
                     },
+                    "antivirus_scanned": {
+                        "type": "boolean"
+                    },
+                    "scanned_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
                     "created_at": {
                         "type": [
                             "string",
@@ -8735,6 +8813,8 @@
                     "purpose",
                     "scan_status",
                     "complete",
+                    "antivirus_scanned",
+                    "scanned_at",
                     "created_at"
                 ],
                 "title": "FileResource"

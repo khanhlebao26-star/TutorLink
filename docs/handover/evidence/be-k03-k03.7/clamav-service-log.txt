@@ -1,0 +1,71 @@
+clamav-1  | Starting Freshclamd
+clamav-1  | Starting ClamAV
+clamav-1  |
+Socket for clamd not found yet, retrying (0/1800) ...ClamAV update process started at Wed Oct 28 13:42:52 2026
+clamav-1  | daily database available for update (local version: 28164, remote version: 28167)
+clamav-1  |
+Socket for clamd not found yet, retrying (1/1800) ...
+Socket for clamd not found yet, retrying (2/1800) ...Testing database: '/var/lib/clamav/tmp.406321f352/clamav-bbcfe2eb3b806739c35b2b9488a38a8f.tmp-daily.cld' ...
+clamav-1  |
+Socket for clamd not found yet, retrying (3/1800) ...
+Socket for clamd not found yet, retrying (4/1800) ...
+Socket for clamd not found yet, retrying (5/1800) ...
+Socket for clamd not found yet, retrying (6/1800) ...
+Socket for clamd not found yet, retrying (7/1800) ...
+Socket for clamd not found yet, retrying (8/1800) ...Database test passed.
+clamav-1  | daily.cld updated (version: 28167, sigs: 355829, f-level: 90, builder: svc.clamav-publisher)
+clamav-1  | main.cvd database is up-to-date (version: 63, sigs: 3287027, f-level: 90, builder: tomjudge)
+clamav-1  | bytecode.cvd database is up-to-date (version: 339, sigs: 80, f-level: 90, builder: nrandolp)
+clamav-1  | WARNING: Clamd was NOT notified: Can't connect to clamd through /tmp/clamd.sock: No such file or directory
+clamav-1  |
+Socket for clamd not found yet, retrying (9/1800) ...
+Socket for clamd not found yet, retrying (10/1800) ...
+Socket for clamd not found yet, retrying (11/1800) ...
+Socket for clamd not found yet, retrying (12/1800) ...
+Socket for clamd not found yet, retrying (13/1800) ...
+Socket for clamd not found yet, retrying (14/1800) ...Wed Oct 28 13:43:07 2026 -> Limits: Global time limit set to 8000 milliseconds.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: Global size limit set to 52428800 bytes.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: File size limit set to 26214400 bytes.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: Recursion level limit set to 10.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: Files limit set to 1000.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxEmbeddedPE limit set to 41943040 bytes.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxHTMLNormalize limit set to 41943040 bytes.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxHTMLNoTags limit set to 8388608 bytes.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxScriptNormalize limit set to 20971520 bytes.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxZipTypeRcg limit set to 1048576 bytes.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxPartitions limit set to 50.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxIconsPE limit set to 100.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: MaxRecHWP3 limit set to 16.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: PCREMatchLimit limit set to 100000.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: PCRERecMatchLimit limit set to 2000.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Limits: PCREMaxFileSize limit set to 104857600.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Archive support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Image (graphics) scanning support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Detection using image fuzzy hash enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Alerting of encrypted archives _and_ documents enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Heuristic alerting enabled for scans that exceed set maximums.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Heuristic alerts enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Portable Executable support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> ELF support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Mail files support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> OLE2 support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> PDF support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> SWF support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> HTML support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> XMLDOCS support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> HWP3 support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> OneNote support enabled.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Self checking every 600 seconds.
+clamav-1  | Wed Oct 28 13:43:07 2026 -> Set stacksize to 1048576
+clamav-1  | socket found, clamd started.
+clamav-1  | Wed Oct 28 13:44:27 2026 -> instream(172.18.0.11@58324): Eicar-Test-Signature FOUND
+clamav-1  | Wed Oct 28 13:53:08 2026 -> SelfCheck: Database status OK.
+clamav-1  | Wed Oct 28 14:02:39 2026 -> instream(172.18.0.11@59132): Eicar-Test-Signature FOUND
+clamav-1  | Wed Oct 28 14:03:09 2026 -> SelfCheck: Database status OK.
+clamav-1  | Wed Oct 28 14:13:10 2026 -> SelfCheck: Database status OK.
+clamav-1  | Wed Oct 28 14:13:22 2026 -> instream(172.18.0.11@45900): Eicar-Test-Signature FOUND
+clamav-1  | Wed Oct 28 14:21:17 2026 -> instream(172.18.0.11@37132): Eicar-Test-Signature FOUND
+clamav-1  | Wed Oct 28 14:23:10 2026 -> SelfCheck: Database status OK.
+clamav-1  | Wed Oct 28 14:24:50 2026 -> instream(172.18.0.11@49978): Eicar-Test-Signature FOUND
+clamav-1  | Wed Oct 28 14:30:49 2026 -> instream(172.18.0.11@44676): Eicar-Test-Signature FOUND
+clamav-1  | Wed Oct 28 14:33:11 2026 -> SelfCheck: Database status OK.
