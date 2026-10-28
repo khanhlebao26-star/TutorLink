@@ -69,6 +69,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage'])
             ->whereNumber('conversation')
             ->name('conversations.messages.store');
+        Route::patch('/conversations/{conversation}/read', [ConversationController::class, 'markRead'])
+            ->whereNumber('conversation')
+            ->name('conversations.read');
     });
 
     Route::prefix('auth')->group(function () {

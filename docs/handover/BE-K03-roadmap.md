@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.5 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.6–K03.14 chờ triển khai và evidence.
+- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.6 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.7–K03.14 chờ triển khai và evidence.
 
 ## Nguyên tắc triển khai
 
@@ -26,7 +26,7 @@
 | A — Lõi API | K03.3 | Tạo/dùng lại Conversation và membership | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.4 | Inbox, detail, history và polling | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.5 | Gửi text, idempotency và quota | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Chưa nghiệm thu |
+| A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.7 | Scanner và complete File | Chưa nghiệm thu |
 | A — Lõi API | K03.8 | Attachment, download và bảo toàn lịch sử | Chưa nghiệm thu |
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Chưa nghiệm thu |
@@ -104,16 +104,22 @@
 
 **Evidence:** [Báo cáo K03.5](BE-K03-K03.5-test-report.md), kèm log test/race, export/parity, lint, schema local và SHA-256 nguồn. Chưa ghi nhận blocker kỹ thuật trong phạm vi gửi text; chưa chạy full backend suite, browser end-to-end hoặc nghiệm thu attachment/realtime.
 
-**Tiếp theo:** Commit phần K03.5 và gửi Hoàng review; triển khai K03.6 — Read cursor tăng đơn điệu. Khi bổ sung writer file/system/lifecycle, giữ thứ tự khóa và thứ tự timestamp/commit tương thích polling; K03.8 tiếp tục attachment và K03.11–K03.13 tiếp tục realtime.
+**Tiếp theo:** K03.5 đã commit tại `fa8af47`; gửi Hoàng review cùng evidence. Kết quả K03.6 được ghi ở mục dưới. Khi bổ sung writer file/system/lifecycle, giữ thứ tự khóa và thứ tự timestamp/commit tương thích polling; K03.8 tiếp tục attachment và K03.11–K03.13 tiếp tục realtime.
 
 ### K03.6 — Read cursor tăng đơn điệu
 
-- [ ] Triển khai PATCH /api/v1/conversations/{conversation}/read.
-- [ ] Chỉ cập nhật member hiện tại, kiểm message thuộc đúng Conversation và khóa/cập nhật nguyên tử.
-- [ ] Mốc cũ/bằng giữ nguyên, trả cursor hiệu lực.
-- [ ] Không cho reset bằng null hoặc đánh dấu thay người khác.
+- [x] Triển khai PATCH /api/v1/conversations/{conversation}/read.
+- [x] Chỉ cập nhật member hiện tại, kiểm message thuộc đúng Conversation và khóa/cập nhật nguyên tử.
+- [x] Mốc cũ/bằng giữ nguyên, trả cursor hiệu lực.
+- [x] Không cho reset bằng null hoặc đánh dấu thay người khác.
 
 **Xong khi:** Cursor không lùi và hai cập nhật cạnh tranh giữ mốc xa nhất.
+
+**Kết quả:** **107 test pass / 740 assertions / exit 0** trên PostgreSQL test riêng sau format, gồm 15 test API và 7 race test mới của K03.6 cùng 85 test K03.2–K03.5. Đã kiểm tuple có phần thập phân, ID khi timestamp bằng nhau, read-vs-read, hai member, read-vs-H02 suspend ở hai thứ tự, read-vs-send và rollback. OpenAPI có **69 operations**, route parity pass; Redocly hợp lệ với **45 warnings** cũ. Không có schema delta. **Đã kiểm tra kỹ thuật — chờ Hoàng review**; K03.6 chưa commit tại thời điểm lưu evidence.
+
+**Báo cáo/evidence:** [Báo cáo K03.6](BE-K03-K03.6-test-report.md) và [log kiểm thử](evidence/be-k03-k03.6/api-schema-race-tests.txt).
+
+**Tiếp theo:** Commit phần K03.6 và gửi Hoàng review; triển khai K03.7 — Scanner và complete File. Chưa có blocker kỹ thuật trong phạm vi read cursor; dữ liệu legacy sai cần review riêng, full backend regression và browser/FE chưa nằm trong lượt kiểm này. Chưa hoàn tất toàn BE-K03 hoặc realtime.
 
 ### K03.7 — Scanner và complete File
 

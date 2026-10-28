@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Messaging\AdvanceReadCursor;
 use App\Actions\Messaging\OpenConversation;
 use App\Actions\Messaging\ReadConversations;
 use App\Actions\Messaging\SendTextMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OpenConversationRequest;
 use App\Http\Requests\SendTextMessageRequest;
+use App\Http\Requests\UpdateReadCursorRequest;
 use App\Http\Resources\ConversationReadResource;
 use App\Http\Resources\ConversationResource;
 use App\Http\Resources\MessageResource;
+use App\Http\Resources\ReadCursorResource;
 use App\Support\ApiErrorResponse;
 use App\Support\MessagingCursor;
 use Dedoc\Scramble\Attributes\HeaderParameter;
@@ -228,5 +231,25 @@ class ConversationController extends Controller
         return (new MessageResource($result['message']))->response()
             ->setStatusCode($result['created'] ? 201 : 200)
             ->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Advance only the current member's read cursor; older or equal targets are no-ops. */
+    #[OpenApiResponse(200, description: 'Effective read cursor after an advance or no-op; no reset operation.', type: 'array{data:ReadCursorResource}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The actor account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Conversation is outside current membership or does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'A legacy stored cursor requires review; it is not reset automatically.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Invalid payload or target message; null/reset and foreign Conversation targets are rejected.', type: self::ERROR_RESPONSE_TYPE)]
+    #[HeaderParameter('X-Request-ID', 'Optional UUID for request tracing.', required: false, type: 'string', format: 'uuid')]
+    public function markRead(UpdateReadCursorRequest $request, int $conversation, AdvanceReadCursor $advance): JsonResponse
+    {
+        $result = $advance->execute(
+            $request->user(),
+            $conversation,
+            $request->validated('last_read_message_id'),
+            (string) $request->attributes->get('request_id'),
+        );
+
+        return (new ReadCursorResource($result))->response()->header('Cache-Control', 'private, no-store');
     }
 }
