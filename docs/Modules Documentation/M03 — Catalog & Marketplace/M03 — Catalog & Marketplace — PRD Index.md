@@ -8,16 +8,16 @@ Xây dựng catalog đọc công khai và luồng Marketplace để Tutor quản
 
 # Danh sách PRD chức năng
 
-[M03-F01 PRD — Xem danh mục công khai](https://docs.google.com/document/d/1tDPsXY1KgTspuNMi3ZglR1x6FsBdsd-hl937zHVj8mw/edit)  
-[M03-F02 PRD — Quản lý Tin dịch vụ của tôi](https://docs.google.com/document/d/1moB8sea1sxCX9FFxlaaq_pRrpVeCKixHQ4PjC5825Yc/edit)  
-[M03-F03 PRD — Đăng và kích hoạt lại Tin dịch vụ](https://docs.google.com/document/d/1OahSxMUYkfC07bjpatO9V_0xLkNR71PkDcs30VR4jfs/edit)  
-[M03-F04 PRD — Tạm dừng Tin dịch vụ](https://docs.google.com/document/d/130ulDoY42mtoH0ZtU8551CCQkpNxTU9hTqCeZt4ZVHQ/edit)  
-[M03-F05 PRD — Lưu trữ Tin dịch vụ](https://docs.google.com/document/d/12sOhiSVbczhYwn7A3afb4MFTyZUBAMKZQCQkR2e6eYo/edit)  
-[M03-F06 PRD — Tìm kiếm và lọc Marketplace](https://docs.google.com/document/d/1eyBVPoGqGJbDl8Tr_7BTuBU_OITSX2WhVoexA8mArks/edit)  
-[M03-F07 PRD — Xem chi tiết Tin dịch vụ công khai](https://docs.google.com/document/d/1-WGzE24F-z-sgMDJrJHDUaIdWykIN1DkhE7hVUQRZbs/edit)  
-[M03-F08 PRD — Xem hồ sơ Gia sư công khai](https://docs.google.com/document/d/1vtXyxOuEt3DCYzXM5H6clBccyXRZ7eC9PXxfRfJjwYc/edit)  
-[M03-F09 PRD — Quản lý khung giờ tham khảo](https://docs.google.com/document/d/1u6ZoA9-YtBob7CRUENXugiCVMMbBSHpuyjUKbmUHp4M/edit)  
-[M03-F10 PRD — Quản trị viên ẩn Tin dịch vụ](https://docs.google.com/document/d/1B_5lc-dPLmJEbvPmKoCHdwVqB-dpi3kBd-TjgrthyPo/edit)
+[M03-F01 PRD — Xem danh mục công khai](<M03-F01 PRD — Xem danh mục công khai.md>)  
+[M03-F02 PRD — Quản lý Tin dịch vụ của tôi](<M03-F02 PRD — Quản lý Tin dịch vụ của tôi.md>)  
+[M03-F03 PRD — Đăng và kích hoạt lại Tin dịch vụ](<M03-F03 PRD — Đăng và kích hoạt lại Tin dịch vụ.md>)  
+[M03-F04 PRD — Tạm dừng Tin dịch vụ](<M03-F04 PRD — Tạm dừng Tin dịch vụ.md>)  
+[M03-F05 PRD — Lưu trữ Tin dịch vụ](<M03-F05 PRD — Lưu trữ Tin dịch vụ.md>)  
+[M03-F06 PRD — Tìm kiếm và lọc Marketplace](<M03-F06 PRD — Tìm kiếm và lọc Marketplace.md>)  
+[M03-F07 PRD — Xem chi tiết Tin dịch vụ công khai](<M03-F07 PRD — Xem chi tiết Tin dịch vụ công khai.md>)  
+[M03-F08 PRD — Xem hồ sơ Gia sư công khai](<M03-F08 PRD — Xem hồ sơ Gia sư công khai.md>)  
+[M03-F09 PRD — Quản lý khung giờ tham khảo](<M03-F09 PRD — Quản lý khung giờ tham khảo.md>)  
+[M03-F10 PRD — Quản trị viên ẩn Tin dịch vụ](<M03-F10 PRD — Quản trị viên ẩn Tin dịch vụ.md>)
 
 # Các quyết định nguồn đã khóa
 
@@ -50,11 +50,11 @@ Contract đang được mô tả theo Product/Domain docs hoàn tất; ghi chú 
 
 # Tài liệu nguồn
 
-Project Overview: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit  
-Roles & Actors: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit  
-Goals & Non-goals: https\://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b\_bgOs\_UcHw/edit  
-Business Rules: https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit  
-State Lifecycles: https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit  
-Enum Catalog: https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit  
-Domain Model: https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit  
-Domain Overview & Glossary: https\://docs.google.com/document/d/1RKRVvidOXFZh4KrbxF5csnqj5Od7-SqdtWg7KdoG554/edit
+Project Overview: [Project Overview](<../../Product Document/Project Overview.md>)  
+Roles & Actors: [Roles & Actors](<../../Product Document/Roles & Actors.md>)  
+Goals & Non-goals: [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>)  
+Business Rules: [Business Rules](<../../Domain Documentation/Business Rules.md>)  
+State Lifecycles: [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>)  
+Enum Catalog: [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)  
+Domain Model: [Domain Model](<../../Domain Documentation/Domain Model.md>)  
+Domain Overview & Glossary: [Domain Overview & Glossary](<../../Domain Documentation/Domain Overview & Glossary.md>)

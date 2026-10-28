@@ -8,12 +8,12 @@ Tạo thỏa thuận riêng giữa Tutor và một Customer, gửi Invitation c�
 
 # PRD chức năng
 
-[M05-F01 PRD — Tạo và chỉnh sửa Program Draft](https://docs.google.com/document/d/1TWKqkStzG96RcZ5zPrHieOiplsOH2U_Dbpowvk2YyYw/edit)  
-[M05-F02 PRD — Gửi Invitation và khóa snapshot](https://docs.google.com/document/d/1jsjP2VyMgYIFan8w-TEkpffGTsEF1tOzjmaYDnygz5g/edit)  
-[M05-F03 PRD — Accept Invitation và kích hoạt Program](https://docs.google.com/document/d/13ptX86UtirBpjJb5PNF4zcChVDHDrhXnE7HZtVa7oKA/edit)  
-[M05-F04 PRD — Reject hoặc cancel Invitation](https://docs.google.com/document/d/1rAsm-iB-0WH4S0MIHzD9GReY3xdbq85TSRiFEYUp_YQ/edit)  
-[M05-F05 PRD — Hết hạn và gửi lại Invitation](https://docs.google.com/document/d/1ujKIomvbF4163NgZxHELoMwz7RnYMxortfbmXvIJnWE/edit)  
-[M05-F06 PRD — Quản lý lifecycle Program](https://docs.google.com/document/d/1SDcNif47y887z3uR7HVYwwfTjAQMee8Sv3DN98J-N5I/edit)
+[M05-F01 PRD — Tạo và chỉnh sửa Program Draft](<M05-F01 PRD — Tạo và chỉnh sửa Program Draft.md>)  
+[M05-F02 PRD — Gửi Invitation và khóa snapshot](<M05-F02 PRD — Gửi Invitation và khóa snapshot.md>)  
+[M05-F03 PRD — Accept Invitation và kích hoạt Program](<M05-F03 PRD — Accept Invitation và kích hoạt Program.md>)  
+[M05-F04 PRD — Reject hoặc cancel Invitation](<M05-F04 PRD — Reject hoặc cancel Invitation.md>)  
+[M05-F05 PRD — Hết hạn và gửi lại Invitation](<M05-F05 PRD — Hết hạn và gửi lại Invitation.md>)  
+[M05-F06 PRD — Quản lý lifecycle Program](<M05-F06 PRD — Quản lý lifecycle Program.md>)
 
 # Quy tắc Product/Domain
 
@@ -25,12 +25,11 @@ Tạo thỏa thuận riêng giữa Tutor và một Customer, gửi Invitation c�
 
 # Implementation gaps
 
-* Schema/migration có vocabulary legacy: Program pending và Invitation active; thiếu/mapping target\_customer\_id, snapshot/version, target uniqueness cần được review.  
-* Program API chưa có trong routes; migration tồn tại không đồng nghĩa endpoint/transaction đã được triển khai.  
-* Expiry worker/scheduler và event\_key idempotency chưa có trong baseline. Lock/isolation của accept với expiry/cancel/suspend/moderation cần test cạnh tranh PostgreSQL; route/API chưa được triển khai.
+* B1 Program create/list/detail/update và B2 send/read Invitation, Program lifecycle, Accept đã đăng ký. Public reject/cancel Invitation API, expiry worker/scheduler và moderation hold writer chưa được triển khai.
+* `ProgramApiTest`, `InvitationAcceptTest` và `NotificationOutboxWriterTest` đã chạy cùng nhau: 33 test, 169 assertion pass trên môi trường test hiện tại. Chưa có bằng chứng kiểm thử cạnh tranh PostgreSQL cho accept-vs-expire/cancel/suspend/hold hoặc complete/cancel-vs-child-write.
 
-F19 — Bằng chứng current-state (18/10/2026): nội dung mục này là baseline của lượt rà soát trước, chưa được kiểm tra lại repository/commit trong lượt Drive-only này. Owner xác minh: chưa gán; ngày/commit kiểm chứng: chưa có; trạng thái: chưa xác minh. Migration tồn tại không tự chứng minh API, transaction hoặc UI đã được triển khai. Phân biệt ghi nhận này với “Quy tắc đích”; mô tả nháp ADR-09/BR-10 nằm trong Business Rules.
+Kiểm tra trạng thái repository ngày 27/10/2026: B1 và Accept có route, controller/action, request/resource và feature test trong backend. Việc route được đăng ký không xác nhận các luồng Invitation/lifecycle còn lại hoặc kiểm thử concurrency PostgreSQL đã hoàn tất.
 
 # Nguồn chuẩn
 
-Product: Project Overview, Roles & Actors, Business Rules, Goals & Non-goals. Domain: State Lifecycles, Enum Catalog, Domain Model, Domain Overview & Glossary. Link nguồn: https\://docs.google.com/document/d/18cMXfeGZnGCFztw7wJSef-sggf\_JJkUguJvhS2dNBa4/edit · https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit · https\://docs.google.com/document/d/1qjHelbP0CIxOj5NMG-GXGjpI0aLYL8-9b\_bgOs\_UcHw/edit · https\://docs.google.com/document/d/1zA9Ft8mWLJmgkbIhfbA1OQx5E5Mue6XqukyIxwBGVJ8/edit · https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit · https\://docs.google.com/document/d/1RKRVvidOXFZh4KrbxF5csnqj5Od7-SqdtWg7KdoG554/edit
+Product: Project Overview, Roles & Actors, Business Rules, Goals & Non-goals. Domain: State Lifecycles, Enum Catalog, Domain Model, Domain Overview & Glossary. Link nguồn: [Project Overview](<../../Product Document/Project Overview.md>) · [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [Domain Overview & Glossary](<../../Domain Documentation/Domain Overview & Glossary.md>)

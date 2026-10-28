@@ -1,0 +1,8 @@
+{
+  "started_at_utc": "2026-10-25T13:17:19.4316423+00:00",
+  "finished_at_utc": "2026-10-25T13:17:30.1245141+00:00",
+  "exit_code": 0,
+  "branch": "be-k02",
+  "base_commit": "27edf19",
+  "source": "Working tree with uncommitted ProcessNotificationOutboxTest.php"
+}

@@ -8,14 +8,14 @@ M02 đặc tả việc Tutor tạo, duy trì và gửi Hồ sơ Tutor; Admin đ�
 
 # Danh sách PRD
 
-[M02-F01 — Tạo và cập nhật hồ sơ Tutor](https://docs.google.com/document/d/16fb7jh4jcrntzQccvxkJSX6YIYywvLcYOmNROA3qb2A/edit?usp=drivesdk)  
-[M02-F02 — Gắn avatar và giấy tờ xác minh](https://docs.google.com/document/d/1V5Uk1sKCEojz3JzAQ26_vzb_PbG7s2d46sBsrf6YVy8/edit?usp=drivesdk)  
-[M02-F03 — Gửi hồ sơ xét duyệt và gửi lại sau chỉnh sửa](https://docs.google.com/document/d/1Wb4Zd0gO1mHJCd-8la0jASlhBIMsC2uK6cbnieWsGac/edit?usp=drivesdk)  
-[M02-F04 — Hàng đợi xét duyệt và xem hồ sơ](https://docs.google.com/document/d/171I8XM6Ou48wVHSgKg9A2Dwq7n_ypZNplWhT8YfqIx0/edit?usp=drivesdk)  
-[M02-F05 — Duyệt hồ sơ Tutor](https://docs.google.com/document/d/1oBlFzaNGtKZkNC8QSn3IGmKrGoWz94S6JzPA3Hqo0uY/edit?usp=drivesdk)  
-[M02-F06 — Yêu cầu chỉnh sửa hồ sơ Tutor](https://docs.google.com/document/d/1ebFL5sxEN61VXARAE-SizTKJyt-6VfqRiSOC16Dwbc4/edit?usp=drivesdk)  
-[M02-F07 — Từ chối hồ sơ Tutor](https://docs.google.com/document/d/1ozQfrGdYh0UV4angtA3zU9RsqzlDYXkMKUbmrciYWO0/edit?usp=drivesdk)  
-[M02-F08 — Đình chỉ và khôi phục hồ sơ Tutor](https://docs.google.com/document/d/1zP1sNEupStYhoOLnYRffzYBA_IO9j68WIU9Fo4S2mHY/edit?usp=drivesdk)
+[M02-F01 — Tạo và cập nhật hồ sơ Tutor](<M02-F01 — Tạo và cập nhật hồ sơ Tutor.md>)  
+[M02-F02 — Gắn avatar và giấy tờ xác minh](<M02-F02 — Gắn avatar và giấy tờ xác minh.md>)  
+[M02-F03 — Gửi hồ sơ xét duyệt và gửi lại sau chỉnh sửa](<M02-F03 — Gửi hồ sơ xét duyệt và gửi lại sau chỉnh sửa.md>)  
+[M02-F04 — Hàng đợi xét duyệt và xem hồ sơ](<M02-F04 — Hàng đợi xét duyệt và xem hồ sơ.md>)  
+[M02-F05 — Duyệt hồ sơ Tutor](<M02-F05 — Duyệt hồ sơ Tutor.md>)  
+[M02-F06 — Yêu cầu chỉnh sửa hồ sơ Tutor](<M02-F06 — Yêu cầu chỉnh sửa hồ sơ Tutor.md>)  
+[M02-F07 — Từ chối hồ sơ Tutor](<M02-F07 — Từ chối hồ sơ Tutor.md>)  
+[M02-F08 — Đình chỉ và khôi phục hồ sơ Tutor](<M02-F08 — Đình chỉ và khôi phục hồ sơ Tutor.md>)
 
 # Vòng đời chuẩn theo Domain Documents
 

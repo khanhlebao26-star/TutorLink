@@ -1,0 +1,2 @@
+slack-worker-1  |   2026-10-25 13:37:56 App\Jobs\SendSlackOperationalAlert ............. RUNNING
+slack-worker-1  |   2026-10-25 13:37:56 App\Jobs\SendSlackOperationalAlert ....... 604.48ms DONE

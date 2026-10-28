@@ -2,7 +2,7 @@
 
 Danh mục **method/path chuẩn cho API đích** của TutorLink. Giữ toàn bộ route trong bảng, gồm 7 route D23; không hoãn hoặc loại route nào khỏi phạm vi. Khi PRD mô tả API đích hoặc code triển khai route mới, dùng method/path tại Catalog. Cột “Mục đích” chỉ tóm tắt chức năng; điều kiện nghiệp vụ nằm trong PRD và Business Rules. [OpenAPI sinh bởi Scramble](../api/README.md) là contract của API hiện được đăng ký trong code, dùng để tích hợp. Catalog không phải contract request/response và không tự trở thành API khả dụng.
 
-Trạng thái đối chiếu ngày 20/10/2026 với `docs/api/openapi.json`:
+Trạng thái đối chiếu ngày 27/10/2026 với `docs/api/openapi.json`; artifact Scramble hiện có 63 operations. Các route Program, Invitation và lifecycle thuộc BE-D02 đã đối chiếu với code đăng ký:
 
 - **Đã đăng ký:** method/path xuất hiện trong OpenAPI sinh từ code. Riêng `GET /sanctum/csrf-cookie` do Sanctum đăng ký ngoài `/api/v1`, nên không nằm trong artifact Scramble. Trạng thái này không xác nhận hành vi, quyền hay dữ liệu đã đạt PRD.
 - **Dự kiến:** method/path thuộc phạm vi API đích nhưng chưa xuất hiện trong OpenAPI sinh từ code; đã được mô tả theo quyết định hiện hành ở Business Rules/PRD. Nhãn này không có nghĩa là hoãn route.
@@ -36,19 +36,19 @@ Các route mutation Session, Task, Fee Record và Announcement tuân version gua
 | PUT /api/v1/tutor/profile | Lưu Draft/Changes Requested hoặc revision riêng của Profile approved; runtime chưa có revision Quyền: Tutor | Đã đăng ký |
 | PUT /api/v1/tutor/profile/avatar | Gắn File avatar đã complete Quyền: Tutor | Đã đăng ký |
 | POST /api/v1/tutor/profile/verification-documents | Gắn tài liệu xác minh và document\_type Quyền: Tutor | Đã đăng ký |
-| POST /api/v1/tutor/profile/submit | Gửi/gửi lại hồ sơ hoặc revision approved; checklist identity/document và assignment theo BR-16, runtime chưa đủ Quyền: Tutor | Đã đăng ký |
+| POST /api/v1/tutor/profile/submit | Gửi/gửi lại hồ sơ hoặc revision approved; checklist identity/document và assignment theo BR-16; H02 hỗ trợ revision riêng Quyền: Tutor | Đã đăng ký |
 | GET /api/v1/admin/tutor-profiles | Danh sách hồ sơ theo trạng thái Quyền: Admin đúng quyền | Đã đăng ký |
 | GET /api/v1/admin/tutor-profiles/{tutorProfile} | Chi tiết hồ sơ trong phạm vi xét duyệt Quyền: Admin đúng quyền | Đã đăng ký |
-| POST /api/v1/admin/tutor-profiles/{tutorProfile}/approve | Duyệt hồ sơ khi giấy tờ bắt buộc approved/còn hạn; với Profile approved quyết định revision submitted và thay bản công khai nguyên tử theo BR-16, runtime chưa đủ Quyền: Admin có `admin.tutor_profiles.decide` và assignment hiện tại | Đã đăng ký |
-| POST /api/v1/admin/tutor-profiles/{tutorProfile}/request-changes | Yêu cầu sửa hồ sơ/revision submitted, giữ bản approved cũ khi xét revision; runtime chưa có revision Quyền: Admin có `admin.tutor_profiles.decide` và assignment hiện tại | Đã đăng ký |
-| POST /api/v1/admin/tutor-profiles/{tutorProfile}/reject | Từ chối hồ sơ/revision submitted, reason/audit; không tự nộp lại, runtime chưa có revision Quyền: Admin có `admin.tutor_profiles.decide` và assignment hiện tại | Đã đăng ký |
+| POST /api/v1/admin/tutor-profiles/{tutorProfile}/approve | Duyệt hồ sơ khi giấy tờ bắt buộc approved/còn hạn; với Profile approved quyết định revision submitted và thay bản công khai nguyên tử theo BR-16, H02 kiểm checklist trong transaction Quyền: Admin có `admin.tutor_profiles.decide` và assignment hiện tại | Đã đăng ký |
+| POST /api/v1/admin/tutor-profiles/{tutorProfile}/request-changes | Yêu cầu sửa hồ sơ/revision submitted, giữ bản approved cũ khi xét revision; H02 hỗ trợ revision Quyền: Admin có `admin.tutor_profiles.decide` và assignment hiện tại | Đã đăng ký |
+| POST /api/v1/admin/tutor-profiles/{tutorProfile}/reject | Từ chối hồ sơ/revision submitted, reason/audit; không tự nộp lại, H02 hỗ trợ revision Quyền: Admin có `admin.tutor_profiles.decide` và assignment hiện tại | Đã đăng ký |
 | POST /api/v1/admin/tutor-profiles/{tutorProfile}/suspend | Đình chỉ hồ sơ và account theo policy Quyền: Admin có đủ hai quyền | Đã đăng ký |
 | POST /api/v1/admin/tutor-profiles/{tutorProfile}/restore | Khôi phục đúng trạng thái hồ sơ trước đình chỉ Quyền: Admin đúng quyền | Đã đăng ký |
-| PUT /api/v1/admin/tutor-profiles/{tutorProfile}/assignment | Giao/chuyển/thu hồi Admin phụ trách hồ sơ Tutor; quyền admin.tutor_profiles.assign | Dự kiến |
+| PUT /api/v1/admin/tutor-profiles/{tutorProfile}/assignment | Giao/chuyển/thu hồi Admin phụ trách hồ sơ Tutor; quyền admin.tutor_profiles.assign | Đã đăng ký |
 | POST /api/v1/admin/users/{user}/suspend | Đình chỉ tài khoản Quyền: Admin đúng quyền | Đã đăng ký |
 | POST /api/v1/admin/users/{user}/restore | Mở lại account suspended, không deactivated Quyền: Admin đúng quyền | Đã đăng ký |
-| POST /api/v1/admin/verification-documents/{document}/approve | Duyệt document pending, audit; Admin active có `admin.verification_documents.decide` và assignment Profile hiện tại theo BR-16 | Dự kiến |
-| POST /api/v1/admin/verification-documents/{document}/reject | Từ chối document pending với reason bắt buộc/audit; Admin active có `admin.verification_documents.decide` và assignment Profile hiện tại theo BR-16 | Dự kiến |
+| POST /api/v1/admin/verification-documents/{document}/approve | Duyệt document pending, audit; Admin active có `admin.verification_documents.decide` và assignment Profile hiện tại theo BR-16 | Đã đăng ký |
+| POST /api/v1/admin/verification-documents/{document}/reject | Từ chối document pending với reason bắt buộc/audit; Admin active có `admin.verification_documents.decide` và assignment Profile hiện tại theo BR-16 | Đã đăng ký |
 | **03 Catalog và khám phá** |  |  |
 | GET /api/v1/catalog/categories | Đọc cây danh mục công khai Quyền: Public | Đã đăng ký |
 | GET /api/v1/catalog/specializations | Đọc/lọc chuyên môn đang hiển thị Quyền: Public | Đã đăng ký |
@@ -81,21 +81,21 @@ Các route mutation Session, Task, Fee Record và Announcement tuân version gua
 | POST /api/v1/conversations/{conversation}/messages | Text không trắng, tối đa 4.000 ký tự; chuẩn hóa newline CRLF/CR thành LF. Cùng sender/key/payload canonical trả bản ghi cũ; key cùng sender nhưng payload khác trả 409. 30 message mới/phút/người dùng, retry không tính quota; 429 kèm Retry-After. Không gửi khi peer bị đình chỉ hoặc Conversation cancelled. File: một tệp/message, 5 MiB, PDF/JPG/PNG/DOC/DOCX, complete + scan clean, gắn nguyên tử. Quyền: Thành viên đủ điều kiện theo BR-21 | Dự kiến |
 | PATCH /api/v1/conversations/{conversation}/read | Cập nhật read cursor chỉ tiến lên Quyền: Thành viên | Dự kiến |
 | **07 Program và Invitation** |  |  |
-| GET /api/v1/programs | Danh sách Program theo actor/state Quyền: Tutor owner/Customer member | Dự kiến |
-| POST /api/v1/programs | Tạo Draft cho Customer đích Quyền: Tutor đủ điều kiện | Dự kiến |
-| GET /api/v1/programs/{program} | Chi tiết thỏa thuận và allowed\_actions Quyền: Owner/member | Dự kiến |
-| PATCH /api/v1/programs/{program} | Sửa Draft khi không có Invitation pending; bắt buộc `expected_version`, thành công tăng version Quyền: Tutor owner | Dự kiến |
-| POST /api/v1/programs/{program}/invitations | Gửi snapshot theo `expected_version`, Draft pending bị khóa; expires_at = sent_at + 72 giờ UTC Quyền: Tutor owner | Dự kiến |
-| GET /api/v1/invitations | Inbox/outbox theo người được phép Quyền: Customer đích/Tutor owner | Dự kiến |
-| GET /api/v1/invitations/{invitation} | Đọc snapshot trước khi trở thành member Quyền: Customer đích/Tutor owner | Dự kiến |
-| POST /api/v1/invitations/{invitation}/accept | Atomic accepted + membership + active; chỉ trước expires_at, kiểm Program.version; 409 khi source Listing đang hold; sau khi gỡ hold có thể accept nếu còn hạn và các gate Customer/Tutor đạt, không cần Listing active lại Quyền: Customer đích | Dự kiến |
+| GET /api/v1/programs | Danh sách Program theo actor/state, phân trang mặc định 20/tối đa 50 Quyền: Tutor owner/Customer member | Đã đăng ký |
+| POST /api/v1/programs | Tạo Draft cho Customer đích; Tutor phải active, verified, Profile approved và đủ giấy tờ; source Listing phải thuộc owner và không bị moderation hold Quyền: Tutor đủ điều kiện | Đã đăng ký |
+| GET /api/v1/programs/{program} | Chi tiết thỏa thuận và allowed\_actions; Customer chỉ đọc sau khi là member Quyền: Owner/member | Đã đăng ký |
+| PATCH /api/v1/programs/{program} | Sửa offer Draft khi không có Invitation pending còn hạn; pending quá hạn được đánh expired trong cùng transaction; bắt buộc `expected_version`, thành công tăng version Quyền: Tutor owner đủ điều kiện | Đã đăng ký |
+| POST /api/v1/programs/{program}/invitations | Gửi snapshot theo `expected_version` và UUID `Idempotency-Key`; Draft pending còn hạn bị khóa; pending quá hạn được đánh expired trong cùng transaction trước khi gửi mới; expires_at = sent_at + 72 giờ UTC Quyền: Tutor owner đủ điều kiện | Đã đăng ký |
+| GET /api/v1/invitations | Inbox/outbox phân trang theo người được phép; pending đã qua expires_at trả effective status expired, không ghi DB Quyền: Customer đích/Tutor owner | Đã đăng ký |
+| GET /api/v1/invitations/{invitation} | Đọc snapshot theo scope; pending đã qua expires_at trả effective status expired, không ghi DB Quyền: Customer đích/Tutor owner | Đã đăng ký |
+| POST /api/v1/invitations/{invitation}/accept | Atomic accepted + Program active + Customer/Tutor membership; yêu cầu UUID `Idempotency-Key`; chỉ trước expires_at, kiểm Program.version, snapshot và Tutor eligibility; 409 khi source Listing đang hold; sau khi gỡ hold có thể accept nếu còn hạn và các gate Customer/Tutor đạt, không cần Listing active lại Quyền: Customer đích | Đã đăng ký |
 | POST /api/v1/invitations/{invitation}/reject | Từ chối Pending còn hiệu lực Quyền: Customer đích | Dự kiến |
 | POST /api/v1/invitations/{invitation}/cancel | Thu hồi Pending Quyền: Tutor owner | Dự kiến |
 | GET /api/v1/programs/{program}/members | Đọc thành viên, không mở CRUD membership Quyền: Owner/member | Dự kiến |
-| POST /api/v1/programs/{program}/pause | active → paused Quyền: Tutor owner | Dự kiến |
-| POST /api/v1/programs/{program}/resume | paused → active Quyền: Tutor owner | Dự kiến |
-| POST /api/v1/programs/{program}/complete | Không Session scheduled; Task đều completed/cancelled; 409 trả blockers Quyền: Tutor owner | Dự kiến |
-| POST /api/v1/programs/{program}/cancel | Draft cancel pending Invitation cùng giao dịch; Active/Paused chỉ cancel khi không còn Session scheduled/Task nonterminal, nếu còn `409 program_cancellation_blocked` với blockers; không cascade cancel Quyền: Tutor owner | Dự kiến |
+| POST /api/v1/programs/{program}/pause | active → paused Quyền: Tutor owner | Đã đăng ký |
+| POST /api/v1/programs/{program}/resume | paused → active Quyền: Tutor owner | Đã đăng ký |
+| POST /api/v1/programs/{program}/complete | Không Session scheduled; Task đều completed/cancelled; 409 trả blockers Quyền: Tutor owner | Đã đăng ký |
+| POST /api/v1/programs/{program}/cancel | Draft hủy Invitation pending cùng giao dịch; Active/Paused chỉ cancel khi không còn Session scheduled/Task nonterminal, nếu còn `409 program_cancellation_blocked` với blockers; không cascade cancel Quyền: Tutor owner | Đã đăng ký |
 | **08 Workspace và Session** |  |  |
 | GET /api/v1/programs/{program}/overview | `next_session`: Session scheduled tương lai theo (planned\_starts\_at,id) tăng dần; đủ counts cho 5 TaskStatus kể cả 0; latest\_progress theo (recorded\_at,id) giảm dần; latest\_announcement published theo (published\_at,id) giảm dần; summary rỗng là null. Program `capabilities`: `can_create_session`, `can_create_task`, `can_record_progress`, `can_create_fee_record`, `can_create_announcement`, `can_create_review`. Timestamp RFC 3339, hiển thị theo Program.timezone. Quyền: Owner/member | Dự kiến |
 | GET /api/v1/programs/{program}/sessions | Danh sách Session Quyền: Owner/member | Dự kiến |
@@ -157,6 +157,8 @@ Các route mutation Session, Task, Fee Record và Announcement tuân version gua
 | GET /api/v1/admin/audit-logs | Tra cứu audit theo scope Quyền: Admin audit viewer | Dự kiến |
 | GET /api/v1/admin/audit-logs/{auditLog} | Chi tiết audit, không sửa/xóa Quyền: Admin audit viewer | Dự kiến |
 | **14 API Admin** |  |  |
+| GET /api/v1/admin/notification-outbox | Danh sách pending/failed, phân trang 20, không trả payload; quyền admin.notification_outbox.view | Đã đăng ký |
+| POST /api/v1/admin/notification-outbox/{outbox}/replay | UUID outbox; reason bắt buộc; replay failed chưa resolved, giữ event_key/payload, audit outbox.replay; quyền admin.notification_outbox.replay | Đã đăng ký |
 | POST /api/v1/admin/listings/{listing}/hide | Đặt hold; active → inactive do Admin, reason_code/reason/audit, thông báo Tutor sau commit. Quyền: Admin active có admin.listings.moderate, toàn bộ Listing MVP | Dự kiến |
 | POST /api/v1/admin/listings/{listing}/restore-visibility | Gỡ hold; inactive do Admin → active khi đủ gate, thiếu gate 409 giữ hold; Tutor tự pause thì giữ inactive. Reason_code/reason/audit, thông báo Tutor. Quyền: Admin active có admin.listings.moderate, toàn bộ Listing MVP | Dự kiến |
 | GET /api/v1/admin/users | `admin.users.view`; hỗ trợ exact `user_id` hoặc email chuẩn hóa chính xác; danh sách chỉ Admin active đủ quyền giao việc, DTO tối thiểu id/display_name; không directory browse hàng loạt | Dự kiến |

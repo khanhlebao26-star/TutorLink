@@ -17,6 +17,11 @@ class TutorProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'expected_version' => ['sometimes', 'integer', 'min:0'],
+            'qualification_claims' => ['sometimes', 'array', 'max:20'],
+            'qualification_claims.*' => ['array:type,name'],
+            'qualification_claims.*.type' => ['required', Rule::in(['degree', 'certificate'])],
+            'qualification_claims.*.name' => ['required', 'string', 'max:160'],
             'headline' => ['required', 'string', 'max:160'],
             'bio' => ['nullable', 'string'],
             'experience_years' => ['sometimes', 'integer', 'min:0', 'max:80'],

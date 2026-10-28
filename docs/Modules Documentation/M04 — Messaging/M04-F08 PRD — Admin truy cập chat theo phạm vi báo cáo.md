@@ -32,7 +32,7 @@ Từ màn hình Report, Admin mở phần Conversation evidence qua route eviden
 
 # 6\. Nguồn
 
-Product: Roles & Actors, Business Rules. Domain: Enum Catalog, Domain Model. Thiết kế: workflow Report, PRD File Lifecycle. Link nguồn: https\://docs.google.com/document/d/13ygl2y4lBb4OC6ReaXTBcaJrKOrqjV2pBX871OXLTik/edit · https\://docs.google.com/document/d/11A70iAzkKyAMpk0ZJg0MK\_rN0\_ZOXIx0Pw4XodHjvXs/edit · https\://docs.google.com/document/d/1LaqqMBoK4PKDsYv8tA-LOTMAdxxiL4xJruibKiHwOoY/edit · https\://docs.google.com/document/d/1sI98J0vYTh5EYdsII1s07\_tWOh8Va3dmJn8g-po5vsw/edit
+Product: Roles & Actors, Business Rules. Domain: Enum Catalog, Domain Model. Thiết kế: workflow Report, PRD File Lifecycle. Link nguồn: [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>)
 
 BR-11 — Kiểm tra quyền Report hiện tại
 Mỗi lần đọc evidence chat cần `admin.reports.view`, assignment hiện tại, Report `open`, đúng message/Conversation được báo cáo và audit truy cập. Phạm vi là message bị báo cáo cùng tối đa 10 tin trước/5 tin sau; không mở toàn bộ thread. Assignment không tạo membership, không cho gửi/sửa message hoặc thay read cursor. Sau khi Report đóng hoặc assignment đổi/thu hồi, không còn quyền đọc evidence; masking và retention vẫn cần chốt riêng.

@@ -8,14 +8,14 @@ Tách M01 thành các luồng người dùng/API có thể giao việc và nghi�
 
 # Danh sách PRD
 
-* [M01-F01 — Đăng ký tài khoản](https://docs.google.com/document/d/1kqYxgvXJjh8_7w2Hbf9GqpXGtPHYwYbjnDsfzdqYQRA/edit)  
-* [M01-F02 — Xác minh và gửi lại email](https://docs.google.com/document/d/1aqXGF1YBZRJw21WEDcFEyajJLKPEE6pRZzvqNvyYYoM/edit)  
-* [M01-F03 — Đăng nhập](https://docs.google.com/document/d/1Xh3tiZtPy-KWBc06Gtg1R63dqmLl8fyKJVp4gkcO5p0/edit)  
-* [M01-F04 — Đăng xuất và phiên bảo mật](https://docs.google.com/document/d/1FdiKYH4l8eKgw1edacCcsaWlir-34C6dsQSiX0wXPzc/edit)  
-* [M01-F05 — Yêu cầu đặt lại mật khẩu](https://docs.google.com/document/d/12nVQNtjtC6Wwzxqfhf6xYcEvU1JCxkjtWESCoZCir4c/edit)  
-* [M01-F06 — Đặt lại mật khẩu](https://docs.google.com/document/d/1mxbshFFkCFMLdBGlNpSO5X3vzwqFEpdToSJkOWgO6lc/edit)  
-* [M01-F07 — Thông tin tài khoản của tôi](https://docs.google.com/document/d/1FHFR7cyCsLKQdgkI8k09vL0535HMXxw6jD9Hwj5fu1I/edit)  
-* [M01-F08 — Role và trạng thái truy cập](https://docs.google.com/document/d/1VjvAR8qfUzUGLS7Z1cQv2d_WHmzRKkpOjeAUdv1GU0Q/edit)
+* [M01-F01 — Đăng ký tài khoản](<M01-F01 — Đăng ký tài khoản.md>)  
+* [M01-F02 — Xác minh và gửi lại email](<M01-F02 — Xác minh và gửi lại email.md>)  
+* [M01-F03 — Đăng nhập](<M01-F03 — Đăng nhập.md>)  
+* [M01-F04 — Đăng xuất và phiên bảo mật](<M01-F04 — Đăng xuất và phiên bảo mật.md>)  
+* [M01-F05 — Yêu cầu đặt lại mật khẩu](<M01-F05 — Yêu cầu đặt lại mật khẩu.md>)  
+* [M01-F06 — Đặt lại mật khẩu](<M01-F06 — Đặt lại mật khẩu.md>)  
+* [M01-F07 — Thông tin tài khoản của tôi](<M01-F07 — Thông tin tài khoản của tôi.md>)  
+* [M01-F08 — Role và trạng thái truy cập](<M01-F08 — Role và trạng thái truy cập.md>)
 
 # Quyết định sản phẩm
 

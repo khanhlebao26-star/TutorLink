@@ -5,15 +5,56 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\FileController;
+use App\Http\Controllers\Api\V1\InvitationAcceptController;
+use App\Http\Controllers\Api\V1\InvitationController;
 use App\Http\Controllers\Api\V1\ListingController;
+use App\Http\Controllers\Api\V1\NotificationOutboxController;
 use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
+use App\Http\Controllers\Api\V1\ProgramController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
+use App\Http\Middleware\EnsureActiveApiActor;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    Route::middleware(EnsureActiveApiActor::class)->group(function () {
+        Route::get('/programs', [ProgramController::class, 'index'])
+            ->name('programs.index');
+        Route::post('/programs', [ProgramController::class, 'store'])
+            ->name('programs.store');
+        Route::get('/programs/{program}', [ProgramController::class, 'show'])
+            ->whereNumber('program')
+            ->name('programs.show');
+        Route::patch('/programs/{program}', [ProgramController::class, 'update'])
+            ->whereNumber('program')
+            ->name('programs.update');
+        Route::post('/programs/{program}/pause', [ProgramController::class, 'pause'])
+            ->whereNumber('program')
+            ->name('programs.pause');
+        Route::post('/programs/{program}/resume', [ProgramController::class, 'resume'])
+            ->whereNumber('program')
+            ->name('programs.resume');
+        Route::post('/programs/{program}/complete', [ProgramController::class, 'complete'])
+            ->whereNumber('program')
+            ->name('programs.complete');
+        Route::post('/programs/{program}/cancel', [ProgramController::class, 'cancel'])
+            ->whereNumber('program')
+            ->name('programs.cancel');
+        Route::post('/programs/{program}/invitations', [InvitationController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.invitations.store');
+        Route::get('/invitations', [InvitationController::class, 'index'])
+            ->name('invitations.index');
+        Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])
+            ->whereNumber('invitation')
+            ->name('invitations.show');
+        Route::post('/invitations/{invitation}/accept', InvitationAcceptController::class)
+            ->whereNumber('invitation')
+            ->name('invitations.accept');
+    });
+
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register'])
             ->middleware('throttle:register')
@@ -67,11 +108,17 @@ Route::prefix('v1')->group(function () {
             'replace',
         ]);
 
-        Route::prefix('admin')->group(function () {
+        Route::prefix('admin')->middleware(EnsureActiveApiActor::class)->group(function () {
             Route::get('/tutor-profiles', [AdminController::class, 'index'])
                 ->name('admin.tutor-profiles.index');
             Route::get('/tutor-profiles/{tutorProfile}', [AdminController::class, 'show'])
                 ->name('admin.tutor-profiles.show');
+            Route::put('/tutor-profiles/{tutorProfile}/assignment', [AdminController::class, 'assign'])
+                ->name('admin.tutor-profiles.assignment');
+            Route::post('/verification-documents/{document}/approve', [AdminController::class, 'approveDocument'])
+                ->name('admin.verification-documents.approve');
+            Route::post('/verification-documents/{document}/reject', [AdminController::class, 'rejectDocument'])
+                ->name('admin.verification-documents.reject');
             Route::post('/tutor-profiles/{tutorProfile}/approve', [AdminController::class, 'approve'])
                 ->name('admin.tutor-profiles.approve');
             Route::post('/tutor-profiles/{tutorProfile}/request-changes', [AdminController::class, 'requestChanges'])
@@ -86,6 +133,16 @@ Route::prefix('v1')->group(function () {
                 ->name('admin.users.suspend');
             Route::post('/users/{user}/restore', [AdminController::class, 'restoreAccount'])
                 ->name('admin.users.restore');
+            Route::get('/notification-outbox', [
+                NotificationOutboxController::class,
+                'index',
+            ])->name('admin.notification-outbox.index');
+
+            Route::post('/notification-outbox/{outbox}/replay', [
+                NotificationOutboxController::class,
+                'replay',
+            ])->whereUuid('outbox')
+                ->name('admin.notification-outbox.replay');
         });
 
         Route::patch('/me', [AuthController::class, 'updateMe'])

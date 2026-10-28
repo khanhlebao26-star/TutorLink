@@ -15,6 +15,9 @@ class TutorProfile extends Model
     protected function casts(): array
     {
         return [
+            'assigned_at' => 'datetime',
+            'assignment_version' => 'integer',
+            'qualification_claims' => 'array',
             'submitted_at' => 'datetime',
             'reviewed_at' => 'datetime',
             'suspended_at' => 'datetime',

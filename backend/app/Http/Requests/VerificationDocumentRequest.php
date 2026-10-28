@@ -17,7 +17,8 @@ class VerificationDocumentRequest extends FormRequest
     {
         return [
             'file_id' => ['required', 'integer', 'exists:files,id'],
-            'document_type' => ['required', 'string', 'max:50'],
+            'expires_at' => ['sometimes', 'nullable', 'date', 'after:now'],
+            'document_type' => ['required', 'string', 'in:identity_card,passport,degree,certificate,other'],
         ];
     }
 }

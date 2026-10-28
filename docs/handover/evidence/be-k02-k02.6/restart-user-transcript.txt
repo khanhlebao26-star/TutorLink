@@ -1,0 +1,25 @@
+Source: User-provided terminal output in the K02.6 demo conversation.
+This excerpt records the user's restart; the verification run did not restart containers again.
+
+Before restart, the user queried the demo row:
+id: 2d0fb74e-70ac-46f9-a9ce-56a8a4e58bdf
+user_id: 61
+type: tutor_profile_changes_requested
+event_key: profile:26:changes-requested:17
+processed_at: 2026-10-25 09:39:42.583422+00
+failed_at: null
+Notification count for user_id/type/event_key: 1
+
+> docker compose -f docker-compose.yml -f compose.workers.yml restart outbox-worker slack-worker scheduler
+[+] restart 0/3
+ - Container tutorlink-src-scheduler-1     Restarting 0.8s
+ - Container tutorlink-src-slack-worker-1  Restarting 0.8s
+ - Container tutorlink-src-outbox-worker-1 Restarting 0.8s
+
+> docker compose -f docker-compose.yml -f compose.workers.yml ps outbox-worker slack-worker scheduler
+NAME                           IMAGE                       SERVICE        STATUS
+tutorlink-src-outbox-worker-1   tutorlink-k02-worker:local  outbox-worker  Up 4 seconds
+tutorlink-src-scheduler-1       tutorlink-k02-worker:local  scheduler      Up 4 seconds
+tutorlink-src-slack-worker-1    tutorlink-k02-worker:local  slack-worker   Up 4 seconds
+
+For the later, independently queried state, see containers.txt and runtime-state.json.

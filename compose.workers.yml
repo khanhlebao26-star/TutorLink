@@ -1,0 +1,47 @@
+x-backend-worker: &backend-worker
+  image: tutorlink-k02-worker:local
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  working_dir: /var/www/html
+  env_file:
+    - ./backend/.env.docker
+  environment:
+    DB_CONNECTION: pgsql
+    DB_HOST: db
+    DB_PORT: 5432
+    DB_DATABASE: tutorlink
+    DB_USERNAME: tutorlink
+    DB_PASSWORD: tutorlink_dev_password
+    DB_QUEUE_CONNECTION: pgsql
+    DB_CACHE_CONNECTION: pgsql
+    DB_CACHE_LOCK_CONNECTION: pgsql
+    QUEUE_CONNECTION: database
+    CACHE_STORE: database
+    DB_QUEUE_RETRY_AFTER: 90
+  volumes:
+    - ./backend:/var/www/html
+    - ./backend/.env.docker:/var/www/html/.env:ro
+    - backend_vendor:/var/www/html/vendor
+    - backend_storage:/var/www/html/storage
+  depends_on:
+    db:
+      condition: service_healthy
+    backend:
+      condition: service_healthy
+  init: true
+  restart: unless-stopped
+  stop_grace_period: 30s
+
+services:
+  outbox-worker:
+    <<: *backend-worker
+    command: ["php", "artisan", "outbox:work", "--sleep=2", "--limit=100"]
+
+  slack-worker:
+    <<: *backend-worker
+    command: ["php", "artisan", "queue:work", "database", "--queue=slack", "--sleep=1", "--tries=10", "--timeout=20", "--max-time=3600"]
+
+  scheduler:
+    <<: *backend-worker
+    command: ["php", "artisan", "schedule:work"]

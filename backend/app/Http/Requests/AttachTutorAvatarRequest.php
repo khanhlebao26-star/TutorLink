@@ -16,6 +16,7 @@ class AttachTutorAvatarRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'expected_version' => ['sometimes', 'integer', 'min:0'],
             'file_id' => ['required', 'integer', 'exists:files,id'],
         ];
     }

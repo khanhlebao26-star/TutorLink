@@ -1,0 +1,66 @@
+[
+  {
+    "file": "backend/app/Console/Commands/ProcessNotificationOutbox.php",
+    "sha256": "e84aee91e2f63f1532f3b61f87c55598fec7de828f0f43a76fdf2a6308759cca"
+  },
+  {
+    "file": "backend/app/Console/Commands/MonitorNotificationOutbox.php",
+    "sha256": "994c6f86f0b34a82b0b7c64d9e7c893aa309783a345396d38a67ad07beb2baf8"
+  },
+  {
+    "file": "backend/app/Console/Commands/WorkNotificationOutbox.php",
+    "sha256": "d59a3595d2428d47f9306ea6051d769fd9b8839b7b8a24b253e79a55914c4990"
+  },
+  {
+    "file": "backend/app/Console/Commands/PurgeNotificationData.php",
+    "sha256": "075043c25831cbd83b56654459d647810e8d62f0c23b90da99f47c85a139f781"
+  },
+  {
+    "file": "backend/app/Support/NotificationOutboxAlerts.php",
+    "sha256": "a077da9cf51efb32520ca162e10801da21dec5236051116d4182415d98212377"
+  },
+  {
+    "file": "backend/app/Support/NotificationOutboxWriter.php",
+    "sha256": "ac0ab8a4a0c4c9744e60b4a024879fc2d24a3861e7a6f8c6363c3811987bfe5b"
+  },
+  {
+    "file": "backend/app/Support/AdminPermissions.php",
+    "sha256": "6c85c2571f73733830aca89377d428e0ed7a654ddfe52e49811273a5d747fac9"
+  },
+  {
+    "file": "backend/app/Jobs/SendSlackOperationalAlert.php",
+    "sha256": "f5d47e87e3b0047540060e5d9c43702c84be9cbef81a450158d341db094b4bea"
+  },
+  {
+    "file": "backend/config/queue.php",
+    "sha256": "6101774da7c8b79af46d0028f2b8b31a484c3f7eda10b76e5b27b6093ad364a4"
+  },
+  {
+    "file": "backend/config/cache.php",
+    "sha256": "5030cdf171704e58b96f2cf17f1c6d5921b27d5c63c2cefb730eeb2da49a8240"
+  },
+  {
+    "file": "backend/config/notification_outbox.php",
+    "sha256": "f06d1a3667d60da7c47d6fb1a2dc2df51a93f1c6b8ddc1836fadba772eacad45"
+  },
+  {
+    "file": "backend/routes/console.php",
+    "sha256": "706197c6b34984dc98ac79d269ebba72b988e8d4110ee6f6a72158b8f34048ea"
+  },
+  {
+    "file": "backend/tests/Feature/NotificationOutboxRuntimeTest.php",
+    "sha256": "4c949d94cf093c79ff837b97bf85bf098dde454eded89871281050afb0e9f9af"
+  },
+  {
+    "file": "backend/Dockerfile.testing",
+    "sha256": "0d634144aeb50f14df3ae24e0472dc3ae0bd79f3e25f7dd7dc802eee5d62b7b4"
+  },
+  {
+    "file": "compose.testing.yml",
+    "sha256": "8a062caf58409cbe267f13b74e0af74285b736aff4d85d667133c2198ca7882e"
+  },
+  {
+    "file": "compose.workers.yml",
+    "sha256": "c6905870df22a43987bcc1fac398ae2b7cba528d669965cdcf7d52b4beff8da3"
+  }
+]

@@ -1,0 +1,12 @@
+scheduler-1  |   2026-10-25 09:46:00 Running ['artisan' outbox:monitor] ....... 347.21ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1  
+scheduler-1  | 
+scheduler-1  |   2026-10-25 09:47:00 Running ['artisan' outbox:monitor] ....... 342.63ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1  
+scheduler-1  | 
+scheduler-1  |   2026-10-25 09:48:00 Running ['artisan' outbox:monitor] ....... 388.92ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1  
+scheduler-1  | 
+scheduler-1  |   2026-10-25 09:49:00 Running ['artisan' outbox:monitor] ....... 327.13ms DONE
+scheduler-1  |   ⇂ '/usr/local/bin/php' 'artisan' outbox:monitor > '/dev/null' 2>&1  
+scheduler-1  | 

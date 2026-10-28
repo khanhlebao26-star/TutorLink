@@ -3,72 +3,170 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Auth\RevokeUserSessions;
+use App\Actions\TutorProfiles\AssignTutorProfile;
+use App\Actions\TutorProfiles\DecideTutorProfile;
+use App\Actions\TutorProfiles\DecideVerificationDocument;
+use App\Actions\TutorProfiles\SuspendTutorProfile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminDecisionRequest;
+use App\Http\Requests\AssignTutorProfileRequest;
+use App\Http\Requests\TutorProfileDecisionRequest;
+use App\Http\Requests\VerificationDocumentDecisionRequest;
 use App\Http\Resources\TutorProfileResource;
 use App\Http\Resources\UserResource;
 use App\Models\TutorProfile;
 use App\Models\User;
+use App\Models\VerificationDocument;
+use App\Policies\TutorProfilePolicy;
 use App\Support\AdminPermissions;
+use App\Support\TutorProfileRevisions;
+use App\Support\TutorProfileWorkflow;
+use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    private const ERROR_TYPE = 'array{code:string,message:string,request_id:string,errors:array<string,mixed>}';
+
+    private const ASSIGNMENT_TYPE = 'array{id:int,assigned_admin_id:int|null,assigned_by:int|null,assigned_at:string|null,assignment_version:int}';
+
+    private const PROFILE_RESULT_TYPE = 'array{data:array{user:array<string,mixed>,allowed_actions:list<string>,profile:array<string,mixed>,assignment:array<string,mixed>,revision:array<string,mixed>|null,verification_documents:list<array<string,mixed>>|null}}';
+
+    private const DOCUMENT_RESULT_TYPE = 'array{data:array{id:int,tutor_profile_id:int,status:string,reviewed_by:int|null,reviewed_at:string|null,review_reason:string|null,expires_at:string|null}}';
+
+    private const SUSPENSION_RESULT_TYPE = 'array{data:array{profile:array{id:int,status:string,status_before_suspension:string|null,suspended_at:string|null},user:array{id:int,status:string}}}';
+
+    /** List assigned profiles, or minimal assignment queue metadata for coordinators. */
+    #[OpenApiResponse(status: 200, description: 'List assigned profiles, or minimal assignment queue metadata for coordinators.', type: 'array{data:list<array<string,mixed>>,meta:array{current_page:int,total:int,per_page:int}}')]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
     public function index(Request $request): JsonResponse
     {
-        $this->requirePermission($request, AdminPermissions::VIEW_TUTOR_PROFILES);
-
+        $actor = $request->user();
+        $policy = app(TutorProfilePolicy::class);
+        $flow = app(TutorProfileWorkflow::class);
+        $canView = $policy->permission($actor, AdminPermissions::VIEW_TUTOR_PROFILES);
+        $canAssign = $policy->permission($actor, AdminPermissions::ASSIGN_TUTOR_PROFILES);
+        $flow->ensure($canView || $canAssign, 403, 'permission_denied', 'Permission denied.');
         $status = $request->query('status', 'submitted');
         $allowedStatuses = ['submitted', 'changes_requested', 'approved', 'rejected', 'suspended'];
-
         if (! in_array($status, $allowedStatuses, true)) {
             return response()->json(['message' => 'Invalid tutor profile status.'], 422);
         }
+        $scope = $request->query('scope', $canView ? 'mine' : 'unassigned');
+        $flow->ensure(in_array($scope, ['mine', 'unassigned', 'all'], true), 422, 'invalid_assignment_scope', 'Invalid assignment scope.');
+        $flow->ensure($scope === 'mine' ? $canView : $canAssign, 403, 'permission_denied', 'Permission denied.');
+        $query = TutorProfile::query()->whereHas('user')->where('status', $status)->orderByDesc('submitted_at')->orderByDesc('id');
+        if ($scope === 'mine') {
+            $query->where('assigned_admin_id', $actor->id)->with(['user', 'specializations', 'verificationDocuments']);
+        } elseif ($scope === 'unassigned') {
+            $query->whereNull('assigned_admin_id');
+        }
+        $page = $query->paginate(min(100, max(1, (int) $request->query('per_page', 20))));
+        $items = $page->getCollection()->map(fn (TutorProfile $profile): array => $scope === 'mine'
+            ? $this->profilePayload($profile)
+            : ['id' => $profile->id, 'status' => $profile->status, 'submitted_at' => $profile->submitted_at?->toISOString(),
+                ...$flow->assignment($profile)]);
 
-        $profiles = TutorProfile::query()
-            ->with(['user', 'specializations', 'verificationDocuments'])
-            ->where('status', $status)
-            ->orderByDesc('submitted_at')
-            ->get()
-            ->map(fn (TutorProfile $profile): array => $this->profilePayload($profile));
-
-        return response()->json(['data' => $profiles]);
+        return response()->json(['data' => $items, 'meta' => ['current_page' => $page->currentPage(), 'total' => $page->total(), 'per_page' => $page->perPage()]]);
     }
 
+    /** Read a profile within the current assignment scope. */
+    #[OpenApiResponse(status: 200, description: 'Read a profile within the current assignment scope.', type: self::PROFILE_RESULT_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
     public function show(Request $request, TutorProfile $tutorProfile): JsonResponse
     {
-        $this->requirePermission($request, AdminPermissions::VIEW_TUTOR_PROFILES);
+        return DB::transaction(function () use ($request, $tutorProfile): JsonResponse {
+            $flow = app(TutorProfileWorkflow::class);
+            [$actor, $profile] = $flow->lock($request->user(), $tutorProfile->id);
+            $policy = app(TutorProfilePolicy::class);
+            $flow->ensure($policy->view($actor, $profile), 404, 'tutor_profile_not_found', 'Tutor profile not found.');
+            $includeDocuments = $policy->download($actor, $profile);
+            if ($includeDocuments) {
+                $flow->audit($actor, 'verification_document.view', 'tutor_profile', $profile->id, [], ['access' => 'metadata']);
+            }
 
-        return response()->json([
-            'data' => $this->profilePayload(
-                $tutorProfile->load('user'),
-                $request->user()->hasPermission(AdminPermissions::DOWNLOAD_VERIFICATION_DOCUMENTS),
-            ),
-        ]);
+            return response()->json(['data' => $this->profilePayload($profile, $includeDocuments)]);
+        });
     }
 
-    public function approve(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
+    /** Assign, reassign or revoke the reviewer using the current assignment version. */
+    #[OpenApiResponse(status: 200, description: 'Assign, reassign or revoke the reviewer using the current assignment version.', type: 'array{data:'.self::ASSIGNMENT_TYPE.'}')]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
+    public function assign(AssignTutorProfileRequest $request, TutorProfile $tutorProfile): JsonResponse
     {
-        return $this->decide($request, $tutorProfile, 'approved', 'tutor_profile_approved');
+        $profile = app(AssignTutorProfile::class)->execute($request->user(), $tutorProfile->id, $request->validated());
+
+        return response()->json(['data' => ['id' => $profile->id, ...app(TutorProfileWorkflow::class)->assignment($profile)]]);
     }
 
-    public function requestChanges(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
+    /** Approve one complete and unexpired pending verification document. */
+    #[OpenApiResponse(status: 200, description: 'Approve one complete and unexpired pending verification document.', type: self::DOCUMENT_RESULT_TYPE)]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
+    public function approveDocument(VerificationDocumentDecisionRequest $request, VerificationDocument $document): JsonResponse
     {
-        return $this->decide($request, $tutorProfile, 'changes_requested', 'tutor_profile_changes_requested');
+        return $this->decideDocument($request, $document, true);
     }
 
-    public function reject(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
+    /** Reject one pending verification document with a reason. */
+    #[OpenApiResponse(status: 200, description: 'Reject one pending verification document with a reason.', type: self::DOCUMENT_RESULT_TYPE)]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
+    public function rejectDocument(VerificationDocumentDecisionRequest $request, VerificationDocument $document): JsonResponse
     {
-        return $this->decide($request, $tutorProfile, 'rejected', 'tutor_profile_rejected');
+        return $this->decideDocument($request, $document, false);
     }
 
+    private function decideDocument(VerificationDocumentDecisionRequest $request, VerificationDocument $document, bool $approve): JsonResponse
+    {
+        $document = app(DecideVerificationDocument::class)->execute($request->user(), $document->id, $approve, $request->validated());
+
+        return response()->json(['data' => $document->only(['id', 'tutor_profile_id', 'status', 'reviewed_by', 'reviewed_at', 'review_reason', 'expires_at'])]);
+    }
+
+    /** Approve a submitted profile or a versioned revision after document checks. */
+    #[OpenApiResponse(status: 200, description: 'Approve a submitted profile or a versioned revision after document checks.', type: self::PROFILE_RESULT_TYPE)]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
+    public function approve(TutorProfileDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
+    {
+        return $this->decide($request, $tutorProfile, 'approved');
+    }
+
+    /** Request changes to a submitted profile or revision, preserving approved content. */
+    #[OpenApiResponse(status: 200, description: 'Request changes to a submitted profile or revision, preserving approved content.', type: self::PROFILE_RESULT_TYPE)]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
+    public function requestChanges(TutorProfileDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
+    {
+        return $this->decide($request, $tutorProfile, 'changes_requested');
+    }
+
+    /** Reject a submitted profile or revision without allowing self-resubmission. */
+    #[OpenApiResponse(status: 200, description: 'Reject a submitted profile or revision without allowing self-resubmission.', type: self::PROFILE_RESULT_TYPE)]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
+    public function reject(TutorProfileDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
+    {
+        return $this->decide($request, $tutorProfile, 'rejected');
+    }
+
+    /** Suspend a profile and its active account atomically with both required permissions. */
+    #[OpenApiResponse(status: 200, description: 'Suspend a profile and its active account atomically with both required permissions.', type: self::SUSPENSION_RESULT_TYPE)]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
     public function suspendProfile(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
     {
         return $this->changeProfileSuspension($request, $tutorProfile, true);
     }
 
+    /** Restore the saved profile state while keeping account restoration separate. */
+    #[OpenApiResponse(status: 200, description: 'Restore the saved profile state while keeping account restoration separate.', type: self::SUSPENSION_RESULT_TYPE)]
+    #[OpenApiResponse(status: 409, description: 'The assignment, revision version or resource state has changed.', type: self::ERROR_TYPE)]
+    #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
     public function restoreProfile(AdminDecisionRequest $request, TutorProfile $tutorProfile): JsonResponse
     {
         return $this->changeProfileSuspension($request, $tutorProfile, false);
@@ -79,46 +177,10 @@ class AdminController extends Controller
         TutorProfile $tutorProfile,
         bool $suspend,
     ): JsonResponse {
-        $actor = $this->requirePermission($request, AdminPermissions::SUSPEND_TUTOR_PROFILES);
-        $data = $request->validated();
+        $profile = app(SuspendTutorProfile::class)->execute($request->user(), $tutorProfile->id, $suspend, $request->validated('reason'));
 
-        $profile = DB::transaction(function () use ($actor, $data, $suspend, $tutorProfile): TutorProfile {
-            $profile = TutorProfile::query()
-                ->with('user')
-                ->lockForUpdate()
-                ->findOrFail($tutorProfile->id);
-
-            $expectedStatus = $suspend ? 'approved' : 'suspended';
-
-            if ($profile->status !== $expectedStatus) {
-                abort(409, 'The requested profile status transition is not allowed.');
-            }
-
-            $before = $this->profileState($profile);
-            $profile->forceFill([
-                'status' => $suspend ? 'suspended' : 'approved',
-                'suspended_at' => $suspend ? now() : null,
-                'suspension_reason' => $suspend ? $data['reason'] : null,
-            ])->save();
-            $this->writeAudit(
-                $actor,
-                $suspend ? 'tutor_profile_suspended' : 'tutor_profile_restored',
-                'tutor_profile',
-                $profile->id,
-                $before,
-                $this->profileState($profile),
-                $data['reason'],
-            );
-
-            return $profile->refresh()->load('user');
-        });
-
-        return response()->json([
-            'data' => $this->profilePayload(
-                $profile,
-                $actor->hasPermission(AdminPermissions::DOWNLOAD_VERIFICATION_DOCUMENTS),
-            ),
-        ]);
+        return response()->json(['data' => ['profile' => $profile->only(['id', 'status', 'status_before_suspension', 'suspended_at']),
+            'user' => $profile->user->only(['id', 'status'])]]);
     }
 
     public function suspendAccount(AdminDecisionRequest $request, User $user): JsonResponse
@@ -132,46 +194,14 @@ class AdminController extends Controller
     }
 
     private function decide(
-        AdminDecisionRequest $request,
+        TutorProfileDecisionRequest $request,
         TutorProfile $tutorProfile,
         string $status,
-        string $action,
     ): JsonResponse {
-        $actor = $this->requirePermission($request, AdminPermissions::DECIDE_TUTOR_PROFILES);
-        $data = $request->validated();
+        $profile = app(DecideTutorProfile::class)->execute($request->user(), $tutorProfile->id, $status, $request->validated());
 
-        $profile = DB::transaction(function () use ($actor, $data, $status, $action, $tutorProfile): TutorProfile {
-            $profile = TutorProfile::query()
-                ->with('user')
-                ->lockForUpdate()
-                ->findOrFail($tutorProfile->id);
-
-            if ($profile->status !== 'submitted') {
-                abort(409, 'Only submitted profiles can be decided.');
-            }
-
-            if ($profile->user->status !== 'active') {
-                abort(409, 'This account is not available.');
-            }
-
-            $before = $this->profileState($profile);
-            $profile->forceFill([
-                'status' => $status,
-                'reviewed_by' => $actor->id,
-                'reviewed_at' => now(),
-                'review_reason' => $data['reason'],
-            ])->save();
-            $this->writeAudit($actor, $action, 'tutor_profile', $profile->id, $before, $this->profileState($profile), $data['reason']);
-
-            return $profile->refresh()->load('user');
-        });
-
-        return response()->json([
-            'data' => $this->profilePayload(
-                $profile,
-                $actor->hasPermission(AdminPermissions::DOWNLOAD_VERIFICATION_DOCUMENTS),
-            ),
-        ]);
+        return response()->json(['data' => $this->profilePayload($profile,
+            app(TutorProfilePolicy::class)->download($request->user(), $profile))]);
     }
 
     private function changeAccountStatus(
@@ -237,7 +267,7 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        abort_unless($user instanceof User && $user->hasPermission($permission), 403, 'Permission denied.');
+        abort_unless($user instanceof User && $user->status === 'active' && $user->hasPermission($permission), 403, 'Permission denied.');
 
         return $user;
     }
@@ -251,6 +281,8 @@ class AdminController extends Controller
             'user' => (new UserResource($profile->user))->resolve(),
             'allowed_actions' => $this->allowedActions($profile),
             'profile' => (new TutorProfileResource($profile))->resolve(),
+            'assignment' => app(TutorProfileWorkflow::class)->assignment($profile),
+            'revision' => app(TutorProfileRevisions::class)->latest($profile),
         ];
 
         if ($includeDocuments) {
@@ -264,6 +296,9 @@ class AdminController extends Controller
                     'documents.document_type',
                     'documents.status',
                     'documents.reviewed_at',
+                    'documents.reviewed_by',
+                    'documents.review_reason',
+                    'documents.expires_at',
                     'files.original_name',
                     'files.mime_type',
                     'files.size_bytes',
@@ -276,6 +311,9 @@ class AdminController extends Controller
                     'document_type' => $document->document_type,
                     'status' => $document->status,
                     'reviewed_at' => $document->reviewed_at,
+                    'reviewed_by' => $document->reviewed_by,
+                    'review_reason' => $document->review_reason,
+                    'expires_at' => $document->expires_at,
                     'original_name' => $document->original_name,
                     'mime_type' => $document->mime_type,
                     'size_bytes' => (int) $document->size_bytes,
@@ -298,15 +336,16 @@ class AdminController extends Controller
         $actions = [];
 
         if (
-            $actor->hasPermission(AdminPermissions::DECIDE_TUTOR_PROFILES)
-            && $profile->status === 'submitted'
+            app(TutorProfilePolicy::class)->decide($actor, $profile)
+            && ($profile->status === 'submitted' || ($profile->status === 'approved'
+                && DB::table('tutor_profile_revisions')->where('tutor_profile_id', $profile->id)->where('status', 'submitted')->exists()))
             && $profile->user->status === 'active'
         ) {
             $actions = ['approve', 'request-changes', 'reject'];
         }
 
         if ($actor->hasPermission(AdminPermissions::SUSPEND_TUTOR_PROFILES)) {
-            if ($profile->status === 'approved') {
+            if ($profile->status !== 'suspended' && ($profile->user->status !== 'active' || $actor->hasPermission(AdminPermissions::SUSPEND_ACCOUNTS))) {
                 $actions[] = 'suspend';
             } elseif ($profile->status === 'suspended') {
                 $actions[] = 'restore';
@@ -328,21 +367,6 @@ class AdminController extends Controller
     }
 
     /**
-     * @return array<string, mixed>
-     */
-    private function profileState(TutorProfile $profile): array
-    {
-        return [
-            'status' => $profile->status,
-            'reviewed_by' => $profile->reviewed_by,
-            'reviewed_at' => $profile->reviewed_at?->toISOString(),
-            'review_reason' => $profile->review_reason,
-            'suspended_at' => $profile->suspended_at?->toISOString(),
-            'suspension_reason' => $profile->suspension_reason,
-        ];
-    }
-
-    /**
      * @param  array<string, mixed>  $before
      * @param  array<string, mixed>  $after
      */
@@ -354,8 +378,8 @@ class AdminController extends Controller
         array $before,
         array $after,
         string $reason,
-    ): void {
-        DB::table('audit_logs')->insert([
+    ): int {
+        return DB::table('audit_logs')->insertGetId([
             'actor_id' => $actor->id,
             'action' => $action,
             'resource_type' => $resourceType,

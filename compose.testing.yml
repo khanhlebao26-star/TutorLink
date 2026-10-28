@@ -51,6 +51,7 @@ services:
       BROADCAST_CONNECTION: "null"
     volumes:
       - ./outputs/be-h01:/evidence
+      - ./backend/.env.docker:/var/www/html/.env:ro
     depends_on:
       test-db:
         condition: service_healthy
@@ -60,7 +61,6 @@ services:
       - sh
       - -c
       - |
-          touch .env
           mkdir -p /evidence/coverage
           exec php \
             -d pcov.enabled=1 \

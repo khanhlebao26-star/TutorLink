@@ -1,0 +1,1 @@
+[2026-10-25 13:37:56] local.INFO: Slack operational alert {"alert_id":"bc6b9a95-3438-4480-a784-e6155a364cf6","status":"sent","error_code":"slack_sent","attempt":1,"at":"2026-10-25T13:37:56.744431Z"}
