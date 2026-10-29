@@ -85,28 +85,23 @@ test('ZIP guard refuses unsafe or incomplete archives', function (string $case):
             0,
             -5,
         ),
-        'deadline' => k037GuardZip([
-            'one.txt' => 'one',
-        ]),
     };
 
     if ($case === 'file') {
-        config(['file-scanning.archive.max_file_bytes' => 99]);
+        config(['file-validation.archive.max_file_bytes' => 99]);
     }
 
     if ($case === 'total') {
         config([
-            'file-scanning.archive.max_total_bytes' => strlen($bytes) + 150,
+            'file-validation.archive.max_total_bytes' => strlen($bytes) + 150,
         ]);
     }
 
     if ($case === 'count') {
-        config(['file-scanning.archive.max_files' => 2]);
+        config(['file-validation.archive.max_files' => 2]);
     }
 
-    $deadline = $case === 'deadline'
-        ? hrtime(true) - 1
-        : hrtime(true) + 10_000_000_000;
+    $deadline = hrtime(true) + 10_000_000_000;
 
     expect(
         app(ZipScanGuard::class)->allows($bytes, $deadline)
@@ -118,10 +113,24 @@ test('ZIP guard refuses unsafe or incomplete archives', function (string $case):
     'encrypted',
     'nested',
     'malformed',
-    'deadline',
 ]);
 
-test('new archive policy invalidates cached clean evidence safely', function (): void {
+test('ZIP guard reports an expired deadline as unavailable', function (): void {
+    $bytes = k037GuardZip(['word/document.xml' => '<document/>']);
+
+    expect(fn () => app(ZipScanGuard::class)->allows($bytes, hrtime(true) - 1))
+        ->toThrow(RuntimeException::class);
+});
+
+test('ZIP guard reports invalid limits as unavailable', function (): void {
+    $bytes = k037GuardZip(['word/document.xml' => '<document/>']);
+    config(['file-validation.archive.max_files' => 0]);
+
+    expect(fn () => app(ZipScanGuard::class)->allows($bytes, hrtime(true) + 10_000_000_000))
+        ->toThrow(RuntimeException::class);
+});
+
+test('archive policy rejection blocks a previously complete file', function (): void {
     Storage::fake('local');
 
     $actor = TestActors::customer();
@@ -153,10 +162,10 @@ test('new archive policy invalidates cached clean evidence safely', function ():
 
     $this->actingAs($actor)
         ->postJson('/api/v1/files/'.$file->id.'/complete')
-        ->assertStatus(503)
-        ->assertHeader('Retry-After', '10');
+        ->assertUnprocessable()
+        ->assertJsonPath('code', 'file_rejected');
 
-    expect($file->fresh()->scan_status)->toBe('pending');
+    expect($file->fresh()->scan_status)->toBe('rejected');
     expect($file->fresh()->hasScanEvidence())->toBeFalse();
 
     $this->get('/api/v1/files/'.$file->id.'/download')

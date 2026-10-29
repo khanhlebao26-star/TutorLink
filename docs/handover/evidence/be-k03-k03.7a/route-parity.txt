@@ -1,0 +1,4 @@
+Checked: 2026-10-29T16:23:01.0595699+07:00
+Command: docker compose exec -T backend php scripts/verify-openapi-routes.php /tmp/tutorlink-k037a-openapi.json
+OpenAPI route parity passed (69 operations).
+Exit code: 0

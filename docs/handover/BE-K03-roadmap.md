@@ -1,4 +1,4 @@
-# BE-K03 — Messaging API, file theo Conversation và realtime
+# BE-K03 — Messaging text, chính sách File và realtime
 
 - **Owner backend:** Khanh
 - **Reviewer:** Hoàng
@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái:** K03.1 đã được team thống nhất; K03.2–K03.7 đã kiểm tra kỹ thuật, chờ Hoàng review; K03.8–K03.14 chờ triển khai và evidence. Legacy K03.7 đã có inventory/chính sách, 8 avatar local chưa lưu rescan qua owner.
+- **Trạng thái (29/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a đã kiểm tra kỹ thuật — chờ Hoàng review. K03.7b, K03.8–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành.
 
 ## Nguyên tắc triển khai
 
@@ -16,6 +16,7 @@
 - Frontend dùng cursor API để đồng bộ tin mới, phục hồi khi mất kết nối và dedupe theo server message ID.
 - Hoàn thành và kiểm thử phần lõi trước khi tích hợp realtime.
 - K03.1 đã thống nhất; các task còn lại chỉ đánh dấu hoàn tất khi có code và evidence.
+- Conversation chỉ text, không đính kèm. Không có antivirus tự động. File bài tập/bài nộp kiểm tra kỹ thuật và scope; CV duyệt nội dung riêng theo phiên bản. Mục tiêu mọi upload mới 5.000.000 byte thuộc K03.7b; chưa áp dụng trong runtime K03.7a.
 
 ## Bảng kế hoạch
 
@@ -27,8 +28,10 @@
 | A — Lõi API | K03.4 | Inbox, detail, history và polling | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.5 | Gửi text, idempotency và quota | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.7 | Scanner và complete File | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.8 | Attachment, download và bảo toàn lịch sử | Chưa nghiệm thu |
+| Lịch sử | K03.7 | Phiên bản ClamAV trước điều chỉnh phạm vi | Giữ evidence lịch sử |
+| A — Lõi API | K03.7a | Gỡ ClamAV, kiểm tra kỹ thuật và regression | Đã kiểm tra kỹ thuật — chờ Hoàng review |
+| A — Lõi API | K03.7b | Đồng bộ complete/upload và giới hạn 5.000.000 byte | Chưa nghiệm thu |
+| A — Lõi API | K03.8 | Chặn attachment chat, kiểm quyền File và bảo toàn legacy | Chưa nghiệm thu |
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Chưa nghiệm thu |
 | A — Lõi API | K03.10 | Nghiệm thu phần lõi | Chưa nghiệm thu |
 | B — Realtime | K03.11 | Backend broadcasting và Reverb | Chưa nghiệm thu |
@@ -40,7 +43,7 @@
 
 ### K03.1 — Thống nhất contract
 
-- [x] Thống nhất Conversation theo cặp, context bất biến, quyền đọc/gửi, request/response, cursor, retry, quota, read cursor và scanner.
+- [x] Thống nhất Conversation theo cặp, context bất biến, quyền đọc/gửi, request/response, cursor, retry, quota và read cursor; điều chỉnh 29/10: chat chỉ text, gỡ scanner, File kiểm tra kỹ thuật và CV duyệt nội dung riêng.
 - [x] Bổ sung định hướng triển khai: dùng Reverb/Echo để thông báo realtime; giữ REST API làm luồng ghi và phục hồi dữ liệu.
 
 **Đầu ra:** [Contract K03.1](BE-K03-K03.1-contract.md) làm căn cứ triển khai và review.
@@ -121,7 +124,9 @@
 
 **Tiếp theo:** K03.6 đã commit tại `c97cb08`; gửi Hoàng review cùng evidence. K03.7 bên dưới bổ sung scanner và đã chạy full backend; các giới hạn của lượt K03.6 được giữ trong báo cáo lịch sử. Chưa hoàn tất toàn BE-K03 hoặc realtime.
 
-### K03.7 — Scanner và complete File
+### K03.7 — Scanner và complete File (lịch sử trước 29/10/2026)
+
+Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attachment/rescan bên dưới đã được thay bởi K03.1 mới và K03.7a–K03.8; không dùng để xác nhận runtime hiện tại hoặc bắt buộc rescan 8 avatar.
 
 - [x] Tích hợp ClamAV service trong Docker Compose; backend gọi INSTREAM tại complete.
 - [x] Kiểm object private local thật, purpose/size/extension/MIME/magic bytes/SHA-256 và hash không đổi trong lượt scan.
@@ -137,17 +142,34 @@
 
 **Giới hạn/tiếp theo:** 8 avatar vẫn chưa có evidence persisted; lượt quét chỉ đọc không phải owner HTTP complete. Container nhúng chưa hỗ trợ giữ pending; chưa chứng nhận browser end-to-end/NFR hoặc mọi định dạng tài liệu. Người dùng tự push/gửi review; K03.8 triển khai hasVerifiedScan + owner/purpose/Conversation policy, attachment và bảo toàn lịch sử. Không đánh dấu toàn issue hoàn tất.
 
-### K03.8 — Attachment, download và bảo toàn lịch sử
+### K03.7a — Gỡ ClamAV
 
-- [ ] Mở rộng purpose message_attachment: một file/message, tối đa 5 MiB, allow-list theo contract.
-- [ ] Tạo Message và FileLink trong cùng transaction; kiểm owner/purpose/trạng thái.
-- [ ] Không cho endpoint link chung bỏ qua policy gửi hoặc sửa attachment đã gửi.
-- [ ] Download kiểm quyền trên Conversation.
-- [ ] Delete không phá file đang được dùng trong lịch sử; kiểm race link-vs-delete.
-- [ ] Giữ các policy verification document hiện có.
-- [ ] Ghi rõ phụ thuộc orphan cleanup/storage compensation nếu chưa được triển khai trong phần File dùng chung.
+- [x] Bỏ scanner client/caller, cấu hình kết nối, service Docker và Compose testing riêng.
+- [x] Complete kiểm tra kỹ thuật; không tạo scan evidence giả, giữ schema/evidence lịch sử.
+- [x] Vi phạm metadata/archive trả 422/rejected; storage/validation tạm lỗi trả 503/pending, cho retry.
+- [x] Thay test scanner bằng test validation, cập nhật comment và regression liên quan.
+- [x] Backend/test chạy không có ClamAV; không còn scanner_unavailable trong source runtime.
+- [x] Sinh OpenAPI, kiểm parity/lint, lưu test report/evidence.
 
-**Xong khi:** Participant hợp lệ tải được; outsider không tải được; rollback không để message/link dở dang.
+**Kết quả:** Full backend **384 pass / 2.367 assertions / exit 0**, PostgreSQL test riêng, không có ClamAV. Pint pass; OpenAPI **69 operations**, parity pass. Kết quả lint và giới hạn ghi trong [báo cáo K03.7a](BE-K03-K03.7a-test-report.md), [evidence](evidence/be-k03-k03.7a/). **Đã kiểm tra kỹ thuật — chờ Hoàng review**. Người dùng tự commit/push/gửi review.
+
+### K03.7b — Complete và giới hạn 5 MB
+
+- [ ] Đồng bộ upload request, complete, cấu hình và mô tả API: mọi upload mới tối đa 5.000.000 byte, không dùng max KiB làm tròn thay cho kiểm byte thực.
+- [ ] Kiểm allow-list theo purpose và object thật; test đúng ngưỡng/ngoài ngưỡng, định dạng, checksum và retry.
+- [ ] Đối soát file legacy vượt ngưỡng trước khi quyết định chuyển tiếp; không xóa/đổi liên kết hàng loạt.
+
+**Xong khi:** Upload mới tuân 5 MB decimal; policy legacy rõ ràng và có evidence. Runtime hiện vẫn avatar 2 MiB/tài liệu 10 MiB.
+
+### K03.8 — Chặn attachment chat và bảo toàn lịch sử
+
+- [ ] Chỉ nhận text; file_ids chỉ omission hoặc mảng rỗng. Bổ sung test null/chuỗi rỗng/object rỗng/mảng có phần tử; không tạo Message/FileLink khi không hợp lệ.
+- [ ] Không cho upload purpose message_attachment hoặc link resource message qua endpoint chung; frontend không có đính kèm chat.
+- [ ] Đối soát file/message/link legacy nếu có; giữ lịch sử, không xóa enum/schema chỉ để tắt tính năng mới.
+- [ ] Giữ policy verification document; test outsider download và linked-file delete, race link-vs-delete trong luồng File đang hỗ trợ.
+- [ ] Ghi rõ orphan cleanup/storage compensation và quyền Task/Submission/CV thuộc module phụ trách, chưa mặc nhiên triển khai.
+
+**Xong khi:** Không có đường tạo attachment chat; outsider không tải file ngoài scope; dữ liệu và liên kết lịch sử được bảo toàn.
 
 ### K03.9 — Đồng bộ Conversation lifecycle
 
@@ -213,16 +235,16 @@
 - [ ] Sinh lại OpenAPI bằng Scramble, kiểm route parity/lint và cập nhật Catalog đúng trạng thái thực tế.
 - [ ] Bàn giao PR/commit và hướng dẫn chạy.
 - [ ] Bàn giao API/schema delta.
-- [ ] Bàn giao cấu hình/service scanner và realtime.
+- [ ] Bàn giao cấu hình validation, hướng dẫn gỡ scanner và cấu hình/service realtime.
 - [ ] Bàn giao test report, log và demo hai tài khoản.
 - [ ] Bàn giao known limitations và blocker chưa giải quyết.
 - [ ] Cập nhật issue theo từng mốc: đã xong gì, evidence ở đâu, việc tiếp theo và blocker.
 
 ## Điều kiện hoàn tất issue
 
-- [ ] Các tiêu chí Messaging API và file ban đầu đều đạt.
+- [ ] Các tiêu chí Messaging text và File theo K03.1 điều chỉnh 29/10/2026 đều đạt.
 - [ ] Không tạo trùng Conversation hoặc message khi cạnh tranh/retry.
-- [ ] Outsider không đọc/gửi/tải file hoặc subscribe realtime.
+- [ ] Outsider không đọc/gửi/subscribe realtime; không tải file ngoài scope resource. Chat không hỗ trợ attachment.
 - [ ] Read cursor và lịch sử đồng bộ đúng sau reconnect.
 - [ ] Suspend/logout được áp dụng cho cả REST và kết nối đang mở.
 - [ ] Không tuyên bố file đã antivirus-scan khi chưa có kết quả quét thực tế.

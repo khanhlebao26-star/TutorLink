@@ -454,7 +454,7 @@ updated\_at — timestamptz; NULL.
 
 Khóa ghép / unique: messages: UNIQUE(sender\_id,client\_message\_id).
 
-BR-21 schema implications: inbox order and unread count derive from `(created_at,id)` and member `last_read_message_id`; report read receipts only at Conversation level. File `scan_status=clean` requires scanner approval; chat FileLink and Message commit atomically. Orphan cleanup uses pending 24h / complete-unlinked 7d; linked file retention follows owning resource.
+BR-21 schema implications (amended 29/10/2026 by [K03.1](../handover/BE-K03-K03.1-contract.md)): inbox order and unread count derive from `(created_at,id)` and member `last_read_message_id`; report read receipts only at Conversation level. Chat accepts text only and creates no attachment FileLink. File `scan_status=clean` means technical validation, not antivirus approval. Preserve historical scan-evidence columns and legacy relations; K03.7a needs no migration. CV content approval is separate and version-specific; its schema/API still requires implementation in the owning module. The new-upload target is 5,000,000 bytes/file (K03.7b pending), overriding old per-file limits below; other Workspace rules stay unchanged. Orphan cleanup remains a separate implementation target (pending 24h / complete-unlinked 7d); linked file retention follows the owning resource.
 
 # 05 · Program và lời mời
 

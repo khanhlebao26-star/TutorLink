@@ -6,7 +6,6 @@ use App\Models\File;
 use App\Models\Specialization;
 use App\Models\User;
 use App\Support\AdminPermissions;
-use App\Support\ClamAvScanner;
 use Database\Seeders\AdminSeeder;
 use Database\Seeders\CatalogSeeder;
 use Illuminate\Auth\Notifications\ResetPassword;
@@ -27,21 +26,6 @@ use Tests\TestCase;
 class AuthFileProfileTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // API regression uses a fake verdict.
-        // Real antivirus evidence comes from ClamAvIntegrationTest.
-        $this->mock(ClamAvScanner::class)
-            ->shouldReceive('scan')
-            ->andReturn([
-                'status' => 'clean',
-                'version' => 'ClamAV test-fake/1/test',
-                'reason' => 'ok',
-            ]);
-    }
 
     public function test_customer_registration_creates_a_customer(): void
     {

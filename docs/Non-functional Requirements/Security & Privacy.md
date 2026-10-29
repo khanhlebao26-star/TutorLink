@@ -156,17 +156,13 @@ Các quy tắc bổ sung:
 
 * **Lưu trữ riêng tư:** Storage phải ở chế độ private theo mặc định. Việc tải xuống phải được kiểm tra quyền truy cập đối với người dùng, mục đích sử dụng và tài nguyên liên quan.  
 * **Kiểm tra file:** Trước khi gắn file vào tài nguyên hoặc cho phép tải xuống, phải kiểm tra quyền sở hữu, mục đích sử dụng (`purpose`), MIME type thực tế, extension, dung lượng, checksum và tài nguyên liên quan.  
-* **Giới hạn file theo purpose:**
-  * Avatar: JPG/PNG, tối đa 2 MiB.  
-  * Chat: PDF/JPG/PNG/DOC/DOCX, tối đa 5 MiB/tệp và một tệp/message.
-  * Submission/Announcement: PDF/JPG/PNG/DOC/DOCX, tối đa 5 MiB/tệp, tối đa 5 tệp/resource.
-  * Purpose khác: giới hạn hiện hành tối đa 10 MiB, PDF/JPG/PNG/DOC/DOCX, trừ quy định riêng của purpose.
+* **Giới hạn điều chỉnh 29/10/2026:** Theo [K03.1](../handover/BE-K03-K03.1-contract.md), mọi upload mới tối đa 5.000.000 byte/file; avatar JPG/JPEG/PNG, tài liệu bài tập/bài nộp/CV PDF/JPG/JPEG/PNG/DOC/DOCX. Chat chỉ text, không upload/gắn file. Giới hạn số file/resource và quyền nghiệp vụ vẫn theo module. Runtime K03.7a còn avatar 2 MiB/tài liệu 10 MiB; K03.7b phải đồng bộ giới hạn mới trước khi nghiệm thu.
 * **Loại file được phép:** Mỗi `FilePurpose` phải có danh sách định dạng được phép rõ ràng. Không tự cho phép định dạng mới nếu chưa có quy định.  
 * **Trạng thái upload:** Chỉ file đã upload hoàn tất và vượt qua các kiểm tra bắt buộc mới được sử dụng.  
 * **Bảo vệ đường dẫn:** Không trả object key hoặc đường dẫn storage nội bộ trong API công khai.  
 * **Xử lý file rủi ro:** File có thể chứa nội dung nguy hiểm phải được cung cấp theo cách hạn chế thực thi, chẳng hạn tải về dưới dạng attachment khi phù hợp. Server không được thực thi HTML, script hoặc macro Office từ file người dùng tải lên.  
 * **Nội dung do người dùng nhập:** Không hiển thị nội dung người dùng dưới dạng HTML không được lọc hoặc mã hóa phù hợp.  
-* **Quarantine và quét malware:** Mọi file phải ở trạng thái cách ly cho đến khi scanner malware được cấu hình thực tế trả kết quả clean. Scanner không sẵn sàng/lỗi thì file giữ pending và không được attach hoặc download; phát hiện malware chuyển rejected. `clean` chỉ biểu thị đã qua các kiểm tra được triển khai, không bảo đảm file hoàn toàn không có malware. Không tuyên bố đã scan nếu chưa tích hợp scanner.
+* **Complete và nội dung:** Không có scanner antivirus tự động theo K03.1 mới. File pending chưa được sử dụng; kiểm tra kỹ thuật đạt mới clean. Vi phạm metadata/archive → rejected; storage/validation tạm không khả dụng → pending và cho retry. clean/complete không xác nhận không có malware. Không giả evidence quét; giữ evidence thật hợp lệ trước đây. Task/Submission không chờ duyệt thủ công; CV duyệt nội dung theo đúng file/version và permission/assignment, độc lập với complete. Duyệt CV không đồng nghĩa antivirus-scan. Các luồng nghiệp vụ này phải có implementation/evidence riêng.
 
 ### **Cách kiểm chứng**
 

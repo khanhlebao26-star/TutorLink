@@ -1,0 +1,34 @@
+Checked: 2026-10-29T16:15:43.4892094+07:00
+Development services:
+db
+backend
+frontend
+mailpit
+pgadmin
+Testing services:
+test-db
+backend-test
+Containers (including stopped):
+backend|running|healthy
+db|running|healthy
+frontend|running|
+mailpit|running|healthy
+outbox-worker|running|
+pgadmin|running|
+scheduler|running|
+slack-worker|running|
+test-db|running|healthy
+PHP version and ZIP support:
+
+zip
+
+Zip => enabled
+Zip version => 1.22.3
+Libzip version => 1.11.3
+BZIP2 compression => Yes
+XZ compression => Yes
+ZSTD compression => Yes
+AES-128 encryption => Yes
+AES-192 encryption => Yes
+AES-256 encryption => Yes
+Exit code: 0

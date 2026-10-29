@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\File;
-use App\Support\ClamAvScanner;
+use App\Support\ZipScanGuard;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -37,93 +37,33 @@ beforeEach(function (): void {
     $this->url = '/api/v1/files/'.$this->file->id.'/complete';
 });
 
-test('clean verdict persists scan evidence and safe replay does not rescan', function (): void {
-    $this->mock(ClamAvScanner::class)
-        ->shouldReceive('scan')
-        ->once()
-        ->with($this->bytes)
-        ->andReturn([
-            'status' => 'clean',
-            'version' => 'ClamAV TEST-FAKE/1/test',
-            'reason' => 'ok',
-        ]);
-
-    $this->actingAs($this->owner)
+test('valid file completes without creating antivirus evidence and replay is stable', function (): void {
+    $first = $this->actingAs($this->owner)
         ->postJson($this->url)
         ->assertOk()
         ->assertJsonPath('data.scan_status', 'clean')
-        ->assertJsonPath('data.antivirus_scanned', true);
+        ->assertJsonPath('data.complete', true)
+        ->assertJsonPath('data.antivirus_scanned', false)
+        ->assertJsonPath('data.scanned_at', null);
+
+    $this->postJson($this->url)
+        ->assertOk()
+        ->assertJsonPath('data', $first->json('data'));
 
     $this->assertDatabaseHas('files', [
         'id' => $this->file->id,
-        'scan_engine' => 'clamav',
-        'scanned_sha256' => hash('sha256', $this->bytes),
+        'scan_status' => 'clean',
+        'scan_engine' => null,
+        'scan_version' => null,
+        'scanned_sha256' => null,
+        'scanned_at' => null,
     ]);
 
-    expect($this->file->fresh()->hasVerifiedScan())->toBeTrue();
-
-    $this->postJson($this->url)->assertOk();
+    $this->assertDatabaseCount('files', 1);
+    $this->assertDatabaseCount('file_links', 0);
 });
 
-test('malware rejection is committed even though HTTP returns an error', function (): void {
-    $this->mock(ClamAvScanner::class)
-        ->shouldReceive('scan')
-        ->once()
-        ->andReturn([
-            'status' => 'rejected',
-            'version' => 'ClamAV TEST-FAKE/1/test',
-            'reason' => 'malware_detected',
-        ]);
-
-    $this->actingAs($this->owner)
-        ->postJson($this->url)
-        ->assertUnprocessable()
-        ->assertJsonPath('code', 'file_rejected');
-
-    expect($this->file->fresh()->scan_status)->toBe('rejected');
-    expect($this->file->fresh()->hasScanEvidence())->toBeTrue();
-    expect($this->file->fresh()->hasVerifiedScan())->toBeFalse();
-
-    $this->get('/api/v1/files/'.$this->file->id.'/download')
-        ->assertConflict();
-
-    $this->postJson($this->url)->assertUnprocessable();
-});
-
-test('scanner error keeps pending returns retry header and blocks use', function (): void {
-    $this->owner = TestActors::tutor();
-    $this->file->update(['owner_id' => $this->owner->id]);
-
-    $this->mock(ClamAvScanner::class)
-        ->shouldReceive('scan')
-        ->once()
-        ->andReturn([
-            'status' => 'unavailable',
-            'version' => null,
-            'reason' => 'scanner_unavailable',
-        ]);
-
-    $this->actingAs($this->owner)
-        ->postJson($this->url)
-        ->assertStatus(503)
-        ->assertHeader('Retry-After', '10')
-        ->assertJsonPath('code', 'scanner_unavailable');
-
-    expect($this->file->fresh()->scan_status)->toBe('pending');
-    expect($this->file->fresh()->scanned_at)->toBeNull();
-
-    $this->get('/api/v1/files/'.$this->file->id.'/download')
-        ->assertConflict();
-
-    $this->postJson('/api/v1/tutor/profile/verification-documents', [
-        'file_id' => $this->file->id,
-        'document_type' => 'identity_card',
-    ])->assertConflict();
-});
-
-test('metadata violations are rejected before invoking scanner', function (string $change): void {
-    $this->mock(ClamAvScanner::class)->shouldNotReceive('scan');
-
+test('metadata violations are persisted as rejected', function (string $change): void {
     match ($change) {
         'size' => $this->file->update([
             'size_bytes' => strlen($this->bytes) + 1,
@@ -143,7 +83,7 @@ test('metadata violations are rejected before invoking scanner', function (strin
         'private' => $this->file->update([
             'visibility' => 'public',
         ]),
-        'signature' => Storage::disk('local')->put(
+        'content' => Storage::disk('local')->put(
             $this->file->object_key,
             str_repeat('x', strlen($this->bytes)),
         ),
@@ -155,7 +95,10 @@ test('metadata violations are rejected before invoking scanner', function (strin
         ->assertJsonPath('code', 'file_rejected');
 
     expect($this->file->fresh()->scan_status)->toBe('rejected');
-    expect($this->file->fresh()->scanned_at)->toBeNull();
+    expect($this->file->fresh()->hasScanEvidence())->toBeFalse();
+
+    $this->get('/api/v1/files/'.$this->file->id.'/download')
+        ->assertConflict();
 })->with([
     'size',
     'hash',
@@ -163,99 +106,132 @@ test('metadata violations are rejected before invoking scanner', function (strin
     'extension',
     'purpose',
     'private',
-    'signature',
+    'content',
 ]);
 
-test('storage read failure stays pending without antivirus evidence', function (): void {
-    $this->mock(ClamAvScanner::class)->shouldNotReceive('scan');
-
+test('missing storage stays pending and returns a storage error', function (): void {
     Storage::disk('local')->delete($this->file->object_key);
 
     $this->actingAs($this->owner)
         ->postJson($this->url)
         ->assertStatus(503)
+        ->assertHeader('Retry-After', '10')
         ->assertJsonPath('code', 'file_storage_unavailable');
 
     expect($this->file->fresh()->scan_status)->toBe('pending');
+
+    $this->get('/api/v1/files/'.$this->file->id.'/download')
+        ->assertConflict();
 });
 
-test('legacy clean has no scan evidence and complete rescans it', function (): void {
-    $this->file->update(['scan_status' => 'clean']);
+test('validation unavailable stays pending and can complete on retry', function (): void {
+    $attempt = 0;
 
-    $this->actingAs($this->owner)
-        ->getJson('/api/v1/files/'.$this->file->id)
-        ->assertOk()
-        ->assertJsonPath('data.complete', true)
-        ->assertJsonPath('data.antivirus_scanned', false)
-        ->assertJsonPath('data.scanned_at', null);
+    $this->mock(ZipScanGuard::class)
+        ->shouldReceive('allows')
+        ->twice()
+        ->andReturnUsing(function () use (&$attempt): bool {
+            if (++$attempt === 1) {
+                throw new RuntimeException('Temporary validation failure.');
+            }
 
-    $this->mock(ClamAvScanner::class)
-        ->shouldReceive('scan')
-        ->once()
-        ->andReturn([
-            'status' => 'clean',
-            'version' => 'ClamAV TEST-FAKE/1/test',
-            'reason' => 'ok',
-        ]);
-
-    $this->postJson($this->url)
-        ->assertOk()
-        ->assertJsonPath('data.antivirus_scanned', true);
-});
-
-test('legacy clean becomes pending when scan cannot complete', function (): void {
-    $this->file->update(['scan_status' => 'clean']);
-
-    $this->mock(ClamAvScanner::class)
-        ->shouldReceive('scan')
-        ->once()
-        ->andReturn([
-            'status' => 'unavailable',
-            'version' => null,
-            'reason' => 'incomplete_scan',
-        ]);
+            return true;
+        });
 
     $this->actingAs($this->owner)
         ->postJson($this->url)
-        ->assertStatus(503);
+        ->assertStatus(503)
+        ->assertHeader('Retry-After', '10')
+        ->assertJsonPath('code', 'file_validation_unavailable');
 
     expect($this->file->fresh()->scan_status)->toBe('pending');
     expect($this->file->fresh()->hasScanEvidence())->toBeFalse();
 
     $this->get('/api/v1/files/'.$this->file->id.'/download')
         ->assertConflict();
+
+    $this->postJson($this->url)
+        ->assertOk()
+        ->assertJsonPath('data.scan_status', 'clean')
+        ->assertJsonPath('data.complete', true)
+        ->assertJsonPath('data.antivirus_scanned', false)
+        ->assertJsonPath('data.scanned_at', null);
 });
 
-test('object changed during scan cannot inherit a clean verdict', function (): void {
+test('rejected files cannot be completed again', function (): void {
+    $this->file->update(['scan_status' => 'rejected']);
+
+    $this->actingAs($this->owner)
+        ->postJson($this->url)
+        ->assertUnprocessable()
+        ->assertJsonPath('code', 'file_rejected');
+
+    expect($this->file->fresh()->scan_status)->toBe('rejected');
+});
+
+test('legacy clean files do not acquire fabricated scan evidence', function (): void {
+    $this->file->update(['scan_status' => 'clean']);
+
+    $this->actingAs($this->owner)
+        ->postJson($this->url)
+        ->assertOk()
+        ->assertJsonPath('data.complete', true)
+        ->assertJsonPath('data.antivirus_scanned', false)
+        ->assertJsonPath('data.scanned_at', null);
+});
+
+test('valid historical scan evidence is preserved without invoking a scanner', function (): void {
+    // Synthetic database fixture; this test does not perform an antivirus scan.
+    $this->file->update([
+        'scan_status' => 'clean',
+        'scan_engine' => 'clamav',
+        'scan_version' => 'Historical test fixture',
+        'scanned_sha256' => hash('sha256', $this->bytes),
+        'scanned_at' => now('UTC'),
+    ]);
+
+    $fields = [
+        'scan_engine',
+        'scan_version',
+        'scanned_sha256',
+        'scanned_at',
+    ];
+
+    $before = $this->file->fresh()->only($fields);
+
+    $this->actingAs($this->owner)
+        ->postJson($this->url)
+        ->assertOk()
+        ->assertJsonPath('data.antivirus_scanned', true);
+
+    expect($this->file->fresh()->only($fields))->toEqual($before);
+});
+
+test('object changed during validation cannot become complete', function (): void {
     $key = $this->file->object_key;
 
-    $this->mock(ClamAvScanner::class)
-        ->shouldReceive('scan')
+    $this->mock(ZipScanGuard::class)
+        ->shouldReceive('allows')
         ->once()
-        ->andReturnUsing(function () use ($key): array {
+        ->andReturnUsing(function () use ($key): bool {
             Storage::disk('local')->put(
                 $key,
-                'Changed after scanning snapshot.',
+                'Changed during validation.',
             );
 
-            return [
-                'status' => 'clean',
-                'version' => 'ClamAV TEST-FAKE/1/test',
-                'reason' => 'ok',
-            ];
+            return true;
         });
 
     $this->actingAs($this->owner)
         ->postJson($this->url)
-        ->assertUnprocessable();
+        ->assertUnprocessable()
+        ->assertJsonPath('code', 'file_rejected');
 
     expect($this->file->fresh()->scan_status)->toBe('rejected');
-    expect($this->file->fresh()->scanned_at)->toBeNull();
+    expect($this->file->fresh()->hasScanEvidence())->toBeFalse();
 });
 
-test('wrong owner and suspended owner cannot invoke scanner', function (): void {
-    $this->mock(ClamAvScanner::class)->shouldNotReceive('scan');
-
+test('wrong owner and suspended owner cannot complete a file', function (): void {
     $this->actingAs(TestActors::customer())
         ->postJson($this->url)
         ->assertForbidden();
@@ -269,9 +245,7 @@ test('wrong owner and suspended owner cannot invoke scanner', function (): void 
     expect($this->file->fresh()->scan_status)->toBe('pending');
 });
 
-test('upload remains quarantined and client cannot supply scan evidence', function (): void {
-    $this->mock(ClamAvScanner::class)->shouldNotReceive('scan');
-
+test('upload does not trust client supplied completion or scan evidence', function (): void {
     $this->actingAs($this->owner)
         ->post('/api/v1/files', [
             'file' => UploadedFile::fake()->createWithContent(
@@ -281,9 +255,13 @@ test('upload remains quarantined and client cannot supply scan evidence', functi
             'purpose' => 'verification_document',
             'scan_status' => 'clean',
             'scan_engine' => 'clamav',
+            'scan_version' => 'Client claim',
             'scanned_sha256' => hash('sha256', $this->bytes),
+            'scanned_at' => now('UTC')->toISOString(),
         ])
         ->assertCreated()
         ->assertJsonPath('data.scan_status', 'pending')
-        ->assertJsonPath('data.antivirus_scanned', false);
+        ->assertJsonPath('data.complete', false)
+        ->assertJsonPath('data.antivirus_scanned', false)
+        ->assertJsonPath('data.scanned_at', null);
 });

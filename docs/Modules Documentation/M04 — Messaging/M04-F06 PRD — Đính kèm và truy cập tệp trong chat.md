@@ -2,6 +2,8 @@
 
 ## PRD chức năng · M04 Messaging · Trạng thái: Draft · Phụ thuộc M10 Files
 
+> **Phạm vi đã thay thế ngày 29/10/2026:** [K03.1](../../handover/BE-K03-K03.1-contract.md) chỉ hỗ trợ text; không upload/gửi/link attachment chat. M04-F06 không phải yêu cầu xây thêm API attachment trong phiên bản này. Các mục 1–6 bên dưới giữ làm tài liệu thiết kế cũ, không áp dụng cho upload/gửi mới. K03.8 phải chứng minh từ chối type=file/system, file_ids khác omission/mảng rỗng và link resource message, đồng thời đối soát/bảo toàn dữ liệu legacy nếu có. Không xóa enum/schema/link lịch sử; quyền tải legacy cần policy/evidence riêng, không tự coi đã có. File bài tập/bài nộp/CV thuộc module tương ứng; không có antivirus tự động.
+
 # 1\. Mục tiêu
 
 Participant đính kèm và tải tệp trong Conversation theo cùng File lifecycle, ownership, purpose và resource authorization của M10.

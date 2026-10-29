@@ -57,6 +57,8 @@ Các trường phí là khai báo của Tutor, không xác nhận ngân hàng/c�
 
 ## Các trạng thái hỗ trợ
 
+File theo [K03.1 điều chỉnh 29/10](../handover/BE-K03-K03.1-contract.md): pending → clean sau kiểm tra kỹ thuật; vi phạm policy → rejected; storage/validation tạm lỗi giữ hoặc chuyển pending, không dùng được và có thể retry. rejected không complete lại. clean không biểu thị antivirus; schema/evidence quét lịch sử được giữ. CV có trạng thái nội dung pending/approved/rejected theo đúng file/version, độc lập FileScanStatus; version mới không thừa hưởng approved. Đây là đích cần module hồ sơ triển khai; K03.7a không tạo workflow/schema CV.
+
 * VerificationDocumentStatus pending → approved/rejected; approved → expired khi có căn cứ hết hiệu lực. Thay file tạo document pending mới, không ghi đè lịch sử bản cũ. Document bắt buộc expired làm mất eligibility public/tạo dịch vụ mới mà không đổi TutorProfileStatus/UserStatus; bản thay thế approved khôi phục gate theo BR-16. ReportStatus open → resolved/dismissed; ReviewVisibility visible ↔ hidden theo quyền moderation và audit. AnnouncementViewState draft → published; private/public là toàn bộ FileVisibility, quyền membership được kiểm riêng.
 
 ## Đối chiếu dữ liệu cũ

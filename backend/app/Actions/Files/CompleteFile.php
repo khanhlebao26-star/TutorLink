@@ -5,7 +5,6 @@ namespace App\Actions\Files;
 use App\Models\File;
 use App\Models\User;
 use App\Support\ApiErrorResponse;
-use App\Support\ClamAvScanner;
 use App\Support\ZipScanGuard;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +19,7 @@ class CompleteFile
         int $fileId,
         string $requestId,
     ): array {
-        // ponytail: synchronous scanning holds actor/file locks;
+        // ponytail: bounded file validation holds actor/file locks;
         // use a leased job with revision checks if throughput requires it.
         return DB::transaction(function () use ($actor, $fileId, $requestId): array {
             $actor = User::whereKey($actor->id)
@@ -93,42 +92,34 @@ class CompleteFile
                 );
             }
 
-            if ($file->hasVerifiedScan()) {
-                $timeout = min(
-                    10,
-                    max(
-                        0.01,
-                        (float) config('file-scanning.timeout_seconds', 10),
-                    ),
-                );
+            $timeout = min(
+                10,
+                max(
+                    0.01,
+                    (float) config('file-validation.archive_timeout_seconds', 10),
+                ),
+            );
 
-                $deadline = hrtime(true)
-                    + (int) ($timeout * 1_000_000_000);
+            $deadline = hrtime(true)
+                + (int) ($timeout * 1_000_000_000);
 
-                if (! app(ZipScanGuard::class)->allows($bytes, $deadline)) {
-                    return $this->finish(
-                        $file,
-                        'pending',
-                        503,
-                        'scanner_unavailable',
-                    );
-                }
-
-                return [
-                    'file' => $file,
-                    'status' => 200,
-                    'code' => null,
-                ];
-            }
-
-            $result = app(ClamAvScanner::class)->scan($bytes);
-
-            if ($result['status'] === 'unavailable') {
+            try {
+                $archiveAllowed = app(ZipScanGuard::class)->allows($bytes, $deadline);
+            } catch (Throwable $exception) {
                 return $this->finish(
                     $file,
                     'pending',
                     503,
-                    'scanner_unavailable',
+                    'file_validation_unavailable',
+                );
+            }
+
+            if (! $archiveAllowed) {
+                return $this->finish(
+                    $file,
+                    'rejected',
+                    422,
+                    'file_rejected',
                 );
             }
 
@@ -157,19 +148,19 @@ class CompleteFile
                 );
             }
 
-            $rejected = $result['status'] !== 'clean';
+            if ($file->isComplete()) {
+                return [
+                    'file' => $file,
+                    'status' => 200,
+                    'code' => null,
+                ];
+            }
 
             return $this->finish(
                 $file,
-                $rejected ? 'rejected' : 'clean',
-                $rejected ? 422 : 200,
-                $rejected ? 'file_rejected' : null,
-                [
-                    'scan_engine' => 'clamav',
-                    'scan_version' => $result['version'],
-                    'scanned_sha256' => hash('sha256', $bytes),
-                    'scanned_at' => now('UTC'),
-                ],
+                'clean',
+                200,
+                null,
             );
         }, 3);
     }
@@ -188,7 +179,7 @@ class CompleteFile
         try {
             $bytes = stream_get_contents(
                 $stream,
-                (int) config('file-scanning.max_bytes', 10485760) + 1,
+                (int) config('file-validation.max_bytes', 10485760) + 1,
             );
 
             if ($bytes === false) {

@@ -17,7 +17,7 @@ Quản lý vòng đời File từ upload, complete, resource attachment, authori
 # Quy tắc đích
 
 * Owner, purpose, visibility, completeness và resource permission phải được kiểm tra tại server.  
-* Verification private; avatar chỉ public nếu policy cho phép; chat/task/submission/announcement theo membership/resource scope.  
+* Verification private; avatar chỉ public nếu policy cho phép; task/submission/announcement theo resource scope. Theo [K03.1 điều chỉnh 29/10](../../handover/BE-K03-K03.1-contract.md), chat chỉ text, không upload/link message; CV duyệt nội dung theo file/version riêng.
 * Không xóa File làm hỏng FK hoặc historical link; outsider download denied.  
 * \`clean\` hiện không đồng nghĩa malware scan.
 
@@ -25,7 +25,7 @@ Quản lý vòng đời File từ upload, complete, resource attachment, authori
 
 * Upload/complete/metadata/download/delete API đã có; link controller hiện chỉ hỗ trợ verification\_document.  
 * Upload purpose whitelist chưa khớp Enum Catalog đầy đủ; resource membership download policy chưa hiện thực.  
-* BR-20/BR-21 đã chốt MIME/size theo purpose, scanner/quarantine, orphan cleanup và compensation. Runtime cần triển khai; retention linked files tiếp tục theo policy resource.
+* [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ antivirus tự động; clean/complete chỉ kiểm tra kỹ thuật, giữ evidence quét thật cũ. K03.7b chưa đồng bộ upload mới 5.000.000 byte; runtime avatar 2 MiB/tài liệu 10 MiB. Task/Submission/CV approval, orphan cleanup và storage compensation cần evidence riêng; retention linked files theo resource.
 
 # Nguồn
 

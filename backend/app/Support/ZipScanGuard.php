@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use RuntimeException;
 use Throwable;
 use ZipArchive;
 
@@ -14,13 +15,13 @@ class ZipScanGuard
         }
 
         if (! class_exists(ZipArchive::class)) {
-            return false;
+            throw new RuntimeException('ZIP support is unavailable.');
         }
 
-        $path = tempnam(sys_get_temp_dir(), 'scan-zip-');
+        $path = tempnam(sys_get_temp_dir(), 'validate-zip-');
 
         if ($path === false) {
-            return false;
+            throw new RuntimeException('Cannot create temporary archive file.');
         }
 
         $zip = new ZipArchive;
@@ -28,34 +29,51 @@ class ZipScanGuard
 
         try {
             if (file_put_contents($path, $bytes) !== strlen($bytes)) {
-                return false;
+                throw new RuntimeException('Cannot write temporary archive file.');
             }
 
-            $opened = $zip->open(
+            $openResult = $zip->open(
                 $path,
                 ZipArchive::RDONLY | ZipArchive::CHECKCONS,
-            ) === true;
+            );
+
+            if ($openResult !== true) {
+                if (in_array($openResult, [
+                    ZipArchive::ER_NOZIP,
+                    ZipArchive::ER_INCONS,
+                    ZipArchive::ER_CRC,
+                    ZipArchive::ER_EOF,
+                    ZipArchive::ER_COMPNOTSUPP,
+                    ZipArchive::ER_ENCRNOTSUPP,
+                ], true)) {
+                    return false;
+                }
+
+                throw new RuntimeException('Cannot open archive for validation.');
+            }
+
+            $opened = true;
 
             $maxFile = (int) config(
-                'file-scanning.archive.max_file_bytes',
+                'file-validation.archive.max_file_bytes',
                 26214400,
             );
 
             $maxTotal = (int) config(
-                'file-scanning.archive.max_total_bytes',
+                'file-validation.archive.max_total_bytes',
                 52428800,
             );
 
             $maxFiles = (int) config(
-                'file-scanning.archive.max_files',
+                'file-validation.archive.max_files',
                 1000,
             );
 
-            if (
-                ! $opened
-                || $zip->numFiles > $maxFiles
-                || min($maxFile, $maxTotal, $maxFiles) <= 0
-            ) {
+            if (min($maxFile, $maxTotal, $maxFiles) <= 0) {
+                throw new RuntimeException('Archive validation limits are invalid.');
+            }
+
+            if ($zip->numFiles > $maxFiles) {
                 return false;
             }
 
@@ -63,7 +81,7 @@ class ZipScanGuard
 
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 if (hrtime(true) >= $deadline) {
-                    return false;
+                    throw new RuntimeException('Archive validation deadline exceeded.');
                 }
 
                 $stat = $zip->statIndex(
@@ -107,7 +125,7 @@ class ZipScanGuard
                 );
 
                 if (! is_resource($stream)) {
-                    return false;
+                    throw new RuntimeException('Cannot open archive entry stream.');
                 }
 
                 $size = 0;
@@ -117,7 +135,7 @@ class ZipScanGuard
                 try {
                     while (! feof($stream)) {
                         if (hrtime(true) >= $deadline) {
-                            return false;
+                            throw new RuntimeException('Archive validation deadline exceeded.');
                         }
 
                         $chunk = @fread($stream, 65536);
@@ -126,7 +144,7 @@ class ZipScanGuard
                             $chunk === false
                             || ($chunk === '' && ! feof($stream))
                         ) {
-                            return false;
+                            throw new RuntimeException('Cannot read archive entry stream.');
                         }
 
                         $size += strlen($chunk);
@@ -156,10 +174,13 @@ class ZipScanGuard
                 }
             }
 
-            return $total <= $maxTotal
-                && hrtime(true) < $deadline;
+            if (hrtime(true) >= $deadline) {
+                throw new RuntimeException('Archive validation deadline exceeded.');
+            }
+
+            return $total <= $maxTotal;
         } catch (Throwable $exception) {
-            return false;
+            throw new RuntimeException('Archive validation is temporarily unavailable.', 0, $exception);
         } finally {
             if ($opened) {
                 $zip->close();
@@ -178,7 +199,7 @@ class ZipScanGuard
 
     private function isNestedContainer(string $bytes): bool
     {
-        // ponytail: embedded containers stay pending;
+        // ponytail: embedded containers are rejected by the current archive policy;
         // add bounded recursive inspection when required.
         $signatures = [
             "PK\x03\x04",

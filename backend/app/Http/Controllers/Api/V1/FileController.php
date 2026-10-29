@@ -59,11 +59,11 @@ class FileController extends Controller
         return (new FileResource($file))->response()->setStatusCode(201);
     }
 
-    /** Complete a private file after metadata checks and a conclusive ClamAV scan. */
-    #[OpenApiResponse(200, description: 'Complete file with scan evidence bound to its SHA-256.', type: 'array{data:FileResource}')]
+    /** Complete a private file after technical validation; no antivirus scan is performed. */
+    #[OpenApiResponse(200, description: 'File passed technical validation. Complete does not imply an antivirus scan.', type: 'array{data:FileResource}')]
     #[OpenApiResponse(403, description: 'Actor is inactive or does not own the file; legacy account middleware may return message only.', type: 'array{message:string,code?:string,request_id?:string,errors?:object}')]
-    #[OpenApiResponse(422, description: 'File rejected by metadata policy or malware scan; rejection is persisted.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
-    #[OpenApiResponse(503, description: 'Scanner or storage unavailable; file remains pending. Retry-After: 10.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
+    #[OpenApiResponse(422, description: 'File rejected by metadata or archive policy; rejection is persisted.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
+    #[OpenApiResponse(503, description: 'Storage or technical validation unavailable; file remains pending. Retry-After: 10.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
     public function complete(
         Request $request,
         File $file,
@@ -81,9 +81,8 @@ class FileController extends Controller
 
         if ($result['status'] !== 200) {
             $message = match ($result['code']) {
-                'scanner_unavailable' => 'The scanner could not complete its checks. Retry later.',
-
                 'file_storage_unavailable' => 'The uploaded object cannot be read. Retry later.',
+                'file_validation_unavailable' => 'File validation could not be completed. Retry later.',
 
                 default => 'The file was rejected. Upload a new valid file.',
             };

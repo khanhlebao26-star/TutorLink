@@ -4053,7 +4053,7 @@
         "/files/{file}/complete": {
             "post": {
                 "operationId": "files.complete",
-                "summary": "Complete a private file after metadata checks and a conclusive ClamAV scan",
+                "summary": "Complete a private file after technical validation; no antivirus scan is performed",
                 "tags": [
                     "File"
                 ],
@@ -4070,7 +4070,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Complete file with scan evidence bound to its SHA-256.",
+                        "description": "File passed technical validation. Complete does not imply an antivirus scan.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4121,7 +4121,7 @@
                         }
                     },
                     "422": {
-                        "description": "File rejected by metadata policy or malware scan; rejection is persisted.",
+                        "description": "File rejected by metadata or archive policy; rejection is persisted.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4151,7 +4151,7 @@
                         }
                     },
                     "503": {
-                        "description": "Scanner or storage unavailable; file remains pending. Retry-After: 10.",
+                        "description": "Storage or technical validation unavailable; file remains pending. Retry-After: 10.",
                         "content": {
                             "application/json": {
                                 "schema": {

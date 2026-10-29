@@ -4,7 +4,7 @@
 
 # Mục tiêu module
 
-Cung cấp Conversation riêng tư giữa Customer và Tutor để trao đổi trước và trong hành trình dịch vụ, với REST-first messaging, kiểm soát membership, retry an toàn, trạng thái đọc và tệp đính kèm theo policy.
+Cung cấp Conversation riêng tư giữa Customer và Tutor với REST-first messaging, membership, retry an toàn và trạng thái đọc. [K03.1 điều chỉnh 29/10](../../handover/BE-K03-K03.1-contract.md) chốt chỉ text, không đính kèm; Reverb/Echo thông báo sau commit và REST resync là phạm vi tiếp theo.
 
 # Danh sách PRD chức năng
 
@@ -24,15 +24,15 @@ Cung cấp Conversation riêng tư giữa Customer và Tutor để trao đổi t
 * ConversationStatus đích chỉ active/cancelled. Conversation chỉ đóng khi không còn Program active/paused và không còn Invitation pending còn hạn; khi có hoạt động mới đủ điều kiện thì dùng lại Conversation cũ.  
 * Chỉ thành viên được đọc/gửi trong Conversation của họ. Admin chỉ truy cập khi được phân công xử lý Report và phải ghi log.  
 * Server derive direct\_key từ cặp participant; idempotency message theo (sender\_id, client\_message\_id); cursor theo (created\_at,id), read cursor đơn điệu.  
-* REST persistence/polling và resync sau reconnect là baseline G2; Reverb/private channels là tùy chọn sau core.  
-* File attachment phải complete, đúng owner/purpose/resource, private theo membership; tệp được phép tải qua backend authorization.
+* REST persistence/polling và resync là baseline; Reverb/private channels thuộc K03.11–K03.13, chưa nghiệm thu và không được bỏ khỏi tiêu chí hoàn tất issue.
+* Không upload/gửi/link file vào message. File Task/Submission/CV đi qua module tương ứng; không dùng scan evidence làm điều kiện mở attachment chat.
 
 # Các chênh lệch và quyết định còn mở
 
-* Đã có migration messaging, nhưng hiện chưa có messaging routes/controller/API/UI trong repo.  
-* Migration cho phép Conversation pending/active/cancelled/expired và MessageType text/file/system; target Domain giữ ConversationStatus active/cancelled và MessageType text/file/system. Như vậy MessageType đã thống nhất; khác biệt ConversationStatus với migration vẫn cần mapping/migration được duyệt.  
+* Sáu route Conversation K03.3–K03.6 đã đăng ký trong [Catalog](../../Architecture%20%26%20Technical%20Design/API%20Route%20Catalog.md); OpenAPI toàn API có 69 operations. Evidence trước điều chỉnh không chứng nhận toàn bộ K03.1 mới, frontend hoặc realtime.
+* K03.2 đã align Conversation active/cancelled và direct; giữ MessageType/file schema legacy không có nghĩa client được gửi file/system.
 * Local W1-C1 contract cũ mô tả cancelled là terminal và Conversation pending/expired, khác State Lifecycles hiện hành; Domain docs đã hoàn tất là target, cần mapping/migration được duyệt.  
-* Enum Catalog đã có MessageType.file và API Route Catalog mô tả gửi text/file; không còn câu hỏi có mở loại message file hay không. BR-21 chốt một file/message, 5 MiB, allow-list, scan, retention orphan và xử lý object mất; runtime còn cần thực hiện các kiểm tra này.
+* Yêu cầu attachment/scanner cũ đã được K03.1 mới thay thế. K03.7a gỡ ClamAV; K03.7b còn giới hạn upload; K03.8 còn siết file_ids, chặn link/upload message và bảo toàn legacy.
 * Customer hoặc Tutor đều được mở liên hệ với vai trò còn lại qua gate M04-F01; cancelled chỉ mở lại bằng yêu cầu mở liên hệ mới đủ điều kiện. BR-17 chốt DTO peer/context và lịch sử khi đình chỉ; BR-21 chốt member active không gửi khi peer bị đình chỉ, inbox/unread/read receipt, body/rate limit, conflict idempotency và policy file chat. Runtime, migration và wire DTO vẫn cần triển khai. Admin report scope đã chốt ở BR-11; field masking/retention của evidence vẫn theo D16–D17.
 
 # Implementation evidence

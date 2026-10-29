@@ -4,6 +4,8 @@ The Markdown files are the local working documentation for TutorLink. Modules re
 
 ## API documentation
 
+- **Điều chỉnh 29/10/2026:** [K03.1](handover/BE-K03-K03.1-contract.md) thay yêu cầu attachment chat và antivirus tự động trước đây: chat chỉ text; File complete là kiểm tra kỹ thuật, CV duyệt nội dung riêng. [K03.7a](handover/BE-K03-K03.7a-test-report.md) ghi runtime đã gỡ ClamAV; giới hạn chung 5.000.000 byte thuộc K03.7b, chưa triển khai. Báo cáo K03.7 cũ chỉ là evidence lịch sử.
+
 - [API Route Catalog](<Architecture & Technical Design/API Route Catalog.md>) is the canonical method/path inventory for the target API; all listed routes remain in scope. **Đã đăng ký** means the method/path appears in generated OpenAPI (or is the Sanctum CSRF bootstrap); it does not certify PRD behavior. **Dự kiến** means the route is planned and may still have policy details to settle before implementation.
 - [Generated OpenAPI](api/README.md) describes the registered `/api/v1` API from backend code. Use it for current integration; regenerate with Scramble after code changes. It does not validate Product/Domain rules by itself.
 - [Business Rules](<Domain Documentation/Business Rules.md>) and the module PRDs define intended behavior. A policy decision can precede backend implementation. The [OpenAPI 0.2.0 draft guide](<Architecture & Technical Design/TutorLink — OpenAPI 0.2.0 draft - hướng dẫn, thay đổi và điểm cần chốt.md>) is a historical target snapshot, not the current generated contract.

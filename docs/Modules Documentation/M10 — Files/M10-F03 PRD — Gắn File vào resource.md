@@ -9,11 +9,11 @@ Liên kết File đã complete với resource đúng owner, purpose và authoriz
 # 2\. Quy tắc
 
 * Chỉ File owner được đề nghị link; resource owner/member/actor được xác nhận theo resource type.  
-* File phải complete và `clean` sau scanner thực tế, có purpose tương thích và resource thuộc scope được phép. Với Message, kiểm member active, Conversation active, sender là owner; tạo Message và FileLink nguyên tử. Chat giới hạn một file/message và 5 MiB/file theo BR-21.
+* Theo [K03.1 điều chỉnh 29/10](../../handover/BE-K03-K03.1-contract.md), file complete/clean sau kiểm tra kỹ thuật, không yêu cầu antivirus; phải đúng owner/purpose/resource scope. Không cho gắn resource message và không tạo attachment chat. CV cần trạng thái duyệt nội dung của đúng file/version, độc lập complete; Task/Submission không cần duyệt thủ công.
 * Resource type theo Enum Catalog: message, task, task\_submission, announcement, verification\_document; các liên kết avatar dùng profile attachment flow.  
 * Verification documents/private task submissions/message/announcement attachments không public.  
 * Link retry idempotent; unique resource/file relation không tạo duplicate.  
-* Không xóa File hoặc resource làm mất lịch sử/foreign key; attachment scope nằm ở M04/M07/M08 và verification ở M02. Một Submission hoặc Announcement được gắn tối đa 5 file; mỗi file tối đa 5 MiB với MIME PDF/JPG/PNG/DOC/DOCX. Duplicate file ID trong một request bị từ chối.
+* Không xóa File hoặc resource làm mất lịch sử/foreign key; file ngoài chat theo module M07/M08/M02. Giới hạn mới mục tiêu 5.000.000 byte/file, số file/resource theo module; duplicate file ID bị từ chối. Không xóa enum hoặc link message legacy chỉ để tắt attachment mới.
 
 # 3\. Tiêu chí chấp nhận
 
@@ -26,7 +26,7 @@ Liên kết File đã complete với resource đúng owner, purpose và authoriz
 
 * POST /files/{id}/links tồn tại nhưng Controller hiện chỉ thực hiện verification\_document; các business resource type khác trả conflict “not available yet”.  
 * Upload purpose whitelist hiện chưa gồm message\_attachment, task\_submission, announcement\_attachment. Cần quyết định link semantics per-resource và transaction/lock owner membership.
-* BR-20 chốt Workspace: `task_submission` và `announcement_attachment` tối đa 5 MiB/file, tối đa 5 file/resource. BR-21 chốt Chat: một file/message, tối đa 5 MiB/file. Runtime kiểm quota và MIME theo purpose/resource khi link; quyền download vẫn theo resource membership.
+* K03.7b còn đồng bộ 5.000.000 byte/file; K03.8 kiểm mọi đường chặn attachment chat. Task/Submission và CV approval theo phiên bản chưa được chứng nhận bởi FileController hiện tại. Quota, purpose và quyền download phải được kiểm ở API nghiệp vụ tương ứng; giữ orphan cleanup/storage compensation là công việc riêng.
 
 # 5\. Nguồn
 
