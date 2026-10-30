@@ -22,7 +22,7 @@ Body không trắng, tối đa 4.000 ký tự; chuẩn hóa CRLF/CR thành LF. C
 
 **![Sơ đồ image4](assets/wf03-chat-va-tep-dinh-kem-image4.png)**
 
-Theo [K03.1](../handover/BE-K03-K03.1-contract.md), không upload/gửi/gắn file trong Conversation; FE không hiển thị đính kèm. Không tạo Message/FileLink từ request attachment. Sơ đồ image4 là luồng cũ, không phải hành vi đích. Dữ liệu legacy nếu có cần bảo toàn và đối soát, không xóa enum/schema hàng loạt. K03.8 kiểm các đường chặn và quyền lịch sử.
+Theo [K03.1](../handover/BE-K03-K03.1-contract.md), không upload/gửi/gắn file trong Conversation; FE không hiển thị đính kèm. Không tạo Message/FileLink từ request attachment. Sơ đồ image4 là luồng cũ, không phải hành vi đích. Dữ liệu legacy nếu có cần bảo toàn và đối soát, không xóa enum/schema hàng loạt. [K03.8](../handover/BE-K03-K03.8-test-report.md) đã kiểm tra kỹ thuật các đường chặn và bảo toàn fixture legacy; không bổ sung quyền download chat. UI chat chưa có để nghiệm thu E2E.
 
 ## 05 Gắn tệp vào tài nguyên hiện có
 

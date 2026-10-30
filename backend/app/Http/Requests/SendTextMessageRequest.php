@@ -33,6 +33,7 @@ class SendTextMessageRequest extends FormRequest
             'client_message_id' => ['required', 'uuid'],
             'message_type' => ['required', 'string', 'in:text'],
             'body' => ['required', 'string', 'max:4000', 'regex:/[^\s\p{Z}]/u'],
+            /** Optional empty JSON array only. Objects (including {}), null, scalar values and non-empty arrays are rejected. Chat attachments are disabled. */
             'file_ids' => ['sometimes', 'array', 'size:0'],
         ];
     }
@@ -40,8 +41,37 @@ class SendTextMessageRequest extends FormRequest
     protected function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
-            foreach (array_diff(array_keys($this->all()), ['client_message_id', 'message_type', 'body', 'file_ids']) as $field) {
-                $validator->errors()->add($field, 'This field is not allowed.');
+            $input = $this->all();
+
+            foreach (
+                array_diff(
+                    array_keys($input),
+                    ['client_message_id', 'message_type', 'body', 'file_ids'],
+                ) as $field
+            ) {
+                $validator->errors()->add(
+                    $field,
+                    'This field is not allowed.',
+                );
+            }
+
+            $rawPayload = $this->isJson()
+                ? json_decode($this->getContent())
+                : null;
+
+            $fileIds = is_object($rawPayload)
+                && property_exists($rawPayload, 'file_ids')
+                ? $rawPayload->file_ids
+                : $this->input('file_ids');
+
+            if (
+                array_key_exists('file_ids', $input)
+                && $fileIds !== []
+            ) {
+                $validator->errors()->add(
+                    'file_ids',
+                    'Chat attachments are disabled. Omit file_ids or send an empty array.',
+                );
             }
         });
     }

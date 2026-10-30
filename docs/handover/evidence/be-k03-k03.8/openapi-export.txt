@@ -1,0 +1,4 @@
+Started: 2026-10-30T10:36:25.1004754+07:00
+Scramble export from final source using migrated SQLite :memory: in the same PHP process. No development PostgreSQL mutation.
+Generated /tmp/tutorlink-k038-openapi.json copied from stdout without content edits.
+Exit code: 0

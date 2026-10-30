@@ -8730,8 +8730,8 @@
                 "properties": {
                     "resource_type": {
                         "type": "string",
+                        "description": "Message links are disabled. Runtime currently supports verification_document; other listed resources remain unavailable.",
                         "enum": [
-                            "message",
                             "task",
                             "task_submission",
                             "announcement",
@@ -9732,6 +9732,7 @@
                     },
                     "file_ids": {
                         "type": "array",
+                        "description": "Optional empty JSON array only. Objects (including {}), null, scalar values and non-empty arrays are rejected. Chat attachments are disabled.",
                         "items": {
                             "type": "string"
                         },

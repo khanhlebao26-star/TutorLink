@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a và K03.7b đã kiểm tra kỹ thuật — chờ Hoàng review. K03.8–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành.
+- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a, K03.7b và K03.8 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.9–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
 
 ## Nguyên tắc triển khai
 
@@ -31,7 +31,7 @@
 | Lịch sử | K03.7 | Phiên bản ClamAV trước điều chỉnh phạm vi | Giữ evidence lịch sử |
 | A — Lõi API | K03.7a | Gỡ ClamAV, kiểm tra kỹ thuật và regression | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.7b | Đồng bộ complete/upload và giới hạn 5.000.000 byte | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.8 | Chặn attachment chat, kiểm quyền File và bảo toàn legacy | Chưa nghiệm thu |
+| A — Lõi API | K03.8 | Khóa chức năng attachment chat và bảo toàn legacy | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Chưa nghiệm thu |
 | A — Lõi API | K03.10 | Nghiệm thu phần lõi | Chưa nghiệm thu |
 | B — Realtime | K03.11 | Backend broadcasting và Reverb | Chưa nghiệm thu |
@@ -166,15 +166,22 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 **Tiếp theo:** K03.8 chặn toàn bộ đường attachment chat và bảo toàn legacy. Không đánh dấu toàn BE-K03 hoàn tất; người dùng tự commit/push/gửi review.
 
-### K03.8 — Chặn attachment chat và bảo toàn lịch sử
+### K03.8 — Khóa chức năng attachment chat
 
-- [ ] Chỉ nhận text; file_ids chỉ omission hoặc mảng rỗng. Bổ sung test null/chuỗi rỗng/object rỗng/mảng có phần tử; không tạo Message/FileLink khi không hợp lệ.
-- [ ] Không cho upload purpose message_attachment hoặc link resource message qua endpoint chung; frontend không có đính kèm chat.
-- [ ] Đối soát file/message/link legacy nếu có; giữ lịch sử, không xóa enum/schema chỉ để tắt tính năng mới.
-- [ ] Giữ policy verification document; test outsider download và linked-file delete, race link-vs-delete trong luồng File đang hỗ trợ.
-- [ ] Ghi rõ orphan cleanup/storage compensation và quyền Task/Submission/CV thuộc module phụ trách, chưa mặc nhiên triển khai.
+- [x] Chỉ nhận text; file_ids chỉ omission hoặc mảng rỗng. Test null/chuỗi rỗng/object rỗng/scalar/mảng có phần tử và multipart; không tạo Message/FileLink khi không hợp lệ.
+- [x] Không upload purpose message_attachment; không link resource message. Giữ một rule resource_type duy nhất và đồng bộ enum OpenAPI.
+- [x] Đối soát local: 0 message, 0 file message_attachment, 0 link message. Test fixture legacy giữ nguyên Message/FileRecord/FileLink và không chuyển file message cũ thành text khi replay key.
+- [x] Kiểm source frontend: upload chỉ ở Tutor onboarding; chưa có Conversation page/component/API client để nghiệm thu UI chat E2E. Không xóa upload hồ sơ.
+- [x] Giữ policy verification document và chạy full backend regression; không xóa enum/schema/model relation legacy.
+- [x] Sinh OpenAPI, kiểm parity/lint và lưu báo cáo/evidence. Ghi rõ orphan cleanup/storage compensation, generic File race và Task/Submission/CV còn thuộc module phụ trách.
 
-**Xong khi:** Không có đường tạo attachment chat; outsider không tải file ngoài scope; dữ liệu và liên kết lịch sử được bảo toàn.
+**Kết quả:** **416 test pass / 2.579 assertions / exit 0**, gồm 18 ca K03.8. Pint và git diff --check đạt. OpenAPI **69 operations**, parity pass; Redocly hợp lệ với **43 warnings**. Không có schema delta. **Đã kiểm tra kỹ thuật — chờ Hoàng review.**
+
+**Báo cáo/evidence:** [K03.8](BE-K03-K03.8-test-report.md), [log, SQL và source audit](evidence/be-k03-k03.8/), [nội dung cập nhật issue](BE-K03-K03.8-issue-update.md).
+
+**Phạm vi/giới hạn:** Nghiệm thu khóa attachment chat qua API và kiểm source UI; chưa nghiệm thu chat UI E2E hoặc bổ sung download attachment legacy. Generic race link-vs-delete và cleanup/compensation thuộc M10/K03.10, chưa được chứng nhận bởi task này.
+
+**Tiếp theo:** K03.9 đồng bộ Conversation lifecycle; người dùng tự commit/push/yêu cầu review. Không đánh dấu toàn BE-K03 hoàn tất.
 
 ### K03.9 — Đồng bộ Conversation lifecycle
 
