@@ -1,0 +1,64 @@
+{
+  "checked_at": "2026-10-30T11:21:41.8236319+07:00",
+  "base_head": "1205c2fad2330a9ac6902fa4398e5312b9da90e7",
+  "branch": "be-k03",
+  "source": "Uncommitted K03.9 working tree; final Pint passed without source changes after full test run.",
+  "files": [
+    {
+      "path": "backend/app/Actions/Messaging/SyncConversationLifecycle.php",
+      "sha256": "9a92744096930bf07a85577f794a60ba765847fd194fa74babc086553da170de"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/OpenConversation.php",
+      "sha256": "75473a2d2f0c4ca1c9e69d98602f219a38acad0c4b7148ac8a7a633eff0ba374"
+    },
+    {
+      "path": "backend/app/Actions/Programs/TransitionProgram.php",
+      "sha256": "55bc6fa52f2336f0252cc93426cd81b46bbcffeb93d2b8ba650055177a89b66e"
+    },
+    {
+      "path": "backend/app/Actions/Programs/UpdateProgramDraft.php",
+      "sha256": "251dcc58883937573ff99bb08064239969d5a74c233ccabd743a4dec9990fc62"
+    },
+    {
+      "path": "backend/app/Actions/Invitations/SendInvitation.php",
+      "sha256": "70ca2dd8e22b8eb037f69a6b16d626438312ef991a121cc930deb6d4c9bf0e7c"
+    },
+    {
+      "path": "backend/app/Actions/Invitations/AcceptInvitation.php",
+      "sha256": "18d664a9e0932ca8f058a8c2691b6b916b256c2c550293db791f238d384c5462"
+    },
+    {
+      "path": "backend/app/Support/InvitationTransitionWriter.php",
+      "sha256": "344683474b50a087c698266429edd6456dd50e42ce2ca331512f480c3dd65fd0"
+    },
+    {
+      "path": "backend/tests/Feature/ConversationLifecycleApiTest.php",
+      "sha256": "1100981f28f39f5ccd1d0c7b2d015d286e5d6fd182d7d5dc00f4d58d8386bd98"
+    },
+    {
+      "path": "backend/tests/Feature/InvitationAcceptConcurrencyTest.php",
+      "sha256": "db18b14f64f8ff96142106c574ed670bd6932f002e27bfdd9b6053a1269624bd"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "fdf5c990c182ed302738225b5666bd323f82a142e26bac0544409f179e1a050d"
+    },
+    {
+      "path": "docs/Architecture & Technical Design/API Route Catalog.md",
+      "sha256": "c2255da2d6f2e511325d6eb03f7fd573cb9bac3e5e04b1c94f5d2bf4ff466ad3"
+    },
+    {
+      "path": "docs/handover/BE-K03-roadmap.md",
+      "sha256": "d81bcda917e71f7619fd6f08ee901c8acc0668d672bc856d5038efb155d52c84"
+    },
+    {
+      "path": "docs/handover/BE-K03-K03.9-test-report.md",
+      "sha256": "1daff4a285d0c0b27e4925b67ff5097c806c5fff6ae4dcff0f323a4984e9761d"
+    },
+    {
+      "path": "docs/handover/BE-K03-K03.9-issue-update.md",
+      "sha256": "ce510f3f172bcd899dbd72d56f91225959e62be71a6fa7fc4d1bccc8e85615da"
+    }
+  ]
+}

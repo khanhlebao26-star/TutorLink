@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a, K03.7b và K03.8 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.9–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
+- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a, K03.7b, K03.8 và K03.9 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.10–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
 
 ## Nguyên tắc triển khai
 
@@ -32,7 +32,7 @@
 | A — Lõi API | K03.7a | Gỡ ClamAV, kiểm tra kỹ thuật và regression | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.7b | Đồng bộ complete/upload và giới hạn 5.000.000 byte | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.8 | Khóa chức năng attachment chat và bảo toàn legacy | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Chưa nghiệm thu |
+| A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.10 | Nghiệm thu phần lõi | Chưa nghiệm thu |
 | B — Realtime | K03.11 | Backend broadcasting và Reverb | Chưa nghiệm thu |
 | B — Realtime | K03.12 | Frontend Laravel Echo và resync | Chưa nghiệm thu |
@@ -185,12 +185,22 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 ### K03.9 — Đồng bộ Conversation lifecycle
 
-- [ ] Tích hợp vào transaction Program/Invitation liên quan.
-- [ ] Chỉ đóng chat khi đạt điều kiện lifecycle và không còn quan hệ tiếp diễn.
-- [ ] Reopen chỉ qua yêu cầu mở liên hệ hợp lệ.
-- [ ] Suspend không đổi membership/status chat; không tự tạo system message.
+- [x] Đồng bộ cuối transaction complete/cancel Program và lazy expiry khi sửa Draft; User theo ID tăng dần → TutorProfile → resource → Conversation. Không đóng giữa expire cũ và gửi Invitation mới.
+- [x] Chỉ đóng chat active khi cùng cặp có Program completed, không còn Program active/paused hoặc Invitation pending còn hạn. Cancel Draft trước khi từng có completed không đóng; không có Conversation thì không tự tạo.
+- [x] Reopen chỉ qua yêu cầu mở liên hệ hợp lệ; giữ Conversation ID/context/history. Send Invitation, đọc lịch sử và replay không tự reopen.
+- [x] Suspend qua API account/Profile thật giữ nguyên chat, membership, read cursor và message; peer active vẫn đọc, actor suspended bị chặn. Không tự tạo system message.
+- [x] Test lỗi sau khi cập nhật Conversation rollback Program/chat/audit/outbox. Race PostgreSQL process độc lập: hai completion và complete-vs-send Invitation, kiểm cả hai thứ tự.
+- [x] Lưu báo cáo/evidence, sinh lại OpenAPI và kiểm route parity/lint.
 
 **Xong khi:** Hoàn tất một Program không đóng chat nếu còn Program active/paused hoặc Invitation pending còn hiệu lực.
+
+**Kết quả:** Hai file lifecycle/concurrency **28 pass / 266 assertions**; full backend **438 pass / 2.770 assertions / exit 0**. **Đã kiểm tra kỹ thuật — chờ Hoàng review.** Không thêm route, request/response field hoặc migration; Scramble sinh artifact không đổi, parity **69 operations**; Redocly hợp lệ với **43 warnings**.
+
+**Báo cáo/evidence:** [K03.9](BE-K03-K03.9-test-report.md), [log và source fingerprints](evidence/be-k03-k03.9/), [nội dung cập nhật issue](BE-K03-K03.9-issue-update.md).
+
+**Giới hạn:** Expiry hiện lazy khi sửa Draft hoặc gửi lại Invitation; GET không ghi DB và chưa có worker tự đóng chat đúng thời điểm hết hạn. Reject/cancel Invitation riêng vẫn là route dự kiến; khi triển khai cần đồng bộ cuối transaction theo cùng thứ tự khóa. Không chứng nhận các writer tương lai đã tích hợp.
+
+**Tiếp theo:** K03.10 nghiệm thu tổng hợp phần lõi. Người dùng tự commit/push/yêu cầu review; không đánh dấu toàn BE-K03 hoàn tất.
 
 ### K03.10 — Nghiệm thu phần lõi
 
