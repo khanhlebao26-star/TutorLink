@@ -11,11 +11,13 @@ use App\Http\Requests\UpdateMeRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Support\RealtimeSessionChannels;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -63,12 +65,30 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        Auth::guard('web')->logout();
+        $actor = Auth::guard('web')->user();
+        $sessionId = $request->hasSession()
+            ? $request->session()->getId()
+            : null;
 
-        if ($request->hasSession()) {
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-        }
+        DB::transaction(function () use ($request, $actor, $sessionId): void {
+            if ($actor instanceof User && $sessionId !== null) {
+                DB::table('users')
+                    ->where('id', $actor->id)
+                    ->lockForUpdate()
+                    ->first();
+
+                $realtime = app(RealtimeSessionChannels::class);
+                $realtime->requireDatabaseSessions();
+                $realtime->tombstone((int) $actor->id, $sessionId);
+            }
+
+            Auth::guard('web')->logout();
+
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+        }, 3);
 
         return response()->json(status: 204);
     }

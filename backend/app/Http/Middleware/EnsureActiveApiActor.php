@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use App\Support\ApiErrorResponse;
+use App\Support\RealtimeSessionChannels;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +39,21 @@ class EnsureActiveApiActor
 
         Auth::shouldUse('web');
         $request->setUserResolver(fn (): User => $actor);
+
+        if (
+            $request->hasSession()
+            && app(RealtimeSessionChannels::class)->isRevoked(
+                (int) $actor->id,
+                $request->session()->getId(),
+            )
+        ) {
+            return ApiErrorResponse::make(
+                401,
+                'session_revoked',
+                'This browser session has been revoked.',
+                $requestId,
+            );
+        }
 
         if ($actor->status !== 'active') {
             return ApiErrorResponse::make(

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\ConversationController;
+use App\Http\Controllers\Api\V1\ConversationRealtimeController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
@@ -72,6 +73,13 @@ Route::prefix('v1')->group(function () {
         Route::patch('/conversations/{conversation}/read', [ConversationController::class, 'markRead'])
             ->whereNumber('conversation')
             ->name('conversations.read');
+
+        Route::post(
+            '/conversations/{conversation}/realtime',
+            ConversationRealtimeController::class,
+        )
+            ->whereNumber('conversation')
+            ->name('conversations.realtime');
     });
 
     Route::prefix('auth')->group(function () {

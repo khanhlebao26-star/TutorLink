@@ -2,11 +2,15 @@
 
 namespace App\Providers;
 
+use App\Events\ConversationMessagesChanged;
+use App\Jobs\BroadcastConversationChanged;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +33,21 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         require base_path('routes/channels.php');
+
+        Event::listen(
+            ConversationMessagesChanged::class,
+            function (ConversationMessagesChanged $event): void {
+                rescue(
+                    function () use ($event): void {
+                        Queue::pushOn(
+                            'broadcasts',
+                            new BroadcastConversationChanged($event->conversationId),
+                        );
+                    },
+                    report: true,
+                );
+            },
+        );
 
         VerifyEmail::createUrlUsing(function (User $user): string {
             $apiUrl = URL::temporarySignedRoute(

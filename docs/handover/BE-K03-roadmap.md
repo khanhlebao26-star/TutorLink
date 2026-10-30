@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a–K03.11 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.12–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
+- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a–K03.11 đã kiểm tra kỹ thuật — chờ Hoàng review. Backend K03.13 có evidence mới — chờ Hoàng review; K03.12 Echo/UI hoãn theo quyết định backend-only; K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
 
 ## Nguyên tắc triển khai
 
@@ -35,8 +35,8 @@
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.10 | Nghiệm thu phần lõi | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | B — Realtime | K03.11 | Backend broadcasting và Reverb | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| B — Realtime | K03.12 | Frontend Laravel Echo và resync | Chưa nghiệm thu |
-| B — Realtime | K03.13 | Thu hồi quyền và nghiệm thu realtime | Chưa nghiệm thu |
+| B — Realtime | K03.12 | Frontend Laravel Echo và resync | Hoãn — team hiện làm backend |
+| B — Realtime | K03.13 | Thu hồi quyền và phục hồi realtime backend | Đã kiểm tra kỹ thuật — chờ Hoàng review; UI hoãn K03.12 |
 | C — Bàn giao | K03.14 | API/schema delta, evidence và PR | Chưa nghiệm thu |
 
 ## Giai đoạn A — Lõi Messaging API
@@ -243,9 +243,13 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 **Giới hạn:** Outage thật thử worker, không tắt Reverb. Chưa nghiệm thu Echo/UI hoặc thu hồi quyền socket đang mở; K03.12–K03.13 còn việc. Broadcast best effort có thể mất/lặp notification; REST/polling/resync phục hồi dữ liệu. Chưa có realtime outbox/TLS/load evidence.
 
-**Tiếp theo:** K03.12 Echo và resync. Người dùng tự commit/push/cập nhật issue/yêu cầu review; không đánh dấu toàn BE-K03 hoàn tất.
+**Bổ sung phiên bản:** Các giới hạn thu hồi socket và Reverb outage ở snapshot K03.11 đã được kiểm trong [K03.13](BE-K03-K03.13-test-report.md); channel dùng chung cũ được thay bằng channel theo phiên. Echo/UI vẫn chưa nghiệm thu.
+
+**Tiếp nối:** Team hoãn K03.12 Echo/UI; backend tiếp tục K03.13 (kết quả bên dưới). Người dùng tự commit/push/cập nhật issue/yêu cầu review; không đánh dấu UI hoàn tất.
 
 ### K03.12 — Frontend Laravel Echo và resync
+
+**Trạng thái:** Hoãn theo quyết định team hiện chỉ triển khai backend. Checklist dưới chưa được nghiệm thu; probe K03.13 không thay thế Echo/UI.
 
 - [ ] Tích hợp Echo trong Next.js; quản lý một kết nối phù hợp với phiên đăng nhập.
 - [ ] Khi mở chat, subscribe private channel.
@@ -256,17 +260,27 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 **Xong khi:** Người nhận thấy tin mới mà không refresh; reconnect không mất hoặc nhân đôi tin.
 
-### K03.13 — Thu hồi quyền và nghiệm thu realtime
+### K03.13 — Thu hồi quyền và phục hồi realtime backend
 
-- [ ] Xử lý trường hợp người dùng bị suspend/logout khi socket đang mở; xác thực lúc subscribe không phải kiểm tra quyền duy nhất.
-- [ ] Outsider không subscribe.
-- [ ] Người mất quyền không tiếp tục nhận dữ liệu.
-- [ ] Disconnect/reconnect vẫn lấy đủ tin.
-- [ ] Replay không tạo tin trùng trên UI.
-- [ ] Reverb/worker lỗi, REST và resync vẫn hoạt động.
-- [ ] Broadcast và API đến khác thứ tự không làm UI nhân đôi message.
+- [x] Channel theo Conversation + phiên; API cấp/gia hạn, auth đúng session/account/membership; từ chối channel chung cũ.
+- [x] Logout chỉ thu hồi phiên hiện tại; suspend account/Profile thu hồi mọi phiên; restore không hồi sinh token; không đổi chat/member/read cursor.
+- [x] Job sau commit kiểm quyền lúc phát, khóa User cùng thứ tự với revoke; replay/rollback/quota/validation không thêm notification.
+- [x] Outsider/Admin và session khác của cùng User không dùng được token; CSRF thật và chữ ký gắn socket được kiểm.
+- [x] Hai race PostgreSQL bằng process độc lập: revoke trước publish và publish giữ khóa trước revoke.
+- [x] Probe giữ socket cũ sau logout/suspend, có socket còn quyền làm đối chứng; job đang chờ bỏ qua phiên đã thu hồi.
+- [x] Disconnect/reconnect lấy đủ 55 message trùng timestamp qua ba trang; retry/resync dedupe theo server message ID trong consumer.
+- [x] Dừng worker/Reverb thật: REST/read/resync hoạt động; restart/auth lại nhận notification.
+- [x] Consumer xử lý API trước event và event/resync trước API đã giữ lại: không nhân đôi.
+- [x] OpenAPI export/parity **70 operations**; lint hợp lệ **43 warnings**; API/schema delta và contract đã cập nhật.
+- [ ] UI/Echo: replay/reconnect không nhân đôi trên giao diện; cleanup listener/poll — hoãn K03.12, không được xác nhận bởi consumer probe.
 
-**Xong khi:** Có evidence tích hợp hai tài khoản, test quyền và phục hồi kết nối.
+**Kết quả backend:** Probe HTTP/WebSocket **12/12 đạt**; targeted **55 pass / 528 assertions / exit 0**; full backend **461 pass / 3.004 assertions / exit 0**. **Đã kiểm tra kỹ thuật — chờ Hoàng review (backend).**
+
+**Báo cáo/evidence:** [K03.13](BE-K03-K03.13-test-report.md), [probe/JSON/log/fingerprints](evidence/be-k03-k03.13/). K03.11 giữ làm evidence lịch sử; contract channel hiện hành theo K03.13.
+
+**Giới hạn:** Notification best effort, chưa có realtime outbox/TLS/load test; socket cũ có thể còn TCP, gói đã publish trước revoke có thể đến muộn. Tombstone chưa có cleanup. Cookie logout POST có thể bị CSRF chặn 419 trước auth; GET trả 401. UI/Echo và polling fallback chưa nghiệm thu.
+
+**Tiếp theo:** K03.14 bàn giao backend; người dùng tự commit/push/cập nhật issue/yêu cầu Hoàng review. K03.12 giữ backlog riêng; không đánh dấu nghiệm thu UI hoặc toàn phạm vi realtime ban đầu.
 
 ## Giai đoạn C — Bàn giao
 

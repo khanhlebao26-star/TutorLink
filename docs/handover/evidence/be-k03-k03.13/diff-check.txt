@@ -1,0 +1,3 @@
+Started: 2026-10-30T16:14:56.2491821+07:00
+warning: in the working copy of 'docs/api/openapi.json', LF will be replaced by CRLF the next time Git touches it
+Exit code: 0

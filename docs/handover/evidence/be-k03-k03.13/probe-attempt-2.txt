@@ -1,0 +1,15 @@
+Started: 2026-10-30T15:56:06.1629791+07:00
+PASS 1: Two participants and two receiver sessions subscribe to distinct session channels
+PASS 2: Outsider/Admin/cross-session auth and legacy channel are denied; live CSRF and socket-bound signature enforced
+PASS 3: REST message commits and active session sockets receive only conversation_id
+PASS 4: Logout S1 leaves its TCP socket open but silent while S2 receives the next notification
+PASS 5: Queued job rechecks logout at execution; fresh login uses a new channel and REST recovers missed message
+PASS 6: Real account suspension revokes sessions; queued message does not notify revoked socket; restore uses new token
+PASS 7: Real Profile suspension revokes sessions atomically; restore cannot revive old token
+PASS 8: Disconnect/reconnect drains three pages with 55 identical timestamps; repeated resync dedupes server IDs
+PASS 9: Worker outage preserves REST send/read/replay/resync; delayed notification does not duplicate a message
+PASS 10: Reverb outage leaves REST/read/resync available; restart permits new socket/auth/subscription
+PASS 11: Consumer merges API response before event-driven resync without duplication
+PASS 12: Consumer handles event/resync before releasing the buffered API response without duplication
+Result: 12/12; passed=true; cleanup={"users_removed":4,"remaining_users":0,"remaining_conversations":0,"remaining_messages":0,"remaining_files":0,"remaining_sessions":0,"remaining_realtime_sessions":0,"probe_jobs_removed":0}
+Exit code: 0

@@ -1,0 +1,765 @@
+{
+  "started_at": "2026-10-30T09:06:11.303Z",
+  "fixture_tag": "04e504f234a6e3d8",
+  "cases": [
+    {
+      "number": 1,
+      "name": "Two participants and two receiver sessions subscribe to distinct session channels",
+      "passed": true,
+      "receiver_sessions": 2,
+      "signed_subscriptions": 3,
+      "raw_session_ids_or_tokens_logged": false
+    },
+    {
+      "number": 2,
+      "name": "Outsider/Admin/cross-session auth and legacy channel are denied; live CSRF and socket-bound signature enforced",
+      "passed": true,
+      "authorization_denials": [
+        403,
+        403,
+        403
+      ],
+      "missing_csrf": [
+        419,
+        419
+      ],
+      "outsider_grant": 404,
+      "legacy_channel": 422,
+      "wrong_socket_rejected": 4009,
+      "outsider_socket_id_present": true
+    },
+    {
+      "number": 3,
+      "name": "REST message commits and active session sockets receive only conversation_id",
+      "passed": true,
+      "message_id": 74,
+      "payload_keys": [
+        "conversation_id"
+      ]
+    },
+    {
+      "number": 4,
+      "name": "Logout S1 leaves its TCP socket open but silent while S2 receives the next notification",
+      "passed": true,
+      "logout_status": 204,
+      "stale_grant_status": 419,
+      "stale_cookie_read_status": 401,
+      "csrf_note": "A stale mutation may fail CSRF with 419 before authentication is evaluated.",
+      "observer_message_id": 75,
+      "old_socket_still_open": true
+    },
+    {
+      "number": 5,
+      "name": "Queued job rechecks logout at execution; fresh login uses a new channel and REST recovers missed message",
+      "passed": true,
+      "queued_message_id": 76,
+      "prior_sockets_silent": true,
+      "fresh_channel_changed": true
+    },
+    {
+      "number": 6,
+      "name": "Real account suspension revokes sessions; queued message does not notify revoked socket; restore uses new token",
+      "passed": true,
+      "suspend_status": 200,
+      "suspended_read_status": 401,
+      "suspended_send_status": 409,
+      "old_token_auth_after_restore": 403,
+      "queued_message_id": 77,
+      "restored_message_id": 78,
+      "membership_and_read_cursor_unchanged": true
+    },
+    {
+      "number": 7,
+      "name": "Real Profile suspension revokes sessions atomically; restore cannot revive old token",
+      "passed": true,
+      "suspend_status": 200,
+      "suspended_read_status": 401,
+      "suspended_send_status": 409,
+      "old_token_auth_after_restore": 403,
+      "queued_message_id": 79,
+      "restored_message_id": 80,
+      "membership_and_read_cursor_unchanged": true
+    },
+    {
+      "number": 8,
+      "name": "Disconnect/reconnect drains three pages with 55 identical timestamps; repeated resync dedupes server IDs",
+      "passed": true,
+      "seeded_fixture_messages": 55,
+      "real_rest_pages": 3,
+      "retry_pages": 3,
+      "unique_messages": 62,
+      "fixture_note": "55 messages seeded directly for pagination; not a quota-bypass acceptance claim"
+    },
+    {
+      "number": 9,
+      "name": "Worker outage preserves REST send/read/replay/resync; delayed notification does not duplicate a message",
+      "passed": true,
+      "send_status": 201,
+      "replay_status": 200,
+      "message_id": 136,
+      "duplicates": 0
+    },
+    {
+      "number": 10,
+      "name": "Reverb outage leaves REST/read/resync available; restart permits new socket/auth/subscription",
+      "passed": true,
+      "outage_message_id": 137,
+      "outage_send_status": 201,
+      "outage_read_status": 200,
+      "recovered_via_rest": true,
+      "new_notification_after_restart": 138,
+      "real_transport_failure": {
+        "attempts": 1,
+        "released_for_retry": true
+      },
+      "delivery_of_outage_notification_required": false
+    },
+    {
+      "number": 11,
+      "name": "Consumer merges API response before event-driven resync without duplication",
+      "passed": true,
+      "message_id": 139,
+      "duplicates": 0,
+      "scope": "probe consumer; no Echo/UI claim"
+    },
+    {
+      "number": 12,
+      "name": "Consumer handles event/resync before releasing the buffered API response without duplication",
+      "passed": true,
+      "message_id": 140,
+      "duplicates": 0,
+      "scope": "controlled consumer processing order; not a claim about network arrival order or UI"
+    }
+  ],
+  "http": [
+    {
+      "session": "customer",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "tutor-S1",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "tutor-S1",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "tutor-S2",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "tutor-S2",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "tutor-S2",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "outsider",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "outsider",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "outsider",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "admin",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "admin",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "admin",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations",
+      "status": 201
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "tutor-S2",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "tutor-S2",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "tutor-S2",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 403
+    },
+    {
+      "session": "outsider",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 403
+    },
+    {
+      "session": "admin",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 403
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 419
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 419
+    },
+    {
+      "session": "outsider",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 404
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 422
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "tutor-S1",
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 204
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "stale-tutor-S1",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 419
+    },
+    {
+      "session": "stale-tutor-S1",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 401
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "tutor-S2",
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "status": 204
+    },
+    {
+      "session": "tutor-S3",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "tutor-S3",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "tutor-S3",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "tutor-S3",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "tutor-S3",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "tutor-S3",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "admin",
+      "method": "POST",
+      "path": "/api/v1/admin/users/83/suspend",
+      "status": 200
+    },
+    {
+      "session": "tutor-S3",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 401
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 409
+    },
+    {
+      "session": "admin",
+      "method": "POST",
+      "path": "/api/v1/admin/users/83/restore",
+      "status": 200
+    },
+    {
+      "session": "tutor-S4",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "tutor-S4",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "tutor-S4",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "tutor-S4",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 403
+    },
+    {
+      "session": "tutor-S4",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "tutor-S4",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "admin",
+      "method": "POST",
+      "path": "/api/v1/admin/tutor-profiles/37/suspend",
+      "status": 200
+    },
+    {
+      "session": "tutor-S4",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 401
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 409
+    },
+    {
+      "session": "admin",
+      "method": "POST",
+      "path": "/api/v1/admin/tutor-profiles/37/restore",
+      "status": 200
+    },
+    {
+      "session": "admin",
+      "method": "POST",
+      "path": "/api/v1/admin/users/83/restore",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 403
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6IkMvbmE0NjZxK1hLR3Y3bExndkkzcWc9PSIsInZhbHVlIjoiVkpmUkt4eGh4MkZtbUhiRkdFWFlSWXhRYUxWcnA5cmJIVFRVME5zSWY4ZHlLOGxhU2g5MUQwSGVaZHRPSnN6UzJ6VXJzR1dnZ3BXd1N0T1NKNWw3dHQ0cS9qbkJtOXY1MHR6TFVNcnhZelJEeGNRWWZIUDQ5eVFPRmJoL3NZTk82SXY3c2lOeGNXcXBrbFk2QjlIRkRGM0NuNWpWUmdzeDJrMzg1UTRCNmVid3V2TDBDOFFyTEl2L3JoenF2anN6SWVXbFBscEZQcDFYRkRGTWxxN3AvUT09IiwibWFjIjoiNWZmOGYyODYwODU2NTM4YjdmYzRjZDQxNjMwYzgwMWNjZWJmZWEyZGMzMDg4NjY1NWI1ZGM3YjUxZWFmOWI0YSIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6IkZBK1M1aTZ6UXlDeGVaWWpNTFdwQlE9PSIsInZhbHVlIjoiSmVOMXFVWUtKSWcyS0RCVHpFYUtBdEk2dnRrNzlJTVp6ZDY2SHR0azhnS052N2t2MFZlVnB0Tk9wQzB4YVJ0N2ZVZ3VzQXlWQkV3ZjJ4UGJyRW1CK05sMkF2b0ZMUElCKzY4aVpOYW5mbUs0d0hmN3FBUngyQ3MxYURSZ25ZYXY1RlovVDdiVkdkWkx1cnpkSitnekRrZUUrekhsR1ZNV0U5SDNTbjArdzlSOXhuZWdKRjdDcUVPY3lJbUgxMlA2elgwWkV2UlZyV05aS2wzUGRYTXVzQT09IiwibWFjIjoiMWM5ZDFhM2M0OGE0ZDIwNGQ1ZTI5NDM1NDJiMGQzYzAwYjIxOWQzOTVhODJiZGI0OTg2NTkxZTA0MTNlY2RjOSIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6Imp0bWxYbStpNWhGaWQvWEcwM1JUWWc9PSIsInZhbHVlIjoidlhHRzFpbEtLU09KaEVyOEJpZHcweHIwdkRTaUVseFZXdnAzdlZMK3M3TTZ4d1g0ais1bTRhdnByNkcxTFVIS1IvaTdvUHFieHEvWks3dEJXNFhnU0FsMm9DSGVCRmFxZUJaRGdFYnkrS1ljV0doRCtHcVhsOWpvbWswdzNWMG16UDZGcmVhMk1wanAxMCt6d0ZiNVVTMVJRMVJURTVCcGtjbGxSaXM1cmF3dkx5anFLZlg1bTNjc0YxZ0VCelZ4NXYwaVZXdTF0aWpGYy9qNTg1Mmwydz09IiwibWFjIjoiN2RmNjgwM2MzN2ZjN2MyMzI5MDgwOGE4MWRlNDlmNzJlNjg0YjIyZjliMjBhNTkyZjc2OGUwNTQyODU4MTY2ZSIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6IkMvbmE0NjZxK1hLR3Y3bExndkkzcWc9PSIsInZhbHVlIjoiVkpmUkt4eGh4MkZtbUhiRkdFWFlSWXhRYUxWcnA5cmJIVFRVME5zSWY4ZHlLOGxhU2g5MUQwSGVaZHRPSnN6UzJ6VXJzR1dnZ3BXd1N0T1NKNWw3dHQ0cS9qbkJtOXY1MHR6TFVNcnhZelJEeGNRWWZIUDQ5eVFPRmJoL3NZTk82SXY3c2lOeGNXcXBrbFk2QjlIRkRGM0NuNWpWUmdzeDJrMzg1UTRCNmVid3V2TDBDOFFyTEl2L3JoenF2anN6SWVXbFBscEZQcDFYRkRGTWxxN3AvUT09IiwibWFjIjoiNWZmOGYyODYwODU2NTM4YjdmYzRjZDQxNjMwYzgwMWNjZWJmZWEyZGMzMDg4NjY1NWI1ZGM3YjUxZWFmOWI0YSIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6ImYyOVBuc0pLSWFLTVdEdE9Td3Eyc2c9PSIsInZhbHVlIjoialpOajgwcUo2Q0xicU0zbzlGSVRPM1IwTFVzTER5amk3b1FqczFSNTJSL0VXTkltSzh0RElieGZUMVNzQytIMEx3cjNOcXJHQ3hwQk9Rb0xDRUZOUjY4RGdsTFVjVFllWmczT0xkendZUm4vS2JhTUlvTW16NGxCUWVkMFE0M0VRN3dTdkFlTDdDcXY4MU5mZG5VMHE4RS9TaDd5L3lZOVMxRzJMM3JnZlRZRGNtWlVOaDdobDNMd2RCQ3hONGpGVlBWZHJUTjR1Sm1yQTdsd3NTdVJNUT09IiwibWFjIjoiMjVlZmJlMTVhZGU4MWI1OGYyNTQxNWQ4MjA5ODcxZmFjODliMjMwNWYyODQ3OWIwNjkyNWEzMzg2YTVkZTA5ZiIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6ImRSKzBmWGF0NXVIOEx0aWM3K1FTUnc9PSIsInZhbHVlIjoiQ3k5YXdndmpzdGo4YnlDRkhmT2RzbGZ2dlR5bGdxQ0RCWndoaXo0NFdmSkFtME95N29FdmlQaVdoYnF2MjBrUHl0TzRvNWtrVVpnVHBXWk1Ta2tCaWlxNzAwK2JhRUt0SUpiNEhHd21yQTg0TlFoSmZiTE5OQUNmMzVIVGtZUUN3TDNNWTcwdVJCcmpDRkErb2JjM2huSkRvR1pseStoT3FrZlcrWVAyZDZLRlNmSE1sL2JtdHJna0FFS013TDQvaVdORVRyTGRZM05BQU54UEE5Rm5qZz09IiwibWFjIjoiYTRiM2E4YzU2MjYyZTg5ZGQ2NGRhNTVhYjhlZjBkZjlhMWQ1ZWQwMDBkYzc1NzQxYjVkZDllZmI2OGRjNmNjYyIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6IjZ0K2pOMEwxTTlsYTE5MVFWOEF1ZVE9PSIsInZhbHVlIjoiM1kzM2M5NzUzT2MwTDNoTWZCUGdrc1M4a0RxVWVaMzdjTkgvMFNTQjM0VzZ1QytkaW9ucVpZUFMzbUZ5UnI1Y1I1cTNYYzhsSUszNEFQVmZRNFM2a2pGQkYwbCtnV3RRNjE4dmh3cCsrQ0tmTlhTeGMvMVZCLzJHdXdWcXlqd243TDNvN3lPWTJta0FvSWxrL3kwNnJBazRUK2NzL1lpSm5iMFF1OUh5aE13b2hDYmFnNlBqZUw3cXFHeDhoSDBUZjY3VzkwaEdRazVSR2NUUHdObGNMZz09IiwibWFjIjoiOWI3ODI1MjNiNWZmNzdhMTcwNjY5MWM2YTk2ZjYxMjhlNzc1ZDljNGY2ZGY2YWEyNTJkYWU0NzJjYmYzMjA3NCIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6InlxMlVHN3lGRm9IOElWUS9qYys5NEE9PSIsInZhbHVlIjoiY2lCTFY1bWNkZUI2TkJCYVBLKzVPQmZ3aGt4YUJGWVpQR0trWXNhNy9UcFV6by9FTjdrbUkveDNlVjZSR05WMVZoOENGTUJ4Z25BcHVCK1NGc3BrdWdQYllUU0pWTzNhZHJyT3hjUGg2YjVNbllHaDhTazROeXZSOE53Q1VrUkNGbDF5b0hwTWhDRGxoelpRZ2krYll2L1hKNGhkd0RjSUZXSE1OVnE0YmFJVnY0QUF1elo3L29VVFg5aG9oLzI1aVlIL3B3cnpEaUF1eWlXMFZoOWtkZz09IiwibWFjIjoiMjVhYzVkZjNkNjY0ODI2ZDRhMjg3ZDAwNDZmZmQ3OTYxNTJlZDI3ODIzNzhmOWU2NGFiOGM5ZjM3NThiMmI5OCIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6InlxMlVHN3lGRm9IOElWUS9qYys5NEE9PSIsInZhbHVlIjoiY2lCTFY1bWNkZUI2TkJCYVBLKzVPQmZ3aGt4YUJGWVpQR0trWXNhNy9UcFV6by9FTjdrbUkveDNlVjZSR05WMVZoOENGTUJ4Z25BcHVCK1NGc3BrdWdQYllUU0pWTzNhZHJyT3hjUGg2YjVNbllHaDhTazROeXZSOE53Q1VrUkNGbDF5b0hwTWhDRGxoelpRZ2krYll2L1hKNGhkd0RjSUZXSE1OVnE0YmFJVnY0QUF1elo3L29VVFg5aG9oLzI1aVlIL3B3cnpEaUF1eWlXMFZoOWtkZz09IiwibWFjIjoiMjVhYzVkZjNkNjY0ODI2ZDRhMjg3ZDAwNDZmZmQ3OTYxNTJlZDI3ODIzNzhmOWU2NGFiOGM5ZjM3NThiMmI5OCIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/realtime",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6IlNpcEtHbzZYYXlJeWlWQWEzS28vRXc9PSIsInZhbHVlIjoib3YyaFZra3dmcTlETEt5YUVwN29BUFlhcGpOVnUwclBhdWVpc051Y1BPZUcrOTRTOVpScFl6c2NUbE1aRldyVjdoWkl5S3U1Y0FGckNNdGtPTG9GN25hS3I1ak9LNDFGY2JETEtBTC9kU3ZtTkxSZlVNS1hoU1U2L0lYT1l1SFA2ekxtUUdoNXJXaVFKMGMwSU4xWlc5STBmakx2T2NSK3QvT0pZMGRDOStGUHpSeUp3N3F6TXBkeGx4Yk9EY085UmJqL2RUWnNHNUhiVlBDaEN2OU1tdz09IiwibWFjIjoiMzlhODc4NzYyZmRkMmIxNTU4YjhlNmVmZjU4ZTAzOGJlMGMzMmE4ZWYyMDMzMmExYjBkNGI4NTg1ZTBmNmZjMyIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6IlNpcEtHbzZYYXlJeWlWQWEzS28vRXc9PSIsInZhbHVlIjoib3YyaFZra3dmcTlETEt5YUVwN29BUFlhcGpOVnUwclBhdWVpc051Y1BPZUcrOTRTOVpScFl6c2NUbE1aRldyVjdoWkl5S3U1Y0FGckNNdGtPTG9GN25hS3I1ak9LNDFGY2JETEtBTC9kU3ZtTkxSZlVNS1hoU1U2L0lYT1l1SFA2ekxtUUdoNXJXaVFKMGMwSU4xWlc5STBmakx2T2NSK3QvT0pZMGRDOStGUHpSeUp3N3F6TXBkeGx4Yk9EY085UmJqL2RUWnNHNUhiVlBDaEN2OU1tdz09IiwibWFjIjoiMzlhODc4NzYyZmRkMmIxNTU4YjhlNmVmZjU4ZTAzOGJlMGMzMmE4ZWYyMDMzMmExYjBkNGI4NTg1ZTBmNmZjMyIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6IjhHNWhpOENkOWs4cnZHeTkyZER0UWc9PSIsInZhbHVlIjoiSXpaR2M3aW13bHJ6N0dqVUJXbFpHcmRYUUdXcVZiUVFjK3dzbU9CNU9DSGNmNDFkRkFncnJjMEpYWDFUejNVYWltNjBGOTlBdTdJMEg5YVNIdnd3Z2ZUQkpZcU5MelJGbTNYYVRYZHREUWhVYVJNRzRSQmg3Yitia0VOMk9wMzRtSnRXT0hTaVlzdnB1Q0hEcXI2eHh5UlZFVU9Tczl3SnBoc0gvSGlySm5oamZxSUtuWWZqSkRYK2tqanpmSC9WQ0VDVUZ3My8xSlE5VmtENUZFMzFFdz09IiwibWFjIjoiNDkyZjM1OGNkNWRlY2UzYzQ3NjljMmJiNWYzMDM3YmQ3ZTFlZGMyMzc2ZWNjNGI1MzIxNWFiYTEwMmNiOGQ3MiIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/5/messages",
+      "status": 201
+    },
+    {
+      "session": "tutor-S5",
+      "method": "GET",
+      "path": "/api/v1/conversations/5/messages?after=eyJpdiI6Ii9kaEd1MTJPZGpOcFk1b0x0eUhNVlE9PSIsInZhbHVlIjoiVy9MZlBHbnA3eTdBOWU1dXQrbFBnNVh4bTRwOVZ3UDJLaEt3b0krRXRKRCtRWk9FV1JEVEFNVjh1UGRYNUZsY2xFaWFNM2twYytDRjlUdnR0Rmo1c2F4N2NlWG9xdnhVVlJ1cFl4cGorSkRKV3JUcnZFWEdwU2JnT08weEpxdFJpdGxmeUdzVXJsRStTaENPYWxXZGpoY2pyRnVOU1FzWFhRVFNnSUIvdEkxUVdMRHJsRDY0ZFhyNmFkWVo5eUMzdGFhRjhGMDhVNlpHWXl3Q09BcWVWUT09IiwibWFjIjoiYmY3ZTYwNzM5ZDJhNDY0MjI0NDA4ZmY2ZmQ4MjIyMDdiMDhmOWNiNmY5OWM1MDQwMDMxM2U5ZjU4ODVlYTJlNSIsInRhZyI6IiJ9&per_page=20",
+      "status": 200
+    }
+  ],
+  "service_actions": [
+    {
+      "action": "stop",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:19.986Z"
+    },
+    {
+      "action": "start",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:21.977Z"
+    },
+    {
+      "action": "stop",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:25.746Z"
+    },
+    {
+      "action": "start",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:27.781Z"
+    },
+    {
+      "action": "stop",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:33.382Z"
+    },
+    {
+      "action": "start",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:35.462Z"
+    },
+    {
+      "action": "stop",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:41.969Z"
+    },
+    {
+      "action": "start",
+      "service": "broadcast-worker",
+      "at": "2026-10-30T09:06:44.835Z"
+    },
+    {
+      "action": "stop",
+      "service": "reverb",
+      "at": "2026-10-30T09:06:46.483Z"
+    },
+    {
+      "action": "start",
+      "service": "reverb",
+      "at": "2026-10-30T09:06:50.397Z"
+    }
+  ],
+  "fixture_ids": {
+    "customer": 82,
+    "tutor": 83,
+    "outsider": 84,
+    "admin": 85
+  },
+  "conversation_id": 5,
+  "passed": true,
+  "cleanup": {
+    "users_removed": 4,
+    "remaining_users": 0,
+    "remaining_conversations": 0,
+    "remaining_messages": 0,
+    "remaining_files": 0,
+    "remaining_sessions": 0,
+    "remaining_realtime_sessions": 0,
+    "probe_jobs_removed": 0
+  },
+  "finished_at": "2026-10-30T09:06:56.925Z"
+}

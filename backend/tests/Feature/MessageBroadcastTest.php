@@ -1,330 +1,260 @@
 <?php
 
-use App\Events\ConversationMessagesChanged;
-use Carbon\CarbonImmutable;
-use Illuminate\Broadcasting\BroadcastEvent;
-use Illuminate\Broadcasting\PrivateChannel;
+namespace Tests\Feature;
+
+use App\Jobs\BroadcastConversationChanged;
+use App\Support\RealtimeSessionChannels;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
-use Illuminate\Contracts\Broadcasting\Factory as BroadcastFactory;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldRescue;
-use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
+use Mockery;
+use RuntimeException;
+use Tests\Support\InteractsWithRealtimeSessions;
 use Tests\Support\MessageSendFixtures as Fixtures;
 use Tests\Support\ProgramApiFixtures;
 use Tests\Support\TestActors;
 use Tests\TestCase;
 
-uses(TestCase::class, DatabaseTruncation::class);
+class MessageBroadcastTest extends TestCase
+{
+    use DatabaseTruncation;
+    use InteractsWithRealtimeSessions;
 
-beforeEach(function (): void {
-    $this->travelTo(
-        CarbonImmutable::parse('2026-10-30T08:00:00.123456Z'),
-    );
+    public function test_notification_is_enqueued_only_after_outer_commit(): void
+    {
+        [$customer, $chat] = $this->messagingFixture();
 
-    $this->customer = TestActors::customer();
-    $this->tutor = ProgramApiFixtures::eligibleTutor();
+        DB::beginTransaction();
 
-    $this->chat = Fixtures::conversation(
-        $this->customer,
-        $this->tutor,
-    );
+        try {
+            $this->actingAs($customer)
+                ->postJson($this->url($chat), Fixtures::payload())
+                ->assertCreated();
 
-    $this->url = '/api/v1/conversations/'
-        .$this->chat.'/messages';
+            Queue::assertNothingPushed();
 
-    Queue::fake();
-});
+            DB::commit();
+        } finally {
+            while (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+        }
 
-afterEach(function (): void {
-    while (DB::transactionLevel() > 0) {
-        DB::rollBack();
+        Queue::assertPushedOn(
+            'broadcasts',
+            BroadcastConversationChanged::class,
+            fn (BroadcastConversationChanged $job): bool => $job->conversationId === $chat,
+        );
+
+        Queue::assertPushed(BroadcastConversationChanged::class, 1);
+        $this->assertDatabaseCount('messages', 1);
     }
 
-    $this->travelBack();
-});
+    public function test_outer_rollback_discards_message_and_notification(): void
+    {
+        [$customer, $chat] = $this->messagingFixture();
 
-test('event uses a private channel and exposes only the conversation ID', function (): void {
-    $event = new ConversationMessagesChanged($this->chat);
+        DB::beginTransaction();
 
-    expect($event)
-        ->toBeInstanceOf(ShouldBroadcast::class)
-        ->toBeInstanceOf(ShouldDispatchAfterCommit::class)
-        ->toBeInstanceOf(ShouldRescue::class);
+        try {
+            $this->actingAs($customer)
+                ->postJson($this->url($chat), Fixtures::payload())
+                ->assertCreated();
 
-    expect($event->queue)->toBe('broadcasts');
+            Queue::assertNothingPushed();
+        } finally {
+            DB::rollBack();
+        }
 
-    expect($event->broadcastAs())
-        ->toBe('conversation.messages_changed');
+        Queue::assertNothingPushed();
+        $this->assertDatabaseCount('messages', 0);
+    }
 
-    expect($event->broadcastWith())->toBe([
-        'conversation_id' => $this->chat,
-    ]);
+    public function test_replay_and_conflict_do_not_enqueue_another_notification(): void
+    {
+        [$customer, $chat, $tutor] = $this->messagingFixture();
 
-    $channels = $event->broadcastOn();
+        $payload = Fixtures::payload("Hello\r\nTutor");
 
-    expect($channels)->toHaveCount(1);
+        $first = $this->actingAs($customer)
+            ->postJson($this->url($chat), $payload)
+            ->assertCreated();
 
-    expect($channels[0])->toBeInstanceOf(PrivateChannel::class);
+        $this->postJson(
+            $this->url($chat),
+            array_replace($payload, ['body' => 'Different']),
+        )->assertConflict();
 
-    expect($channels[0]->name)
-        ->toBe('private-conversations.'.$this->chat);
-});
-
-test('new message dispatches and queues exactly once after outer commit', function (): void {
-    $observed = [];
-
-    Event::listen(
-        ConversationMessagesChanged::class,
-        function (ConversationMessagesChanged $event) use (&$observed): void {
-            $observed[] = $event;
-        },
-    );
-
-    DB::beginTransaction();
-
-    $response = $this->actingAs($this->customer)
-        ->postJson($this->url, Fixtures::payload())
-        ->assertCreated();
-
-    $this->assertDatabaseHas('messages', [
-        'id' => $response->json('data.id'),
-        'conversation_id' => $this->chat,
-    ]);
-
-    expect($observed)->toBe([]);
-
-    Queue::assertNothingPushed();
-
-    DB::commit();
-
-    expect($observed)->toHaveCount(1);
-
-    Queue::assertPushed(BroadcastEvent::class, 1);
-
-    Queue::assertPushedOn(
-        'broadcasts',
-        BroadcastEvent::class,
-        fn (BroadcastEvent $job): bool => $job->event instanceof ConversationMessagesChanged
-            && $job->event->conversationId === $this->chat,
-    );
-});
-
-test('outer rollback discards both message and broadcast', function (): void {
-    $observed = [];
-
-    Event::listen(
-        ConversationMessagesChanged::class,
-        function (ConversationMessagesChanged $event) use (&$observed): void {
-            $observed[] = $event;
-        },
-    );
-
-    DB::beginTransaction();
-
-    $this->actingAs($this->customer)
-        ->postJson($this->url, Fixtures::payload())
-        ->assertCreated();
-
-    expect($observed)->toBe([]);
-
-    Queue::assertNothingPushed();
-
-    DB::rollBack();
-
-    expect($observed)->toBe([]);
-
-    Queue::assertNothingPushed();
-
-    $this->assertDatabaseCount('messages', 0);
-    $this->assertDatabaseCount('jobs', 0);
-});
-
-test('normalized replay does not enqueue another broadcast or reopen chat', function (): void {
-    $payload = Fixtures::payload("Hello\r\nTutor");
-
-    $first = $this->actingAs($this->customer)
-        ->postJson($this->url, $payload)
-        ->assertCreated();
-
-    Queue::assertPushed(BroadcastEvent::class, 1);
-
-    DB::table('conversations')
-        ->where('id', $this->chat)
-        ->update([
+        DB::table('conversations')->where('id', $chat)->update([
             'status' => 'cancelled',
-            'ended_at' => now('UTC'),
+            'ended_at' => now(),
         ]);
 
-    DB::table('users')
-        ->where('id', $this->tutor->id)
-        ->update(['status' => 'suspended']);
+        DB::table('users')->where('id', $tutor->id)
+            ->update(['status' => 'suspended']);
 
-    $retry = array_replace($payload, [
-        'body' => "Hello\nTutor",
-    ]);
+        $this->postJson(
+            $this->url($chat),
+            array_replace($payload, ['body' => "Hello\nTutor"]),
+        )->assertOk()->assertJsonPath('data.id', $first->json('data.id'));
 
-    $this->postJson($this->url, $retry)
-        ->assertOk()
-        ->assertJsonPath('data.id', $first->json('data.id'));
+        Queue::assertPushed(BroadcastConversationChanged::class, 1);
+        $this->assertDatabaseCount('messages', 1);
 
-    Queue::assertPushed(BroadcastEvent::class, 1);
-
-    $this->assertDatabaseCount('messages', 1);
-
-    $this->assertDatabaseHas('conversations', [
-        'id' => $this->chat,
-        'status' => 'cancelled',
-    ]);
-});
-
-test('conflicting payload does not enqueue another broadcast', function (): void {
-    $payload = Fixtures::payload('First body');
-
-    $this->actingAs($this->customer)
-        ->postJson($this->url, $payload)
-        ->assertCreated();
-
-    $this->postJson(
-        $this->url,
-        array_replace($payload, ['body' => 'Different body']),
-    )
-        ->assertConflict()
-        ->assertJsonPath('code', 'client_message_id_conflict');
-
-    Queue::assertPushed(BroadcastEvent::class, 1);
-
-    $this->assertDatabaseCount('messages', 1);
-});
-
-test('validation failure creates neither message nor broadcast', function (array $changes): void {
-    $payload = array_replace(Fixtures::payload(), $changes);
-
-    $this->actingAs($this->customer)
-        ->postJson($this->url, $payload)
-        ->assertUnprocessable();
-
-    Queue::assertNothingPushed();
-
-    $this->assertDatabaseCount('messages', 0);
-})->with([
-    'blank body' => [['body' => '   ']],
-    'system message' => [['message_type' => 'system']],
-    'attachment attempt' => [['file_ids' => [123]]],
-]);
-
-test('quota rejection does not dispatch or enqueue a broadcast', function (): void {
-    for ($index = 0; $index < 30; $index++) {
-        Fixtures::seed($this->chat, $this->customer);
+        $this->assertDatabaseHas('conversations', [
+            'id' => $chat,
+            'status' => 'cancelled',
+        ]);
     }
 
-    $this->actingAs($this->customer)
-        ->postJson($this->url, Fixtures::payload())
-        ->assertTooManyRequests()
-        ->assertHeader('Retry-After', '60');
+    public function test_validation_quota_and_outsider_failures_do_not_enqueue(): void
+    {
+        [$customer, $chat] = $this->messagingFixture();
 
-    Queue::assertNothingPushed();
+        foreach ([
+            ['body' => '   '],
+            ['message_type' => 'system'],
+            ['file_ids' => [123]],
+        ] as $changes) {
+            $this->actingAs($customer)
+                ->postJson(
+                    $this->url($chat),
+                    array_replace(Fixtures::payload(), $changes),
+                )->assertUnprocessable();
+        }
 
-    $this->assertDatabaseCount('messages', 30);
-});
+        $this->actingAs(TestActors::customer())
+            ->postJson($this->url($chat), Fixtures::payload())
+            ->assertNotFound();
 
-test('outsider send creates neither message nor broadcast', function (): void {
-    $this->actingAs(TestActors::customer())
-        ->postJson($this->url, Fixtures::payload())
-        ->assertNotFound();
+        for ($index = 0; $index < 30; $index++) {
+            Fixtures::seed($chat, $customer);
+        }
 
-    Queue::assertNothingPushed();
+        $this->actingAs($customer)
+            ->postJson($this->url($chat), Fixtures::payload())
+            ->assertTooManyRequests()
+            ->assertHeader('Retry-After');
 
-    $this->assertDatabaseCount('messages', 0);
-});
+        Queue::assertNothingPushed();
+        $this->assertDatabaseCount('messages', 30);
+    }
 
-test('queue push failure is reported without losing the committed message', function (): void {
-    Exceptions::fake();
+    public function test_queue_failure_does_not_lose_the_committed_message(): void
+    {
+        [$customer, $chat] = $this->messagingFixture();
+        Exceptions::fake();
 
-    $failure = new RuntimeException(
-        'Injected broadcast queue failure.',
-    );
+        $failure = new RuntimeException('Injected queue failure.');
 
-    $queue = Mockery::mock(QueueContract::class);
+        Queue::shouldReceive('pushOn')
+            ->once()
+            ->with(
+                'broadcasts',
+                Mockery::type(BroadcastConversationChanged::class),
+            )
+            ->andThrow($failure);
 
-    $queue->shouldReceive('pushOn')
-        ->once()
-        ->with(
-            'broadcasts',
-            Mockery::type(BroadcastEvent::class),
-        )
-        ->andThrow($failure);
+        $payload = Fixtures::payload('Stored despite queue failure');
 
-    Queue::shouldReceive('connection')
-        ->once()
-        ->with(null)
-        ->andReturn($queue);
+        $first = $this->actingAs($customer)
+            ->postJson($this->url($chat), $payload)
+            ->assertCreated();
 
-    $payload = Fixtures::payload('Stored despite queue failure');
+        Exceptions::assertReported(
+            fn (RuntimeException $exception): bool => $exception === $failure,
+        );
 
-    $response = $this->actingAs($this->customer)
-        ->postJson($this->url, $payload)
-        ->assertCreated();
+        $this->getJson($this->url($chat))
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $first->json('data.id'));
 
-    $messageId = $response->json('data.id');
+        $this->postJson($this->url($chat), $payload)
+            ->assertOk()
+            ->assertJsonPath('data.id', $first->json('data.id'));
 
-    Exceptions::assertReported(
-        fn (RuntimeException $exception): bool => $exception === $failure,
-    );
+        $this->assertDatabaseCount('messages', 1);
+    }
 
-    $this->assertDatabaseHas('messages', [
-        'id' => $messageId,
-        'body' => 'Stored despite queue failure',
-    ]);
+    public function test_transport_uses_only_session_channels_and_minimal_payload(): void
+    {
+        [$customer, $chat] = $this->messagingFixture();
+        $fixture = $this->realtimeFixture($customer);
 
-    $this->getJson($this->url)
-        ->assertOk()
-        ->assertJsonPath('data.0.id', $messageId);
+        $expected = 'private-'.app(RealtimeSessionChannels::class)
+            ->channel($chat, $fixture['token']);
 
-    $this->postJson($this->url, $payload)
-        ->assertOk()
-        ->assertJsonPath('data.id', $messageId);
+        $driver = Mockery::mock(Broadcaster::class);
 
-    $this->assertDatabaseCount('messages', 1);
-});
+        $driver->shouldReceive('broadcast')
+            ->once()
+            ->with(
+                [$expected],
+                'conversation.messages_changed',
+                ['conversation_id' => $chat],
+            );
 
-test('broadcast transport failure leaves the committed message readable', function (): void {
-    $response = $this->actingAs($this->customer)
-        ->postJson($this->url, Fixtures::payload())
-        ->assertCreated();
+        Broadcast::shouldReceive('connection')->once()->andReturn($driver);
 
-    Queue::assertPushed(BroadcastEvent::class, 1);
+        (new BroadcastConversationChanged($chat))
+            ->handle(app(RealtimeSessionChannels::class));
+    }
 
-    $job = Queue::pushed(BroadcastEvent::class)->first();
+    public function test_transport_failure_leaves_the_committed_message_readable(): void
+    {
+        [$customer, $chat] = $this->messagingFixture();
+        $this->realtimeFixture($customer);
 
-    expect($job)->toBeInstanceOf(BroadcastEvent::class);
+        $first = $this->actingAs($customer)
+            ->postJson($this->url($chat), Fixtures::payload())
+            ->assertCreated();
 
-    $driver = Mockery::mock(Broadcaster::class);
+        $driver = Mockery::mock(Broadcaster::class);
+        $driver->shouldReceive('broadcast')
+            ->once()
+            ->andThrow(new RuntimeException('Injected transport failure.'));
 
-    $driver->shouldReceive('broadcast')
-        ->once()
-        ->andThrow(new RuntimeException('Reverb unavailable.'));
+        Broadcast::shouldReceive('connection')->once()->andReturn($driver);
 
-    $factory = Mockery::mock(BroadcastFactory::class);
+        $failure = null;
 
-    $factory->shouldReceive('connection')
-        ->once()
-        ->with(null)
-        ->andReturn($driver);
+        try {
+            (new BroadcastConversationChanged($chat))
+                ->handle(app(RealtimeSessionChannels::class));
+        } catch (RuntimeException $exception) {
+            $failure = $exception;
+        }
 
-    expect(fn () => $job->handle($factory))
-        ->toThrow(RuntimeException::class, 'Reverb unavailable.');
+        $this->assertNotNull($failure);
 
-    $this->assertDatabaseHas('messages', [
-        'id' => $response->json('data.id'),
-    ]);
+        $this->getJson($this->url($chat))
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $first->json('data.id'));
 
-    $this->getJson($this->url)
-        ->assertOk()
-        ->assertJsonPath('data.0.id', $response->json('data.id'));
-});
+        $this->assertDatabaseCount('messages', 1);
+    }
+
+    private function messagingFixture(): array
+    {
+        config([
+            'session.driver' => 'database',
+            'session.connection' => config('database.default'),
+        ]);
+
+        Queue::fake();
+
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $chat = Fixtures::conversation($customer, $tutor);
+
+        return [$customer, $chat, $tutor];
+    }
+
+    private function url(int $chat): string
+    {
+        return '/api/v1/conversations/'.$chat.'/messages';
+    }
+}

@@ -1,0 +1,5 @@
+Started: 2026-10-30T15:59:22.1766448+07:00
+Scramble export on migrated SQLite :memory: in the same PHP process; development PostgreSQL untouched.
+Operations: 70
+New realtime path present: True
+Exit code: 0

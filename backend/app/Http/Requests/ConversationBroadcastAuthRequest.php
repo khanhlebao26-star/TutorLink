@@ -23,8 +23,8 @@ class ConversationBroadcastAuthRequest extends FormRequest
             'channel_name' => [
                 'required',
                 'string',
-                'max:100',
-                'regex:/\Aprivate-conversations\.[1-9][0-9]*\z/',
+                'max:164',
+                'regex:/\Aprivate-conversations\.[1-9][0-9]*\.sessions\.[a-f0-9]{64}\z/',
             ],
         ];
     }

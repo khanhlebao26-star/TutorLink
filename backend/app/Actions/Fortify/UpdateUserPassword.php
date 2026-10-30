@@ -4,6 +4,7 @@ namespace App\Actions\Fortify;
 
 use App\Actions\Auth\RevokeUserSessions;
 use App\Models\User;
+use App\Support\RealtimeSessionChannels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,10 @@ class UpdateUserPassword implements UpdatesUserPasswords
 
             app(RevokeUserSessions::class)->handle(
                 $user,
+                $currentSessionId,
+            );
+            app(RealtimeSessionChannels::class)->tombstone(
+                (int) $user->id,
                 $currentSessionId,
             );
         });

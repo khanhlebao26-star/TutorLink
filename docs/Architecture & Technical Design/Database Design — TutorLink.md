@@ -1150,3 +1150,7 @@ Business Rules: [Business Rules](<../Domain Documentation/Business Rules.md>)
 
 F03 — Cột phân công Admin (thiết kế đích)  
 Các cột assignment đã được đưa vào bảng tutor\_profiles và reports ở trên. NULL assignee biểu thị chưa phân công; reviewed\_by và handled\_by tiếp tục chỉ người ra quyết định. Assignment đổi cùng audit, tăng assignment\_version; không thêm bảng lịch sử assignment riêng. Index hàng đợi theo (status, assigned\_admin\_id, submitted\_at) cho tutor\_profiles và (status, assigned\_admin\_id, created\_at) cho reports. Đây là thiết kế tài liệu, chưa phải migration đã chạy.
+
+## Realtime session registry — K03.13 (30/10/2026)
+
+Migration `2026_10_30_180000_create_realtime_sessions_table` bổ sung `realtime_sessions`: `id`, `user_id` FK User cascade delete, `session_hash` char(64) HMAC không phải session ID thô, `channel_token` char(64) ngẫu nhiên, `expires_at`, nullable `revoked_at`, `created_at`/`updated_at` timestamptz(6). Unique `(user_id,session_hash)`, unique token, index `(user_id,revoked_at,expires_at)`. Registry và database sessions dùng cùng connection. Giữ revoked tombstone để chặn request cũ tái cấp quyền; chưa có cleanup tự động. Không thay schema Conversation/Message/File hoặc xóa scan evidence lịch sử. [Contract](../handover/BE-K03-K03.1-contract.md#13-realtime) và [test/evidence](../handover/BE-K03-K03.13-test-report.md) là căn cứ cho bổ sung này; sơ đồ draw.io chưa cập nhật trong task này.

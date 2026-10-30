@@ -33,8 +33,10 @@ class SuspendTutorProfile
                 $beforeUser = $user->only(['status', 'suspended_at']);
                 $user->forceFill(['status' => 'suspended', 'suspended_at' => now(), 'remember_token' => str()->random(60)])->save();
                 $user->tokens()->delete();
-                app(RevokeUserSessions::class)->handle($user);
                 $flow->audit($actor, 'account_suspended', 'user', $user->id, $beforeUser, $user->only(['status', 'suspended_at']), $reason);
+            }
+            if ($suspend) {
+                app(RevokeUserSessions::class)->handle($user);
             }
             $before = $profile->only(['status', 'suspended_at', 'suspension_reason', 'status_before_suspension']);
             $restoredStatus = $profile->status_before_suspension;
@@ -44,13 +46,20 @@ class SuspendTutorProfile
             $profile->forceFill([
                 'status_before_suspension' => $suspend ? $profile->status : null,
                 'status' => $suspend ? 'suspended' : $restoredStatus,
-                'suspended_at' => $suspend ? now() : null, 'suspension_reason' => $suspend ? $reason : null,
+                'suspended_at' => $suspend ? now() : null,
+                'suspension_reason' => $suspend ? $reason : null,
             ])->save();
             $verb = $suspend ? 'suspend' : 'restore';
             $type = $suspend ? 'tutor_profile_suspended' : 'tutor_profile_restored';
             $auditId = $flow->audit($actor, $type, 'tutor_profile', $profile->id, $before, $profile->only(array_keys($before)), $reason);
-            app(NotificationOutboxWriter::class)->record($type, 'tutor_profile', $profile->id,
-                "profile:{$profile->id}:{$verb}:{$auditId}", [$profile->user_id], ['deep_link' => '/profile']);
+            app(NotificationOutboxWriter::class)->record(
+                $type,
+                'tutor_profile',
+                $profile->id,
+                "profile:{$profile->id}:{$verb}:{$auditId}",
+                [$profile->user_id],
+                ['deep_link' => '/profile']
+            );
 
             return $profile->refresh()->load('user');
         }, 3);

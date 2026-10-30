@@ -46,6 +46,8 @@ Các trường phí là khai báo của Tutor, không xác nhận ngân hàng/c�
 
 ## Conversation
 
+* Bổ sung K03.13 (30/10): logout/suspend thu hồi registry realtime theo phiên, không đổi Conversation/membership/read cursor. Logout giữ các phiên khác; suspend account/Profile thu hồi tất cả; restore không hồi sinh token cũ. Cấp quyền mới sau đăng nhập lại theo [contract §13](../handover/BE-K03-K03.1-contract.md#13-realtime).
+
 * ConversationStatus chỉ active/cancelled. Khi có Program completed, active → cancelled chỉ nếu cặp không còn Program active/paused và không còn Invitation pending còn hạn. cancelled chỉ đọc. Nếu còn quan hệ đang tiếp diễn thì giữ active. Khi bắt đầu trao đổi dịch vụ mới và đủ điều kiện, cancelled → active trên chính Conversation cũ; không tạo hội thoại trùng cặp.
 * BR-17: đình chỉ participant không tự chuyển active → cancelled, không xóa membership/message/context. Member active vẫn đọc lịch sử của mình; member bị đình chỉ bị từ chối đọc/gửi kể cả khi còn session cũ và đọc lại được sau khôi phục. `context_listing_id` chỉ được ghi khi tạo lần đầu, không đổi khi dùng lại hoặc tái mở. BR-21: member active không gửi message mới khi peer bị đình chỉ; cancelled chỉ mở lại bằng request mở liên hệ mới đủ gate; lifecycle không tự chèn system message.
 

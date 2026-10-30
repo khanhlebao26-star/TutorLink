@@ -1,184 +1,187 @@
 <?php
 
+namespace Tests\Feature;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\DB;
-use Tests\Support\MessageSendFixtures as Fixtures;
+use Tests\Support\InteractsWithRealtimeSessions;
+use Tests\Support\MessageSendFixtures;
 use Tests\Support\ProgramApiFixtures;
 use Tests\Support\TestActors;
 use Tests\TestCase;
 
-uses(TestCase::class, RefreshDatabase::class);
+class ConversationBroadcastAuthTest extends TestCase
+{
+    use InteractsWithRealtimeSessions;
+    use RefreshDatabase;
 
-beforeEach(function (): void {
-    config([
-        'broadcasting.default' => 'reverb',
-        'broadcasting.connections.reverb' => [
-            'driver' => 'reverb',
-            'key' => 'test-reverb-key',
-            'secret' => 'test-reverb-secret',
-            'app_id' => 'test-reverb-app',
-            'options' => [
-                'host' => '127.0.0.1',
-                'port' => 8080,
-                'scheme' => 'http',
-                'useTLS' => false,
-            ],
-            'client_options' => [],
-        ],
-    ]);
+    public function test_authentication_is_required(): void
+    {
+        $this->configureRealtimeTests();
+        $cookies = [];
 
-    Broadcast::forgetDrivers();
+        $this->authorizeChannel(
+            $cookies,
+            'conversations.1.sessions.'.str_repeat('a', 64),
+        )->assertUnauthorized();
+    }
 
-    require base_path('routes/channels.php');
+    public function test_members_receive_a_valid_session_bound_signature(): void
+    {
+        $this->configureRealtimeTests();
 
-    $this->customer = TestActors::customer();
-    $this->tutor = ProgramApiFixtures::eligibleTutor();
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $chat = MessageSendFixtures::conversation($customer, $tutor);
 
-    $this->chat = Fixtures::conversation(
-        $this->customer,
-        $this->tutor,
-    );
+        foreach ([$customer, $tutor] as $actor) {
+            $cookies = $this->loginBrowser($actor);
+            $grant = $this->issueChannel($cookies, $chat);
 
-    $this->authPayload = [
-        'socket_id' => '123.456',
-        'channel_name' => 'private-conversations.'.$this->chat,
-    ];
-});
+            $expected = 'test-reverb-key:'.hash_hmac(
+                'sha256',
+                '123.456:private-'.$grant['channel'],
+                'test-reverb-secret',
+            );
 
-test('broadcast authorization requires an authenticated session', function (): void {
-    $this->postJson('/broadcasting/auth', $this->authPayload)
-        ->assertUnauthorized();
-});
+            $this->authorizeChannel($cookies, $grant['channel'])
+                ->assertOk()
+                ->assertJsonPath('auth', $expected);
+        }
+    }
 
-test('either active member receives the exact private channel signature', function (string $role): void {
-    $actor = $role === 'customer'
-        ? $this->customer
-        : $this->tutor;
+    public function test_other_sessions_outsider_and_admin_cannot_use_the_token(): void
+    {
+        $this->configureRealtimeTests();
 
-    $signature = hash_hmac(
-        'sha256',
-        $this->authPayload['socket_id']
-        .':'.$this->authPayload['channel_name'],
-        'test-reverb-secret',
-    );
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $chat = MessageSendFixtures::conversation($customer, $tutor);
 
-    $this->actingAs($actor)
-        ->postJson('/broadcasting/auth', $this->authPayload)
-        ->assertOk()
-        ->assertExactJson([
-            'auth' => 'test-reverb-key:'.$signature,
-        ]);
-})->with(['customer', 'tutor']);
+        $first = $this->loginBrowser($customer);
+        $passwordHash = $customer->fresh()->getAuthPassword();
+        $second = $this->loginBrowser($customer);
 
-test('outsider and admin cannot authorize a conversation channel', function (string $role): void {
-    $actor = $role === 'admin'
-        ? TestActors::admin()
-        : TestActors::customer();
+        $this->assertSame($passwordHash, $customer->fresh()->getAuthPassword());
+        $this->assertSame(
+            2,
+            DB::table('sessions')->where('user_id', $customer->id)->count(),
+        );
 
-    $this->actingAs($actor)
-        ->postJson('/broadcasting/auth', $this->authPayload)
-        ->assertForbidden();
-})->with(['customer', 'admin']);
+        $outsider = $this->loginBrowser(TestActors::customer());
+        $admin = $this->loginBrowser(TestActors::admin());
 
-test('a missing conversation cannot be authorized', function (): void {
-    $payload = array_replace($this->authPayload, [
-        'channel_name' => 'private-conversations.'.PHP_INT_MAX,
-    ]);
+        $grant = $this->issueChannel($first, $chat);
 
-    $this->actingAs($this->customer)
-        ->postJson('/broadcasting/auth', $payload)
-        ->assertForbidden();
-});
+        $this->authorizeChannel($second, $grant['channel'])
+            ->assertForbidden();
 
-test('current database account state overrides a stale authenticated actor', function (string $change): void {
-    $this->actingAs($this->customer);
+        $this->authorizeChannel($outsider, $grant['channel'])
+            ->assertForbidden();
 
-    $changes = match ($change) {
-        'suspended' => ['status' => 'suspended'],
-        'deleted' => ['deleted_at' => now('UTC')],
-        'admin' => ['role' => 'admin'],
-    };
+        $this->authorizeChannel($admin, $grant['channel'])
+            ->assertForbidden();
 
-    DB::table('users')
-        ->where('id', $this->customer->id)
-        ->update($changes);
+        $this->browserRequest(
+            $outsider,
+            'POST',
+            '/api/v1/conversations/'.$chat.'/realtime',
+        )->assertNotFound();
+    }
 
-    $this->postJson('/broadcasting/auth', $this->authPayload)
-        ->assertForbidden();
-})->with(['suspended', 'deleted', 'admin']);
+    public function test_cancelled_chat_and_suspended_peer_remain_readable(): void
+    {
+        $this->configureRealtimeTests();
 
-test('channel authorization checks membership again on every request', function (): void {
-    $this->actingAs($this->customer)
-        ->postJson('/broadcasting/auth', $this->authPayload)
-        ->assertOk();
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $chat = MessageSendFixtures::conversation($customer, $tutor);
+        $cookies = $this->loginBrowser($customer);
 
-    DB::table('conversation_members')
-        ->where('conversation_id', $this->chat)
-        ->where('user_id', $this->customer->id)
-        ->delete();
-
-    $this->postJson('/broadcasting/auth', $this->authPayload)
-        ->assertForbidden();
-});
-
-test('an active member may subscribe to cancelled chat with suspended peer', function (): void {
-    DB::table('conversations')
-        ->where('id', $this->chat)
-        ->update([
+        DB::table('conversations')->where('id', $chat)->update([
             'status' => 'cancelled',
-            'ended_at' => now('UTC'),
+            'ended_at' => now(),
         ]);
 
-    DB::table('users')
-        ->where('id', $this->tutor->id)
-        ->update(['status' => 'suspended']);
+        DB::table('users')->where('id', $tutor->id)
+            ->update(['status' => 'suspended']);
 
-    $this->actingAs($this->customer)
-        ->postJson('/broadcasting/auth', $this->authPayload)
-        ->assertOk();
+        $grant = $this->issueChannel($cookies, $chat);
 
-    $this->assertDatabaseHas('conversations', [
-        'id' => $this->chat,
-        'status' => 'cancelled',
-    ]);
-});
+        $this->authorizeChannel($cookies, $grant['channel'])
+            ->assertOk();
+    }
 
-test('invalid socket or channel input is rejected', function (string $field, mixed $value): void {
-    $payload = array_replace($this->authPayload, [
-        $field => $value,
-    ]);
+    public function test_membership_removal_denies_an_existing_token(): void
+    {
+        $this->configureRealtimeTests();
 
-    $this->actingAs($this->customer)
-        ->postJson('/broadcasting/auth', $payload)
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors($field);
-})->with([
-    'null socket' => ['socket_id', null],
-    'malformed socket' => ['socket_id', 'invalid-socket'],
-    'array socket' => ['socket_id', ['123.456']],
-    'null channel' => ['channel_name', null],
-    'public channel' => ['channel_name', 'conversations.1'],
-    'another channel namespace' => [
-        'channel_name',
-        'private-users.1',
-    ],
-    'zero conversation ID' => [
-        'channel_name',
-        'private-conversations.0',
-    ],
-    'negative conversation ID' => [
-        'channel_name',
-        'private-conversations.-1',
-    ],
-]);
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $chat = MessageSendFixtures::conversation($customer, $tutor);
+        $cookies = $this->loginBrowser($customer);
+        $grant = $this->issueChannel($cookies, $chat);
 
-test('missing authorization fields are rejected', function (): void {
-    $this->actingAs($this->customer)
-        ->postJson('/broadcasting/auth', [])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors([
-            'socket_id',
-            'channel_name',
+        DB::table('conversation_members')
+            ->where('conversation_id', $chat)
+            ->where('user_id', $customer->id)
+            ->delete();
+
+        $this->authorizeChannel($cookies, $grant['channel'])
+            ->assertForbidden();
+    }
+
+    public function test_expired_grant_is_denied_and_renewal_rotates_its_token(): void
+    {
+        $this->configureRealtimeTests();
+
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $chat = MessageSendFixtures::conversation($customer, $tutor);
+        $cookies = $this->loginBrowser($customer);
+        $old = $this->issueChannel($cookies, $chat);
+
+        DB::table('realtime_sessions')->update([
+            'expires_at' => now()->subMinute(),
         ]);
-});
+
+        $this->authorizeChannel($cookies, $old['channel'])
+            ->assertForbidden();
+
+        $new = $this->issueChannel($cookies, $chat);
+
+        $this->assertNotSame($old['channel'], $new['channel']);
+
+        $this->authorizeChannel($cookies, $old['channel'])
+            ->assertForbidden();
+
+        $this->authorizeChannel($cookies, $new['channel'])
+            ->assertOk();
+    }
+
+    public function test_invalid_channel_socket_and_client_selected_session_are_rejected(): void
+    {
+        $this->configureRealtimeTests();
+
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $chat = MessageSendFixtures::conversation($customer, $tutor);
+        $cookies = $this->loginBrowser($customer);
+        $grant = $this->issueChannel($cookies, $chat);
+
+        $this->browserRequest($cookies, 'POST', '/broadcasting/auth', [
+            'socket_id' => '123.456',
+            'channel_name' => 'private-conversations.'.$chat,
+        ])->assertUnprocessable();
+
+        $this->authorizeChannel($cookies, $grant['channel'], 'invalid')
+            ->assertUnprocessable();
+
+        $this->browserRequest(
+            $cookies,
+            'POST',
+            '/api/v1/conversations/'.$chat.'/realtime',
+            ['session_id' => 'client-selected'],
+        )->assertUnprocessable();
+    }
+}
