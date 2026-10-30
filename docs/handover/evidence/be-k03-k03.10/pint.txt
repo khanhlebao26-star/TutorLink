@@ -1,0 +1,4 @@
+Started: 2026-10-30T13:55:52.8684737+07:00
+Command: docker compose exec -T backend vendor/bin/pint --format agent tests/Feature/FileLifecycleConcurrencyTest.php
+{"tool":"pint","result":"passed"}
+Exit code: 0

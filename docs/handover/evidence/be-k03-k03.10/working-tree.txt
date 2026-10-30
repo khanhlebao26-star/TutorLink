@@ -1,0 +1,17 @@
+Checked: 2026-10-30T14:01:24.8215731+07:00
+Base HEAD: f61deafd1e042fff19f7ab3a6bdc57eb17bea43d
+Command: git -c core.quotepath=false status --short
+ M backend/tests/Feature/ConversationLifecycleApiTest.php
+ M docs/handover/BE-K03-K03.9-issue-update.md
+ M docs/handover/BE-K03-K03.9-test-report.md
+ M docs/handover/BE-K03-roadmap.md
+ M docs/handover/evidence/be-k03-k03.9/diff-check.txt
+ M docs/handover/evidence/be-k03-k03.9/full-backend-tests.txt
+ M docs/handover/evidence/be-k03-k03.9/pint.txt
+ M docs/handover/evidence/be-k03-k03.9/source-fingerprints.json
+ M docs/handover/evidence/be-k03-k03.9/targeted-tests.txt
+?? backend/tests/Feature/FileLifecycleConcurrencyTest.php
+?? docs/handover/BE-K03-K03.10-issue-update.md
+?? docs/handover/BE-K03-K03.10-test-report.md
+?? docs/handover/evidence/be-k03-k03.10/
+?? docs/handover/evidence/be-k03-k03.9/api-evidence-reuse.txt

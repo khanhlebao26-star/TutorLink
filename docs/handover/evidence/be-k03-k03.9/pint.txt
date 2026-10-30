@@ -1,4 +1,4 @@
-Started: 2026-10-30T11:21:15.5448562+07:00
-Command: docker compose exec -T backend vendor/bin/pint --format agent app/Actions/Messaging/SyncConversationLifecycle.php app/Actions/Programs/TransitionProgram.php app/Actions/Programs/UpdateProgramDraft.php tests/Feature/ConversationLifecycleApiTest.php tests/Feature/InvitationAcceptConcurrencyTest.php
-{"tool":"pint","result":"passed"}
+Started: 2026-10-30T13:48:47.6324782+07:00
+Command: docker compose exec -T backend vendor/bin/pint --format agent tests/Feature/ConversationLifecycleApiTest.php
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Feature\/ConversationLifecycleApiTest.php","fixers":["function_declaration","array_indentation","fully_qualified_strict_types","concat_space","statement_indentation","not_operator_with_successor_space","ordered_imports","single_blank_line_at_eof"]}]}
 Exit code: 0

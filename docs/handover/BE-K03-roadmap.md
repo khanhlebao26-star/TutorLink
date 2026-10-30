@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a, K03.7b, K03.8 và K03.9 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.10–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
+- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a–K03.10 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.11–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
 
 ## Nguyên tắc triển khai
 
@@ -33,7 +33,7 @@
 | A — Lõi API | K03.7b | Đồng bộ complete/upload và giới hạn 5.000.000 byte | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.8 | Khóa chức năng attachment chat và bảo toàn legacy | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.10 | Nghiệm thu phần lõi | Chưa nghiệm thu |
+| A — Lõi API | K03.10 | Nghiệm thu phần lõi | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | B — Realtime | K03.11 | Backend broadcasting và Reverb | Chưa nghiệm thu |
 | B — Realtime | K03.12 | Frontend Laravel Echo và resync | Chưa nghiệm thu |
 | B — Realtime | K03.13 | Thu hồi quyền và nghiệm thu realtime | Chưa nghiệm thu |
@@ -196,6 +196,8 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 **Kết quả:** Hai file lifecycle/concurrency **28 pass / 266 assertions**; full backend **438 pass / 2.770 assertions / exit 0**. **Đã kiểm tra kỹ thuật — chờ Hoàng review.** Không thêm route, request/response field hoặc migration; Scramble sinh artifact không đổi, parity **69 operations**; Redocly hợp lệ với **43 warnings**.
 
+**Tái kiểm tra 30/10/2026:** HEAD nền `f61deaf`, working tree có test lifecycle cập nhật; targeted chạy lại **7,45 giây**, full backend **46,49 giây**, cùng đạt exit 0. Đã thay log test, cập nhật fingerprints và đối chiếu source API không đổi trước khi giữ lại evidence export/parity/lint cũ. Không đánh dấu K03.10 hoàn tất từ kết quả K03.9 này.
+
 **Báo cáo/evidence:** [K03.9](BE-K03-K03.9-test-report.md), [log và source fingerprints](evidence/be-k03-k03.9/), [nội dung cập nhật issue](BE-K03-K03.9-issue-update.md).
 
 **Giới hạn:** Expiry hiện lazy khi sửa Draft hoặc gửi lại Invitation; GET không ghi DB và chưa có worker tự đóng chat đúng thời điểm hết hạn. Reject/cancel Invitation riêng vẫn là route dự kiến; khi triển khai cần đồng bộ cuối transaction theo cùng thứ tự khóa. Không chứng nhận các writer tương lai đã tích hợp.
@@ -204,15 +206,23 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 ### K03.10 — Nghiệm thu phần lõi
 
-- [ ] Tổng hợp test API, quyền, cursor, quota, retry, read cursor, file và lifecycle.
-- [ ] Chạy race test PostgreSQL bằng process/kết nối độc lập: create-vs-create.
-- [ ] Chạy race send-vs-send cùng key.
-- [ ] Chạy race read-vs-read.
-- [ ] Chạy race send-vs-suspend.
-- [ ] Chạy race link-vs-delete.
-- [ ] Chạy regression các phần bị ảnh hưởng: File, Tutor suspension và Program/Invitation.
+- [x] Tổng hợp ma trận test API, quyền, cursor, quota, retry, read cursor, file và lifecycle; xác nhận runtime không có scanner.
+- [x] Chạy race test PostgreSQL bằng process/kết nối độc lập: create-vs-create.
+- [x] Chạy race send-vs-send cùng key và slot quota cuối.
+- [x] Chạy race read-vs-read, read-vs-suspend và send-vs-read.
+- [x] Chạy race send-vs-suspend theo cả hai thứ tự.
+- [x] Chạy race File attach/link-vs-delete theo VerificationDocument đang hỗ trợ; chia sẻ storage test riêng, kiểm row và object, không suy thành resource Task/Submission/CV chưa triển khai.
+- [x] Chạy full regression File, Tutor suspension/approval và Program/Invitation; lưu evidence mới, không dùng test ClamAV cũ thay thế.
 
 **Xong khi:** Các tiêu chí lõi có test/evidence, kết quả và phần còn thiếu được ghi rõ.
+
+**Kết quả:** File race **3 pass / 60 assertions**; Messaging/schema/lifecycle/race **139 pass / 1.065 assertions**; full backend **441 pass / 2.830 assertions / exit 0**, 47,37 giây. Pint và git diff --check đạt. **Đã kiểm tra kỹ thuật — chờ Hoàng review.** Không có API/schema delta; OpenAPI 69 operations, API baseline đối chiếu K03.9 không đổi.
+
+**Báo cáo/evidence:** [K03.10 và ma trận coverage](BE-K03-K03.10-test-report.md), [log/fingerprints](evidence/be-k03-k03.10/), [nội dung cập nhật issue](BE-K03-K03.10-issue-update.md).
+
+**Giới hạn:** Chưa nghiệm thu chat UI/realtime; expiry còn lazy. Task/Submission/CV resource policy, orphan cleanup/storage compensation và writer tương lai cần kiểm riêng. clean/complete không chứng nhận antivirus scan. Kết quả này nghiệm thu backend lõi hiện có, không xác nhận mọi route/module đích đã hoàn tất.
+
+**Tiếp theo:** K03.11 backend broadcasting/Reverb. Người dùng tự commit/push/cập nhật issue/yêu cầu review; không đánh dấu toàn BE-K03 hoàn tất.
 
 ## Giai đoạn B — Realtime với Reverb/Echo
 

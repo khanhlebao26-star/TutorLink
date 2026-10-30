@@ -1,3 +1,5 @@
+Checked: 2026-10-30T13:51:17.1983969+07:00
 Command: git diff --check
+warning: in the working copy of 'docs/handover/BE-K03-K03.9-issue-update.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/handover/BE-K03-K03.9-test-report.md', LF will be replaced by CRLF the next time Git touches it
 Exit code: 0
-Trailing whitespace in changed PHP/new report files: 0

@@ -1,0 +1,20 @@
+Checked: 2026-10-30T13:50:30.4455887+07:00
+Current base HEAD: f61deafd1e042fff19f7ab3a6bdc57eb17bea43d
+Previous evidence base HEAD: 1205c2fad2330a9ac6902fa4398e5312b9da90e7
+Reuse original Scramble/parity/Redocly logs from 30/10/2026 11:16-11:18 +07:00; no new API export or lint run is claimed.
+Runtime API files, OpenAPI artifact and Catalog hashes compared with previous evidence:
+
+Path                                                        Unchanged SHA256
+----                                                        --------- ------
+backend/app/Actions/Messaging/SyncConversationLifecycle.php      True 9a92744096930bf07a85577f794a60ba765847fd194fa74babc086553da170de
+backend/app/Actions/Messaging/OpenConversation.php               True 75473a2d2f0c4ca1c9e69d98602f219a38acad0c4b7148ac8a7a633eff0ba374
+backend/app/Actions/Programs/TransitionProgram.php               True 55bc6fa52f2336f0252cc93426cd81b46bbcffeb93d2b8ba650055177a89b66e
+backend/app/Actions/Programs/UpdateProgramDraft.php              True 251dcc58883937573ff99bb08064239969d5a74c233ccabd743a4dec9990fc62
+backend/app/Actions/Invitations/SendInvitation.php               True 70ca2dd8e22b8eb037f69a6b16d626438312ef991a121cc930deb6d4c9bf0e7c
+backend/app/Actions/Invitations/AcceptInvitation.php             True 18d664a9e0932ca8f058a8c2691b6b916b256c2c550293db791f238d384c5462
+backend/app/Support/InvitationTransitionWriter.php               True 344683474b50a087c698266429edd6456dd50e42ce2ca331512f480c3dd65fd0
+docs/api/openapi.json                                            True fdf5c990c182ed302738225b5666bd323f82a142e26bac0544409f179e1a050d
+docs/Architecture & Technical Design/API Route Catalog.md        True c2255da2d6f2e511325d6eb03f7fd573cb9bac3e5e04b1c94f5d2bf4ff466ad3
+
+
+Changed entries: 0
