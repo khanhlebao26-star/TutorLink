@@ -26,4 +26,6 @@ Architecture also contains `Other source files.md` with links to its five non-Go
 
 ## Issue handover
 
+- [BE-K03 — K03.14 bàn giao backend](handover/BE-K03-K03.14-handover.md): code `8e7cdaf`, scope/API-schema delta, evidence và [runbook review](handover/BE-K03-K03.14-runbook.md). Đã chuẩn bị — chờ Hoàng review; Echo/UI hoãn K03.12, Task/Submission/CV/cleanup/production chưa được chứng nhận. Publication/review chưa thực hiện tự động.
+
 - [BE-D01 — Issue #36: tổng kết và nghiệm thu database](handover/BE-D01-issue-36-handover.md) là báo cáo chính thay cho năm báo cáo Task 1–5. Bản chi tiết cũ vẫn có trong lịch sử Git tại commit `6cc1d0b2dfbea701bae7a5617c9c313c5b75270c`.

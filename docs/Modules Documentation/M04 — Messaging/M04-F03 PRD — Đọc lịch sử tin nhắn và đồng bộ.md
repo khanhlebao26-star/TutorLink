@@ -17,7 +17,7 @@ Participant mở Conversation, xem lịch sử theo thứ tự và nhận các t
 
 # 3\. Hành vi API đích
 
-GET lịch sử trả page message theo cursor, next\_cursor và trạng thái đồng bộ tối thiểu. Poll bằng cursor mới nhất; client không chồng nhiều request polling, có backoff/cleanup và resync sau reconnect. Endpoint, page size và error payload cần được chốt trong OpenAPI.
+GET lịch sử trả page message theo cursor, next\_cursor và trạng thái đồng bộ tối thiểu. Poll bằng cursor mới nhất; client không chồng nhiều request polling, có backoff/cleanup và resync sau reconnect. Endpoint, page size và error payload hiện được mô tả trong OpenAPI; xem trạng thái triển khai bên dưới.
 
 # 4\. Tiêu chí chấp nhận
 
@@ -27,10 +27,12 @@ GET lịch sử trả page message theo cursor, next\_cursor và trạng thái �
 * Mất kết nối rồi kết nối lại tiếp tục đồng bộ từ cursor mà không cần realtime.  
 * Tin system chỉ xuất hiện từ event do server kiểm soát.
 
-# 5\. Chênh lệch/câu hỏi mở
+# 5\. Trạng thái triển khai và giới hạn (K03.14)
 
-* Migration có index conversation\_id/created\_at nhưng cursor composite (created\_at,id) là policy service/API còn thiếu.  
-* Chốt page size, cursor encoding và thứ tự khi clock values lệch. Conversation cancelled đã chốt chỉ đọc theo membership/BR-17; wire response và runtime còn cần triển khai.
+* Backend đã triển khai `GET /api/v1/conversations/{conversation}/messages`, cursor opaque scoped theo Conversation và thứ tự `(created_at,id)`; index `(conversation_id,created_at,id)` đã có. Không nhận đồng thời before/after; mặc định 20, tối đa 50 message/trang.
+* Trang đầu/before trả mới → cũ; after trả cũ → mới. Response có `next_cursor`, `has_more`, `polling_cursor`; timestamp UTC giữ độ chính xác microsecond của DB. API không tự reopen hoặc đổi read cursor.
+* [K03.4](../../handover/BE-K03-K03.4-test-report.md)/[K03.10](../../handover/BE-K03-K03.10-test-report.md) kiểm quyền/cursor; [K03.13](../../handover/BE-K03-K03.13-test-report.md) có probe 55 tin cùng timestamp qua ba trang, reconnect và retry/resync dedupe theo server ID.
+* Consumer probe chứng minh backend và thứ tự xử lý response/event, chưa chứng nhận UI, polling fallback hoặc cleanup listener. K03.12 hoãn. Writer mới phải giữ tương thích thứ tự commit/cursor; không suy ra generic delete/hide message đã có API.
 
 # 6\. Nguồn
 

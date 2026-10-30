@@ -26,11 +26,12 @@ Máy chủ tính lại điều kiện theo quan hệ Program/Invitation trong tr
 * Trao đổi dịch vụ mới đủ điều kiện dùng lại Conversation cancelled hiện có.  
 * Hai lifecycle event cạnh tranh không để trạng thái Conversation hoặc membership ở trạng thái nửa chừng.
 
-# 5\. Chênh lệch/câu hỏi mở
+# 5\. Trạng thái triển khai và giới hạn (K03.14)
 
-* Migration hiện cho status pending/active/cancelled/expired; target Domain chỉ active/cancelled. Local W1-C1 contract còn mô tả pending/expired terminal và cancelled không reopen, mâu thuẫn với State Lifecycles hiện hành. Cần migration/transition mapping được duyệt.  
-* BR-21 chốt không tự ghi system message khi lifecycle đổi trạng thái. Server tính lại điều kiện đóng trong cùng giao dịch với sự kiện Program/Invitation làm thay đổi quan hệ; Conversation chỉ được mở lại qua request mở liên hệ mới đủ gate tại M04-F01.
-* BR-17 đã chốt quyền đọc lịch sử cancelled và trường hợp participant bị đình chỉ. Trigger đóng/mở, migration và chính sách gửi ở M04-F04 vẫn cần triển khai/kiểm thử.
+* Migration K03.2 đã align type direct và status active/cancelled, default active; giữ unique direct_key. pending/expired/type=program trong thiết kế cũ không còn là trạng thái runtime được phép. Migration dừng nếu gặp Conversation legacy cần mapping hoặc message cũ cần canonical backfill; chưa có công cụ chuyển đổi legacy tổng quát.
+* [K03.9](../../handover/BE-K03-K03.9-test-report.md) đã kiểm đóng chat cuối transaction complete/cancel Program và lazy expiry khi cập nhật Draft. Chỉ đóng khi cặp từng có Program completed, không còn Program active/paused và không còn Invitation pending còn hiệu lực; không có Conversation thì không tự tạo.
+* Chỉ POST mở liên hệ mới đủ gate mới reopen Conversation cũ, giữ ID/context. GET, send/accept Invitation, polling và replay không tự reopen; không tự ghi system message. Suspend giữ nguyên Conversation/member/read cursor; restore account không tự đổi status chat.
+* [K03.10](../../handover/BE-K03-K03.10-test-report.md)/[K03.13](../../handover/BE-K03-K03.13-test-report.md) có regression và race. Expiry hiện xử lý lazy; chưa có worker tự đóng ngay lúc Invitation hết hạn. Không suy ra reject/cancel Invitation hoặc writer lifecycle tương lai đã triển khai nếu Catalog còn Dự kiến.
 
 # 6\. Nguồn
 

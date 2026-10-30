@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a–K03.11 đã kiểm tra kỹ thuật — chờ Hoàng review. Backend K03.13 có evidence mới — chờ Hoàng review; K03.12 Echo/UI hoãn theo quyết định backend-only; K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
+- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a–K03.11 đã kiểm tra kỹ thuật — chờ Hoàng review. Backend K03.13 có evidence mới — chờ Hoàng review; K03.12 Echo/UI hoãn theo quyết định backend-only; K03.14 đã chuẩn bị bàn giao backend — chờ Hoàng review; chưa gửi PR/issue từ xa. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
 
 ## Nguyên tắc triển khai
 
@@ -37,7 +37,7 @@
 | B — Realtime | K03.11 | Backend broadcasting và Reverb | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | B — Realtime | K03.12 | Frontend Laravel Echo và resync | Hoãn — team hiện làm backend |
 | B — Realtime | K03.13 | Thu hồi quyền và phục hồi realtime backend | Đã kiểm tra kỹ thuật — chờ Hoàng review; UI hoãn K03.12 |
-| C — Bàn giao | K03.14 | API/schema delta, evidence và PR | Chưa nghiệm thu |
+| C — Bàn giao | K03.14 | Đồng bộ tài liệu/API-schema/evidence và chuẩn bị review | Đã chuẩn bị bàn giao backend — chờ Hoàng review |
 
 ## Giai đoạn A — Lõi Messaging API
 
@@ -284,24 +284,31 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 ## Giai đoạn C — Bàn giao
 
-### K03.14 — API/schema delta, evidence và PR
+### K03.14 — Đồng bộ tài liệu và chuẩn bị bàn giao backend
 
-- [ ] Sinh lại OpenAPI bằng Scramble, kiểm route parity/lint và cập nhật Catalog đúng trạng thái thực tế.
-- [ ] Bàn giao PR/commit và hướng dẫn chạy.
-- [ ] Bàn giao API/schema delta.
-- [ ] Bàn giao cấu hình validation, hướng dẫn gỡ scanner và cấu hình/service realtime.
-- [ ] Bàn giao test report, log và demo hai tài khoản.
-- [ ] Bàn giao known limitations và blocker chưa giải quyết.
-- [ ] Cập nhật issue theo từng mốc: đã xong gì, evidence ở đâu, việc tiếp theo và blocker.
+- [x] Chốt ba nhóm scope: backend đã kiểm; Echo/UI K03.12 hoãn; Task/Submission/CV/cleanup/production chưa được BE-K03 chứng nhận.
+- [x] Đồng bộ BR-21, M04-F01–F07/Index, M10 Index, Security SP-01/SP-06 và workflow; attachment/scanner cũ giữ nhãn lịch sử.
+- [x] Đối chiếu artifact sinh từ code hiện tại: **70 operations**, parity exit 0; lint hợp lệ **43 warnings**, exit 0. Không export lại vì không sửa code API.
+- [x] Ghi commit code bàn giao `8e7cdaf`, API/schema delta, File technical-only/5 MB và cấu hình realtime theo phiên.
+- [x] Tạo [báo cáo K03.14](BE-K03-K03.14-handover.md), [runbook](BE-K03-K03.14-runbook.md) và [checklist/evidence mới](evidence/be-k03-k03.14/).
+- [x] Dẫn log K03.13 55/528, 461/3.004 và probe 12/12; source backend khớp baseline, manifest/log lịch sử giữ nguyên. Không trình bày như đã chạy lại trong K03.14.
+- [x] Liệt kê limitations, phạm vi reviewer và nội dung đề xuất cho issue/PR.
+- [ ] Khanh tự commit/push tài liệu K03.14, tạo/cập nhật PR/issue, gắn link thực và gửi Hoàng review.
+- [ ] Hoàng review, ghi nhận kết quả và xử lý feedback trước nghiệm thu cuối.
 
-## Điều kiện hoàn tất issue
+**Trạng thái:** **Đã chuẩn bị bàn giao backend — chờ Hoàng review**. Không có claim đã gửi hoặc đã approved. Working tree K03.14 chỉ tài liệu/evidence; code hiện hành tại `8e7cdaf`.
 
-- [ ] Các tiêu chí Messaging text và File theo K03.1 điều chỉnh 29/10/2026 đều đạt.
-- [ ] Không tạo trùng Conversation hoặc message khi cạnh tranh/retry.
-- [ ] Outsider không đọc/gửi/subscribe realtime; không tải file ngoài scope resource. Chat không hỗ trợ attachment.
-- [ ] Read cursor và lịch sử đồng bộ đúng sau reconnect.
-- [ ] Suspend/logout được áp dụng cho cả REST và kết nối đang mở.
-- [ ] Không tuyên bố file đã antivirus-scan khi chưa có kết quả quét thực tế.
-- [ ] API/schema, test evidence và known limitations khớp với code bàn giao.
+**Tiếp theo:** Khanh thực hiện các bước publication/review còn mở. K03.12 là backlog đã hoãn; Task/Submission/CV và cleanup/production cần task/evidence riêng. Không dùng checklist backend để đánh dấu UI hoặc các module đó hoàn tất.
 
-Nếu team chỉ nghiệm thu phần lõi trước, ghi rõ Giai đoạn B chưa hoàn tất; không đánh dấu toàn issue hoàn tất khi realtime vẫn nằm trong phạm vi.
+## Điều kiện hoàn tất theo phạm vi bàn giao
+
+- [x] Phần backend Messaging text/File dùng chung được xác nhận ở K03.14 có code/evidence; không suy ra Task/Submission/CV hoàn tất.
+- [x] Concurrent create/send và retry không tạo trùng Conversation/message theo tests hiện hành.
+- [x] Outsider không đọc/gửi/subscribe; File authorization và lịch sử chỉ được chứng nhận theo resource đã có. Chat không hỗ trợ attachment.
+- [x] Read cursor/history và resync đúng theo feature/race/consumer probe; UI/Echo chưa nghiệm thu.
+- [x] Suspend/logout áp dụng REST và quyền publish tới channel theo phiên; packet đã phát trước revoke có thể đến muộn.
+- [x] File clean/complete không được mô tả là antivirus-scan; không có ClamAV runtime.
+- [x] API/schema, test evidence, known limitations và scope trong báo cáo K03.14 khớp source đã kiểm.
+- [ ] Hoàng review và team xác nhận nghiệm thu backend theo phạm vi điều chỉnh; publication do Khanh thực hiện.
+
+Toàn phạm vi realtime/UI ban đầu chưa hoàn tất: K03.12 hoãn. Tách rõ trạng thái backend sẵn sàng review với trạng thái UI/module khác khi cập nhật issue.

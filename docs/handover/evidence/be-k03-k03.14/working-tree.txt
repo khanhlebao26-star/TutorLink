@@ -1,0 +1,23 @@
+Captured: 2026-10-30T16:36:23.5806944+07:00
+Code HEAD: 8e7cdaf674f7c2a8927a243eac86a5ce1bf0f004
+Branch: be-k03
+K03.14 changes are documentation/evidence only; no commit, push, issue/PR update or review request executed.
+ M "docs/Architecture & Technical Design/API Route Catalog.md"
+ M "docs/Domain Documentation/Business Rules.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04 — Messaging — PRD Index.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F01 PRD — Tạo hoặc dùng lại Conversation.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F02 PRD — Danh sách Conversation của tôi.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F03 PRD — Đọc lịch sử tin nhắn và đồng bộ.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F04 PRD — Gửi tin nhắn văn bản và retry.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F05 PRD — Cập nhật trạng thái đã đọc.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F06 PRD — Đính kèm và truy cập tệp trong chat.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F07 PRD — Vòng đời Conversation.md"
+ M "docs/Modules Documentation/M10 — Files/M10 — Files — PRD Index.md"
+ M "docs/Non-functional Requirements/Security & Privacy.md"
+ M docs/README.md
+ M "docs/Workflow/WF03 Chat và tệp đính kèm.md"
+ M docs/handover/BE-K03-K03.1-contract.md
+ M docs/handover/BE-K03-roadmap.md
+?? docs/handover/BE-K03-K03.14-handover.md
+?? docs/handover/BE-K03-K03.14-runbook.md
+?? docs/handover/evidence/be-k03-k03.14/

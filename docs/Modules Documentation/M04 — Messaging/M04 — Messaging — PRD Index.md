@@ -31,14 +31,14 @@ Cung cấp Conversation riêng tư giữa Customer và Tutor với REST-first me
 
 * Bảy route Conversation K03.3–K03.6/K03.13 đã đăng ký trong [Catalog](../../Architecture%20%26%20Technical%20Design/API%20Route%20Catalog.md); OpenAPI toàn API có 70 operations. Evidence trước điều chỉnh không chứng nhận toàn bộ K03.1 mới, frontend hoặc realtime.
 * K03.2 đã align Conversation active/cancelled và direct; giữ MessageType/file schema legacy không có nghĩa client được gửi file/system.
-* Local W1-C1 contract cũ mô tả cancelled là terminal và Conversation pending/expired, khác State Lifecycles hiện hành; Domain docs đã hoàn tất là target, cần mapping/migration được duyệt.  
+* Local W1-C1 mô tả pending/expired và cancelled terminal là lịch sử. K03.2 đã align direct, active/cancelled; môi trường có legacy phải lập mapping/backfill riêng trước migration.
 * Yêu cầu attachment/scanner cũ đã được K03.1 mới thay thế. K03.7a gỡ ClamAV; K03.7b đã kiểm tra kỹ thuật giới hạn upload 5.000.000 byte; [K03.8](../../handover/BE-K03-K03.8-test-report.md) đã kiểm tra kỹ thuật file_ids, chặn link/upload message và bảo toàn legacy; frontend chat chưa có để nghiệm thu E2E.
-* Customer hoặc Tutor đều được mở liên hệ với vai trò còn lại qua gate M04-F01; cancelled chỉ mở lại bằng yêu cầu mở liên hệ mới đủ điều kiện. BR-17 chốt DTO peer/context và lịch sử khi đình chỉ; BR-21 chốt member active không gửi khi peer bị đình chỉ, inbox/unread/read receipt, body/rate limit, conflict idempotency và policy file chat. Runtime, migration và wire DTO vẫn cần triển khai. Admin report scope đã chốt ở BR-11; field masking/retention của evidence vẫn theo D16–D17.
+* Customer hoặc Tutor đều được mở liên hệ với vai trò còn lại qua gate M04-F01; cancelled chỉ mở lại bằng yêu cầu mở liên hệ mới đủ điều kiện. BR-17 chốt DTO peer/context và lịch sử khi đình chỉ; BR-21 chốt member active không gửi khi peer bị đình chỉ, inbox/unread/read receipt, body/rate limit, conflict idempotency và policy file chat. Backend Messaging đã có code/OpenAPI/evidence K03.2–K03.13; UI hoãn K03.12. Các route Admin report evidence còn theo trạng thái Catalog, chưa được BE-K03 chứng nhận. Admin report scope đã chốt ở BR-11; field masking/retention của evidence vẫn theo D16–D17.
 
 # Implementation evidence
 
 * backend/database/migrations/2026\_10\_07\_000300\_create\_messaging\_tables.php tạo conversations, conversation\_members, messages; có unique direct\_key, unique (sender\_id, client\_message\_id), read cursor FK và index conversation/time.  
-* Data model note ghi natural key/cursor service policy còn cần hiện thực. Bảng migration không đồng nghĩa endpoint hoặc permission đã có.
+* Schema/natural key/cursor và permission đã có evidence theo từng task backend; bảng migration hoặc route parity riêng lẻ không chứng minh toàn bộ hành vi. [K03.14 handover](../../handover/BE-K03-K03.14-handover.md) tổng hợp scope, runbook và phần chưa chứng nhận.
 
 Nguồn chuẩn PRD: các Product/Domain Docs hoàn tất liên kết dưới đây. Module README, WF-03, ADR-002, OpenAPI và migration được dùng để đối chiếu implementation/contract, không ghi đè quyết định Product/Domain.
 

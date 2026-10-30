@@ -11,7 +11,7 @@ Participant đánh dấu tiến độ đã đọc trong một Conversation để
 * Read cursor thuộc về một member trong một Conversation; không dùng cursor chung cho mọi cuộc trò chuyện.  
 * Message được gửi trong cùng Conversation với member mới được làm mốc read.  
 * Cập nhật đơn điệu theo thứ tự (created\_at,id): mốc mới hơn có thể tiến lên; request cũ không được kéo cursor lùi.  
-* MessageReadViewState đích: unread/read. Quy tắc hiển thị read receipt cho đối phương cần thống nhất với privacy/UI contract.
+* MessageReadViewState đích: unread/read. Read receipt theo Conversation/member; UI chưa nghiệm thu và không công bố per-message read receipt.
 
 # 3\. Hành vi API đích
 
@@ -25,10 +25,12 @@ PATCH read-state trong Conversation với message ID cuối cùng người dùng
 * Hai cập nhật cạnh tranh kết thúc tại cursor xa nhất đã đọc, không mất tiến độ.  
 * Member khác không thể cập nhật read cursor của người dùng hiện tại.
 
-# 5\. Chênh lệch/câu hỏi mở
+# 5\. Trạng thái triển khai và giới hạn (K03.14)
 
-* Schema có last\_read\_message\_id và last\_read\_at; service cần kiểm tra quan hệ Conversation và bảo đảm monotonic.  
-* Chốt semantics khi message đã bị xóa/ẩn hoặc mốc null; chọn no-op hay lỗi khi request lùi; chốt mức chi tiết read receipt (per message hay per conversation).
+* `PATCH /api/v1/conversations/{conversation}/read` đã triển khai. Body nhận `last_read_message_id`, chỉ cập nhật member của actor, không nhận user_id hoặc reset null.
+* So sánh `(created_at,id)`; mốc mới hơn cập nhật, mốc cũ/bằng no-op và trả 200 cùng cursor hiệu lực. Thiếu/null/sai kiểu, message không tồn tại hoặc thuộc chat khác trả 422 trung tính; outsider 404. Không có thao tác reset cursor.
+* [K03.6](../../handover/BE-K03-K03.6-test-report.md), [K03.10](../../handover/BE-K03-K03.10-test-report.md) và regression [K03.13](../../handover/BE-K03-K03.13-test-report.md) là evidence. ReadCursorConcurrencyTest dùng process PostgreSQL độc lập để kiểm hai cập nhật giữ mốc xa nhất.
+* Read receipt theo Conversation/member, không chứng nhận UI đã hiển thị; K03.12 hoãn. Chưa có generic message hide/delete API; dữ liệu legacy cursor bất thường cần xử lý riêng, không tự reset hoặc suy ra semantics mới.
 
 # 6\. Nguồn
 

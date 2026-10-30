@@ -47,3 +47,7 @@ Complete chỉ đóng khi không còn Program active/paused và Invitation pendi
 ## Realtime theo phiên — bổ sung 30/10/2026
 
 Sau đăng nhập, member gọi POST /api/v1/conversations/{conversation}/realtime bằng session và CSRF để lấy channel/expiry, rồi ký POST /broadcasting/auth bằng đúng session và socket_id. Channel là private-conversations.{id}.sessions.{token}; channel chung cũ bị từ chối. Worker sau commit chỉ phát tới những session/registry còn quyền, dùng cùng khóa User với logout/suspend. Logout thu hồi một phiên; suspend account/Profile thu hồi mọi phiên; restore không hồi sinh token. Reconnect lấy channel còn hợp lệ, auth socket mới rồi gọi REST after từ checkpoint, drain has_more và dedupe server message ID. Reverb/worker outage không thay thế hoặc làm mất dữ liệu REST. [K03.13 evidence](../handover/BE-K03-K03.13-test-report.md) kiểm consumer probe; K03.12 UI/Echo hoãn, chưa chứng nhận listener/poll cleanup hoặc hành vi UI.
+
+## Phạm vi bàn giao K03.14
+
+[Handover](../handover/BE-K03-K03.14-handover.md) và [runbook](../handover/BE-K03-K03.14-runbook.md) là điểm bắt đầu review backend. Luồng Conversation chỉ text; không mở attachment chat. File upload/complete dùng chung không chứng nhận Task/Submission hoặc CV approval đã tích hợp. Echo/UI/polling fallback/listener cleanup hoãn K03.12; backend probe không thay thế nghiệm thu giao diện.

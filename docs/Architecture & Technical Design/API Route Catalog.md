@@ -1,5 +1,7 @@
 # API Route Catalog
 
+**Bàn giao K03.14:** [Scope/API-schema delta/runbook/evidence](../handover/BE-K03-K03.14-handover.md). Code bàn giao `8e7cdaf`; K03.14 chỉ đồng bộ tài liệu, artifact giữ 70 operations và parity/lint được kiểm lại. Echo/UI hoãn K03.12; Task/Submission/CV và cleanup/production chưa được BE-K03 chứng nhận. Chưa gửi review hoặc đánh dấu Hoàng đã duyệt.
+
 **Realtime K03.13 (30/10/2026):** [Báo cáo/evidence](../handover/BE-K03-K03.13-test-report.md) xác nhận channel theo Conversation + phiên browser, thu hồi logout/suspend account/Profile, restore không hồi sinh token, job kiểm quyền lúc phát, reconnect qua ba trang và outage Reverb/worker vẫn dùng REST/resync. Probe HTTP/WebSocket thật đạt 12/12; UI/Echo K03.12 hoãn theo quyết định backend-only. K03.11 giữ làm evidence lịch sử channel chung. POST /broadcasting/auth nằm ngoài /api/v1; API cấp channel mới nằm trong OpenAPI.
 
 Danh mục **method/path chuẩn cho API đích** của TutorLink. Giữ toàn bộ route trong bảng, gồm 7 route D23; không hoãn hoặc loại route nào khỏi phạm vi. Khi PRD mô tả API đích hoặc code triển khai route mới, dùng method/path tại Catalog. Cột “Mục đích” chỉ tóm tắt chức năng; điều kiện nghiệp vụ nằm trong PRD và Business Rules. [OpenAPI sinh bởi Scramble](../api/README.md) là contract của API hiện được đăng ký trong code, dùng để tích hợp. Catalog không phải contract request/response và không tự trở thành API khả dụng.

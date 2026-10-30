@@ -143,3 +143,7 @@ Phạm vi điều chỉnh BR-21 được chốt tại [K03.1](../handover/BE-K03
 ## Bổ sung BR-17/BR-21 — Realtime theo phiên (30/10/2026)
 
 Theo quyết định K03.13 đã thống nhất, channel riêng gắn Conversation và phiên browser; token phải thuộc đúng User/session, chưa thu hồi và chưa hết hạn. Logout thu hồi phiên hiện tại; suspend account/Profile thu hồi mọi phiên. Restore không khôi phục token cũ; đăng nhập lại cấp channel mới. Worker kiểm lại quyền lúc phát, dùng khóa User chung với thu hồi; không thay đổi Conversation/membership/read cursor. Notification chỉ mang Conversation ID, là best effort sau commit; REST cursor/resync là nguồn phục hồi. Gói đã phát trước thu hồi có thể đến muộn. Backend đã có [evidence K03.13](../handover/BE-K03-K03.13-test-report.md); frontend Echo/UI K03.12 hoãn. Chi tiết lease, lỗi CSRF và giới hạn ở [contract §13](../handover/BE-K03-K03.1-contract.md#13-realtime).
+
+## Phạm vi nghiệm thu BE-K03 — chốt K03.14
+
+Team đồng ý ba nhóm: backend Messaging/File dùng chung/realtime đã có evidence; Echo/UI K03.12 hoãn; Task/Submission resource integration, duyệt CV theo phiên bản, orphan cleanup/storage compensation và production TLS/load chưa được BE-K03 chứng nhận. Upload/complete hoặc purpose được validation chấp nhận không xác nhận luồng resource tương ứng hoàn tất; endpoint link chung hiện chỉ triển khai verification_document. Không đổi quyết định BR-21 đã chốt: text-only, 5.000.000 byte, không antivirus tự động. Xem [bàn giao K03.14](../handover/BE-K03-K03.14-handover.md).
