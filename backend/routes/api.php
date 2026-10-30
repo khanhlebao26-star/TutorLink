@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\ProgramController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
+use App\Http\Controllers\Api\V1\TaskController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\EnsureActiveApiActor;
@@ -55,6 +56,17 @@ Route::prefix('v1')->group(function () {
         Route::post('/invitations/{invitation}/accept', InvitationAcceptController::class)
             ->whereNumber('invitation')
             ->name('invitations.accept');
+        Route::get('/programs/{program}/tasks', [TaskController::class, 'index'])->whereNumber('program');
+        Route::post('/programs/{program}/tasks', [TaskController::class, 'store'])->whereNumber('program');
+        Route::get('/tasks/{task}', [TaskController::class, 'show'])->whereNumber('task');
+        Route::patch('/tasks/{task}', [TaskController::class, 'update'])->whereNumber('task');
+        Route::post('/tasks/{task}/start', [TaskController::class, 'start'])->whereNumber('task');
+        Route::post('/tasks/{task}/cancel', [TaskController::class, 'cancel'])->whereNumber('task');
+        Route::get('/tasks/{task}/submission', [TaskController::class, 'submission'])->whereNumber('task');
+        Route::put('/tasks/{task}/submission', [TaskController::class, 'submit'])->whereNumber('task');
+        Route::get('/tasks/{task}/submission/versions', [TaskController::class, 'versions'])->whereNumber('task');
+        Route::post('/tasks/{task}/submission/review', [TaskController::class, 'review'])->whereNumber('task');
+        Route::post('/tasks/{task}/submission/request-revision', [TaskController::class, 'requestRevision'])->whereNumber('task');
         Route::post('/conversations', [ConversationController::class, 'store'])
             ->name('conversations.store');
         Route::get('/conversations', [ConversationController::class, 'index'])

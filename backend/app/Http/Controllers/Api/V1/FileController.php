@@ -159,6 +159,39 @@ class FileController extends Controller
     {
         return DB::transaction(function () use ($request, $file) {
             $isOwner = $file->owner_id === $request->user()->id;
+            if (! $isOwner && $file->purpose === 'task_attachment' && $file->visibility === 'private') {
+                $taskLink = DB::table('file_links')
+                    ->where('file_id', $file->id)
+                    ->whereIn('resource_type', ['task', 'task_submission'])
+                    ->where('purpose', 'task_attachment')
+                    ->get()
+                    ->first(function ($link) use ($request) {
+                        $taskId = $link->resource_type === 'task'
+                            ? $link->resource_id
+                            : DB::table('task_submissions')->where('id', $link->resource_id)->value('task_id');
+                        $task = $taskId ? DB::table('tasks')->find($taskId) : null;
+                        if (! $task) {
+                            return false;
+                        }
+                        $program = DB::table('programs')->find($task->program_id);
+                        if (! $program) {
+                            return false;
+                        }
+                        if ($request->user()->role === 'tutor') {
+                            return DB::table('tutor_profiles')->where('id', $program->owner_tutor_profile_id)
+                                ->where('user_id', $request->user()->id)->exists();
+                        }
+
+                        return $request->user()->role === 'customer'
+                            && (int) $task->assigned_to === (int) $request->user()->id
+                            && DB::table('program_members')->where('program_id', $program->id)
+                                ->where('user_id', $request->user()->id)
+                                ->where('member_role', 'customer')->where('status', 'active')->exists();
+                    });
+                if ($taskLink) {
+                    $isOwner = true;
+                }
+            }
             if (! $isOwner) {
                 $document = VerificationDocument::where('file_id', $file->id)->first();
                 abort_unless($document, 403, 'Forbidden.');

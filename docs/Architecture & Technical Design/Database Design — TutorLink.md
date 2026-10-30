@@ -658,7 +658,7 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-current\_submission\_id — bigint; NULL; FK; tham chiếu task\_submissions.id; đề xuất thêm.
+current\_submission\_id — bigint; NULL; FK; tham chiếu task\_submissions.id; đã có trong migration BE-D03.
 
 ### Bảng task\_submissions
 
@@ -684,7 +684,7 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-submission\_version — integer; NOT NULL; đề xuất thêm.
+submission\_version — integer; NOT NULL; đã có trong migration BE-D03.
 
 idempotency\_key — uuid; NOT NULL; F05; khóa chống gửi trùng cùng version.
 
@@ -692,7 +692,7 @@ request\_hash — char(64); NOT NULL; SHA-256 JSON canonical RFC 8785 của `exp
 
 Khóa ghép / unique: task\_submissions: UNIQUE(task\_id,customer\_id,submission\_version); UNIQUE(task\_id,customer\_id,idempotency\_key).
 
-Mỗi lần nộp/cập nhật chủ động tạo một task\_submissions mới: content, tệp và feedback của version cũ được bảo toàn; submission\_version tăng từ 1\. tasks.current\_submission\_id chỉ tới version mới nhất của chính Task và Customer được giao. Insert, cập nhật pointer, Task state và file links thực hiện trong cùng transaction. PUT bắt buộc Idempotency-Key UUID; lưu key và SHA-256 request\_hash theo BR-20, giữ theo lịch sử submission (không hết hạn khi version còn lưu). UNIQUE(task\_id,customer\_id,idempotency\_key) giới hạn key theo người nộp và Task. Mỗi Submission tối đa 5 file, mỗi file tối đa 5 MiB; MIME PDF/JPG/PNG/DOC/DOCX. Sau khi kiểm tra quyền/assignee, cùng key \+ hash trả đúng version đã commit mà không tăng version/audit/notification; cùng key nhưng hash khác trả 409\. Key mới chỉ tạo version nếu expected\_submission\_version khớp version hiện tại; stale trả 409\. Feedback chỉ ghi cho version mới nhất và kiểm expected\_submission\_version; reviewed\_by/reviewed\_at/feedback gắn vào đúng row version.
+Mỗi lần nộp/cập nhật chủ động tạo một task\_submissions mới: content, tệp và feedback của version cũ được bảo toàn; submission\_version tăng từ 1\. tasks.current\_submission\_id chỉ tới version mới nhất của chính Task và Customer được giao. Insert, cập nhật pointer, Task state và file links thực hiện trong cùng transaction. File Task và Submission dùng purpose `task_attachment`; FileLink phân biệt `resource_type=task` và `task_submission`. PUT bắt buộc Idempotency-Key UUID; lưu key và SHA-256 request\_hash theo BR-20, giữ theo lịch sử submission (không hết hạn khi version còn lưu). UNIQUE(task\_id,customer\_id,idempotency\_key) giới hạn key theo người nộp và Task. Mỗi Submission tối đa 5 file, mỗi file tối đa 5.000.000 byte theo BR-21/K03.1; MIME PDF/JPG/PNG/DOC/DOCX. Sau khi kiểm tra quyền/assignee, cùng key \+ hash trả đúng version đã commit mà không tăng version/audit/notification; cùng key nhưng hash khác trả 409\. Key mới chỉ tạo version nếu expected\_submission\_version khớp version hiện tại; stale trả 409\. Feedback chỉ ghi cho version mới nhất và kiểm expected\_submission\_version; reviewed\_by/reviewed\_at/feedback gắn vào đúng row version.
 
 `tasks.version` theo BR-19 tăng mỗi mutation Task thành công, gồm edit/start/cancel và status change cùng Submission/feedback. PATCH/start/cancel kiểm `expected_version`; Submission/feedback giữ guard `expected_submission_version` riêng. Các thay đổi liên quan phải đồng bộ trong transaction; replay không tăng version/audit/notification.
 
@@ -744,7 +744,7 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-Progress lưu metric\_name/value/note; không thêm status. Chỉ cho `metric_name=progress_percent`, value nguyên 0–100. customer\_id phải là Customer của Program; recorded\_by là Tutor owner. Mọi PATCH kiểm `expected_version`, tăng version và ghi audit before/after; không hard-delete. `recorded_at` do server đặt; đọc/hiển thị theo Program timezone. Announcement draft/published suy ra từ published\_at; bản nháp không hiển thị với Customer. Title/body giới hạn 180/10.000 ký tự; tối đa 5 file, mỗi file tối đa 5 MiB, MIME PDF/JPG/PNG/DOC/DOCX. Chỉ thành viên phù hợp của Program được đọc nội dung và tệp workspace.
+Progress lưu metric\_name/value/note; không thêm status. Chỉ cho `metric_name=progress_percent`, value nguyên 0–100. customer\_id phải là Customer của Program; recorded\_by là Tutor owner. Mọi PATCH kiểm `expected_version`, tăng version và ghi audit before/after; không hard-delete. `recorded_at` do server đặt; đọc/hiển thị theo Program timezone. Announcement draft/published suy ra từ published\_at; bản nháp không hiển thị với Customer. Title/body giới hạn 180/10.000 ký tự; tối đa 5 file, mỗi file tối đa 5.000.000 byte theo BR-21/K03.1, MIME PDF/JPG/PNG/DOC/DOCX. Chỉ thành viên phù hợp của Program được đọc nội dung và tệp workspace.
 
 Announcement có `version` theo BR-19; PATCH Draft và publish kiểm `expected_version`. Khi published, nội dung/tệp không được sửa; đính chính bằng record mới.
 
@@ -1092,7 +1092,7 @@ batch — integer; NOT NULL.
 
 # 13 · Quy tắc liên kết và toàn vẹn
 
-## Idempotency receipts dùng chung — schema BR-23, runtime Accept Invitation
+## Idempotency receipts dùng chung — schema BR-23, runtime Accept Invitation và feedback Task
 
 ### Bảng idempotency\_receipts — migration BE-D02
 
@@ -1116,7 +1116,7 @@ created\_at — timestamptz; NOT NULL.
 
 expires\_at — timestamptz; NULL; command BR-23 có hạn 30 ngày, Fee Record theo BR-22 có thể NULL đến khi đủ điều kiện purge.
 
-UNIQUE(actor\_id,idempotency\_key). Accept Invitation ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa tích hợp bảng này. Fee Record cần tính hash/replay theo BR-22 và giữ receipt tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
+UNIQUE(actor\_id,idempotency\_key). Accept Invitation và feedback Task ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa được chứng nhận đã tích hợp bảng này. Feedback Task dùng receipt 30 ngày theo Tutor + UUID key + POST + canonical path + hash của `expected_submission_version` và `feedback` đã chuẩn hóa; replay trả response snapshot sau kiểm quyền hiện tại, không ghi lại side effect. Fee Record cần tính hash/replay theo BR-22 và giữ receipt tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
 
 ## Tham chiếu đa hình
 

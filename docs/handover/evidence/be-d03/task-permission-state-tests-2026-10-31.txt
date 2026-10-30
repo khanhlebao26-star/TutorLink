@@ -1,0 +1,13 @@
+BE-D03 Task permission and state matrix tests — 31/10/2026
+
+Command: docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest tests/Feature/TaskWorkflowApiTest.php
+Environment: isolated PostgreSQL 16 test service from compose.testing.yml (database tutorlink_test).
+
+Result: 10 tests passed (179 assertions).
+
+Additional matrix cases:
+- Different Tutor owner, Customer member from another Program (cannot be assigned to this Program), outsider, correct assignee, and cancelled membership.
+- Active, Paused, Completed, and Cancelled Program gates for create/edit/start/submit/cancel.
+- Task edit/start/cancel/submit restrictions across todo, in_progress, submitted, completed, and cancelled states.
+
+The database permits at most one active Customer member per Program; a same-Program active Customer who is not the assignee cannot be represented by the current schema. The test uses an active member of another Program for that access-denial case.

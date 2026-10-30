@@ -11,7 +11,7 @@ The Markdown files are the local working documentation for TutorLink. Modules re
 - [Business Rules](<Domain Documentation/Business Rules.md>) and the module PRDs define intended behavior. A policy decision can precede backend implementation. The [OpenAPI 0.2.0 draft guide](<Architecture & Technical Design/TutorLink — OpenAPI 0.2.0 draft - hướng dẫn, thay đổi và điểm cần chốt.md>) is a historical target snapshot, not the current generated contract.
 - [Decision register](UNRESOLVED_DECISIONS_2026-10-20.md) records the Product rules approved through 21/10/2026 and distinguishes them from implementation gaps. BR-23–BR-27 close the five groups previously listed as open; this does not certify API or migration completion.
 
-**Realtime 30/10/2026:** [K03.13](handover/BE-K03-K03.13-test-report.md) kiểm backend bằng session/CSRF và WebSocket thật: channel theo phiên, logout/suspend/restore, reconnect/resync và outage Reverb/worker. OpenAPI hiện có 70 operations. Echo/UI K03.12 hoãn; consumer probe không thay thế nghiệm thu giao diện.
+**Realtime 30/10/2026:** [K03.13](handover/BE-K03-K03.13-test-report.md) kiểm backend bằng session/CSRF và WebSocket thật: channel theo phiên, logout/suspend/restore, reconnect/resync và outage Reverb/worker. Artifact tại thời điểm K03.13 có 70 operations; artifact hiện tại có 81 sau 11 route BE-D03. Echo/UI K03.12 hoãn; consumer probe không thay thế nghiệm thu giao diện.
 
 ## Folder map
 

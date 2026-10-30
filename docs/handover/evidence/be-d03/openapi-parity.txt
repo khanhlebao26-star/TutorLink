@@ -1,0 +1,4 @@
+OpenAPI route parity passed (81 operations).
+PUT /tasks/{task}/submission: required UUID Idempotency-Key
+POST /tasks/{task}/submission/review: required UUID Idempotency-Key
+POST /tasks/{task}/submission/request-revision: required UUID Idempotency-Key

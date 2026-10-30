@@ -25,8 +25,8 @@ Liên kết File đã complete với resource đúng owner, purpose và authoriz
 # 4\. Implementation hiện tại và câu hỏi mở
 
 * POST /files/{id}/links tồn tại nhưng Controller hiện chỉ thực hiện verification\_document; các business resource type khác trả conflict “not available yet”.  
-* Upload purpose whitelist hiện chưa gồm message\_attachment, task\_submission, announcement\_attachment. Cần quyết định link semantics per-resource và transaction/lock owner membership.
-* K03.7b đã đồng bộ frontend/upload/complete tối đa 5.000.000 byte/file; [K03.8](../../handover/BE-K03-K03.8-test-report.md) đã kiểm tra kỹ thuật các đường tạo attachment chat: không upload message_attachment, không link resource message, chỉ gửi text với file_ids omitted/[]. Task/Submission và CV approval theo phiên bản chưa được chứng nhận bởi FileController hiện tại. Quota, purpose và quyền download phải được kiểm ở API nghiệp vụ tương ứng; giữ orphan cleanup/storage compensation là công việc riêng.
+* Purpose `task_attachment` dùng chung cho file Task/Submission; FileLink dùng `resource_type=task` hoặc `task_submission`. Không thêm purpose upload riêng cho Submission chỉ để phân biệt resource. Message attachment vẫn bị chặn; Announcement/CV có phạm vi triển khai riêng.
+* K03.7b đã đồng bộ frontend/upload/complete tối đa 5.000.000 byte/file; [K03.8](../../handover/BE-K03-K03.8-test-report.md) đã kiểm tra kỹ thuật các đường tạo attachment chat. BE-D03 gắn Task/Submission trong transaction API M07. Test PostgreSQL xác nhận Tutor phụ trách và Customer assignee active tải file Task được; Tutor khác, outsider và assignee không còn membership active bị từ chối. Với Submission, Customer nộp bài và Tutor phụ trách tải được, Tutor khác và outsider bị từ chối; [ma trận và kết quả](../../handover/BE-D03-issue-74-test-report.md#ma-tran-quyen-tai-file-tasksubmission--31102026). FileController `/files/{file}/links` vẫn chỉ hỗ trợ `verification_document`; BE-K03 chưa chứng nhận luồng link Task/Submission qua endpoint chung, quyền CV, orphan cleanup hoặc storage compensation. Owner vẫn có thể tải file của chính họ theo quyền owner chung.
 
 # 5\. Nguồn
 

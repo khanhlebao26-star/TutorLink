@@ -8023,6 +8023,1613 @@
                 "security": []
             }
         },
+        "/programs/{program}/tasks": {
+            "get": {
+                "operationId": "task.index",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "program",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "program_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "assigned_to": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "version": {
+                                                        "type": "string"
+                                                    },
+                                                    "current_submission_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "file_ids": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "program_id",
+                                                    "title",
+                                                    "description",
+                                                    "due_at",
+                                                    "assigned_to",
+                                                    "status",
+                                                    "version",
+                                                    "current_submission_id",
+                                                    "file_ids"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "task.store",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "program",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 180
+                                    },
+                                    "description": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "due_at": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date-time"
+                                    },
+                                    "assigned_to": {
+                                        "type": "integer"
+                                    },
+                                    "file_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "maxItems": 5,
+                                        "uniqueItems": true
+                                    }
+                                },
+                                "required": [
+                                    "title",
+                                    "assigned_to"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "program_id": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "assigned_to": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "version": {
+                                                    "type": "string"
+                                                },
+                                                "current_submission_id": {
+                                                    "type": "string"
+                                                },
+                                                "file_ids": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "program_id",
+                                                "title",
+                                                "description",
+                                                "due_at",
+                                                "assigned_to",
+                                                "status",
+                                                "version",
+                                                "current_submission_id",
+                                                "file_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "program_state_conflict"
+                                        },
+                                        "message": {
+                                            "type": [
+                                                "array",
+                                                "string"
+                                            ]
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": [
+                                                "object",
+                                                "string"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/tasks/{task}": {
+            "get": {
+                "operationId": "task.show",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "program_id": {
+                                                    "type": "string"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "assigned_to": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "version": {
+                                                    "type": "string"
+                                                },
+                                                "current_submission_id": {
+                                                    "type": "string"
+                                                },
+                                                "file_ids": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "program_id",
+                                                "title",
+                                                "description",
+                                                "due_at",
+                                                "assigned_to",
+                                                "status",
+                                                "version",
+                                                "current_submission_id",
+                                                "file_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "task.update",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "expected_version": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 180
+                                    },
+                                    "description": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "due_at": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date-time"
+                                    },
+                                    "file_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "maxItems": 5,
+                                        "uniqueItems": true
+                                    }
+                                },
+                                "required": [
+                                    "expected_version"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/tasks/{task}/start": {
+            "post": {
+                "operationId": "task.start",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "expected_version": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    }
+                                },
+                                "required": [
+                                    "expected_version"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/tasks/{task}/cancel": {
+            "post": {
+                "operationId": "task.cancel",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "expected_version": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    }
+                                },
+                                "required": [
+                                    "expected_version"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/tasks/{task}/submission": {
+            "get": {
+                "operationId": "task.submission",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": [
+                                                "object",
+                                                "null"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "task_id": {
+                                                    "type": "string"
+                                                },
+                                                "submission_version": {
+                                                    "type": "string"
+                                                },
+                                                "content": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string"
+                                                },
+                                                "feedback": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_by": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_at": {
+                                                    "type": "string"
+                                                },
+                                                "file_ids": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "task_id",
+                                                "submission_version",
+                                                "content",
+                                                "status",
+                                                "submitted_at",
+                                                "feedback",
+                                                "reviewed_by",
+                                                "reviewed_at",
+                                                "file_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "task.submit",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "UUID used to replay the same Submission request.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "expected_submission_version": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "maximum": 9007199254740991
+                                    },
+                                    "content": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 10000
+                                    },
+                                    "file_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "minimum": 1,
+                                            "maximum": 9007199254740991
+                                        },
+                                        "maxItems": 5,
+                                        "uniqueItems": true
+                                    }
+                                },
+                                "required": [
+                                    "expected_submission_version"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "task_id": {
+                                                    "type": "string"
+                                                },
+                                                "submission_version": {
+                                                    "type": "string"
+                                                },
+                                                "content": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string"
+                                                },
+                                                "feedback": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_by": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_at": {
+                                                    "type": "string"
+                                                },
+                                                "file_ids": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "task_id",
+                                                "submission_version",
+                                                "content",
+                                                "status",
+                                                "submitted_at",
+                                                "feedback",
+                                                "reviewed_by",
+                                                "reviewed_at",
+                                                "file_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "stale_submission_version"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "task_state_conflict"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "idempotency_conflict"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "task_id": {
+                                                    "type": "string"
+                                                },
+                                                "submission_version": {
+                                                    "type": "string"
+                                                },
+                                                "content": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "submitted_at": {
+                                                    "type": "string"
+                                                },
+                                                "feedback": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_by": {
+                                                    "type": "string"
+                                                },
+                                                "reviewed_at": {
+                                                    "type": "string"
+                                                },
+                                                "file_ids": {
+                                                    "type": "array",
+                                                    "items": {}
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "task_id",
+                                                "submission_version",
+                                                "content",
+                                                "status",
+                                                "submitted_at",
+                                                "feedback",
+                                                "reviewed_by",
+                                                "reviewed_at",
+                                                "file_ids"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/tasks/{task}/submission/versions": {
+            "get": {
+                "operationId": "task.versions",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "task_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "submission_version": {
+                                                        "type": "string"
+                                                    },
+                                                    "content": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "submitted_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "feedback": {
+                                                        "type": "string"
+                                                    },
+                                                    "reviewed_by": {
+                                                        "type": "string"
+                                                    },
+                                                    "reviewed_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "file_ids": {
+                                                        "type": "array",
+                                                        "items": {}
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "task_id",
+                                                    "submission_version",
+                                                    "content",
+                                                    "status",
+                                                    "submitted_at",
+                                                    "feedback",
+                                                    "reviewed_by",
+                                                    "reviewed_at",
+                                                    "file_ids"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/{task}/submission/review": {
+            "post": {
+                "operationId": "task.review",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "UUID retained for 30 days to replay this feedback decision.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "task_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "submission_version": {
+                                                            "type": "string"
+                                                        },
+                                                        "version": {
+                                                            "type": "number"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "feedback": {
+                                                            "type": "string"
+                                                        },
+                                                        "reviewed_by": {
+                                                            "type": "string"
+                                                        },
+                                                        "reviewed_at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "task_id",
+                                                        "submission_version",
+                                                        "version",
+                                                        "status",
+                                                        "feedback",
+                                                        "reviewed_by",
+                                                        "reviewed_at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "data"
+                                            ]
+                                        },
+                                        {}
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "stale_submission_version"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "task_state_conflict"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "idempotency_key_reused"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "feedback_required"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "invalid_idempotency_key"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "invalid_feedback_payload"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/{task}/submission/request-revision": {
+            "post": {
+                "operationId": "task.requestRevision",
+                "tags": [
+                    "Task"
+                ],
+                "parameters": [
+                    {
+                        "name": "task",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "UUID retained for 30 days to replay this feedback decision.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "task_id": {
+                                                            "type": "string"
+                                                        },
+                                                        "submission_version": {
+                                                            "type": "string"
+                                                        },
+                                                        "version": {
+                                                            "type": "number"
+                                                        },
+                                                        "status": {
+                                                            "type": "string"
+                                                        },
+                                                        "feedback": {
+                                                            "type": "string"
+                                                        },
+                                                        "reviewed_by": {
+                                                            "type": "string"
+                                                        },
+                                                        "reviewed_at": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "task_id",
+                                                        "submission_version",
+                                                        "version",
+                                                        "status",
+                                                        "feedback",
+                                                        "reviewed_by",
+                                                        "reviewed_at"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "data"
+                                            ]
+                                        },
+                                        {}
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "stale_submission_version"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "task_state_conflict"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "idempotency_key_reused"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "feedback_required"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "invalid_idempotency_key"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "code": {
+                                                    "type": "string",
+                                                    "const": "invalid_feedback_payload"
+                                                },
+                                                "message": {
+                                                    "type": [
+                                                        "array",
+                                                        "string"
+                                                    ]
+                                                },
+                                                "request_id": {
+                                                    "type": "string"
+                                                },
+                                                "errors": {
+                                                    "type": [
+                                                        "object",
+                                                        "string"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "request_id",
+                                                "errors"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/tutor/profile": {
             "get": {
                 "operationId": "tutor.profile.show",
@@ -10511,6 +12118,25 @@
                     }
                 }
             },
+            "ModelNotFoundException": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
+                            ]
+                        }
+                    }
+                }
+            },
             "AuthenticationException": {
                 "description": "Unauthenticated",
                 "content": {
@@ -10532,25 +12158,6 @@
             },
             "AuthorizationException": {
                 "description": "Authorization error",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "description": "Error overview."
-                                }
-                            },
-                            "required": [
-                                "message"
-                            ]
-                        }
-                    }
-                }
-            },
-            "ModelNotFoundException": {
-                "description": "Not found",
                 "content": {
                     "application/json": {
                         "schema": {

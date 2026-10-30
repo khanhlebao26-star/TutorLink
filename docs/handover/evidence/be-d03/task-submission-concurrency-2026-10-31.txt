@@ -1,0 +1,17 @@
+BE-D03 Task Submission PostgreSQL concurrency test — 31/10/2026
+
+Command: docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest tests/Feature/TaskSubmissionConcurrencyTest.php
+Environment: isolated PostgreSQL 16 test service from compose.testing.yml (database tutorlink_test).
+
+Result: 1 test passed (27 assertions).
+Standalone repeatability run: same command without `--build` — 1 test passed (28 assertions). The assertion count varies with which valid resubmit/review ordering wins.
+Final build rerun after test helper typing cleanup: 1 test passed (27 assertions).
+
+The persistent test launches separate PHP workers with independent PostgreSQL connections. The parent transaction locks the shared Program row; the test confirms each worker is blocked on that row with `pg_blocking_pids` before releasing it.
+
+Assertions cover:
+- Different payloads and keys racing at submission version 0 produce one 201 and one 409, with one version 1 row.
+- Same key and payload racing at version 0 produce 201/200 with the same Submission ID and no duplicate row.
+- Resubmit version 2 racing with review of version 1 produces one commit and one 409; the final Task/current Submission state matches the winner.
+
+Each worker dispatches a prepared Laravel Request directly to TaskController. HTTP route/session middleware is covered by the separate sequential TaskWorkflowApiTest; this concurrency test isolates the transaction and row-lock behavior.

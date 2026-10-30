@@ -24,8 +24,8 @@ Người dùng đã đăng nhập upload một tệp vào storage private và nh
 # 4\. Implementation hiện tại và câu hỏi mở
 
 * API POST /files đã đồng bộ K03.7b: avatar và tài liệu không rỗng, tối đa 5.000.000 byte/file; kiểm số byte thực, không dùng quy đổi KiB làm tròn. Vượt giới hạn trả 422 trước khi tạo object/FileRecord. [Evidence](../../handover/BE-K03-K03.7b-test-report.md). Giới hạn số file/resource vẫn theo module.
-* UploadRequest hiện chỉ whitelist avatar/verification\_document/task\_attachment/profile\_document; target Enum còn message\_attachment/task\_submission/announcement\_attachment. Cần đồng bộ theo từng module.  
-* BR-21/K03.1 điều chỉnh thay các giới hạn file cũ; [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ scanner. Runtime còn cần triển khai các purpose Task/Submission/CV theo module, kiểm allow-list và email verification theo identity policy; không tự áp dụng quyền/resource mới qua File API chung.
+* UploadRequest hiện whitelist avatar/verification\_document/task\_attachment/profile\_document. `task_attachment` là purpose upload chung cho Task và Submission; `resource_type` của FileLink phân biệt `task` và `task_submission`. Các enum message\_attachment/task\_submission/announcement\_attachment không tự mở upload mới; chat attachment vẫn bị chặn theo BR-21.
+* BR-21/K03.1 điều chỉnh thay các giới hạn file cũ; [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ scanner. BE-D03 có [bằng chứng gắn và tải file Submission qua API M07](../../handover/BE-D03-issue-74-test-report.md); không suy ra toàn bộ quyền download, CV hay API File link dùng chung đã được triển khai.
 
 # 5\. Nguồn
 

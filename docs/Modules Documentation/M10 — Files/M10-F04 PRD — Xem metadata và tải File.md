@@ -25,7 +25,7 @@ Cho phép đúng owner/member hoặc Admin có permission tải File private qua
 # 4\. Implementation hiện tại và câu hỏi mở
 
 * GET metadata owner-only; download hiện cho owner hoặc reviewer có permission khi file thuộc verification\_document.  
-* Các Member/resource policies cho message/task/submission/announcement chưa được triển khai trong FileController.  
+* BE-D03 đã thêm quyền tải Task/Submission cho Tutor owner và Customer assignee trong FileController; [test tập trung](../../handover/BE-D03-issue-74-test-report.md) kiểm Tutor tải file Submission và outsider bị từ chối. Chưa chứng nhận toàn bộ quyền download, cạnh tranh membership/attach trên PostgreSQL, hoặc policy message/announcement/CV.
 * D06 đã chốt điều kiện avatar Tutor công khai; cần triển khai quyền tải và invalidation khi gate mất. Chi tiết URL hết hạn, caching và range/stream vẫn là thiết kế kỹ thuật cần hoàn thiện. Permission Admin report evidence theo BR-11 ở dưới.
 
 # 5\. Nguồn

@@ -1,0 +1,29 @@
+time="2026-10-31T04:50:28+07:00" level=warning msg="Found orphan containers (tutorlink-backend-1, tutorlink-pgadmin-1, tutorlink-db-1, tutorlink-frontend-1, tutorlink-mailpit-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-backend-test-run-99c36da5026a Creating 
+ Container tutorlink-backend-test-run-99c36da5026a Created 
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TaskWorkflowApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit completes task assignment, versioned submission, revision, and a[39m[90m…[39m [90m0.63s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows a new submission while review is pending and rejects feed[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows task owners to cancel only open tasks and restricts trans[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays feedback from the shared receipt after authorization wit[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit links a completed task file and permits only the task participan[39m[90m…[39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back submission and task state when a file link cannot be[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit backfills a legacy submission into version one and the task curr[39m[90m…[39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Task3SchemaDeltaTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtask3 schema columns exist[39m[90m                                          [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90massignment and outbox reject invalid references and duplicates[39m[90m      [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtask submissions keep versions and current pointer matches task and[39m[90m…[39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ProgramLifecycleApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit records distinct lifecycle events without changing the offer ver[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns Session and Task blockers without completing the Program[39m[90m [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 404 when another Tutor attempts a Program lifecycle acti[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects a transition outside the allowed state without side effe[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cancels a Draft and its unexpired Invitation in one transaction[39m[90m  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit completes a Program when Tasks are terminal and writes the membe[39m[90m…[39m [90m0.04s[39m  
+
+  [90mTests:[39m    [32;1m16 passed[39;22m[90m (184 assertions)[39m
+  [90mDuration:[39m [39m1.33s[39m
+

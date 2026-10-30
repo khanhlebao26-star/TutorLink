@@ -14,8 +14,8 @@ Tutor owner đánh giá đúng version hiện tại, chấp nhận bài hoặc y
 * Yêu cầu sửa: Submission submitted → revision\_requested và Task submitted → in\_progress; Customer nộp lại sẽ tạo version mới.  
 * Program Paused vẫn cho feedback; Program Completed/Cancelled readonly.  
 * Feedback gắn version và được giữ lại qua resubmission; không overwrite lịch sử.
-* Payload chỉ gồm `feedback`; tối đa 5.000 ký tự. Với `revision_requested`, feedback bắt buộc không trắng và giải thích lý do; với accept, feedback tùy chọn.
-* Review/request-revision phải kiểm `expected_submission_version` và trạng thái hiện tại nguyên tử; mutation thành công cập nhật Task state/version cùng feedback. Replay hợp lệ không tăng version/audit/notification lần nữa.
+* Ngoài `expected_submission_version`, body chỉ gồm `feedback` tối đa 5.000 ký tự. Với `revision_requested`, feedback bắt buộc không trắng và giải thích lý do; với accept, feedback tùy chọn. Response của mutation mới chứa `version` của Task và `submission_version` đã quyết định.
+* Review/request-revision yêu cầu UUID `Idempotency-Key`; sau khi kiểm quyền Tutor owner hiện tại, dùng receipt BR-23 theo Tutor + key + method + path + payload chuẩn hóa (`expected_submission_version`, `feedback`). Feedback chuẩn hóa CRLF/CR thành LF, feedback bỏ qua/null/whitespace chỉ tương đương null khi accept; request-revision bắt buộc lý do không trắng. Receipt có hạn 30 ngày, lưu response snapshot cùng mutation. Cùng key/yêu cầu trả lại 200 và snapshot cũ; khác path/payload trả 409; key mới trên version cũ hoặc đã quyết định trả 409; key thiếu/sai UUID trả 422. Test kiểm tra replay không tăng version/receipt và không thêm dòng `audit_logs`, `notification_outbox` hoặc `notifications`; [báo cáo/evidence](../../handover/BE-D03-issue-74-test-report.md#auditoutbox-v%C3%A0-side-effect-khi-replay--31102026).
 
 # 3\. Tiêu chí chấp nhận
 
@@ -27,7 +27,7 @@ Tutor owner đánh giá đúng version hiện tại, chấp nhận bài hoặc y
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Schema version/expected version chưa được triển khai; cần migration additive và kiểm thử race trên PostgreSQL.  
+* BE-D03 có schema version, API feedback và receipt/replay 30 ngày; [test PostgreSQL chạy lại được](../../handover/BE-D03-issue-74-test-report.md) kiểm tra cạnh tranh resubmit/review và side effect khi replay trên database test cô lập. Task-specific audit/outbox event chưa được tích hợp; assertion replay xác nhận không tạo thêm audit/notification rows, không chứng nhận event delivery.
 * Payload/độ dài feedback được chốt tại BR-20; feedback của `revision_requested` chính là lý do hiển thị cho Customer.
 
 # 5\. Nguồn
