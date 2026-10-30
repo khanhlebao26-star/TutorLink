@@ -1,0 +1,657 @@
+Command: docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest
+
+time="2026-10-31T06:46:32+07:00" level=warning msg="Found orphan containers (tutorlink-backend-1, tutorlink-pgadmin-1, tutorlink-db-1, tutorlink-frontend-1, tutorlink-mailpit-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-test-db-1 Running 
+ Image tutorlink-h01-backend-test:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 612B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 DONE 0.3s
+
+#4 [internal] load metadata for docker.io/library/composer:2
+#4 DONE 0.3s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 FROM docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a
+#6 resolve docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919
+#7 resolve docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 19.01kB done
+#8 DONE 0.0s
+
+#9 [stage-0 5/9] WORKDIR /var/www/html
+#9 CACHED
+
+#10 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#11 CACHED
+
+#12 [stage-0 6/9] COPY composer.json composer.lock ./
+#12 CACHED
+
+#13 [stage-0 8/9] COPY . .
+#13 CACHED
+
+#14 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#14 CACHED
+
+#15 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#15 CACHED
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:6ecfe57155c3719af964f9d8fc2755ff89b36ebe292d889b78d178d7b117d072 done
+#17 exporting config sha256:e1a6346c6089fb2790c2176547e5c1d16b3799dbccaa2701673a09080e2ae72f done
+#17 exporting attestation manifest sha256:a3895c48d0a729c0e644e75900badbcaaf801a8906a4b05a3ae296bade286587 done
+#17 exporting manifest list sha256:b4ff8a5a6de2a6b8f02afa71497cf1287fb5b8993d9fcf5ca3afb1bbd7a2bf17 done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#17 DONE 0.0s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built 
+ Container tutorlink-test-db-1 Waiting 
+ Container tutorlink-test-db-1 Healthy 
+ Container tutorlink-backend-test-run-065715124b66 Creating 
+ Container tutorlink-backend-test-run-065715124b66 Created 
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\ExampleTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthat true is true[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\TaskSubmissionRequestHashTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit matches the RFC 8785 JCS hash vector for special Unicode submission content[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\TestConsoleGuardTest[39m
+  [32;1m✓[39;22m[90m [39m[90munsafe targets are rejected before connection[39m[90m                       [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdatabase override options are rejected[39m[90m                              [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcheck accepts sqlite memory without migrating[39m[90m                       [39m [90m0.08s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Unit\TestDatabaseIsolationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mdevelopment database is rejected before providers or refresh databa[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90msqlite memory is safe even when development environment is inherite[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcached configuration with wrong target is rejected before boot[39m[90m      [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AdminApprovalAuditTest[39m
+  [32;1m✓[39;22m[90m [39m[90mrequest changes resubmit and approve records every decision[39m[90m         [39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mapproval decisions require a reason[39m[90m                                 [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin without permission and non admin cannot review profiles[39m[90m       [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid tutor profile status filters are rejected[39m[90m                   [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90monly reviewer with permission can download verification document[39m[90m    [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccount and profile suspension are separate and audited[39m[90m             [39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AuthFileProfileTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcustomer registration creates a customer[39m[90m                            [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtutor registration creates a tutor[39m[90m                                  [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregistration sends a frontend email verification link[39m[90m               [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcustomer exactly fifteen can register[39m[90m                               [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcustomer one day under fifteen cannot register[39m[90m                      [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtutor exactly eighteen can register[39m[90m                                 [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtutor one day under eighteen cannot register[39m[90m                        [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrole cannot be changed through me[39m[90m                                   [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90munauthenticated api request returns json 401[39m[90m                        [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin and current user work[39m[90m                                         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90memail verification marks the user verified[39m[90m                          [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword reset sends a frontend link[39m[90m                                [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword reset updates the password[39m[90m                                 [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexpired password reset token is rejected[39m[90m                            [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid password reset token is rejected[39m[90m                            [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword reset is throttled for sixty seconds[39m[90m                       [39m [90m0.42s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlocal admin seeder is idempotent and grants all permissions[39m[90m         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcsrf mismatch returns json 419 for api requests[39m[90m                     [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid payload returns json 422 with field errors[39m[90m                  [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90munverified user cannot upload business file[39m[90m                         [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile can be completed and only owner can download or delete[39m[90m         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90msubmitted tutor profile cannot be edited[39m[90m                            [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtutor profile stores specialization and avatar[39m[90m                      [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompleted verification document can be attached to tutor profile[39m[90m    [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcatalog can be seeded and read[39m[90m                                      [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogin is rate limited[39m[90m                                               [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mregister is rate limited[39m[90m                                            [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ChatAttachmentDisabledTest[39m
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile_ids accepts only omission or an empty JSON array with dataset[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90momitted file_ids and empty array replay the same text[39m[90m               [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclient cannot send file or system messages with ('file')[39m[90m            [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclient cannot send file or system messages with ('system')[39m[90m          [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmultipart cannot attach a binary file to a text message[39m[90m             [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmessage attachment purpose cannot be uploaded[39m[90m                       [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90man owned complete file cannot be linked to a real message[39m[90m           [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlegacy message files and links remain unchanged when new linking is[39m[90m…[39m [90m0.05s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\CompleteFileApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mvalid file completes without creating antivirus evidence and replay[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmetadata violations are persisted as rejected with ('size')[39m[90m         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmetadata violations are persisted as rejected with ('hash')[39m[90m         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmetadata violations are persisted as rejected with ('mime')[39m[90m         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmetadata violations are persisted as rejected with ('extension')[39m[90m    [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmetadata violations are persisted as rejected with ('purpose')[39m[90m      [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmetadata violations are persisted as rejected with ('private')[39m[90m      [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmetadata violations are persisted as rejected with ('content')[39m[90m      [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmissing storage stays pending and returns a storage error[39m[90m           [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mvalidation unavailable stays pending and can complete on retry[39m[90m      [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrejected files cannot be completed again[39m[90m                            [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlegacy clean files do not acquire fabricated scan evidence[39m[90m          [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mvalid historical scan evidence is preserved without invoking a scan[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mobject changed during validation cannot become complete[39m[90m             [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mwrong owner and suspended owner cannot complete a file[39m[90m              [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload does not trust client supplied completion or scan evidence[39m[90m   [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ConversationBroadcastAuthTest[39m
+  [32;1m✓[39;22m[90m [39m[90mauthentication is required[39m[90m                                          [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmembers receive a valid session bound signature[39m[90m                     [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mother sessions outsider and admin cannot use the token[39m[90m              [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelled chat and suspended peer remain readable[39m[90m                   [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmembership removal denies an existing token[39m[90m                         [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexpired grant is denied and renewal rotates its token[39m[90m               [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid channel socket and client selected session are rejected[39m[90m     [39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ConversationLifecycleApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion closes only when the pair has no ongoing relationship wi[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90monly an eligible contact request reopens the same conversation[39m[90m      [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlazy invitation expiry respects remaining active programs with data[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlazy invitation expiry respects remaining active programs with data[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplacing an expired invitation does not close the conversation[39m[90m     [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfailure after conversation closure rolls back all lifecycle writes[39m[90m  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin suspension preserves conversation state and read cursors with[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin suspension preserves conversation state and read cursors with[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin suspension preserves conversation state and read cursors with[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin suspension preserves conversation state and read cursors with[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelling a draft before any completed program keeps the chat acti[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprogram completion does not create a missing conversation[39m[90m           [39m [90m0.05s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\DatabaseSchemaTest[39m
+  [32;1m✓[39;22m[90m [39m[90msuite uses the configured database[39m[90m                                  [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcore business tables are created[39m[90m                                    [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90musers match the tutorlink identity contract[39m[90m                         [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres accepts current user statuses[39m[90m                              [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres rejects legacy inactive user status[39m[90m                        [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres rejects legacy pending user status[39m[90m                         [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres accepts current tutor profile statuses[39m[90m                     [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres rejects cancelled tutor profile status[39m[90m                     [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres rejects expired tutor profile status[39m[90m                       [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlaravel and learning sessions use distinct tables[39m[90m                   [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprogram and invitation store immutable offer snapshots[39m[90m              [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprograms have a customer id column[39m[90m                                  [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres accepts completed programs and requires a customer[39m[90m         [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres allows only one customer and pending invitation per progra[39m[90m…[39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ExampleTest[39m
+  [32;1m✓[39;22m[90m [39m[90mthe application returns a successful response[39m[90m                       [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\FileLifecycleConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mdocument attachment committing first prevents file deletion[39m[90m         [39m [90m0.25s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile deletion committing first prevents document attachment[39m[90m         [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlink and delete preserve an existing verification document[39m[90m          [39m [90m0.39s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\FileSizePolicyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('avatar[39m[90m…[39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('avatar[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('avatar[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('verifi[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('verifi[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('verifi[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('task_a[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('task_a[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('task_a[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('profil[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('profil[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mupload and complete enforce the decimal byte boundary with ('profil[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcomplete rejects an oversized object despite smaller declared metad[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcomplete rejects an oversized object even when metadata matches[39m[90m     [39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\IdentitySecurityTest[39m
+  [32;1m✓[39;22m[90m [39m[90mspa login without csrf token is rejected[39m[90m                            [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mspa login with wrong csrf token is rejected[39m[90m                         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mspa login with valid csrf token succeeds[39m[90m                            [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtampered verification signature is rejected[39m[90m                         [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexpired verification link is rejected[39m[90m                               [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90msigned link with wrong email hash is rejected[39m[90m                       [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\IdentitySessionTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin and logout use real session cookies[39m[90m                           [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword change keeps a and revokes b and old a[39m[90m                     [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpassword reset revokes current and other sessions[39m[90m                   [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mresetting b does not log out a[39m[90m                                      [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuspend and restore do not restore old credentials[39m[90m                  [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrevocation action only removes target sessions[39m[90m                      [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90maudit failure rolls back suspend and revocation[39m[90m                     [39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Infrastructure\PostgresConnectionsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit opens two distinct PostgreSQL sessions on the test database[39m[90m      [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces transaction locks across independent PostgreSQL session[39m[90m…[39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Infrastructure\PostgresRuntimeTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit boots the guarded Laravel test application on PostgreSQL[39m[90m         [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Infrastructure\TestActorsTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit authenticates a basic user fixture[39m[90m                               [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit provides a customer profile without tutor access[39m[90m                 [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit provides a tutor draft accessible to its owner[39m[90m                   [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires explicit permissions for an admin fixture[39m[90m               [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\InvitationAcceptConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90monly one concurrent accept creates membership audit and outbox[39m[90m      [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccept and lazy expiry race leaves no membership or partial writes[39m[90m  [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccept and draft cancel race commit a consistent serial order[39m[90m       [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccept and account suspension race respect the user lock[39m[90m            [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccept and atomic profile suspension preserve a consistent outcome[39m[90m  [39m [90m0.46s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconcurrent assignment changes cannot overwrite the same version[39m[90m     [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtwo completions close the chat only after both programs end[39m[90m         [39m [90m0.34s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompletion and invitation send follow serialized order[39m[90m              [39m [90m0.72s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\InvitationAcceptTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit activates the Program once and replays the same response for an[39m[90m… [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 404 without mutations when another Customer accepts the[39m[90m… [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 409 at the exact expiry time without activating the Prog[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts an offer after its source Listing becomes inactive when[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 409 when the Program version no longer matches the Invit[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 409 when the required identity document expires at the c[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 409 when the stored snapshot names a different Program[39m[90m   [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 409 while the source Listing has an active moderation ho[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 409 when an Idempotency-Key is reused for a different In[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 422 without mutating state when the request has an unsup[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 422 when Idempotency-Key is not a UUID[39m[90m                   [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 401 with the API error envelope when no Customer is auth[39m[90m…[39m [90m0.01s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\InvitationApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit sends an immutable snapshot and replays the same idempotent resp[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns effective expiry in scoped Invitation reads without writ[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit expires an old pending Invitation atomically before sending a re[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back lazy expiry when the replacement request has a stale[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects a send while an unexpired Invitation locks the Draft[39m[90m     [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit snapshots the allow-listed source Listing context at send time[39m[90m   [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects sending when the source Listing has a moderation hold[39m[90m    [39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MarketplaceApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mpending tutor cannot publish listing[39m[90m                                [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mother tutor cannot update listing[39m[90m                                   [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnon public listing is not returned[39m[90m                                  [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprice sort requires price unit[39m[90m                                      [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90moverlapping availability is rejected[39m[90m                                [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdelete listing soft cancels it[39m[90m                                      [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuspended profile cannot publish listing[39m[90m                            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuspended account cannot manage listing[39m[90m                             [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mother tutor cannot read or delete listing[39m[90m                           [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnon public listing is hidden from list and detail[39m[90m                   [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuspend and restore changes public visibility[39m[90m                       [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90minactive catalog is not public[39m[90m                                      [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlisting filters are applied on server[39m[90m                               [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlisting pagination returns total count[39m[90m                              [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprice filter does not mix price units[39m[90m                               [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mowner detail and public tutor slug work[39m[90m                             [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcatalog seeder is idempotent[39m[90m                                        [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90marchive preserves program reference and snapshot[39m[90m                    [39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MarketplaceCloseoutTest[39m
+  [32;1m✓[39;22m[90m [39m[90mowner status counts and actions are scoped before pagination[39m[90m        [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mowner actions match catalog and terminal state enforcement[39m[90m          [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpublic listing exposes tutor slug without owner actions[39m[90m             [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreviews exclude all non completed programs and return empty aggrega[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreviews validate pagination and public tutor visibility[39m[90m             [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompleted review pagination aggregates full set and exposes only pu[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcompleted reviews require matching owner customer membership and un[39m[90m…[39m [90m0.05s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MarketplaceSearchCompatibilityTest[39m
+  [32;1m✓[39;22m[90m [39m[90mmixed case search matches title and description with filters and pa[39m[90m…[39m [90m0.07s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MessageBroadcastTest[39m
+  [32;1m✓[39;22m[90m [39m[90mnotification is enqueued only after outer commit[39m[90m                    [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mouter rollback discards message and notification[39m[90m                    [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplay and conflict do not enqueue another notification[39m[90m             [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mvalidation quota and outsider failures do not enqueue[39m[90m               [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mqueue failure does not lose the committed message[39m[90m                   [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtransport uses only session channels and minimal payload[39m[90m            [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtransport failure leaves the committed message readable[39m[90m             [39m [90m0.11s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MessagingSchemaTest[39m
+  [32;1m✓[39;22m[90m [39m[90mmembers and messages follow conversation relationships[39m[90m              [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mattachments do not include other resource types with the same id[39m[90m    [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdatabase defaults hash column and cursor index match the contract[39m[90m   [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdatabase rejects duplicate direct keys[39m[90m                              [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmessage keys are unique per sender across conversations[39m[90m             [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpostgres rejects legacy statuses types and missing direct keys[39m[90m      [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmigration can round trip on empty messaging tables[39m[90m                  [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmigration refuses legacy conversations without modifying them[39m[90m       [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmigration refuses existing messages without modifying them[39m[90m          [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\NotificationOutboxRuntimeTest[39m
+  [32;1m✓[39;22m[90m [39m[90mworker command processes committed events without duplicate[39m[90m         [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfailure queues one alert and monitor does not duplicate it[39m[90m          [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfailed handoff rolls back failure marker and job together[39m[90m           [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmonitor backfills legacy failures and throttles reminders[39m[90m           [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpending alerts are aggregated and limited to once per ten minutes[39m[90m   [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpending alert handoff rollback does not consume throttle slot[39m[90m       [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mqueue on an independent connection is rejected[39m[90m                      [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mretention preview does not delete any data[39m[90m                          [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexecuting retention requires both permissions[39m[90m                       [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mretention preserves unresolved failures and audits each batch[39m[90m       [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfailed retention audit rolls back deletion[39m[90m                          [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mscheduler has monitor and controlled retention tasks[39m[90m                [39m [90m0.05s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\NotificationOutboxWriterTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcommit records once per recipient without creating notifications[39m[90m    [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrollback removes the outbox event[39m[90m                                   [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplay does not create a second outbox event[39m[90m                        [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreusing an event key with different payload is rejected[39m[90m             [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpayload outside the allow list is rejected[39m[90m                          [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccepted invitation requires the program deep link to match its id[39m[90m  [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\OpenConversationApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcreates one conversation with two members and minimal peer data[39m[90m     [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreverse direction reuses the same pair and does not duplicate membe[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtutor can initiate a new conversation[39m[90m                               [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcontext is frozen on reuse and reopen and history is preserved[39m[90m      [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90minitial null context stays null on later requests[39m[90m                   [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreuse still validates supplied listing ownership and visibility[39m[90m     [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhidden catalog or moderation hold blocks listing context[39m[90m            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mauthentication actor role and active state are enforced[39m[90m             [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mself same role admin and missing peers are rejected[39m[90m                 [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown fields and invalid ids are rejected[39m[90m                         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90munverified unapproved or expired tutors cannot open contact[39m[90m         [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreopen rechecks eligibility and does not change a cancelled chat on[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexisting invalid membership is not silently repaired[39m[90m                [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmember write failure rolls back the entire conversation[39m[90m             [39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\OpenConversationConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mconcurrent opposite direction opens create one conversation and kee[39m[90m…[39m [90m0.47s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PersonalAccessTokenTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit issues a one-time token and only lists metadata for its owner[39m[90m    [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit validates token names abilities and expiry bounds[39m[90m                [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces PAT abilities and rejects PAT use on session-only token[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit combines listing abilities with tutor eligibility and resource o[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects expired tokens and revokes PATs when account is suspende[39m[90m…[39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PhaseTwoAcceptanceTest[39m
+  [32;1m✓[39;22m[90m [39m[90mavatar rejects documents and files over five million bytes[39m[90m          [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmissing or tampered storage cannot be completed[39m[90m                     [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mattached files cannot be deleted and storage is preserved[39m[90m           [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90munlinked owner file can be deleted[39m[90m                                  [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mgeneric links do not grant cross resource access or fake future fea[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdeactivated account cannot use me or login[39m[90m                          [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90munverified tutor cannot submit and incomplete profile returns field[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mready profile submit is idempotent and locks every edit path[39m[90m        [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin queue excludes drafts and view only admin has no actions[39m[90m      [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreject is terminal and restore requires each separate permission[39m[90m    [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mdeactivated accounts cannot be approved or reactivated by suspend r[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90maudit failure rolls back admin decision[39m[90m                             [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mowner verification link is idempotent and locked after submit[39m[90m       [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin seed cannot change a customer role or password[39m[90m                [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcustomer cannot access tutor onboarding[39m[90m                             [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlogout clears web session after sanctum authentication[39m[90m              [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ProcessNotificationOutboxTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcommitted outbox creates notification and is marked processed[39m[90m       [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrunning command again does not duplicate notification[39m[90m               [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfuture outbox is not processed[39m[90m                                      [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mbusiness rollback leaves nothing for worker[39m[90m                         [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexisting matching notification is not duplicated[39m[90m                    [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconflicting notification does not mark outbox processed[39m[90m             [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90muncommitted outbox is invisible to another worker[39m[90m                   [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mworker skips row locked by another connection[39m[90m                       [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrolled back processing can be retried[39m[90m                               [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mretry window expires without another delivery attempt[39m[90m               [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfailed processing rolls back notification and can retry[39m[90m             [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtenth failure stops automatic retries[39m[90m                               [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mretry backoff is at most five minutes[39m[90m                               [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mauthorized replay preserves event and writes audit[39m[90m                  [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuccessful replay resolves failure without duplicate notification[39m[90m   [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfailed replay requires a new replay request[39m[90m                         [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90moutbox apis require explicit permissions[39m[90m                            [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplay requires a nonblank reason[39m[90m                                   [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma second pending replay is rejected without another audit[39m[90m           [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprocessed or resolved outbox cannot be replayed[39m[90m                     [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90maudit failure rolls back replay state[39m[90m                               [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlisting classifies outbox states and excludes payload[39m[90m               [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mkilled worker before commit can be retried[39m[90m                          [39m [90m0.24s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ProgramApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit creates a Draft for an active Customer and records an audit entr[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies Program creation to a Customer[39m[90m                            [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unsupported offer values and fields without creating a P[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects a source Listing under moderation hold[39m[90m                   [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit lists and shows only Programs visible to the actor[39m[90m               [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit lets a Customer read a Program only after becoming an active mem[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit updates a Draft once and increments its version[39m[90m                  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects stale versions and unsupported mutation fields without c[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps a Draft locked while an Invitation is pending and unexpire[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit expires an overdue Invitation and edits the Draft in one transac[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back auto-expiry when the PATCH version is stale[39m[90m           [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 403 when an active Program member attempts to edit the D[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects editing a Program that is no longer a Draft[39m[90m              [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns an empty list to an active Customer without Program memb[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit denies Program listing to an Admin[39m[90m                               [39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ProgramLifecycleApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit records distinct lifecycle events without changing the offer ver[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns Session and Task blockers without completing the Program[39m[90m [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 404 when another Tutor attempts a Program lifecycle acti[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects a transition outside the allowed state without side effe[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cancels a Draft and its unexpired Invitation in one transaction[39m[90m  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit completes a Program when Tasks are terminal and writes the membe[39m[90m…[39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ReadConversationApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mall three reads require a session[39m[90m                                   [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90minbox scopes before returning private data and returns only minimal[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90moutsider gets 404 before cursor validation and cannot distinguish m[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90madmin has no participant inbox or conversation read access[39m[90m          [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma suspended actor with an existing session cannot read[39m[90m              [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelled chat and suspended peer remain readable without any read[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90munread counts only peer messages after the composite read position[39m[90m  [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma legacy read marker from another conversation is not used as a val[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfile preview is generic and history hides internal metadata[39m[90m         [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhistory visits every message with identical timestamps exactly once[39m[90m [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpolling drains all pages of new messages in ascending order[39m[90m         [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90man empty conversation provides a usable polling origin for the firs[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mloading older history never replaces the polling checkpoint[39m[90m         [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpage size defaults to 20 and accepts 50[39m[90m                             [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid query parameters return the agreed error envelope[39m[90m           [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmessage cursors reject tampering and a different conversation scope[39m[90m [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90minbox uses cursor pagination with messages first and deterministic[39m[90m… [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90minbox cursor cannot be reused by another actor or as a message curs[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpagination preserves fractional timestamps when the database stores[39m[90m…[39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ReadCursorApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mfirst read advances only the current member and updates inbox unrea[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mequal and older targets return the effective marker without changin[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtimestamp including fractions takes priority over a numerically lar[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mID breaks ties between messages with identical timestamps[39m[90m           [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmissing and foreign target messages return the same neutral error w[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnull reset missing field non-integer and non-positive targets are r[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclient cannot choose another member or set server-owned read fields[39m[90m [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90moutsider and Admin receive 404 before validation including when the[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90munauthenticated and suspended actors cannot change read state[39m[90m       [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcancelled chat with suspended peer remains readable and is not reop[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90meither participant may mark own or system messages without changing[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlegacy cursor pointing to another Conversation is reported without[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma null-timestamp target is invalid and a malformed legacy marker re[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mequal legacy marker keeps a null last_read_at rather than inventing[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma failed pivot write rolls back and a retry may advance normally[39m[90m    [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ReadCursorConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mracing reads keep the furthest timestamp even when its id is smalle[39m[90m…[39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90mracing equal timestamp targets keep the larger message id[39m[90m           [39m [90m0.32s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtwo stale reads cannot reduce an existing newer marker or change it[39m[90m…[39m [90m0.31s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtwo members update only their own markers when they race[39m[90m            [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuspension committing before a waiting read blocks a stale actor[39m[90m    [39m [90m0.29s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma read committing first is preserved when suspension then completes[39m[90m [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma send waiting for read commit stays unread after the target[39m[90m        [39m [90m0.27s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\RealtimeRevocationConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mrevocation committing first prevents publishing[39m[90m                     [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpublishing first holds the lock until revocation can commit[39m[90m         [39m [90m0.24s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\RealtimeSessionAccessTest[39m
+  [32;1m✓[39;22m[90m [39m[90mlogout revokes only current session and stale requests cannot reiss[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90maccount suspend revokes every session and restore does not restore[39m[90m… [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprofile suspend revokes every session and restore does not restore[39m[90m… [39m [90m0.15s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuspend transaction rollback preserves realtime access[39m[90m              [39m [90m0.09s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SendSlackOperationalAlertTest[39m
+  [32;1m✓[39;22m[90m [39m[90msuccess uses backend token and safe operational message[39m[90m             [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpending and worker alerts have only operational fields[39m[90m              [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconnection timeout releases job without inline retry[39m[90m                [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrate limit respects retry after[39m[90m                                     [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mretry after is not shortened to normal backoff cap[39m[90m                  [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid retry after uses bounded backoff[39m[90m                            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mretry after beyond retry window fails without early retry[39m[90m           [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtemporary http error releases job with data set #0[39m[90m                  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtemporary http error releases job with data set #1[39m[90m                  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtemporary http error releases job with data set #2[39m[90m                  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhttp 200 with temporary api error is retried[39m[90m                        [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhttp 200 with api rate limit respects retry after[39m[90m                   [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpermanent api error fails without retry with data set #0[39m[90m            [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpermanent api error fails without retry with data set #1[39m[90m            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpermanent api error fails without retry with data set #2[39m[90m            [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpermanent api error fails without retry with data set #3[39m[90m            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpermanent api error fails without retry with data set #4[39m[90m            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpermanent api error fails without retry with data set #5[39m[90m            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mhttp auth error fails without retry[39m[90m                                 [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90minvalid json response is not treated as success[39m[90m                     [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmissing configuration fails without http request[39m[90m                    [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtenth temporary failure stops retry with safe exception[39m[90m             [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mexpired job does not send to slack[39m[90m                                  [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90munknown response content and token are not logged or serialized[39m[90m     [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mprivate fields are rejected before queue serialization[39m[90m              [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mslack failure does not rollback committed business or notification[39m[90m  [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mpermanent failure is stored in failed jobs without token[39m[90m            [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mrolled back enqueue does not send any slack request[39m[90m                 [39m [90m0.05s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SendTextMessageApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtext send preserves spaces and only normalizes newlines with the se[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90minput trimming and empty-string normalization remain enabled outsid[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90msame normalized payload replays including an uppercase UUID and omi[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mchanging significant spaces or unicode composition conflicts instea[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90msame sender key in a different member conversation returns 409[39m[90m      [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mthe same UUID is independent for a different sender[39m[90m                 [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplay is allowed after cancellation and peer suspension without re[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma suspended actor cannot replay a previously persisted message[39m[90m      [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mreplay checks current membership before looking up the sender key[39m[90m   [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mnew messages are blocked for cancelled chat or suspended peer witho[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90msuspended TutorProfile blocks new messages while expired contact do[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mauthentication outsider and Admin cannot send a valid payload[39m[90m       [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mvalidation rejects blank oversized system file and client-controlle[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtext length is checked after newline normalization and accepts exac[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma sliding 60 second quota is global to the sender and replay never[39m[90m… [39m [90m0.24s[39m  
+  [32;1m✓[39;22m[90m [39m[90mfailed and conflicting attempts do not consume the remaining quota[39m[90m… [39m [90m0.22s[39m  
+  [32;1m✓[39;22m[90m [39m[90mquota uses the thirtieth newest timestamp even when legacy rows exc[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mlegacy text with a null hash can replay without modifying the store[39m[90m…[39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mclock regression cannot place a new message behind an issued pollin[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma message insert failure rolls back the message and leaves the same[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mmessage timestamp precision and sender-time index exist without dro[39m[90m…[39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SendTextMessageConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mconcurrent retries create one message and return 201 and 200[39m[90m        [39m [90m0.38s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconcurrent different payloads with one key return one conflict[39m[90m      [39m [90m0.37s[39m  
+  [32;1m✓[39;22m[90m [39m[90msame sender key cannot be created in two conversations concurrently[39m[90m [39m [90m0.43s[39m  
+  [32;1m✓[39;22m[90m [39m[90monly one request can take the last global quota slot[39m[90m                [39m [90m0.40s[39m  
+  [32;1m✓[39;22m[90m [39m[90msend waiting for committed h02 suspension is rejected[39m[90m               [39m [90m0.28s[39m  
+  [32;1m✓[39;22m[90m [39m[90msend commits before waiting h02 suspension and remains visible to p[39m[90m…[39m [90m0.30s[39m  
+  [32;1m✓[39;22m[90m [39m[90ma stale sender object waiting for its own suspension is rejected[39m[90m    [39m [90m0.22s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SubmissionVersioningBackfillPostgresTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit reruns PostgreSQL backfill for representative legacy rows and ro[39m[90m…[39m [90m0.07s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\Task3SchemaDeltaTest[39m
+  [32;1m✓[39;22m[90m [39m[90mtask3 schema columns exist[39m[90m                                          [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90massignment and outbox reject invalid references and duplicates[39m[90m      [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mtask submissions keep versions and current pointer matches task and[39m[90m…[39m [90m0.04s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TaskSubmissionConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90msubmission retry and review races leave consistent versions[39m[90m         [39m [90m0.64s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TaskWorkflowApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit completes task assignment, versioned submission, revision, and a[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves meaningful edge whitespace for submission and feedback[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit serializes Task and Submission timestamps as RFC 3339 UTC throug[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit stores the RFC 8785 JCS hash for special Unicode submission cont[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows a new submission while review is pending and rejects feed[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows task owners to cancel only open tasks and restricts trans[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces task visibility and mutation permissions by owner and a[39m[90m…[39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies Program state gates to task creation and actions[39m[90m         [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects task edits and submissions in terminal task states while[39m[90m…[39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays feedback from the shared receipt after authorization wit[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit links a completed task file and permits only the task participan[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back submission and task state when a file link cannot be[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit backfills a legacy submission into version one and the task curr[39m[90m…[39m [90m0.02s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TutorProfileApprovalWorkflowTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit assigns reassigns and revokes with optimistic locking and a mini[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid assignees and callers without assignment permiss[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit removes the old reviewer scope for detail decisions and private[39m[90m… [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps assignment-only queue metadata separate from profile detai[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires identity and structured qualification evidence before s[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit submits once retains eligible assignments and requires separate[39m[90m… [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns a stale conflict even if a profile is reassigned back to[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit clears an ineligible reviewer on resubmission and forbids reject[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks document decision permission separately from download and[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit suspends profile and active account atomically then restores onl[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cannot partially suspend with either required permission missing[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cannot partially suspend with either required permission missing[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back account profile audit and token revocation if the out[39m[90m…[39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces authorization when business actions are called directly[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit keeps approved content unchanged until a versioned revision is a[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves approved content on revision rejection and does not re[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit supports changes requested revisions with versioned edits and re[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit retains document decisions when the owner retries attaching the[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit protects revision avatar files from deletion while keeping the o[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces unique open revisions and positive revision versions in[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires private identity files and matching ownership before su[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not grant Program eligibility when a claimed qualification[39m[90m… [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit backfills the legacy suspension state and preserves profile and[39m[90m… [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit hides profiles with deleted tutor accounts without partial decis[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows profile suspension and restoration with profile permissio[39m[90m…[39m [90m0.06s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ZipScanGuardTest[39m
+  [32;1m✓[39;22m[90m [39m[90mZIP guard accepts ordinary entries and non ZIP[39m[90m                      [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard refuses unsafe or incomplete archives with ('file')[39m[90m       [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard refuses unsafe or incomplete archives with ('total')[39m[90m      [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard refuses unsafe or incomplete archives with ('count')[39m[90m      [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard refuses unsafe or incomplete archives with ('encrypted')[39m[90m  [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard refuses unsafe or incomplete archives with ('nested')[39m[90m     [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard refuses unsafe or incomplete archives with ('malformed')[39m[90m  [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard reports an expired deadline as unavailable[39m[90m                [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90mZIP guard reports invalid limits as unavailable[39m[90m                     [39m [90m0.02s[39m  
+  [32;1m✓[39;22m[90m [39m[90marchive policy rejection blocks a previously complete file[39m[90m          [39m [90m0.03s[39m  
+
+  [90mTests:[39m    [32;1m477 passed[39;22m[90m (3284 assertions)[39m
+  [90mDuration:[39m [39m33.99s[39m
+

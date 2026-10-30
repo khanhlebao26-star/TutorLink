@@ -10,7 +10,7 @@ Tutor giao công việc cho Customer member trong đúng Program và theo dõi t
 
 * Chỉ Tutor owner tạo/chỉnh nội dung Task và gán cho Customer member của Program.  
 * Task mới có trạng thái todo (Chưa bắt đầu); enum đích hỗ trợ todo/in\_progress/submitted/completed/cancelled.  
-* Task có nội dung, due\_at tùy chọn và file đính kèm purpose `task_attachment`, FileLink `resource_type=task`. `due_at` là instant, lưu UTC và hiển thị theo `Program.timezone`; API dùng RFC 3339.
+* Task có nội dung, due\_at tùy chọn và file đính kèm purpose `task_attachment`, FileLink `resource_type=task`. `due_at` là instant lưu UTC; API serialize timestamp RFC 3339 UTC với hậu tố `Z`, còn UI hiển thị theo `Program.timezone`.
 * Chỉ Program Active tạo Task mới; Paused/Completed/Cancelled không tạo. Task Completed/Cancelled không tự mở lại.  
 * “CRUD Task” không bao gồm DELETE vật lý: Task được hủy theo lifecycle, giữ Task, Submission và lịch sử. API dùng `POST /tasks/{task}/cancel`; không có DELETE route.
 * Khi Program Paused, Customer assignee vẫn có thể start Task `todo` đã giao; Customer có thể nộp và Tutor feedback theo M07-F02/F03. Tutor chỉ sửa title/description/due_at/attachment của Task `todo` khi Program Active; không sửa `in_progress` hoặc `submitted`.

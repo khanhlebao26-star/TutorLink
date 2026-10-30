@@ -18,7 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         $isMessageSend = fn (Request $request): bool => $request->isMethod('POST')
             && $request->is('api/v1/conversations/*/messages');
-        $middleware->trimStrings(except: [$isMessageSend]);
+        $isTaskRequest = fn (Request $request): bool => $request->is(
+            'api/v1/programs/*/tasks',
+            'api/v1/tasks/*',
+        );
+        $middleware->trimStrings(except: [$isMessageSend, $isTaskRequest]);
         $middleware->convertEmptyStringsToNull(except: [$isMessageSend]);
         $middleware->redirectGuestsTo(
             fn (Request $request) => $request->is('api/*') ? null : route('login'),

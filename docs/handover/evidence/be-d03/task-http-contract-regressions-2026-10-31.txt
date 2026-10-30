@@ -1,0 +1,99 @@
+Command: docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest tests/Feature/TaskWorkflowApiTest.php
+
+time="2026-10-31T06:47:34+07:00" level=warning msg="Found orphan containers (tutorlink-backend-1, tutorlink-pgadmin-1, tutorlink-db-1, tutorlink-frontend-1, tutorlink-mailpit-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-test-db-1 Running 
+ Image tutorlink-h01-backend-test:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 612B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/php:8.3-cli
+#4 DONE 0.8s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 DONE 0.9s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 FROM docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a
+#6 resolve docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919
+#7 resolve docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 19.01kB done
+#8 DONE 0.0s
+
+#9 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#9 CACHED
+
+#10 [stage-0 8/9] COPY . .
+#10 CACHED
+
+#11 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#11 CACHED
+
+#12 [stage-0 5/9] WORKDIR /var/www/html
+#12 CACHED
+
+#13 [stage-0 6/9] COPY composer.json composer.lock ./
+#13 CACHED
+
+#14 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#14 CACHED
+
+#15 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:6ecfe57155c3719af964f9d8fc2755ff89b36ebe292d889b78d178d7b117d072 done
+#17 exporting config sha256:e1a6346c6089fb2790c2176547e5c1d16b3799dbccaa2701673a09080e2ae72f done
+#17 exporting attestation manifest sha256:f8cbca256272429162e52e9564d9d05134b40637523bbdbbcc12db6f967fb055 done
+#17 exporting manifest list sha256:0be2a0c63232e7655f38fddecc3fc5d78d99e4e76b25d096feb6322b303890c3
+#17 exporting manifest list sha256:0be2a0c63232e7655f38fddecc3fc5d78d99e4e76b25d096feb6322b303890c3 done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#17 DONE 0.0s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built 
+ Container tutorlink-test-db-1 Waiting 
+ Container tutorlink-test-db-1 Healthy 
+ Container tutorlink-backend-test-run-a49a96d5f6b5 Creating 
+ Container tutorlink-backend-test-run-a49a96d5f6b5 Created 
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TaskWorkflowApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit completes task assignment, versioned submission, revision, and a[39m[90m…[39m [90m0.54s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit preserves meaningful edge whitespace for submission and feedback[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit serializes Task and Submission timestamps as RFC 3339 UTC throug[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit stores the RFC 8785 JCS hash for special Unicode submission cont[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows a new submission while review is pending and rejects feed[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows task owners to cancel only open tasks and restricts trans[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit enforces task visibility and mutation permissions by owner and a[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies Program state gates to task creation and actions[39m[90m         [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects task edits and submissions in terminal task states while[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays feedback from the shared receipt after authorization wit[39m[90m…[39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit links a completed task file and permits only the task participan[39m[90m…[39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back submission and task state when a file link cannot be[39m[90m… [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit backfills a legacy submission into version one and the task curr[39m[90m…[39m [90m0.02s[39m  
+
+  [90mTests:[39m    [32;1m13 passed[39;22m[90m (231 assertions)[39m
+  [90mDuration:[39m [39m1.22s[39m
+

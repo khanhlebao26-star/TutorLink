@@ -10,7 +10,7 @@ Migration versioning đã được bổ sung backfill: bài nộp cũ thành ver
 
 ## Quy trình đã chạy
 
-Test `TaskWorkflowApiTest` chạy từ HTTP request tới database trên SQLite test database:
+Snapshot test `TaskWorkflowApiTest` chạy từ HTTP request tới database trên SQLite test database ở lượt đầu; các regression và toàn backend mới nhất chạy bằng PostgreSQL được ghi riêng bên dưới:
 
 1. Tutor giao Task cho Customer member, đọc danh sách và sửa Task với version đúng.
 2. Outsider bị từ chối; version Task cũ trả 409; Customer bắt đầu Task.
@@ -22,7 +22,7 @@ Test `TaskWorkflowApiTest` chạy từ HTTP request tới database trên SQLite 
 
 ## Bằng chứng
 
-- [Kết quả kiểm thử tập trung](evidence/be-d03/focused-tests.txt): **13/13 test, 116 assertions đạt** (Task workflow, Task schema và Program lifecycle).
+- [Kết quả kiểm thử tập trung ban đầu trên SQLite](evidence/be-d03/focused-tests.txt): **13/13 test, 116 assertions đạt**; đây là snapshot lịch sử, không phải bằng chứng PostgreSQL.
 - [Kiểm tra OpenAPI](evidence/be-d03/openapi-parity.txt): **81 operations, route parity đạt**.
 - [Ảnh trình bày kết quả chạy thực tế](evidence/be-d03/focused-tests.png): ảnh được dựng từ hai tệp kết quả lệnh ở trên để dễ đưa vào issue; đây là bằng chứng test backend, không phải ảnh chụp giao diện người dùng.
 
@@ -64,12 +64,12 @@ Test `TaskWorkflowApiTest` chạy từ HTTP request tới database trên SQLite 
 - [Probe backfill PostgreSQL](evidence/be-d03/postgres-backfill.txt): hai legacy rows được backfill đúng (assignee, current pointer, version 1, synthetic UUID và SHA-256); row sai assignee bị từ chối và transactional DDL rollback, giữ nguyên row cũ.
 - [Test tập trung PostgreSQL](evidence/be-d03/postgres-focused-tests.txt): **16/16 test, 184 assertions đạt** trong lượt chạy trước khi bổ sung assertion side-effect replay.
 - [Test toàn backend PostgreSQL trước khi bổ sung các test BE-D03 mới](evidence/be-d03/postgres-full-suite.txt): **468/468 test, 3.121 assertions đạt**; đây là log của lượt chạy trước, được giữ lại làm lịch sử.
-- [Test toàn backend PostgreSQL mới nhất](evidence/be-d03/postgres-full-suite-current-2026-10-31.txt): **475/475 test, 3.252 assertions đạt** sau khi bổ sung test BE-D03 về quyền download và side effect replay.
+- [Test toàn backend PostgreSQL trước hai regression fix mới nhất](evidence/be-d03/postgres-full-suite-current-2026-10-31.txt): **475/475 test, 3.252 assertions đạt**; log này được giữ làm snapshot lịch sử.
 - Các tệp `postgres-concurrency-probes.txt` và `postgres-backfill.txt` ghi kết quả probe ad hoc ban đầu; script gốc của các lần đó không còn. Có thể tái lập hành vi tương ứng bằng `TaskSubmissionConcurrencyTest` và `SubmissionVersioningBackfillPostgresTest`. Không dùng hai log ad hoc làm bằng chứng rằng chính script cũ còn chạy được.
 
 ## Giới hạn kiểm chứng
 
-- Kết quả toàn backend mới nhất là **475/475, 3.252 assertions** trên PostgreSQL test database; log 468/468 là snapshot cũ trước khi thêm các test BE-D03 và không còn là kết quả hiện tại. Lần chạy cũ có 5 test lỗi cũng đã được thay thế bởi kết quả đạt này.
+- Kết quả toàn backend mới nhất trước các regression fix Task là **475/475, 3.252 assertions**; log 468/468 và 475/3.252 là snapshot lịch sử đã được thay bằng kết quả hiện tại ở phần regression fix bên dưới. Lần chạy cũ có 5 test lỗi cũng đã được thay thế bởi kết quả đạt.
 - Các log trong `evidence/be-d03/` là bản ghi đầu ra của từng lần chạy. Có thể tái lập bằng source test: `TaskWorkflowApiTest.php`, `TaskSubmissionConcurrencyTest.php` và `SubmissionVersioningBackfillPostgresTest.php` trong backend; các lệnh Docker tương ứng được ghi ở đầu những tệp evidence có định dạng báo cáo. Probe race/backfill dùng database/schema test cô lập, không chứng nhận trên bản sao PostgreSQL production hoặc dữ liệu production thật.
 - Audit/outbox cho sự kiện Task và thông báo người nhận chưa được tích hợp vì deep link Task cho frontend vẫn chưa được chốt trong contract BE-K02.
 - API backend đã có; UI Task/Submission và Progress API/UI M07-F04 chưa được triển khai trong phạm vi BE-D03. `/files/{file}/links` chung vẫn chỉ hỗ trợ `verification_document`; Task/Submission file links được tạo qua API nghiệp vụ M07. CV, orphan cleanup/storage compensation và kiểm thử trên dữ liệu production-like chưa được chứng nhận trong #74.
@@ -82,7 +82,7 @@ API đã cho Customer assignee tạo version mới ngay khi Task còn `submitted
 
 - [Kết quả test tập trung ngày 31/10](evidence/be-d03/focused-tests-2026-10-31.txt): **15/15 test, 155 assertions đạt** trên SQLite, gồm version mới khi đang chờ duyệt, stale feedback, replay cùng payload đã chuẩn hóa, mismatch path/payload, key thiếu/sai, kiểm quyền trước replay và rollback khi ghi receipt thất bại.
 - OpenAPI được xuất lại từ code; 81 method/path và header UUID bắt buộc trên PUT Submission cùng hai POST feedback được kiểm qua artifact và route parity.
-- Đã có bằng chứng race và backfill trên PostgreSQL test cô lập cùng test toàn backend 468/468. Chưa có UI Task. Task-specific audit/outbox/notification event chưa được phát; phần kiểm tra replay chỉ xác nhận không có dòng audit/notification nào phát sinh thêm từ request gốc hoặc retry, không chứng nhận event delivery.
+- Đã có bằng chứng race và backfill trên PostgreSQL test cô lập cùng test toàn backend 477/477 (3.284 assertions) sau regression fix mới nhất. Chưa có UI Task. Task-specific audit/outbox/notification event chưa được phát; phần kiểm tra replay chỉ xác nhận không có dòng audit/notification nào phát sinh thêm từ request gốc hoặc retry, không chứng nhận event delivery.
 
 ## Audit/outbox và side effect khi replay — 31/10/2026
 
@@ -93,8 +93,17 @@ API đã cho Customer assignee tạo version mới ngay khi Task còn `submitted
 ## Tái lập kiểm thử và phạm vi bàn giao
 
 - Chạy lại luồng Task, permission, download, replay side effect và rollback: `docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest tests/Feature/TaskWorkflowApiTest.php`.
-- Chạy lại toàn backend trên PostgreSQL test: `docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest`; kết quả mới nhất **475/475 test, 3.252 assertions**, được lưu trong [log hiện tại](evidence/be-d03/postgres-full-suite-current-2026-10-31.txt).
+- Chạy lại toàn backend trên PostgreSQL test: `docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest`; kết quả mới nhất **477/477 test, 3.284 assertions**, được lưu trong [log hiện tại](evidence/be-d03/postgres-full-suite-issue74-regressions-2026-10-31.txt).
 - Chạy riêng probe tái lập: `docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest tests/Feature/TaskSubmissionConcurrencyTest.php` hoặc `docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest tests/Feature/SubmissionVersioningBackfillPostgresTest.php`. Source test là phương tiện tái lập; log chỉ là snapshot kết quả theo lần chạy. Các log probe ad hoc cũ đã được đánh dấu là lịch sử.
 - Phạm vi #74 là API/schema/backend và evidence. UI Task/Submission, Progress API/UI M07-F04 và hỗ trợ `task`/`task_submission` trong `/files/{file}/links` chung nằm ngoài phạm vi hiện tại. CV, orphan cleanup/storage compensation thuộc BE-K03; kiểm thử bằng dữ liệu production-like chưa được thực hiện.
 - Không còn blocker cho các acceptance criteria backend của #74 trong phạm vi hiện tại. Task-specific event audit/outbox/notification chưa tích hợp; việc này không bắt buộc theo #74/M07 và chỉ nên xét khi contract deep link BE-K02 được chốt. Issue nên giữ mở đến khi PR được review và merge.
 - Bàn giao local hiện nằm trên branch `codex/2w-be-d03`; commit đã tạo nhưng chưa được đẩy lên GitHub. Draft PR chưa mở vì `git push` trong môi trường này không có thông tin xác thực GitHub (`could not read Username`); GitHub integration cũng từ chối ghi blob/bình luận issue với HTTP 403 `Resource not accessible by integration`. Vì vậy trạng thái Issue #74 chưa thể được cập nhật từ môi trường hiện tại. Đây là blocker bàn giao/publish, không phải blocker kiểm thử hay acceptance criteria backend.
+
+## Regression fix: whitespace và timestamp Task API — 31/10/2026
+
+- Nguyên nhân mất khoảng trắng là middleware Laravel `TrimStrings` chạy toàn cục trước `TaskController`. `bootstrap/app.php` nay loại trừ đúng các route `/api/v1/tasks/*` và `/api/v1/programs/{program}/tasks`; các endpoint khác vẫn giữ hành vi trim. Chuẩn hóa trong controller tiếp tục đổi CRLF/CR thành LF, đổi chuỗi toàn whitespace thành `null`, giữ nguyên khoảng trắng đầu/cuối khi chuỗi có nội dung, không Unicode-normalize; hash tính trên đúng payload sau chuẩn hóa.
+- Regression HTTP trên PostgreSQL kiểm tra submit padded-content cùng key trả replay 200, payload chỉ khác edge spaces trả 409, DB giữ nguyên nội dung; feedback tương tự, và chuỗi toàn whitespace bị từ chối theo validation hiện hành.
+- `taskData`, `submissionData`, `feedbackData` dùng chung serializer UTC RFC 3339: `due_at`, `submitted_at`, `reviewed_at` trả dạng `...Z`; giá trị null vẫn null. Test kiểm tra chuyển `2026-11-02T09:30:00+07:00` thành `2026-11-02T02:30:00Z`, các timestamp Submission/feedback đúng định dạng, và null cho due/review trước khi duyệt. Database timestamp storage không đổi.
+- [Regression TaskWorkflowApiTest PostgreSQL](evidence/be-d03/task-http-contract-regressions-2026-10-31.txt): **13/13 test, 231 assertions đạt**. [Toàn backend PostgreSQL sau fix](evidence/be-d03/postgres-full-suite-issue74-regressions-2026-10-31.txt): **477/477 test, 3.284 assertions đạt**.
+- [OpenAPI Scramble export và route parity](evidence/be-d03/task-openapi-parity-2026-10-31.txt): export từ source thành công; route parity **81 operations**.
+- Giới hạn bàn giao không đổi: UI Task/Submission và mở rộng `/files/{file}/links` vẫn ngoài phạm vi; Issue #74 vẫn chưa có PR hoặc cập nhật GitHub do giới hạn quyền publish đã nêu ở trên.

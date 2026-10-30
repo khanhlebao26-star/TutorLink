@@ -108,6 +108,102 @@ it('completes task assignment, versioned submission, revision, and acceptance wi
     ]);
 });
 
+it('preserves meaningful edge whitespace for submission and feedback HTTP idempotency', function () {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $program = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+    ProgramApiFixtures::addMember($program, $customer, 'customer');
+
+    $this->actingAs($tutor, 'web');
+    $task = $this->postJson("/api/v1/programs/{$program}/tasks", [
+        'title' => 'Giữ khoảng trắng', 'assigned_to' => $customer->id,
+    ])->assertCreated()->json('data.id');
+
+    $content = '  Preserve spaces  ';
+    $submissionKey = (string) Str::uuid();
+    $this->actingAs($customer, 'web');
+    $submissionId = $this->putJson("/api/v1/tasks/{$task}/submission", [
+        'expected_submission_version' => 0, 'content' => $content,
+    ], ['Idempotency-Key' => $submissionKey])->assertCreated()
+        ->assertJsonPath('data.content', $content)->json('data.id');
+    $this->putJson("/api/v1/tasks/{$task}/submission", [
+        'expected_submission_version' => 0, 'content' => $content,
+    ], ['Idempotency-Key' => $submissionKey])->assertOk()
+        ->assertJsonPath('data.id', $submissionId)->assertJsonPath('data.content', $content);
+    $this->putJson("/api/v1/tasks/{$task}/submission", [
+        'expected_submission_version' => 0, 'content' => 'Preserve spaces',
+    ], ['Idempotency-Key' => $submissionKey])->assertStatus(409);
+    $this->putJson("/api/v1/tasks/{$task}/submission", [
+        'expected_submission_version' => 1, 'content' => " \t\r\n ",
+    ], ['Idempotency-Key' => (string) Str::uuid()])->assertUnprocessable()
+        ->assertJsonPath('code', 'empty_submission');
+    $this->assertDatabaseHas('task_submissions', ['id' => $submissionId, 'content' => $content]);
+    $this->assertDatabaseCount('task_submissions', 1);
+
+    $this->actingAs($tutor, 'web');
+    $feedbackKey = (string) Str::uuid();
+    $this->postJson("/api/v1/tasks/{$task}/submission/request-revision", [
+        'expected_submission_version' => 1, 'feedback' => '   ',
+    ], ['Idempotency-Key' => (string) Str::uuid()])->assertUnprocessable();
+    $feedback = '  Please revise  ';
+    $this->postJson("/api/v1/tasks/{$task}/submission/request-revision", [
+        'expected_submission_version' => 1, 'feedback' => $feedback,
+    ], ['Idempotency-Key' => $feedbackKey])->assertOk()
+        ->assertJsonPath('data.feedback', $feedback);
+    $this->postJson("/api/v1/tasks/{$task}/submission/request-revision", [
+        'expected_submission_version' => 1, 'feedback' => 'Please revise',
+    ], ['Idempotency-Key' => $feedbackKey])->assertStatus(409);
+    $this->postJson("/api/v1/tasks/{$task}/submission/request-revision", [
+        'expected_submission_version' => 1, 'feedback' => $feedback,
+    ], ['Idempotency-Key' => $feedbackKey])->assertOk()
+        ->assertJsonPath('data.feedback', $feedback);
+    $this->assertDatabaseHas('task_submissions', [
+        'id' => $submissionId, 'content' => $content, 'feedback' => $feedback,
+    ]);
+    $this->assertDatabaseCount('idempotency_receipts', 1);
+});
+
+it('serializes Task and Submission timestamps as RFC 3339 UTC through HTTP', function () {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $program = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+    ProgramApiFixtures::addMember($program, $customer, 'customer');
+
+    $this->actingAs($tutor, 'web');
+    $task = $this->postJson("/api/v1/programs/{$program}/tasks", [
+        'title' => 'Timestamp Task', 'assigned_to' => $customer->id,
+        'due_at' => '2026-11-02T09:30:00+07:00',
+    ])->assertCreated()->assertJsonPath('data.due_at', '2026-11-02T02:30:00Z')
+        ->json('data.id');
+    $this->postJson("/api/v1/programs/{$program}/tasks", [
+        'title' => 'Task without due date', 'assigned_to' => $customer->id,
+    ])->assertCreated()->assertJsonPath('data.due_at', null);
+
+    $this->actingAs($customer, 'web');
+    $submission = $this->putJson("/api/v1/tasks/{$task}/submission", [
+        'expected_submission_version' => 0, 'content' => 'Bài nộp',
+    ], ['Idempotency-Key' => (string) Str::uuid()])->assertCreated()
+        ->assertJsonPath('data.reviewed_at', null);
+    $submissionId = $submission->json('data.id');
+    $this->assertMatchesRegularExpression(
+        '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/',
+        $submission->json('data.submitted_at'),
+    );
+
+    $this->actingAs($tutor, 'web');
+    $feedback = $this->postJson("/api/v1/tasks/{$task}/submission/review", [
+        'expected_submission_version' => 1,
+    ], ['Idempotency-Key' => (string) Str::uuid()])->assertOk();
+    $this->assertMatchesRegularExpression(
+        '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/',
+        $feedback->json('data.reviewed_at'),
+    );
+    $this->getJson("/api/v1/tasks/{$task}/submission")->assertOk()
+        ->assertJsonPath('data.reviewed_at', $feedback->json('data.reviewed_at'));
+    $this->assertDatabaseHas('task_submissions', ['id' => $submissionId, 'status' => 'accepted']);
+    $this->assertNotNull(DB::table('task_submissions')->where('id', $submissionId)->value('reviewed_at'));
+});
+
 it('stores the RFC 8785 JCS hash for special Unicode submission content', function () {
     $tutor = ProgramApiFixtures::eligibleTutor();
     $customer = TestActors::customer();

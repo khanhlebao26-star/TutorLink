@@ -394,7 +394,7 @@ class TaskController extends Controller
         return [
             'id' => $record->id, 'program_id' => $record->program_id,
             'title' => $record->title, 'description' => $record->description,
-            'due_at' => $record->due_at, 'assigned_to' => $record->assigned_to,
+            'due_at' => $this->rfc3339Utc($record->due_at), 'assigned_to' => $record->assigned_to,
             'status' => $record->status, 'version' => $record->version,
             'current_submission_id' => $record->current_submission_id,
             'file_ids' => DB::table('file_links')->where('resource_type', 'task')->where('resource_id', $record->id)->pluck('file_id'),
@@ -407,8 +407,8 @@ class TaskController extends Controller
             'id' => $record->id, 'task_id' => $record->task_id,
             'submission_version' => $record->submission_version,
             'content' => $record->content, 'status' => $record->status,
-            'submitted_at' => $record->submitted_at, 'feedback' => $record->feedback,
-            'reviewed_by' => $record->reviewed_by, 'reviewed_at' => $record->reviewed_at,
+            'submitted_at' => $this->rfc3339Utc($record->submitted_at), 'feedback' => $record->feedback,
+            'reviewed_by' => $record->reviewed_by, 'reviewed_at' => $this->rfc3339Utc($record->reviewed_at),
             'file_ids' => DB::table('file_links')->where('resource_type', 'task_submission')->where('resource_id', $record->id)->pluck('file_id'),
         ];
     }
@@ -420,8 +420,25 @@ class TaskController extends Controller
             'submission_version' => $record->submission_version,
             'version' => $taskVersion,
             'status' => $record->status, 'feedback' => $record->feedback,
-            'reviewed_by' => $record->reviewed_by, 'reviewed_at' => $record->reviewed_at,
+            'reviewed_by' => $record->reviewed_by, 'reviewed_at' => $this->rfc3339Utc($record->reviewed_at),
         ];
+    }
+
+    private function rfc3339Utc(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $timestamp = CarbonImmutable::parse($value)->utc();
+        $formatted = $timestamp->format('Y-m-d\TH:i:s');
+        $microseconds = $timestamp->format('u');
+
+        if ($microseconds !== '000000') {
+            $formatted .= '.'.rtrim($microseconds, '0');
+        }
+
+        return $formatted.'Z';
     }
 
     private function error(Request $request, int $status, string $code): JsonResponse
