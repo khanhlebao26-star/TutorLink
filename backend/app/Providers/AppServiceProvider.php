@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        require base_path('routes/channels.php');
+
         VerifyEmail::createUrlUsing(function (User $user): string {
             $apiUrl = URL::temporarySignedRoute(
                 'verification.verify',

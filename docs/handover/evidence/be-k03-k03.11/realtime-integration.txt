@@ -1,0 +1,10 @@
+Started: 2026-10-30T14:48:51.8451340+07:00
+Command: node docs/handover/evidence/be-k03-k03.11/reverb-integration-probe.cjs
+PASS 1: Member receives socket_id from live Reverb
+PASS 2: Real session and CSRF authorize member channel
+PASS 3: Member subscribes to private conversation channel
+PASS 4: REST send produces minimal realtime notification
+PASS 5: Outsider denied HTTP auth and live subscribe with another socket signature
+PASS 6: Worker outage preserves REST write/read/polling and replay; notification arrives after restart
+Result: 6/6; passed=true; cleanup={"users_removed":3,"remaining_users":0,"remaining_conversations":0,"remaining_messages":0,"remaining_files":0,"remaining_sessions":0,"probe_jobs_removed":0}
+Exit code: 0

@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a–K03.10 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.11–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
+- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a–K03.11 đã kiểm tra kỹ thuật — chờ Hoàng review. K03.12–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành. Frontend chat chưa có để nghiệm thu E2E.
 
 ## Nguyên tắc triển khai
 
@@ -34,7 +34,7 @@
 | A — Lõi API | K03.8 | Khóa chức năng attachment chat và bảo toàn legacy | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.10 | Nghiệm thu phần lõi | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| B — Realtime | K03.11 | Backend broadcasting và Reverb | Chưa nghiệm thu |
+| B — Realtime | K03.11 | Backend broadcasting và Reverb | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | B — Realtime | K03.12 | Frontend Laravel Echo và resync | Chưa nghiệm thu |
 | B — Realtime | K03.13 | Thu hồi quyền và nghiệm thu realtime | Chưa nghiệm thu |
 | C — Bàn giao | K03.14 | API/schema delta, evidence và PR | Chưa nghiệm thu |
@@ -228,14 +228,22 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 ### K03.11 — Backend broadcasting và Reverb
 
-- [ ] Cài/cấu hình Laravel Reverb, service Docker và broadcast worker phù hợp.
-- [ ] Tạo private channel theo Conversation; kiểm session, account và membership khi subscribe.
-- [ ] Phát sự kiện báo có tin mới sau commit.
-- [ ] Payload tối thiểu để frontend biết cần đồng bộ; không phát nội dung/file metadata riêng tư không cần thiết.
-- [ ] Retry message không phát thêm sự kiện nghiệp vụ.
-- [ ] Broadcast lỗi không làm mất message đã lưu.
+- [x] Cài Reverb 1.12.0, service Docker và worker database queue broadcasts; local origins, client events none.
+- [x] Private Conversation channel; POST /broadcasting/auth kiểm session/CSRF/account/membership; HMAC và subscribe thật đạt.
+- [x] ShouldDispatchAfterCommit và rollback tests đạt; event chỉ từ nhánh insert mới.
+- [x] Payload chỉ conversation_id, tích hợp thật không chứa body/file/peer metadata.
+- [x] Replay không thêm job; outage retry trả cùng message ID.
+- [x] Mô phỏng lỗi enqueue/transport và outage worker thật: REST/polling giữ dữ liệu, worker start lại gửi notification.
 
 **Xong khi:** Chỉ người đủ quyền subscribe được; rollback không phát sự kiện; message đã commit có thể được thông báo realtime.
+
+**Kết quả:** Tích hợp thật **6/6 đạt** qua HTTP session/CSRF và WebSocket; targeted **60 pass / 341 assertions**; full backend **473 pass / 2.945 assertions / exit 0**. OpenAPI **69 operations**, export/parity đạt; lint hợp lệ với **43 warnings**. Composer audit không advisory. **Đã kiểm tra kỹ thuật — chờ Hoàng review.**
+
+**Báo cáo/evidence:** [K03.11](BE-K03-K03.11-test-report.md), [JSON/log/probe/fingerprints](evidence/be-k03-k03.11/). Đã dọn fixture và khôi phục worker; backend/Reverb/worker đang running.
+
+**Giới hạn:** Outage thật thử worker, không tắt Reverb. Chưa nghiệm thu Echo/UI hoặc thu hồi quyền socket đang mở; K03.12–K03.13 còn việc. Broadcast best effort có thể mất/lặp notification; REST/polling/resync phục hồi dữ liệu. Chưa có realtime outbox/TLS/load evidence.
+
+**Tiếp theo:** K03.12 Echo và resync. Người dùng tự commit/push/cập nhật issue/yêu cầu review; không đánh dấu toàn BE-K03 hoàn tất.
 
 ### K03.12 — Frontend Laravel Echo và resync
 

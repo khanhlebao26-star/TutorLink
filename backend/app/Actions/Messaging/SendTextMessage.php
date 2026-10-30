@@ -2,6 +2,7 @@
 
 namespace App\Actions\Messaging;
 
+use App\Events\ConversationMessagesChanged;
 use App\Models\Conversation;
 use App\Models\TutorProfile;
 use App\Models\User;
@@ -132,6 +133,8 @@ class SendTextMessage
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ]);
+
+            ConversationMessagesChanged::dispatch($conversationId);
 
             return ['message' => DB::table('messages')->where('id', $id)->first(), 'created' => true];
         }, 3);

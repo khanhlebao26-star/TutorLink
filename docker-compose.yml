@@ -36,7 +36,7 @@ services:
       - "8025:8025"
       - "1025:1025"
 
-  backend:
+  backend: &backend-runtime
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -70,6 +70,37 @@ services:
       db:
         condition: service_healthy
     command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000", "--no-reload"]
+
+  reverb:
+    <<: *backend-runtime
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      disable: true
+    command:
+      - php
+      - artisan
+      - reverb:start
+      - --host=0.0.0.0
+      - --port=8080
+    restart: unless-stopped
+
+  broadcast-worker:
+    <<: *backend-runtime
+    ports: []
+    healthcheck:
+      disable: true
+    command:
+      - php
+      - artisan
+      - queue:work
+      - database
+      - --queue=broadcasts
+      - --sleep=1
+      - --tries=3
+      - --backoff=5
+      - --timeout=30
+    restart: unless-stopped
 
   frontend:
     image: node:22-bookworm-slim

@@ -1,0 +1,208 @@
+{
+  "started_at": "2026-10-30T07:48:51.938Z",
+  "fixture_tag": "3de247198a204b6c",
+  "cases": [
+    {
+      "number": 1,
+      "name": "Member receives socket_id from live Reverb",
+      "passed": true,
+      "socket_id": "346794941.115786640"
+    },
+    {
+      "number": 2,
+      "name": "Real session and CSRF authorize member channel",
+      "passed": true,
+      "missing_csrf_status": 419,
+      "authorized_status": 200,
+      "cors_origin": "http://localhost:3000",
+      "cors_credentials": "true",
+      "preflight_status": 204
+    },
+    {
+      "number": 3,
+      "name": "Member subscribes to private conversation channel",
+      "passed": true,
+      "channel": "private-conversations.2"
+    },
+    {
+      "number": 4,
+      "name": "REST send produces minimal realtime notification",
+      "passed": true,
+      "message_id": 3,
+      "event": {
+        "event": "conversation.messages_changed",
+        "data": {
+          "conversation_id": 2
+        },
+        "channel": "private-conversations.2"
+      }
+    },
+    {
+      "number": 5,
+      "name": "Outsider denied HTTP auth and live subscribe with another socket signature",
+      "passed": true,
+      "auth_status": 403,
+      "websocket_error": {
+        "code": 4009,
+        "message": "Connection is unauthorized"
+      }
+    },
+    {
+      "number": 6,
+      "name": "Worker outage preserves REST write/read/polling and replay; notification arrives after restart",
+      "passed": true,
+      "send_status": 201,
+      "retry_status": 200,
+      "message_id": 4,
+      "polling_status": 200,
+      "polling_ids": [
+        4
+      ],
+      "restored_event": {
+        "event": "conversation.messages_changed",
+        "data": {
+          "conversation_id": 2
+        },
+        "channel": "private-conversations.2"
+      },
+      "outage_target": "broadcast-worker only; Reverb remained running"
+    }
+  ],
+  "http": [
+    {
+      "session": "customer",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "tutor",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "tutor",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "tutor",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "outsider",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "status": 204
+    },
+    {
+      "session": "outsider",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "status": 200
+    },
+    {
+      "session": "outsider",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations",
+      "status": 201
+    },
+    {
+      "session": "tutor",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 419
+    },
+    {
+      "session": "tutor",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/2/messages",
+      "status": 201
+    },
+    {
+      "session": "outsider",
+      "method": "POST",
+      "path": "/broadcasting/auth",
+      "status": 403
+    },
+    {
+      "session": "tutor",
+      "method": "GET",
+      "path": "/api/v1/conversations/2/messages",
+      "status": 200
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/2/messages",
+      "status": 201
+    },
+    {
+      "session": "customer",
+      "method": "POST",
+      "path": "/api/v1/conversations/2/messages",
+      "status": 200
+    },
+    {
+      "session": "tutor",
+      "method": "GET",
+      "path": "/api/v1/conversations/2/messages?after=eyJpdiI6Ijg5R2VGdVVacDN6UlJuUTUwODVGOHc9PSIsInZhbHVlIjoiR3pxM3RGRm5odkx0UEUvU0hjS1JQSzVJYlpQMTlLeHk2K2ZmQ1ozK3ZIbzljK2l0NXFvTS9wR2NSN3hZcXdLYXYyOGhxODFRaklHeWJqcENINHpFRlZ2a3YxZE5KbGZnRWtvNzdDMHpvWEoxdDdJeWh1eGlTYlI2YlF3UXUyTTIwQ3JML1JkbEtNQ1ZFQWtLTkRQWWZxb2JsVXoweDFuUmZ5azRCMWxtMGtPcXBUTU9LOWlBY3dTcWVPNXA3cFQ1dldYVjE1WFArUDBJN0VyL3RtUGc1dz09IiwibWFjIjoiYWMxOTgwYzg2OTJiM2UxZjg0NDFiMzY1OWNmOGViYzI4N2JiZWQwMzZkZjQ0ZDdhNTEyZTMyYmYzZGEzNDZmNyIsInRhZyI6IiJ9",
+      "status": 200
+    }
+  ],
+  "service_actions": [
+    {
+      "action": "stop broadcast-worker",
+      "at": "2026-10-30T07:48:58.655Z"
+    },
+    {
+      "action": "start broadcast-worker",
+      "at": "2026-10-30T07:49:00.144Z"
+    }
+  ],
+  "fixture_ids": {
+    "customer": 71,
+    "tutor": 72,
+    "outsider": 73
+  },
+  "conversation_id": 2,
+  "passed": true,
+  "cleanup": {
+    "users_removed": 3,
+    "remaining_users": 0,
+    "remaining_conversations": 0,
+    "remaining_messages": 0,
+    "remaining_files": 0,
+    "remaining_sessions": 0,
+    "probe_jobs_removed": 0
+  },
+  "finished_at": "2026-10-30T07:49:01.259Z"
+}

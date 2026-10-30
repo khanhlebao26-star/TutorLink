@@ -1,0 +1,5 @@
+Started: 2026-10-30T14:51:06.8117542+07:00
+Scramble export on migrated SQLite :memory: in the same PHP process.
+Generated path: /tmp/tutorlink-k0311-openapi.json
+Artifact unchanged: True
+Exit code: 0

@@ -1,0 +1,1 @@
+[{"domain":null,"method":"POST","uri":"broadcasting\/auth","name":"broadcasting.auth","action":"App\\Http\\Controllers\\BroadcastAuthController","middleware":["web","App\\Http\\Middleware\\EnsureActiveApiActor"],"path":null}]
