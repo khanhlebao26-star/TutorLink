@@ -1,0 +1,9 @@
+Started: 2026-10-30T10:02:03.1214279+07:00
+Lint command: docker compose exec -T frontend npm run lint -- src/components/tutor-onboarding-form.tsx src/lib/data/services.ts
+
+> frontend@0.1.0 lint
+> eslint src/components/tutor-onboarding-form.tsx src/lib/data/services.ts
+
+Lint exit code: 0
+TypeScript command: docker compose exec -T frontend npx tsc --noEmit
+TypeScript exit code: 0

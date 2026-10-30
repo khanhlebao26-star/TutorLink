@@ -179,7 +179,7 @@ class CompleteFile
         try {
             $bytes = stream_get_contents(
                 $stream,
-                (int) config('file-validation.max_bytes', 10485760) + 1,
+                (int) config('file-validation.max_bytes', 5_000_000) + 1,
             );
 
             if ($bytes === false) {
@@ -196,13 +196,16 @@ class CompleteFile
 
     private function matchesMetadata(File $file, string $bytes): bool
     {
-        $limits = [
-            'avatar' => 2097152,
-            'verification_document' => 10485760,
-            'task_attachment' => 10485760,
-            'profile_document' => 10485760,
-            'message_attachment' => 5242880,
-        ];
+        $limits = array_fill_keys(
+            [
+                'avatar',
+                'verification_document',
+                'task_attachment',
+                'profile_document',
+                'message_attachment',
+            ],
+            (int) config('file-validation.max_bytes', 5_000_000),
+        );
 
         $size = strlen($bytes);
 

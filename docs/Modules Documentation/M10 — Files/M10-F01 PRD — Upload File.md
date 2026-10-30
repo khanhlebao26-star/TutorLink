@@ -23,7 +23,7 @@ Người dùng đã đăng nhập upload một tệp vào storage private và nh
 
 # 4\. Implementation hiện tại và câu hỏi mở
 
-* API POST /files có; runtime hiện giới hạn avatar 2 MiB JPG/PNG và file khác 10 MiB PDF/JPG/PNG/DOC/DOCX. K03.7b phải đồng bộ về 5.000.000 byte/file; chưa được ghi nhận là đã triển khai. Giới hạn số file/resource vẫn theo module.
+* API POST /files đã đồng bộ K03.7b: avatar và tài liệu không rỗng, tối đa 5.000.000 byte/file; kiểm số byte thực, không dùng quy đổi KiB làm tròn. Vượt giới hạn trả 422 trước khi tạo object/FileRecord. [Evidence](../../handover/BE-K03-K03.7b-test-report.md). Giới hạn số file/resource vẫn theo module.
 * UploadRequest hiện chỉ whitelist avatar/verification\_document/task\_attachment/profile\_document; target Enum còn message\_attachment/task\_submission/announcement\_attachment. Cần đồng bộ theo từng module.  
 * BR-21/K03.1 điều chỉnh thay các giới hạn file cũ; [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ scanner. Runtime còn cần triển khai các purpose Task/Submission/CV theo module, kiểm allow-list và email verification theo identity policy; không tự áp dụng quyền/resource mới qua File API chung.
 

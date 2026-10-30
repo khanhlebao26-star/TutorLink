@@ -1,0 +1,8 @@
+Started: 2026-10-30T10:01:36.3078775+07:00
+Command: docker compose exec -T backend vendor/bin/pint --format agent [6 K03.7b PHP files]
+{"tool":"pint","result":"passed"}
+Exit code: 0
+Checked: 2026-10-30T10:03:19.2799669+07:00
+Final metadata source: native FormRequest rule PHPDoc, preserving binary type and required request body.
+{"tool":"pint","result":"passed"}
+Exit code: 0

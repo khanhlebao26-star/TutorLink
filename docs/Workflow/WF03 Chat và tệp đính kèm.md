@@ -30,7 +30,7 @@ Theo [K03.1](../handover/BE-K03-K03.1-contract.md), không upload/gửi/gắn fi
 
 Chỉ dùng resource\_type/purpose trong catalog và resource đã tồn tại, đúng quyền. Tạo tài nguyên mới nên gắn file nguyên tử tại API của tài nguyên.
 
-Không cho link resource message. File Task/Submission qua module tương ứng, không chờ duyệt nội dung; CV có duyệt theo phiên bản riêng. Complete chỉ kiểm tra kỹ thuật, không antivirus; pending/rejected không được sử dụng. Giới hạn upload mới mục tiêu 5.000.000 byte thuộc K03.7b, chưa áp dụng trong runtime K03.7a. Quyền resource/retention/cleanup không tự có chỉ vì complete thành công.
+Không cho link resource message. File Task/Submission qua module tương ứng, không chờ duyệt nội dung; CV có duyệt theo phiên bản riêng. Complete chỉ kiểm tra kỹ thuật, không antivirus; pending/rejected không được sử dụng. K03.7b đã đồng bộ frontend/upload/complete cho mọi upload mới tối đa 5.000.000 byte; kiểm byte boundary và file rỗng đã có evidence. Quyền resource/retention/cleanup không tự có chỉ vì complete thành công.
 
 ## 06 Xóa tệp chưa dùng
 

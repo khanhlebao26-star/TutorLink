@@ -2,6 +2,7 @@
 
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import {
+  MAX_UPLOAD_BYTES,
   attachTutorAvatar,
   completeFile,
   createVerificationDocument,
@@ -261,18 +262,21 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     event.currentTarget.value = "";
     if (!file || locked || busy || uploadRef.current) return;
 
-    const maxBytes = purpose === "avatar" ? 2 * 1024 * 1024 : 10 * 1024 * 1024;
     const allowed = purpose === "avatar"
       ? ["image/jpeg", "image/png"]
       : ["application/pdf", "image/jpeg", "image/png", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-    if (file.size > maxBytes || !allowed.includes(file.type)) {
+    if (
+      file.size <= 0
+      || file.size > MAX_UPLOAD_BYTES
+      || !allowed.includes(file.type)
+    ) {
       setUploads((current) => ({
         ...current,
         [purpose]: {
           ...emptyUpload,
           error: purpose === "avatar"
-            ? "Ảnh đại diện phải là JPG hoặc PNG và tối đa 2 MiB."
-            : "Tài liệu phải là PDF, JPG, PNG, DOC hoặc DOCX và tối đa 10 MiB.",
+            ? "Ảnh đại diện phải là JPG hoặc PNG, không rỗng và tối đa 5 MB (5.000.000 byte)."
+            : "Tài liệu phải là PDF, JPG, PNG, DOC hoặc DOCX, không rỗng và tối đa 5 MB (5.000.000 byte).",
         },
       }));
       return;
@@ -411,7 +415,11 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
               {label}
               {purpose === "avatar" ? <span className="onboarding-required"> *</span> : <span className="muted"> · Không bắt buộc</span>}
             </strong>
-            <p>{purpose === "avatar" ? "Ảnh hồ sơ rõ mặt, JPG hoặc PNG, tối đa 2 MiB." : "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 10 MiB. Có thể bổ sung sau."}</p>
+            <p>
+              {purpose === "avatar"
+                ? "Ảnh hồ sơ rõ mặt, JPG hoặc PNG, tối đa 5 MB (5.000.000 byte)."
+                : "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 5 MB (5.000.000 byte). Có thể bổ sung sau."}
+            </p>
           </div>
         </div>
         {purpose === "verification_document" ? (
@@ -444,7 +452,11 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         />
         <label className={`onboarding-file-picker ${disabled ? "is-disabled" : ""}`} htmlFor={inputId}>
           <span>{state.busy ? "Đang xử lý tệp…" : purpose === "avatar" ? "Chọn ảnh đại diện" : "Chọn tài liệu xác minh"}</span>
-          <small>{purpose === "avatar" ? "JPG, PNG · tối đa 2 MiB" : "PDF, JPG, PNG, DOC, DOCX · tối đa 10 MiB"}</small>
+          <small>
+            {purpose === "avatar"
+              ? "JPG, PNG · tối đa 5 MB (5.000.000 byte)"
+              : "PDF, JPG, PNG, DOC, DOCX · tối đa 5 MB (5.000.000 byte)"}
+          </small>
         </label>
         {!verified && purpose === "verification_document" ? <p className="onboarding-inline-note">Xác minh email trước khi tải tài liệu. <a href="/auth/verify-email">Xác minh email</a></p> : null}
         {!profile && purpose === "verification_document" ? <p className="onboarding-inline-note">Lưu các bước thông tin trước khi tải tài liệu.</p> : null}

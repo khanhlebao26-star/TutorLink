@@ -25,7 +25,7 @@ Quản lý vòng đời File từ upload, complete, resource attachment, authori
 
 * Upload/complete/metadata/download/delete API đã có; link controller hiện chỉ hỗ trợ verification\_document.  
 * Upload purpose whitelist chưa khớp Enum Catalog đầy đủ; resource membership download policy chưa hiện thực.  
-* [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ antivirus tự động; clean/complete chỉ kiểm tra kỹ thuật, giữ evidence quét thật cũ. K03.7b chưa đồng bộ upload mới 5.000.000 byte; runtime avatar 2 MiB/tài liệu 10 MiB. Task/Submission/CV approval, orphan cleanup và storage compensation cần evidence riêng; retention linked files theo resource.
+* [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ antivirus tự động; clean/complete chỉ kiểm tra kỹ thuật, giữ evidence quét thật cũ. [K03.7b](../../handover/BE-K03-K03.7b-test-report.md) đã kiểm tra kỹ thuật frontend/upload/complete: mọi upload mới tối đa 5.000.000 byte, không rỗng. Task/Submission/CV approval, orphan cleanup và storage compensation cần evidence riêng; retention linked files theo resource.
 
 # Nguồn
 

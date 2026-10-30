@@ -112,7 +112,7 @@ Request
 
 ## Ma trận truy vết
 
-Phạm vi điều chỉnh BR-21 được chốt tại [K03.1](../handover/BE-K03-K03.1-contract.md); thay phần chat attachment/scanner và giới hạn file cũ có liên quan. Runtime [K03.7a](../handover/BE-K03-K03.7a-test-report.md) đã gỡ ClamAV nhưng chưa áp dụng 5 MB decimal (K03.7b), siết toàn bộ đường attachment chat (K03.8), Task/Submission hoặc CV approval theo phiên bản. Giữ evidence quét thật trước đây, không giả engine/version/time và không coi duyệt CV là quét malware. Các quy tắc Workspace khác của BR-20 giữ nguyên; chỉ giới hạn mỗi file mới theo điều chỉnh này.
+Phạm vi điều chỉnh BR-21 được chốt tại [K03.1](../handover/BE-K03-K03.1-contract.md); thay phần chat attachment/scanner và giới hạn file cũ có liên quan. Runtime [K03.7a](../handover/BE-K03-K03.7a-test-report.md) đã gỡ ClamAV; [K03.7b](../handover/BE-K03-K03.7b-test-report.md) đã kiểm tra kỹ thuật frontend/upload/complete với giới hạn 5.000.000 byte. K03.8 còn siết toàn bộ đường attachment chat; Task/Submission và CV approval theo phiên bản vẫn cần triển khai/evidence riêng. Giữ evidence quét thật trước đây, không giả engine/version/time và không coi duyệt CV là quét malware. Các quy tắc Workspace khác của BR-20 giữ nguyên; chỉ giới hạn mỗi file mới theo điều chỉnh này.
 
 | Quy tắc | Tài liệu liên quan |
 |---|---|

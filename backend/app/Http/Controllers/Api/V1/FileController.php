@@ -31,6 +31,7 @@ class FileController extends Controller
         return new FileResource($file);
     }
 
+    /** Upload a private file for technical validation. */
     public function store(FileUploadRequest $request): JsonResponse
     {
         $data = $request->validated();

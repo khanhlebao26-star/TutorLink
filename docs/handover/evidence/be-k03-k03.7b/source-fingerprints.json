@@ -1,0 +1,117 @@
+{
+  "base_head": "0bebbb574ec962dde3c02a54703c96b9a05553a4",
+  "branch": "be-k03",
+  "checked_at": "2026-10-30T10:07:45.3447446+07:00",
+  "tested_state": "K03.7b uncommitted working tree. Backend runtime validation and frontend upload behavior unchanged after full tests; final PHPDoc/summary OpenAPI metadata checked by export/parity/lint. Frontend trailing whitespace removed before final lint/TypeScript.",
+  "full_backend": {
+    "passed": 398,
+    "assertions": 2469,
+    "exit_code": 0,
+    "duration_seconds": 44.44,
+    "database": "isolated PostgreSQL via compose.testing.yml"
+  },
+  "browser": {
+    "status": "PASS",
+    "checked_at": "2026-10-30T02:55:09.868Z",
+    "checks": 68,
+    "ui_cases": 8,
+    "api_cases": 16,
+    "source_snapshot": "browser/source-fingerprints.json",
+    "post_browser_changes": [
+      "FormRequest PHPDoc and controller upload summary only",
+      "frontend whitespace only"
+    ],
+    "raw_evidence_copied_from": "outputs/be-k03/k03.7b-browser-tests"
+  },
+  "frontend": {
+    "targeted_eslint_exit": 0,
+    "typescript_exit": 0
+  },
+  "openapi": {
+    "operations": 69,
+    "parity": "pass",
+    "redocly": "2.60.0",
+    "lint_exit": 0,
+    "warnings": 43
+  },
+  "legacy": {
+    "scope": "local database only",
+    "files_over_limit": 0,
+    "mutation": "none"
+  },
+  "publication": "Local only; user commits/pushes/requests review",
+  "files": [
+    {
+      "path": "backend/config/file-validation.php",
+      "sha256": "c4717abd20ddc8ef3c52a5052480e402b94f67954442023059b2f0885d9c8811"
+    },
+    {
+      "path": "backend/app/Http/Requests/FileUploadRequest.php",
+      "sha256": "9e41b11ce84a0b7cb0e6ff600a27bb4b82c51fef1f0ee8d743f092bd65afd746"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/FileController.php",
+      "sha256": "c1495fbb3b96203a9971e33966500bbd5de5597e72852162fdf2a3bb0daff205"
+    },
+    {
+      "path": "backend/app/Actions/Files/CompleteFile.php",
+      "sha256": "602dd1c323647f04196a4e9c3e94b0036b91b0a7e20f01664b6c61ba48c3bcdd"
+    },
+    {
+      "path": "backend/app/Models/File.php",
+      "sha256": "11dce37b9d5dda9f52d60b2402d1fe449c46f07e4979ca6dd0b444643aa80c26"
+    },
+    {
+      "path": "backend/app/Http/Resources/FileResource.php",
+      "sha256": "cba57b7c32ac4292f010a41e41c883e5be13d06111138a17fe854c6a139cbb89"
+    },
+    {
+      "path": "backend/tests/Feature/FileSizePolicyTest.php",
+      "sha256": "afab7c5a0c7b8a63b619cec08a3b319f773a92abc13dce527406c0dcd217c8c7"
+    },
+    {
+      "path": "backend/tests/Feature/PhaseTwoAcceptanceTest.php",
+      "sha256": "05b5d9838042906ecc7e86616f6aae27a2115052fff7c374feb076d251d5d4f5"
+    },
+    {
+      "path": "backend/tests/Feature/CompleteFileApiTest.php",
+      "sha256": "7996494cadff21d6502bf947249a875ac12bb9e072d79cac71f2d236477cc467"
+    },
+    {
+      "path": "backend/tests/Feature/ZipScanGuardTest.php",
+      "sha256": "ae9ccc4f4fbf68ef0e1d6888af7c87383187bd537ddc76849bc9b564231b87b6"
+    },
+    {
+      "path": "backend/docker/uploads.ini",
+      "sha256": "266d1158430e7de7c5d840bc709497c2d4f7f488af6fa8cb4d7c091630be80bc"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "0f83f73a2259b373ef25b1c64c6087884f1bf9254ebfbacf97ba5b681bcc2c2a"
+    },
+    {
+      "path": "compose.testing.yml",
+      "sha256": "07d2f4b8ae09106fb7bdb121212a827380eab4debce7b32baa9b4c06d8617a3c"
+    },
+    {
+      "path": "docker-compose.yml",
+      "sha256": "d9f249e5c674fe4d59cbe8168a74bb20df8e0ca2a2d8d20697da94f01959e27f"
+    },
+    {
+      "path": "frontend/src/lib/data/services.ts",
+      "sha256": "fbf73d715ba4b7e99456002a57ee0bb821a37e2ce317c635793dc1da4a032da7"
+    },
+    {
+      "path": "frontend/src/components/tutor-onboarding-form.tsx",
+      "sha256": "e234c7f13bd8ac84e14aaac6edcfbbbe58a6fc9ff8c0c2f30804c71b3f71f612"
+    },
+    {
+      "path": "frontend/scripts/issue-22-api-browser.mjs",
+      "sha256": "f9eb6100c3ad7ee1164aa2d94664c9fa143fe4d60ba5ee418e812d4aba7e2a23"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "c94f76589922e9a6550b5a1294a87925277ee81eceb1cd69a6f767fb2dabb5ac"
+    }
+  ]
+}

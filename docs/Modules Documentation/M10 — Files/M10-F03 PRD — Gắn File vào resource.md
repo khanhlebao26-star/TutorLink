@@ -26,7 +26,7 @@ Liên kết File đã complete với resource đúng owner, purpose và authoriz
 
 * POST /files/{id}/links tồn tại nhưng Controller hiện chỉ thực hiện verification\_document; các business resource type khác trả conflict “not available yet”.  
 * Upload purpose whitelist hiện chưa gồm message\_attachment, task\_submission, announcement\_attachment. Cần quyết định link semantics per-resource và transaction/lock owner membership.
-* K03.7b còn đồng bộ 5.000.000 byte/file; K03.8 kiểm mọi đường chặn attachment chat. Task/Submission và CV approval theo phiên bản chưa được chứng nhận bởi FileController hiện tại. Quota, purpose và quyền download phải được kiểm ở API nghiệp vụ tương ứng; giữ orphan cleanup/storage compensation là công việc riêng.
+* K03.7b đã đồng bộ frontend/upload/complete tối đa 5.000.000 byte/file; K03.8 vẫn cần kiểm mọi đường chặn attachment chat. Task/Submission và CV approval theo phiên bản chưa được chứng nhận bởi FileController hiện tại. Quota, purpose và quyền download phải được kiểm ở API nghiệp vụ tương ứng; giữ orphan cleanup/storage compensation là công việc riêng.
 
 # 5\. Nguồn
 

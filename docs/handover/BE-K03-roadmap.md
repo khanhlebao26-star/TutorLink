@@ -6,7 +6,7 @@
 - **Branch:** be-k03
 - **Phạm vi:** M04; tích hợp File lifecycle M10 và Laravel Reverb/Echo.
 - **Contract:** [K03.1 — Contract Messaging API và file theo Conversation](BE-K03-K03.1-contract.md)
-- **Trạng thái (29/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a đã kiểm tra kỹ thuật — chờ Hoàng review. K03.7b, K03.8–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành.
+- **Trạng thái (30/10/2026):** K03.1 đã chốt phạm vi mới; K03.2–K03.6 giữ evidence phiên bản trước. K03.7a và K03.7b đã kiểm tra kỹ thuật — chờ Hoàng review. K03.8–K03.14 chưa nghiệm thu. K03.7 ClamAV là lịch sử, không phải yêu cầu runtime hiện hành.
 
 ## Nguyên tắc triển khai
 
@@ -16,7 +16,7 @@
 - Frontend dùng cursor API để đồng bộ tin mới, phục hồi khi mất kết nối và dedupe theo server message ID.
 - Hoàn thành và kiểm thử phần lõi trước khi tích hợp realtime.
 - K03.1 đã thống nhất; các task còn lại chỉ đánh dấu hoàn tất khi có code và evidence.
-- Conversation chỉ text, không đính kèm. Không có antivirus tự động. File bài tập/bài nộp kiểm tra kỹ thuật và scope; CV duyệt nội dung riêng theo phiên bản. Mục tiêu mọi upload mới 5.000.000 byte thuộc K03.7b; chưa áp dụng trong runtime K03.7a.
+- Conversation chỉ text, không đính kèm. Không có antivirus tự động. File bài tập/bài nộp kiểm tra kỹ thuật và scope; CV duyệt nội dung riêng theo phiên bản. K03.7b đã đồng bộ frontend/upload/complete: mọi upload mới tối đa 5.000.000 byte. Điều này không chứng nhận API Task/Submission hoặc CV approval đã triển khai.
 
 ## Bảng kế hoạch
 
@@ -30,7 +30,7 @@
 | A — Lõi API | K03.6 | Read cursor tăng đơn điệu | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | Lịch sử | K03.7 | Phiên bản ClamAV trước điều chỉnh phạm vi | Giữ evidence lịch sử |
 | A — Lõi API | K03.7a | Gỡ ClamAV, kiểm tra kỹ thuật và regression | Đã kiểm tra kỹ thuật — chờ Hoàng review |
-| A — Lõi API | K03.7b | Đồng bộ complete/upload và giới hạn 5.000.000 byte | Chưa nghiệm thu |
+| A — Lõi API | K03.7b | Đồng bộ complete/upload và giới hạn 5.000.000 byte | Đã kiểm tra kỹ thuật — chờ Hoàng review |
 | A — Lõi API | K03.8 | Chặn attachment chat, kiểm quyền File và bảo toàn legacy | Chưa nghiệm thu |
 | A — Lõi API | K03.9 | Đồng bộ Conversation lifecycle | Chưa nghiệm thu |
 | A — Lõi API | K03.10 | Nghiệm thu phần lõi | Chưa nghiệm thu |
@@ -155,11 +155,16 @@ Phần này giữ kết quả phiên bản ClamAV. Các yêu cầu scanner/attac
 
 ### K03.7b — Complete và giới hạn 5 MB
 
-- [ ] Đồng bộ upload request, complete, cấu hình và mô tả API: mọi upload mới tối đa 5.000.000 byte, không dùng max KiB làm tròn thay cho kiểm byte thực.
-- [ ] Kiểm allow-list theo purpose và object thật; test đúng ngưỡng/ngoài ngưỡng, định dạng, checksum và retry.
-- [ ] Đối soát file legacy vượt ngưỡng trước khi quyết định chuyển tiếp; không xóa/đổi liên kết hàng loạt.
+- [x] Đồng bộ upload request, complete, cấu hình, frontend và mô tả API: mọi upload mới tối đa 5.000.000 byte, kiểm số byte thực.
+- [x] Kiểm allow-list theo purpose và object thật; test đúng ngưỡng/ngoài ngưỡng, định dạng, checksum, storage lỗi và retry.
+- [x] Đối soát local: 0 FileRecord vượt 5.000.000 byte. Không xóa/đổi trạng thái/liên kết hàng loạt; môi trường khác phải kiểm kê trước rollout.
+- [x] Sinh OpenAPI, parity/lint; lưu evidence vào thư mục được Git theo dõi.
 
-**Xong khi:** Upload mới tuân 5 MB decimal; policy legacy rõ ràng và có evidence. Runtime hiện vẫn avatar 2 MiB/tài liệu 10 MiB.
+**Kết quả:** Full backend **398 pass / 2.469 assertions / exit 0**; frontend lint hai file thay đổi và TypeScript pass. Kiểm trình duyệt/API: **8 ca UI + 16 ca API, 68 kiểm tra đạt**. OpenAPI **69 operations**, parity pass; Redocly hợp lệ, **43 warnings**. Không có schema delta. **Đã kiểm tra kỹ thuật — chờ Hoàng review.**
+
+**Báo cáo/evidence:** [K03.7b](BE-K03-K03.7b-test-report.md), [log và ảnh](evidence/be-k03-k03.7b/). [Bản cập nhật issue](BE-K03-K03.7b-issue-update.md) để người dùng tự đăng.
+
+**Tiếp theo:** K03.8 chặn toàn bộ đường attachment chat và bảo toàn legacy. Không đánh dấu toàn BE-K03 hoàn tất; người dùng tự commit/push/gửi review.
 
 ### K03.8 — Chặn attachment chat và bảo toàn lịch sử
 

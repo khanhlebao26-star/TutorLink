@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-10-30T10:07:02.3033939+07:00",
+  "operations": 69,
+  "checks": {
+    "operations_69": true,
+    "request_body_required": true,
+    "file_and_purpose_required": true,
+    "file_binary_preserved": true,
+    "exact_decimal_limit_described": true,
+    "non_empty_described": true,
+    "old_10240_kilobytes_absent": true,
+    "no_antivirus_claim": true,
+    "four_purposes_preserved": true,
+    "historical_scan_fields_preserved": true
+  },
+  "description": "Non-empty file, maximum 5,000,000 bytes (5 MB decimal), for every supported purpose.\nAvatar: JPG/JPEG/PNG; documents: PDF/JPG/JPEG/PNG/DOC/DOCX.\nUpload creates a pending file; complete performs technical validation, not an antivirus scan."
+}

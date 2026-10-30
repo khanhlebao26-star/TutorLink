@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'max_bytes' => 10 * 1024 * 1024,
+    'max_bytes' => 5_000_000,
 
     'archive_timeout_seconds' => 10,
 

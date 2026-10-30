@@ -156,7 +156,7 @@ Các quy tắc bổ sung:
 
 * **Lưu trữ riêng tư:** Storage phải ở chế độ private theo mặc định. Việc tải xuống phải được kiểm tra quyền truy cập đối với người dùng, mục đích sử dụng và tài nguyên liên quan.  
 * **Kiểm tra file:** Trước khi gắn file vào tài nguyên hoặc cho phép tải xuống, phải kiểm tra quyền sở hữu, mục đích sử dụng (`purpose`), MIME type thực tế, extension, dung lượng, checksum và tài nguyên liên quan.  
-* **Giới hạn điều chỉnh 29/10/2026:** Theo [K03.1](../handover/BE-K03-K03.1-contract.md), mọi upload mới tối đa 5.000.000 byte/file; avatar JPG/JPEG/PNG, tài liệu bài tập/bài nộp/CV PDF/JPG/JPEG/PNG/DOC/DOCX. Chat chỉ text, không upload/gắn file. Giới hạn số file/resource và quyền nghiệp vụ vẫn theo module. Runtime K03.7a còn avatar 2 MiB/tài liệu 10 MiB; K03.7b phải đồng bộ giới hạn mới trước khi nghiệm thu.
+* **Giới hạn điều chỉnh 29/10/2026:** Theo [K03.1](../handover/BE-K03-K03.1-contract.md), mọi upload mới tối đa 5.000.000 byte/file; avatar JPG/JPEG/PNG, tài liệu bài tập/bài nộp/CV PDF/JPG/JPEG/PNG/DOC/DOCX. Chat chỉ text, không upload/gắn file. Giới hạn số file/resource và quyền nghiệp vụ vẫn theo module. [K03.7b](../handover/BE-K03-K03.7b-test-report.md) đã kiểm tra kỹ thuật giới hạn byte tại frontend/upload/complete; không dùng kiểm client thay cho backend validation.
 * **Loại file được phép:** Mỗi `FilePurpose` phải có danh sách định dạng được phép rõ ràng. Không tự cho phép định dạng mới nếu chưa có quy định.  
 * **Trạng thái upload:** Chỉ file đã upload hoàn tất và vượt qua các kiểm tra bắt buộc mới được sử dụng.  
 * **Bảo vệ đường dẫn:** Không trả object key hoặc đường dẫn storage nội bộ trong API công khai.  

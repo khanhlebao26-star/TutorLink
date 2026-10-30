@@ -3830,6 +3830,7 @@
         "/files": {
             "post": {
                 "operationId": "files.store",
+                "summary": "Upload a private file for technical validation",
                 "tags": [
                     "File"
                 ],
@@ -8826,7 +8827,7 @@
                         "type": "string",
                         "format": "binary",
                         "contentMediaType": "application/octet-stream",
-                        "description": "Maximum file size: 10240 kilobytes."
+                        "description": "Non-empty file, maximum 5,000,000 bytes (5 MB decimal), for every supported purpose.\nAvatar: JPG/JPEG/PNG; documents: PDF/JPG/JPEG/PNG/DOC/DOCX.\nUpload creates a pending file; complete performs technical validation, not an antivirus scan."
                     },
                     "purpose": {
                         "type": "string",

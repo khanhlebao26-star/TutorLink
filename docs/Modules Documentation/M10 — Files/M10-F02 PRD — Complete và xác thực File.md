@@ -24,7 +24,7 @@ Chỉ cho phép attach/download File khi upload hoàn tất, object tồn tại 
 # 4\. Implementation hiện tại và câu hỏi mở
 
 * [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ ClamAV, giữ ZIP guard có giới hạn; guard không phân tích đệ quy container nhúng và không phải antivirus. Evidence quét thật cũ và schema được giữ; file legacy thiếu evidence không bị gán bằng chứng giả.
-* K03.7b còn phải đồng bộ upload/complete về 5.000.000 byte; runtime vẫn avatar 2 MiB/tài liệu 10 MiB. Cleanup/storage compensation theo M10-F05 và CV approval theo phiên bản là công việc riêng, không được chứng nhận bởi complete.
+* [K03.7b](../../handover/BE-K03-K03.7b-test-report.md) đã kiểm tra kỹ thuật upload/complete với giới hạn chung 5.000.000 byte, gồm byte boundary, metadata khai nhỏ hơn object thật và object quá lớn dù checksum khớp. Cleanup/storage compensation theo M10-F05 và CV approval theo phiên bản là công việc riêng, không được chứng nhận bởi complete.
 
 # 5\. Nguồn
 

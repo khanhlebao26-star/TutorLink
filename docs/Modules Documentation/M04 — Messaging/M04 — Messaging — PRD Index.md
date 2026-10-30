@@ -32,7 +32,7 @@ Cung cấp Conversation riêng tư giữa Customer và Tutor với REST-first me
 * Sáu route Conversation K03.3–K03.6 đã đăng ký trong [Catalog](../../Architecture%20%26%20Technical%20Design/API%20Route%20Catalog.md); OpenAPI toàn API có 69 operations. Evidence trước điều chỉnh không chứng nhận toàn bộ K03.1 mới, frontend hoặc realtime.
 * K03.2 đã align Conversation active/cancelled và direct; giữ MessageType/file schema legacy không có nghĩa client được gửi file/system.
 * Local W1-C1 contract cũ mô tả cancelled là terminal và Conversation pending/expired, khác State Lifecycles hiện hành; Domain docs đã hoàn tất là target, cần mapping/migration được duyệt.  
-* Yêu cầu attachment/scanner cũ đã được K03.1 mới thay thế. K03.7a gỡ ClamAV; K03.7b còn giới hạn upload; K03.8 còn siết file_ids, chặn link/upload message và bảo toàn legacy.
+* Yêu cầu attachment/scanner cũ đã được K03.1 mới thay thế. K03.7a gỡ ClamAV; K03.7b đã kiểm tra kỹ thuật giới hạn upload 5.000.000 byte; K03.8 còn siết file_ids, chặn link/upload message và bảo toàn legacy.
 * Customer hoặc Tutor đều được mở liên hệ với vai trò còn lại qua gate M04-F01; cancelled chỉ mở lại bằng yêu cầu mở liên hệ mới đủ điều kiện. BR-17 chốt DTO peer/context và lịch sử khi đình chỉ; BR-21 chốt member active không gửi khi peer bị đình chỉ, inbox/unread/read receipt, body/rate limit, conflict idempotency và policy file chat. Runtime, migration và wire DTO vẫn cần triển khai. Admin report scope đã chốt ở BR-11; field masking/retention của evidence vẫn theo D16–D17.
 
 # Implementation evidence
