@@ -7,22 +7,23 @@ use Illuminate\Support\Facades\DB;
 
 final class InvitationTransitionWriter
 {
-    public function expire(object $invitation, int $tutorUserId, string $requestId, CarbonImmutable $now): void
+    public function expire(object $invitation, ?int $actorId, string $requestId, CarbonImmutable $now, ?int $tutorUserId = null): void
     {
         $this->write(
             $invitation,
             'expired',
             CarbonImmutable::parse($invitation->expires_at),
-            $tutorUserId,
+            $actorId,
             'invitation.expire',
             'invitation_expired',
             "/programs/{$invitation->program_id}",
             $requestId,
             $now,
+            $tutorUserId ?? $actorId ?? throw new \InvalidArgumentException('Expiry requires a Tutor recipient.'),
         );
     }
 
-    public function cancel(object $invitation, int $actorId, string $requestId, CarbonImmutable $now): void
+    public function cancel(object $invitation, int $actorId, string $requestId, CarbonImmutable $now, ?string $reason = null): void
     {
         $this->write(
             $invitation,
@@ -34,6 +35,25 @@ final class InvitationTransitionWriter
             "/invitations/{$invitation->id}",
             $requestId,
             $now,
+            (int) $invitation->invitee_user_id,
+            $reason,
+        );
+    }
+
+    public function reject(object $invitation, int $actorId, int $tutorUserId, string $requestId, CarbonImmutable $now, ?string $reason = null): void
+    {
+        $this->write(
+            $invitation,
+            'rejected',
+            $now,
+            $actorId,
+            'invitation.reject',
+            'invitation_rejected',
+            "/programs/{$invitation->program_id}",
+            $requestId,
+            $now,
+            $tutorUserId,
+            $reason,
         );
     }
 
@@ -41,12 +61,14 @@ final class InvitationTransitionWriter
         object $invitation,
         string $status,
         CarbonImmutable $respondedAt,
-        int $actorId,
+        ?int $actorId,
         string $auditAction,
         string $notificationType,
         string $deepLink,
         string $requestId,
         CarbonImmutable $now,
+        int $recipientId,
+        ?string $reason = null,
     ): void {
         $timestamp = $now->format('Y-m-d H:i:s.uP');
         $respondedAt = $respondedAt->setTimezone('UTC');
@@ -69,6 +91,7 @@ final class InvitationTransitionWriter
                 'status' => $status,
                 'responded_at' => $respondedAt->format('Y-m-d\TH:i:s.u\Z'),
             ], JSON_THROW_ON_ERROR),
+            'reason' => $reason,
             'request_id' => $requestId,
             'created_at' => $timestamp,
         ]);
@@ -78,7 +101,7 @@ final class InvitationTransitionWriter
             'program_invitation',
             (int) $invitation->id,
             "invitation:{$invitation->id}:{$status}",
-            [$status === 'expired' ? $actorId : (int) $invitation->invitee_user_id],
+            [$recipientId],
             ['deep_link' => $deepLink],
         );
     }

@@ -20,6 +20,10 @@ Cho Customer đích từ chối offer hoặc Tutor owner thu hồi Invitation pe
 * Snapshot và lý do/thời điểm quyết định được bảo toàn.  
 * Program không tự Active và không có Customer membership sau reject/cancel.
 
+## Runtime BE-H03 — 31/10/2026
+
+Hai POST reject/cancel đã đăng ký theo API Route Catalog. Request chỉ có `reason` tùy chọn/null, tối đa 2.000 ký tự; lưu vào audit, không đưa vào notification payload. Active target Customer reject, active Tutor owner cancel; pending phải còn hạn và Program Draft. Actor sai trả 404; terminal hoặc tại/qua expires_at trả 409, không thêm side effect. Program.version/snapshot giữ nguyên và không tạo membership. Luồng ghi trạng thái + audit + outbox cho bên còn lại + đồng bộ chat trong một transaction. Requiredness của reason vẫn chờ Product review; đây là contract runtime hiện tại. [Báo cáo BE-H03](../../handover/BE-H03-issue-75-test-report.md).
+
 # 4\. Chênh lệch/câu hỏi mở
 
 * Chốt bắt buộc resolution/rejection reason và trường audit cho từng action.  

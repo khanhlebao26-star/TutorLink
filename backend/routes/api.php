@@ -56,6 +56,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/invitations/{invitation}/accept', InvitationAcceptController::class)
             ->whereNumber('invitation')
             ->name('invitations.accept');
+        Route::post('/invitations/{invitation}/reject', [InvitationController::class, 'reject'])
+            ->whereNumber('invitation')
+            ->name('invitations.reject');
+        Route::post('/invitations/{invitation}/cancel', [InvitationController::class, 'cancel'])
+            ->whereNumber('invitation')
+            ->name('invitations.cancel');
         Route::get('/programs/{program}/tasks', [TaskController::class, 'index'])->whereNumber('program');
         Route::post('/programs/{program}/tasks', [TaskController::class, 'store'])->whereNumber('program');
         Route::get('/tasks/{task}', [TaskController::class, 'show'])->whereNumber('task');

@@ -37,3 +37,7 @@ Tutor owner quản lý Program sau khi được chấp nhận theo lifecycle đ�
 # 6\. Nguồn
 
 Product: Project Overview, Roles & Actors, Business Rules, Goals & Non-goals. Domain: State Lifecycles, Enum Catalog, Domain Model, Domain Overview & Glossary. Link nguồn: [Project Overview](<../../Product Document/Project Overview.md>) · [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Goals & Non-goals](<../../Product Document/Goals & Non-goals.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [Domain Overview & Glossary](<../../Domain Documentation/Domain Overview & Glossary.md>)
+
+## Runtime BE-H03 — 31/10/2026
+
+Kế thừa TransitionProgram từ BE-D02 và tích hợp chat K03.9. PostgreSQL tests kiểm các TaskStatus chặn/cho phép complete/cancel, không cascade hay tự hoàn tất Task, và complete-vs-create-Task theo cả hai thứ tự. Test HTTP dùng Task/Submission BE-D03 chứng minh sau accept mới có quyền; Paused vẫn nộp/sửa/feedback được; chỉ complete sau feedback accept bản hiện hành và vẫn đọc lịch sử sau terminal. Blocker nằm trong API envelope `errors.blockers.sessions/tasks`. Program.version tiếp tục là version offer; lifecycle body rỗng và không tăng version. Session HTTP writer chưa có để chứng nhận race với Session mới. Xem [bàn giao/evidence](../../handover/BE-H03-issue-75-test-report.md).

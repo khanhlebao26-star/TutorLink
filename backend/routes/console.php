@@ -10,6 +10,10 @@ Artisan::command('inspire', function () {
 
 Schedule::useCache('database');
 
+Schedule::command('invitations:expire')
+    ->everyMinute()
+    ->withoutOverlapping(5);
+
 Schedule::command('outbox:monitor')
     ->everyMinute()
     ->withoutOverlapping(5);
