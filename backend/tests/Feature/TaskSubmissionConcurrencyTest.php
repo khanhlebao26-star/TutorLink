@@ -109,7 +109,7 @@ class TaskSubmissionConcurrencyTest extends TestCase
     }
 
     /** @param list<array<string, mixed>> $actions
-     *  @return list<array{status: int, submission_id: int|null}>
+     * @return list<array{status: int, submission_id: int|null}>
      */
     private function runBehindProgramLock(int $program, array $actions): array
     {
@@ -244,7 +244,7 @@ class TaskSubmissionConcurrencyTest extends TestCase
     }
 
     /** @param list<array{status: int, submission_id: int|null}> $results
-     *  @return list<int>
+     * @return list<int>
      */
     private function sortedStatuses(array $results): array
     {
