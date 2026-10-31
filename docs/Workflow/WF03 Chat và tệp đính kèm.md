@@ -18,17 +18,19 @@ Inbox theo message mới nhất `(created_at,id)` giảm dần; unread đếm me
 
 Body không trắng, tối đa 4.000 ký tự; chuẩn hóa CRLF/CR thành LF. Cùng client\_message\_id và payload canonical trả message cũ; cùng key khác payload trả 409. Tối đa 30 message mới/phút/người dùng; vượt hạn trả 429 và Retry-After. System chỉ backend tạo.
 
-## 04 Gửi tệp trong chat
+## 04 Chat chỉ text — điều chỉnh 29/10/2026
 
 **![Sơ đồ image4](assets/wf03-chat-va-tep-dinh-kem-image4.png)**
 
-Một file/message, tối đa 5 MiB, PDF/JPG/PNG/DOC/DOCX. Chỉ attach sau complete và malware scan clean; scanner lỗi thì giữ quarantine. Backend kiểm owner/purpose/quyền và gắn link nguyên tử cùng message. File mất về sau giữ lịch sử và hiện unavailable.
+Theo [K03.1](../handover/BE-K03-K03.1-contract.md), không upload/gửi/gắn file trong Conversation; FE không hiển thị đính kèm. Không tạo Message/FileLink từ request attachment. Sơ đồ image4 là luồng cũ, không phải hành vi đích. Dữ liệu legacy nếu có cần bảo toàn và đối soát, không xóa enum/schema hàng loạt. [K03.8](../handover/BE-K03-K03.8-test-report.md) đã kiểm tra kỹ thuật các đường chặn và bảo toàn fixture legacy; không bổ sung quyền download chat. UI chat chưa có để nghiệm thu E2E.
 
 ## 05 Gắn tệp vào tài nguyên hiện có
 
 **![Sơ đồ image5](assets/wf03-chat-va-tep-dinh-kem-image5.png)**
 
 Chỉ dùng resource\_type/purpose trong catalog và resource đã tồn tại, đúng quyền. Tạo tài nguyên mới nên gắn file nguyên tử tại API của tài nguyên.
+
+Không cho link resource message. File Task/Submission qua module tương ứng, không chờ duyệt nội dung; CV có duyệt theo phiên bản riêng. Complete chỉ kiểm tra kỹ thuật, không antivirus; pending/rejected không được sử dụng. K03.7b đã đồng bộ frontend/upload/complete cho mọi upload mới tối đa 5.000.000 byte; kiểm byte boundary và file rỗng đã có evidence. Quyền resource/retention/cleanup không tự có chỉ vì complete thành công.
 
 ## 06 Xóa tệp chưa dùng
 
@@ -41,3 +43,11 @@ Chỉ owner; tệp còn liên kết hoặc lịch sử cần giữ bị từ ch�
 **![Sơ đồ image7](assets/wf03-chat-va-tep-dinh-kem-image7.png)**
 
 Complete chỉ đóng khi không còn Program active/paused và Invitation pending còn hạn. Bước POST sau chỉ khi bắt đầu dịch vụ mới, đủ điều kiện; không tạo cặp trùng hoặc ghi đè context. Lifecycle không tự chèn system message. Đình chỉ participant không tự đóng chat hay xóa membership/lịch sử. Không có API đóng chat thủ công.
+
+## Realtime theo phiên — bổ sung 30/10/2026
+
+Sau đăng nhập, member gọi POST /api/v1/conversations/{conversation}/realtime bằng session và CSRF để lấy channel/expiry, rồi ký POST /broadcasting/auth bằng đúng session và socket_id. Channel là private-conversations.{id}.sessions.{token}; channel chung cũ bị từ chối. Worker sau commit chỉ phát tới những session/registry còn quyền, dùng cùng khóa User với logout/suspend. Logout thu hồi một phiên; suspend account/Profile thu hồi mọi phiên; restore không hồi sinh token. Reconnect lấy channel còn hợp lệ, auth socket mới rồi gọi REST after từ checkpoint, drain has_more và dedupe server message ID. Reverb/worker outage không thay thế hoặc làm mất dữ liệu REST. [K03.13 evidence](../handover/BE-K03-K03.13-test-report.md) kiểm consumer probe; K03.12 UI/Echo hoãn, chưa chứng nhận listener/poll cleanup hoặc hành vi UI.
+
+## Phạm vi bàn giao K03.14
+
+[Handover](../handover/BE-K03-K03.14-handover.md) và [runbook](../handover/BE-K03-K03.14-runbook.md) là điểm bắt đầu review backend. Luồng Conversation chỉ text; không mở attachment chat. File upload/complete dùng chung không chứng nhận Task/Submission hoặc CV approval đã tích hợp. Echo/UI/polling fallback/listener cleanup hoãn K03.12; backend probe không thay thế nghiệm thu giao diện.

@@ -1,0 +1,39 @@
+
+   INFO  Preparing database.  
+
+  Creating migration table ....................................... 5.76ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table ........................... 3.26ms DONE
+  0001_01_01_000001_create_cache_table ........................... 0.71ms DONE
+  0001_01_01_000002_create_jobs_table ............................ 2.23ms DONE
+  2026_10_06_155651_create_personal_access_tokens_table .......... 0.73ms DONE
+  2026_10_07_000050_create_sessions_table ........................ 0.19ms DONE
+  2026_10_07_000100_extend_users_and_create_files_table .......... 4.40ms DONE
+  2026_10_07_000200_create_identity_and_catalog_tables .......... 15.36ms DONE
+  2026_10_07_000300_create_messaging_tables ...................... 6.62ms DONE
+  2026_10_07_000400_create_program_and_learning_tables ........... 7.86ms DONE
+  2026_10_07_000500_create_operations_and_trust_tables ........... 7.25ms DONE
+  2026_10_07_000600_add_purpose_to_files_table ................... 0.92ms DONE
+  2026_10_07_000700_add_admin_approval_fields .................... 2.56ms DONE
+  2026_10_07_000700_add_tutor_onboarding_file_links .............. 5.57ms DONE
+  2026_10_12_000800_align_identity_status_constraints ............ 0.08ms DONE
+  2026_10_13_162057_add_public_slug_to_tutor_profiles_table ...... 1.62ms DONE
+  2026_10_20_075315_align_user_and_tutor_profile_statuses ........ 4.28ms DONE
+  2026_10_20_101959_add_two_factor_columns_to_users_table ........ 2.03ms DONE
+  2026_10_20_102000_create_passkeys_table ........................ 9.77ms DONE
+  2026_10_22_000000_align_program_schema_with_domain_design ...... 6.39ms DONE
+  2026_10_22_073014_add_admin_assignment_columns_to_tutor_profiles_and_reports  23.27ms DONE
+  2026_10_22_073015_create_notification_outbox_and_add_event_key_to_notifications  7.19ms DONE
+  2026_10_22_073016_add_submission_versioning_and_idempotency ... 20.21ms DONE
+  2026_10_22_080000_enforce_utc_timestamps_and_vnd_currency ...... 0.18ms DONE
+  2026_10_25_000000_preserve_outbox_timestamp_precision .......... 3.94ms DONE
+  2026_10_26_212524_add_invitation_acceptance_support_tables ..... 2.69ms DONE
+  2026_10_27_074546_add_h02_approval_support ..................... 4.09ms DONE
+  2026_10_28_034616_align_messaging_contract ..................... 4.77ms DONE
+  2026_10_28_140000_prepare_message_sending ...................... 0.34ms DONE
+  2026_10_28_200000_add_file_scan_evidence ....................... 3.49ms DONE
+  2026_10_30_180000_create_realtime_sessions_table ............... 0.99ms DONE
+
+OpenAPI document exported to ../docs/api/openapi.json.

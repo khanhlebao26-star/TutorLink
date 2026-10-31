@@ -46,6 +46,8 @@ Các trường phí là khai báo của Tutor, không xác nhận ngân hàng/c�
 
 ## Conversation
 
+* Bổ sung K03.13 (30/10): logout/suspend thu hồi registry realtime theo phiên, không đổi Conversation/membership/read cursor. Logout giữ các phiên khác; suspend account/Profile thu hồi tất cả; restore không hồi sinh token cũ. Cấp quyền mới sau đăng nhập lại theo [contract §13](../handover/BE-K03-K03.1-contract.md#13-realtime).
+
 * ConversationStatus chỉ active/cancelled. Khi có Program completed, active → cancelled chỉ nếu cặp không còn Program active/paused và không còn Invitation pending còn hạn. cancelled chỉ đọc. Nếu còn quan hệ đang tiếp diễn thì giữ active. Khi bắt đầu trao đổi dịch vụ mới và đủ điều kiện, cancelled → active trên chính Conversation cũ; không tạo hội thoại trùng cặp.
 * BR-17: đình chỉ participant không tự chuyển active → cancelled, không xóa membership/message/context. Member active vẫn đọc lịch sử của mình; member bị đình chỉ bị từ chối đọc/gửi kể cả khi còn session cũ và đọc lại được sau khôi phục. `context_listing_id` chỉ được ghi khi tạo lần đầu, không đổi khi dùng lại hoặc tái mở. BR-21: member active không gửi message mới khi peer bị đình chỉ; cancelled chỉ mở lại bằng request mở liên hệ mới đủ gate; lifecycle không tự chèn system message.
 
@@ -56,6 +58,8 @@ Các trường phí là khai báo của Tutor, không xác nhận ngân hàng/c�
 * SubmissionStatus: submitted → accepted/revision\_requested; revision\_requested → submitted khi nộp lại. Nộp/cập nhật tạo version mới, feedback gắn version, stale bị từ chối. Không dùng reviewed làm literal đích.
 
 ## Các trạng thái hỗ trợ
+
+File theo [K03.1 điều chỉnh 29/10](../handover/BE-K03-K03.1-contract.md): pending → clean sau kiểm tra kỹ thuật; vi phạm policy → rejected; storage/validation tạm lỗi giữ hoặc chuyển pending, không dùng được và có thể retry. rejected không complete lại. clean không biểu thị antivirus; schema/evidence quét lịch sử được giữ. CV có trạng thái nội dung pending/approved/rejected theo đúng file/version, độc lập FileScanStatus; version mới không thừa hưởng approved. Đây là đích cần module hồ sơ triển khai; K03.7a không tạo workflow/schema CV.
 
 * VerificationDocumentStatus pending → approved/rejected; approved → expired khi có căn cứ hết hiệu lực. Thay file tạo document pending mới, không ghi đè lịch sử bản cũ. Document bắt buộc expired làm mất eligibility public/tạo dịch vụ mới mà không đổi TutorProfileStatus/UserStatus; bản thay thế approved khôi phục gate theo BR-16. ReportStatus open → resolved/dismissed; ReviewVisibility visible ↔ hidden theo quyền moderation và audit. AnnouncementViewState draft → published; private/public là toàn bộ FileVisibility, quyền membership được kiểm riêng.
 

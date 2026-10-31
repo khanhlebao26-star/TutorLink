@@ -1,0 +1,12 @@
+Started: 2026-10-30T11:16:29.4892984+07:00
+Command: npx --yes @redocly/cli@2.60.0 lint docs/api/openapi.json --config .redocly.yaml
+npm error code ENOTFOUND
+npm error syscall getaddrinfo
+npm error errno ENOTFOUND
+npm error network request to https://registry.npmjs.org/@redocly%2fcli failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+npm error network This is a problem related to network connectivity.
+npm error network In most cases you are behind a proxy or have bad network settings.
+npm error network
+npm error network If you are behind a proxy, please make sure that the 'proxy' config is set properly.  See: 'npm help config'
+npm error A complete log of this run can be found in: C:\Users\khanh\AppData\Local\Packages\sandbox.{***}\AC\npm-cache\_logs\2026-10-30T04_16_30_052Z-debug-0.log
+Exit code: 1

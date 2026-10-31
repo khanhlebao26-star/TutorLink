@@ -1,0 +1,22 @@
+{
+  "checked_at": "2026-10-30T10:37:12.3225656+07:00",
+  "operations": 69,
+  "checks": {
+    "operations_69": true,
+    "only_text_message": true,
+    "file_ids_array": true,
+    "file_ids_empty_only": true,
+    "strict_file_ids_description": true,
+    "message_link_not_advertised": true,
+    "four_other_link_types_preserved": true,
+    "message_upload_not_advertised": true,
+    "upload_limit_preserved": true
+  },
+  "link_types": [
+    "task",
+    "task_submission",
+    "announcement",
+    "verification_document"
+  ],
+  "file_ids_description": "Optional empty JSON array only. Objects (including {}), null, scalar values and non-empty arrays are rejected. Chat attachments are disabled."
+}

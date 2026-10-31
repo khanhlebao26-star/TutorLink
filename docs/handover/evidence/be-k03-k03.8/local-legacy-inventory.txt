@@ -1,0 +1,19 @@
+Checked: 2026-10-30T10:36:23.4919846+07:00
+Read-only local PostgreSQL inventory. Development database, not the isolated test database.
+SELECT message_type, count(*) FROM messages GROUP BY message_type; SELECT count(*) AS legacy_message_files FROM files WHERE purpose = 'message_attachment'; SELECT count(*) AS legacy_message_links FROM file_links WHERE resource_type = 'message';
+ message_type | count 
+--------------+-------
+(0 rows)
+
+ legacy_message_files 
+----------------------
+                    0
+(1 row)
+
+ legacy_message_links 
+----------------------
+                    0
+(1 row)
+
+Exit code: 0
+No FileRecord, Message or FileLink was deleted or updated.

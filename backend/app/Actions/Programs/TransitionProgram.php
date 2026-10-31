@@ -2,6 +2,7 @@
 
 namespace App\Actions\Programs;
 
+use App\Actions\Messaging\SyncConversationLifecycle;
 use App\Exceptions\ProgramActionException;
 use App\Models\Program;
 use App\Models\User;
@@ -180,6 +181,13 @@ class TransitionProgram
                     "program:{$programId}:{$transition}:{$auditId}",
                     $recipients,
                     ['deep_link' => "/programs/{$programId}"],
+                );
+            }
+
+            if (in_array($definition['to'], ['completed', 'cancelled'], true)) {
+                app(SyncConversationLifecycle::class)->execute(
+                    (int) $program->owner_tutor_profile_id,
+                    (int) $program->customer_id,
                 );
             }
 

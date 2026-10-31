@@ -1,0 +1,10 @@
+BE-D03 PostgreSQL backfill probe — 31/10/2026
+
+Environment: compose.testing.yml, postgres:16-alpine, database tutorlink_test, isolated temporary schema issue74_backfill_*; TestDatabaseGuard passed.
+
+Observed results:
+- Two legacy Task/Submission rows migrated: nullable assignee populated from the legacy Submission, existing assignee preserved, current_submission_id linked correctly, Submission version set to 1, synthetic UUID key and 64-character SHA-256 hash present.
+- A legacy row whose Customer did not match the Task assignee was refused. PostgreSQL transactional DDL rolled back: the version column was absent after failure and the legacy row remained unchanged.
+- Temporary schema dropped after verification.
+
+Probe script was temporary and removed after the run; this file records the observed PostgreSQL results. The persistent migration test still covers the independent SQLite case and is not treated as PostgreSQL evidence.

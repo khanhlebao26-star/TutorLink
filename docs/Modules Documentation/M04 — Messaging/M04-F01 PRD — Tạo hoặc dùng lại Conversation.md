@@ -17,7 +17,7 @@ Customer hoặc Tutor bắt đầu trao đổi với người thuộc vai trò c
 
 # 3\. Hành vi API đích
 
-Request đích `POST /api/v1/conversations` nhận `peer_user_id` và `context_listing_id` tùy chọn; client không gửi `direct_key` hoặc `sender_id`. Máy chủ suy ra Customer/Tutor từ vai trò hai participant, xác thực cả Listing đầu vào nếu có, derive key, khóa/tra cứu key và atomically find-or-create. Response tối thiểu: `id`, `status`, `peer: {id, display_name}`, `context_listing_id` đã lưu; không trả direct_key, email, điện thoại hoặc thông tin riêng tư của peer. `can_send` nếu được trả chỉ là gợi ý UI do server tính, không thay kiểm quyền lúc gửi. Nếu Conversation đã có, trả đúng context gốc và cho UI biết đây là chat cũ; không gán lịch sử cũ cho Listing mới. Method/path theo Catalog vẫn Dự kiến; DTO này chưa có trong OpenAPI sinh từ code.
+Request đích `POST /api/v1/conversations` nhận `peer_user_id` và `context_listing_id` tùy chọn; client không gửi `direct_key` hoặc `sender_id`. Máy chủ suy ra Customer/Tutor từ vai trò hai participant, xác thực cả Listing đầu vào nếu có, derive key, khóa/tra cứu key và atomically find-or-create. Response tối thiểu: `id`, `status`, `peer: {id, display_name}`, `context_listing_id` đã lưu; không trả direct_key, email, điện thoại hoặc thông tin riêng tư của peer. `can_send` nếu được trả chỉ là gợi ý UI do server tính, không thay kiểm quyền lúc gửi. Nếu Conversation đã có, trả đúng context gốc và cho UI biết đây là chat cũ; không gán lịch sử cũ cho Listing mới. Method/path đã đăng ký và DTO hiện có trong OpenAPI sinh từ code; UI chưa nghiệm thu.
 
 # 4\. Tiêu chí chấp nhận
 
@@ -26,10 +26,11 @@ Request đích `POST /api/v1/conversations` nhận `peer_user_id` và `context_l
 * Request không đủ quyền, cặp trùng vai trò, Tutor không đủ điều kiện hoặc Listing không thuộc Tutor bị từ chối; không tạo dữ liệu dở dang.  
 * Retry sau timeout không tạo Conversation thứ hai.
 
-# 5\. Chênh lệch/câu hỏi mở
+# 5\. Trạng thái triển khai và giới hạn (K03.14)
 
-* Migration có type=direct/program và status mặc định pending; target Domain mô tả một Conversation theo cặp Customer–Tutor với status active/cancelled. Cần mapping trước endpoint.  
-* BR-17 đã chốt field/allow-list tối thiểu và xử lý lịch sử khi một bên bị suspend. Migration, schema lỗi và chi tiết wire DTO cần hiện thực/kiểm thử; không coi Catalog hay PRD là API đã khả dụng.
+* POST /api/v1/conversations đã triển khai theo [K03.3](../../handover/BE-K03-K03.3-test-report.md): kiểm actor/peer/Tutor eligibility và Listing context, find-or-create nguyên tử theo cặp, đúng hai member, context bất biến kể cả null; tạo mới 201, dùng lại/reopen hợp lệ 200.
+* K03.2 đã align type direct, status active/cancelled, default active; migration chặn dữ liệu legacy cần mapping/backfill riêng. Không sửa migration đã chạy hoặc tự xóa dữ liệu để vượt guard.
+* [K03.10](../../handover/BE-K03-K03.10-test-report.md)/[K03.13](../../handover/BE-K03-K03.13-test-report.md) có regression/concurrent create; [OpenAPI](../../api/openapi.json) là wire contract hiện hành. UI/Echo K03.12 hoãn; không chứng nhận mọi module hoặc môi trường production.
 
 # 6\. Nguồn
 

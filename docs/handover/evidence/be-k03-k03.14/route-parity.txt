@@ -1,0 +1,4 @@
+Started: 2026-10-30T16:29:29.7208775+07:00
+Command: docker compose exec -T backend php scripts/verify-openapi-routes.php /tmp/be-k03-openapi-review.json
+OpenAPI route parity passed (70 operations).
+Exit code: 0

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Programs;
 
+use App\Actions\Messaging\SyncConversationLifecycle;
 use App\Exceptions\ProgramActionException;
 use App\Models\Program;
 use App\Models\User;
@@ -36,6 +37,7 @@ class UpdateProgramDraft
                 ->where('programs.id', $programId)
                 ->select([
                     'programs.owner_tutor_profile_id',
+                    'programs.customer_id',
                     'tutor_profiles.user_id as tutor_user_id',
                 ])
                 ->first();
@@ -44,10 +46,21 @@ class UpdateProgramDraft
                 throw new ProgramActionException(404, 'program_not_found', 'Program not found.');
             }
 
-            $tutor = DB::table('users')
-                ->where('id', $actor->id)
+            $userIds = array_values(array_unique([
+                $actor->id,
+                (int) $context->customer_id,
+            ]));
+
+            sort($userIds, SORT_NUMERIC);
+
+            $users = DB::table('users')
+                ->whereIn('id', $userIds)
+                ->orderBy('id')
                 ->lockForUpdate()
-                ->first();
+                ->get()
+                ->keyBy('id');
+
+            $tutor = $users->get($actor->id);
             $profile = DB::table('tutor_profiles')
                 ->where('id', $context->owner_tutor_profile_id)
                 ->lockForUpdate()
@@ -81,6 +94,8 @@ class UpdateProgramDraft
                 throw new ProgramActionException(409, 'program_not_draft', 'Only a Draft Program can be edited.');
             }
 
+            $expiredInvitation = false;
+
             $invitation = DB::table('program_invitations')
                 ->where('program_id', $programId)
                 ->where('status', 'pending')
@@ -100,6 +115,8 @@ class UpdateProgramDraft
                 }
 
                 app(InvitationTransitionWriter::class)->expire($invitation, $actor->id, $requestId, $now);
+
+                $expiredInvitation = true;
             }
 
             if ((int) $program->version !== (int) $data['expected_version']) {
@@ -142,6 +159,13 @@ class UpdateProgramDraft
                 'request_id' => $requestId,
                 'created_at' => $timestamp,
             ]);
+
+            if ($expiredInvitation) {
+                app(SyncConversationLifecycle::class)->execute(
+                    (int) $program->owner_tutor_profile_id,
+                    (int) $program->customer_id,
+                );
+            }
 
             return Program::query()
                 ->withActionContext()

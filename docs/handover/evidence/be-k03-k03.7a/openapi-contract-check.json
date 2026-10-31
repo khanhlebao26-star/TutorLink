@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-10-29T16:17:45.8833416+07:00",
+  "operation_count": 69,
+  "checks": {
+    "operations_69": true,
+    "complete_technical_validation": true,
+    "complete_no_antivirus_claim": true,
+    "responses_200_403_422_503": true,
+    "response_503_storage_and_validation": true,
+    "response_503_retry_after": true,
+    "historical_evidence_fields_preserved": true,
+    "old_scanner_summary_absent": true
+  },
+  "complete_summary": "Complete a private file after technical validation; no antivirus scan is performed",
+  "response_503": "Storage or technical validation unavailable; file remains pending. Retry-After: 10."
+}

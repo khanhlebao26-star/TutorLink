@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\V1\AdminController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
+use App\Http\Controllers\Api\V1\ConversationController;
+use App\Http\Controllers\Api\V1\ConversationRealtimeController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\ProgramController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
+use App\Http\Controllers\Api\V1\TaskController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\EnsureActiveApiActor;
@@ -53,6 +56,48 @@ Route::prefix('v1')->group(function () {
         Route::post('/invitations/{invitation}/accept', InvitationAcceptController::class)
             ->whereNumber('invitation')
             ->name('invitations.accept');
+        Route::post('/invitations/{invitation}/reject', [InvitationController::class, 'reject'])
+            ->whereNumber('invitation')
+            ->name('invitations.reject');
+        Route::post('/invitations/{invitation}/cancel', [InvitationController::class, 'cancel'])
+            ->whereNumber('invitation')
+            ->name('invitations.cancel');
+        Route::get('/programs/{program}/tasks', [TaskController::class, 'index'])->whereNumber('program');
+        Route::post('/programs/{program}/tasks', [TaskController::class, 'store'])->whereNumber('program');
+        Route::get('/tasks/{task}', [TaskController::class, 'show'])->whereNumber('task');
+        Route::patch('/tasks/{task}', [TaskController::class, 'update'])->whereNumber('task');
+        Route::post('/tasks/{task}/start', [TaskController::class, 'start'])->whereNumber('task');
+        Route::post('/tasks/{task}/cancel', [TaskController::class, 'cancel'])->whereNumber('task');
+        Route::get('/tasks/{task}/submission', [TaskController::class, 'submission'])->whereNumber('task');
+        Route::put('/tasks/{task}/submission', [TaskController::class, 'submit'])->whereNumber('task');
+        Route::get('/tasks/{task}/submission/versions', [TaskController::class, 'versions'])->whereNumber('task');
+        Route::post('/tasks/{task}/submission/review', [TaskController::class, 'review'])->whereNumber('task');
+        Route::post('/tasks/{task}/submission/request-revision', [TaskController::class, 'requestRevision'])->whereNumber('task');
+        Route::post('/conversations', [ConversationController::class, 'store'])
+            ->name('conversations.store');
+        Route::get('/conversations', [ConversationController::class, 'index'])
+            ->name('conversations.index');
+
+        Route::get('/conversations/{conversation}', [ConversationController::class, 'show'])
+            ->whereNumber('conversation')
+            ->name('conversations.show');
+
+        Route::get('/conversations/{conversation}/messages', [ConversationController::class, 'messages'])
+            ->whereNumber('conversation')
+            ->name('conversations.messages.index');
+        Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage'])
+            ->whereNumber('conversation')
+            ->name('conversations.messages.store');
+        Route::patch('/conversations/{conversation}/read', [ConversationController::class, 'markRead'])
+            ->whereNumber('conversation')
+            ->name('conversations.read');
+
+        Route::post(
+            '/conversations/{conversation}/realtime',
+            ConversationRealtimeController::class,
+        )
+            ->whereNumber('conversation')
+            ->name('conversations.realtime');
     });
 
     Route::prefix('auth')->group(function () {

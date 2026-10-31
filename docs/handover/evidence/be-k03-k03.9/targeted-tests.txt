@@ -1,0 +1,87 @@
+Started: 2026-10-30T13:49:08.6241082+07:00
+Base HEAD: f61deafd1e042fff19f7ab3a6bdc57eb17bea43d
+Command: docker compose -f compose.testing.yml run --rm --build -T backend-test php artisan test --compact --filter="ConversationLifecycleApiTest|InvitationAcceptConcurrencyTest" --display-warnings --fail-on-warning --no-ansi
+time="2026-10-30T13:49:08+07:00" level=warning msg="Found orphan containers (tutorlink-src-backend-1, tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running
+ Image tutorlink-h01-backend-test:local Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/php:8.3-cli
+#4 DONE 1.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 DONE 1.3s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 FROM docker.io/library/composer:2@sha256:c7f68260503e3c1f0ece10bdbe84519fd98d48ba091f2c02f16ea94a7faae337
+#6 resolve docker.io/library/composer:2@sha256:c7f68260503e3c1f0ece10bdbe84519fd98d48ba091f2c02f16ea94a7faae337 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919
+#7 resolve docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 36.26kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#9 CACHED
+
+#10 [stage-0 5/9] WORKDIR /var/www/html
+#10 CACHED
+
+#11 [stage-0 6/9] COPY composer.json composer.lock ./
+#11 CACHED
+
+#12 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#13 CACHED
+
+#14 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#14 CACHED
+
+#15 [stage-0 8/9] COPY . .
+#15 DONE 0.1s
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 DONE 0.3s
+
+#17 exporting to image
+#17 exporting layers 0.1s done
+#17 exporting manifest sha256:d1cd8e57301f665b6510b2868d32a5bc181af93cca94d68e9e017e72b62617d2 0.0s done
+#17 exporting config sha256:ab065e7f7933cefe8fc414f19b231a31df5922a5861276c6e577ac359725b9db 0.0s done
+#17 exporting attestation manifest sha256:e3b7d5d60d4274117d66a1addb4db7d450b252abd92a2035a8291fd2130614eb 0.0s done
+#17 exporting manifest list sha256:4d62ed59de5a57ae7d9bc77783ef1e36208a2eb2e43ff44bc38568612b469e4f 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local 0.1s done
+#17 DONE 0.4s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built
+ Container tutorlink-src-test-db-1 Waiting
+ Container tutorlink-src-test-db-1 Healthy
+ Container tutorlink-src-backend-test-run-7437dc875325 Creating
+ Container tutorlink-src-backend-test-run-7437dc875325 Created
+
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+
+  [90mTests:[39m    [32;1m28 passed[39;22m[90m (266 assertions)[39m
+  [90mDuration:[39m [39m7.45s[39m
+
+Exit code: 0

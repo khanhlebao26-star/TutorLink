@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-10-30T09:14:57.680943+00:00",
+  "operations": 70,
+  "realtime_session_cookie_security": true,
+  "realtime_responses": [
+    "200",
+    "401",
+    "403",
+    "404",
+    "422"
+  ],
+  "broadcast_auth_outside_openapi": true,
+  "probe_cases": 12,
+  "real_transport_retry_observed": true,
+  "fixture_cleanup_passed": true,
+  "services_restored": true,
+  "test_logs_exit_zero": true
+}

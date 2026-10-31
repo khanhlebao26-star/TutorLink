@@ -1,0 +1,1133 @@
+{
+  "checked_at": "2026-10-30T09:14:58.082533+00:00",
+  "base_head": "e6ffd0575e954be3e46448142bf8cd972477b437",
+  "branch": "be-k03",
+  "source": "K03.13 uncommitted working tree. PHP formatting precedes final targeted image build and full regression. Final probe includes actual transport retry while Reverb is down. No runtime PHP logic changes during this evidence task.",
+  "scope": "Local isolated fixture HTTP/WebSocket probe plus dedicated PostgreSQL test database; Echo/UI deferred. No environment secrets read or fingerprinted. Manifest and verification log excluded to avoid self-reference.",
+  "files": [
+    {
+      "path": "backend/Dockerfile",
+      "sha256": "e8b9a39afab5e059de62faa7852bcd9638c83bac20892c242d72b1b8e3e69f96"
+    },
+    {
+      "path": "backend/Dockerfile.testing",
+      "sha256": "dba016eddec7468a28cee8bbd10287f507c0a8e5e4c954de48541391bfc75734"
+    },
+    {
+      "path": "backend/app/Actions/Auth/RevokeUserSessions.php",
+      "sha256": "5edf0656e1507a83e1e8eddf43e40cc6483bef457f49bbd98a5794babdd2b3b2"
+    },
+    {
+      "path": "backend/app/Actions/Files/CompleteFile.php",
+      "sha256": "602dd1c323647f04196a4e9c3e94b0036b91b0a7e20f01664b6c61ba48c3bcdd"
+    },
+    {
+      "path": "backend/app/Actions/Fortify/CreateNewUser.php",
+      "sha256": "b6e59c031344f8d19f9dd6ba7a82580ead7de009f20a584e42ed0be62b695bb5"
+    },
+    {
+      "path": "backend/app/Actions/Fortify/PasswordValidationRules.php",
+      "sha256": "cffb686ef5ad2e1b87ac7f79d146ac04d56488afd926ca2a54707c74294637c9"
+    },
+    {
+      "path": "backend/app/Actions/Fortify/ResetUserPassword.php",
+      "sha256": "a1d6d652221e93d61e353153de22346cdc4dac15f601b852461c42e7fea71468"
+    },
+    {
+      "path": "backend/app/Actions/Fortify/UpdateUserPassword.php",
+      "sha256": "09689c395103b7c247bc4b408d7e7a53c57f69d9ce86dd644d844d2a00ea1f2d"
+    },
+    {
+      "path": "backend/app/Actions/Fortify/UpdateUserProfileInformation.php",
+      "sha256": "421e47087749455d7295d34e17f105a68b63abcac000ca6a1041896eac019b67"
+    },
+    {
+      "path": "backend/app/Actions/Invitations/AcceptInvitation.php",
+      "sha256": "18d664a9e0932ca8f058a8c2691b6b916b256c2c550293db791f238d384c5462"
+    },
+    {
+      "path": "backend/app/Actions/Invitations/SendInvitation.php",
+      "sha256": "70ca2dd8e22b8eb037f69a6b16d626438312ef991a121cc930deb6d4c9bf0e7c"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/AdvanceReadCursor.php",
+      "sha256": "2a3e1b4aec39b51fb2b395c10ccf67646e90d6f2ca03204d62e69b343747a38e"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/IssueConversationRealtime.php",
+      "sha256": "bbbf99bfc65c07cb1e6e7967a1f90b7805fa32b237d4bc504acae301f8702401"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/OpenConversation.php",
+      "sha256": "75473a2d2f0c4ca1c9e69d98602f219a38acad0c4b7148ac8a7a633eff0ba374"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/ReadConversations.php",
+      "sha256": "005575eea92ec8e9eabf4457be8089f5b71d3907eb75233e52cc1d3569a03d60"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/SendTextMessage.php",
+      "sha256": "9bd96b3637a5c88e89e4adb2f4171cf5961d21d384b69e87d0d2198a1867c336"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/SyncConversationLifecycle.php",
+      "sha256": "9a92744096930bf07a85577f794a60ba765847fd194fa74babc086553da170de"
+    },
+    {
+      "path": "backend/app/Actions/Programs/CreateProgramDraft.php",
+      "sha256": "05dc61a057e8160681ae651fba4ff7fd1008023aa7d7f5f95f4ed23617d8725e"
+    },
+    {
+      "path": "backend/app/Actions/Programs/TransitionProgram.php",
+      "sha256": "55bc6fa52f2336f0252cc93426cd81b46bbcffeb93d2b8ba650055177a89b66e"
+    },
+    {
+      "path": "backend/app/Actions/Programs/UpdateProgramDraft.php",
+      "sha256": "251dcc58883937573ff99bb08064239969d5a74c233ccabd743a4dec9990fc62"
+    },
+    {
+      "path": "backend/app/Actions/TutorProfiles/AssignTutorProfile.php",
+      "sha256": "e803905dbb0a8395ccb6adb39b3858a76d2520102401b303382afeaa6b4fb8e0"
+    },
+    {
+      "path": "backend/app/Actions/TutorProfiles/DecideTutorProfile.php",
+      "sha256": "a55ba7412fc94b4e2d1db49f26e1fea855c5a4eda72b4a2c1087899f627db533"
+    },
+    {
+      "path": "backend/app/Actions/TutorProfiles/DecideVerificationDocument.php",
+      "sha256": "58f6db75c3e9aacd10b828bab14c599276695e688d5921e2f7f33bc9e7059fe0"
+    },
+    {
+      "path": "backend/app/Actions/TutorProfiles/SubmitTutorProfile.php",
+      "sha256": "664495502f385c5ac0cbb8887c3754805fa5bb7a40e6eebf60b17c87579cb29d"
+    },
+    {
+      "path": "backend/app/Actions/TutorProfiles/SuspendTutorProfile.php",
+      "sha256": "d3155e36e200d08ce8d8765d2ce772c14ea3b1477a65820e98523b18b082868c"
+    },
+    {
+      "path": "backend/app/Console/Commands/MonitorNotificationOutbox.php",
+      "sha256": "994c6f86f0b34a82b0b7c64d9e7c893aa309783a345396d38a67ad07beb2baf8"
+    },
+    {
+      "path": "backend/app/Console/Commands/ProcessNotificationOutbox.php",
+      "sha256": "5cd6b0a78f9b03997424fc7a6e5a18a82cedc94fae7b415626235758aa503948"
+    },
+    {
+      "path": "backend/app/Console/Commands/PurgeNotificationData.php",
+      "sha256": "075043c25831cbd83b56654459d647810e8d62f0c23b90da99f47c85a139f781"
+    },
+    {
+      "path": "backend/app/Console/Commands/WorkNotificationOutbox.php",
+      "sha256": "d59a3595d2428d47f9306ea6051d769fd9b8839b7b8a24b253e79a55914c4990"
+    },
+    {
+      "path": "backend/app/Events/ConversationMessagesChanged.php",
+      "sha256": "6ed800829c76fa854022672a7eaa91ff4a12c210271740bcee3f83c5f3e7bb22"
+    },
+    {
+      "path": "backend/app/Exceptions/InvitationAcceptException.php",
+      "sha256": "28fa525c88c5d133f7c3cac32399942330b127c68df437ded38c49de3618d57f"
+    },
+    {
+      "path": "backend/app/Exceptions/ProgramActionException.php",
+      "sha256": "c45d864d7e15db33ee3341d428d5304ff76a746019559540db642a0bf3e6c15b"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/AdminController.php",
+      "sha256": "2d6d808d777ebb62614af2662d5533c6b9dc0ebe304844bb0237deaf9209eae0"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/AuthController.php",
+      "sha256": "70155c3ae42f921a3de84b495ba406d823bde96e4759265c1e7b91ca8e19ef93"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/AvailabilityRuleController.php",
+      "sha256": "8a5379d6bc1dda6199300414470247232c6682ec101afbbe592d0a86c701227f"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/CatalogController.php",
+      "sha256": "da15ee5bfa54111d4bc7b62fa21e44e8541abcee252ee465e3ca50b1da914eae"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ConversationController.php",
+      "sha256": "9e10f60a5d07074e55feffa4e76ab3542d1c3482064b7ad50d5a003d64dfcd4b"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ConversationRealtimeController.php",
+      "sha256": "9f85fecae9778b6566a3b8f8c70772f92ff858ef484659c779e345f11ef9bd3e"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/FileController.php",
+      "sha256": "c1495fbb3b96203a9971e33966500bbd5de5597e72852162fdf2a3bb0daff205"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/InvitationAcceptController.php",
+      "sha256": "4537d2958633f4ffba5c22f67ad58c58db01f9cffd3abdca978b087a4d48c14a"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/InvitationController.php",
+      "sha256": "2a14c148eeee4da1bb5b9451fc5af798cb8e53b4dbc4ce0a57e5a9ba0dec5887"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ListingController.php",
+      "sha256": "58a3c140d4426ad642b096f1f6d15df83073a9fea253ad5549298aa18197a27b"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/NotificationOutboxController.php",
+      "sha256": "324ad53dab9e978e8972a547ebb5149eb4a8a34a56925fa0a13f247b87008077"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/PersonalAccessTokenController.php",
+      "sha256": "b265a8c6b157fd8d303b9161441ebb79e377448bb832aa10704e56ff2556f5ea"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ProgramController.php",
+      "sha256": "1d02c95519d1262bcd44a3d94fb42ec9b8ff212ee76e6954cad940e66c23d580"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/PublicTutorController.php",
+      "sha256": "43571a36ae627e01414c644902ca7e9c8ac5ee3ec920b36e943feeb53cd26c6b"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/PublicTutorReviewController.php",
+      "sha256": "982ee0e79b10f575880e3d7551509076acba50af50200185d97df3d0e2a14d4e"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/TutorProfileController.php",
+      "sha256": "989aa46d01c9e8039f1101f17755e96a813ba5e69e891f8fa79b1b196412186c"
+    },
+    {
+      "path": "backend/app/Http/Controllers/BroadcastAuthController.php",
+      "sha256": "40f39a925ae93b69a5131fe966c0324539693e8086edd8fb68c334542a9915b4"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Controller.php",
+      "sha256": "25d1c1ef8e6cc8a376553faacfba2b07d9dfaee9bdbb84f14f77517580e9deb1"
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureActiveAccount.php",
+      "sha256": "1104361eab8ece5772fe9c75fdeb9d4434965276a10658c35198d4e095966a2d"
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureActiveApiActor.php",
+      "sha256": "e46630066af4fa905d64c86b9686568e5f00dc97802c1ce0ef546c7f33b0853f"
+    },
+    {
+      "path": "backend/app/Http/Requests/AdminDecisionRequest.php",
+      "sha256": "8da909bf4916a04abad0a8ecdf0e7a64354a45b9a8cf3ec1af426de7bf531ff8"
+    },
+    {
+      "path": "backend/app/Http/Requests/AssignTutorProfileRequest.php",
+      "sha256": "0f6c757221e55e2c685f8bb74385895433f35a2b1f6acf678be586bf80639f3e"
+    },
+    {
+      "path": "backend/app/Http/Requests/AttachTutorAvatarRequest.php",
+      "sha256": "3dbafc38daf5ed397746492705e3272752983b9a9e36e8bbbacbc1e59dc6bcde"
+    },
+    {
+      "path": "backend/app/Http/Requests/AvailabilityRuleRequest.php",
+      "sha256": "e4a22c29e9862c6af848fc8d62f26a6abdb9d0cf01bc6247b0ec52ba5cfc40fa"
+    },
+    {
+      "path": "backend/app/Http/Requests/ConversationBroadcastAuthRequest.php",
+      "sha256": "e5e25f8d0e32e448b5506ac7a44264b6d10ae5c9628f1cc2bcc4aee93e747c3f"
+    },
+    {
+      "path": "backend/app/Http/Requests/CreateListingRequest.php",
+      "sha256": "9fd45c8909ac239a6647a993f4126e7910d9e2abb40419676d4a27e504af1e67"
+    },
+    {
+      "path": "backend/app/Http/Requests/CreatePersonalAccessTokenRequest.php",
+      "sha256": "84634f662cdd2902e7c46d84934c1356021ad5558a6e96f6782994b3fd83bd60"
+    },
+    {
+      "path": "backend/app/Http/Requests/CreateProgramRequest.php",
+      "sha256": "e5d3a7061481adf0792939073adb312a673896b95189ccab627ee8491ed3143b"
+    },
+    {
+      "path": "backend/app/Http/Requests/FileLinkRequest.php",
+      "sha256": "a5cbe9c6881c0bd45a7e0e92a923dcdd5bcb2801b378083f84c9a72b871d87b0"
+    },
+    {
+      "path": "backend/app/Http/Requests/FileUploadRequest.php",
+      "sha256": "9e41b11ce84a0b7cb0e6ff600a27bb4b82c51fef1f0ee8d743f092bd65afd746"
+    },
+    {
+      "path": "backend/app/Http/Requests/ForgotPasswordRequest.php",
+      "sha256": "7e8b08f0387a87379e5db7efb612970e956bc01bc6ff834ed2ac00e5b6989391"
+    },
+    {
+      "path": "backend/app/Http/Requests/InvitationIndexRequest.php",
+      "sha256": "e5e586148bfb1f041808ae834684b955bf3ee766fe534d30fdbfe4858b3e6995"
+    },
+    {
+      "path": "backend/app/Http/Requests/IssueConversationRealtimeRequest.php",
+      "sha256": "f2e76aa4a6c75f8f6afc8f7a3570122be82a3e153150b8f65ed75e09190bac28"
+    },
+    {
+      "path": "backend/app/Http/Requests/LoginRequest.php",
+      "sha256": "f7e24b54e989b97825051ab549742b555da4c17e08e52966c4f2a8710d6f181b"
+    },
+    {
+      "path": "backend/app/Http/Requests/OpenConversationRequest.php",
+      "sha256": "e55dbb08e11b057fbdb3963f9ad7968c053effa0193717b49aff25380fdaeb44"
+    },
+    {
+      "path": "backend/app/Http/Requests/ProgramActionRequest.php",
+      "sha256": "fe2cd03ff52d10d642e87e5bb1024d302371d86b5c67b2837da0dbcf6c6e7727"
+    },
+    {
+      "path": "backend/app/Http/Requests/ProgramApiRequest.php",
+      "sha256": "7c102d8e88d063923e540f30cd8816fb61fd938a854b1cb5f548cd1fd505028c"
+    },
+    {
+      "path": "backend/app/Http/Requests/ProgramIndexRequest.php",
+      "sha256": "de61203e4ea3ccb77f1c69f043815c341bc2e415c3001aefa1e6e420539a7e43"
+    },
+    {
+      "path": "backend/app/Http/Requests/RegisterRequest.php",
+      "sha256": "ecb3cd57b8e69046cc1b4c3393f9bc9fc5ae0ef7ace6b621e72ca4a046d15e0f"
+    },
+    {
+      "path": "backend/app/Http/Requests/ResetPasswordRequest.php",
+      "sha256": "e48d8e821a01515a5ad7727a177c1467830e4101859ff6e14a44b3a58682dab1"
+    },
+    {
+      "path": "backend/app/Http/Requests/SendInvitationRequest.php",
+      "sha256": "d9368bf77af16c0a26e750b9901bf3a753c544ceac3eb756e954d48342c96a9f"
+    },
+    {
+      "path": "backend/app/Http/Requests/SendTextMessageRequest.php",
+      "sha256": "dbef0e3a7ad1cb8e44ec58fca7e0cd0fb2a6c781fd1b0463e4987786e37f4b05"
+    },
+    {
+      "path": "backend/app/Http/Requests/TutorProfileDecisionRequest.php",
+      "sha256": "da9304025cf5524fa40a8e1bfd1db8c5ef604e3df8d10969d2aab71e19b50f68"
+    },
+    {
+      "path": "backend/app/Http/Requests/TutorProfileRequest.php",
+      "sha256": "eee337e583eee97f181c8ce2a05a25b8b0a7da6b6a38f92a16927cb5f23f906a"
+    },
+    {
+      "path": "backend/app/Http/Requests/UpdateListingRequest.php",
+      "sha256": "0f1e06549a3788348f6cc12656e7969c0eca838c83bee7c6fd2eb51213b327d9"
+    },
+    {
+      "path": "backend/app/Http/Requests/UpdateMeRequest.php",
+      "sha256": "f602f3f181cd6e94036218392ca4c49eb5571c48eebdcb20bc25ddaabb9f1618"
+    },
+    {
+      "path": "backend/app/Http/Requests/UpdatePasswordRequest.php",
+      "sha256": "edd73e819f37f02899ac355e13b4c0d284cd92ec2f0712ea517a867b3f1d2949"
+    },
+    {
+      "path": "backend/app/Http/Requests/UpdateProgramRequest.php",
+      "sha256": "4543a2391332dc8f2c4ce8cebcaf6fd629fd75b7848b390a7e5f9f793cef5b52"
+    },
+    {
+      "path": "backend/app/Http/Requests/UpdateReadCursorRequest.php",
+      "sha256": "5426bf685e40b4e28300650f53299b7220b0b037f42e94a37063a632b1fc5326"
+    },
+    {
+      "path": "backend/app/Http/Requests/VerificationDocumentDecisionRequest.php",
+      "sha256": "cb1217f2496a1bd47ffbbdc78cdef8af66a21ab4441b7aa2cabb109e5dd52d0f"
+    },
+    {
+      "path": "backend/app/Http/Requests/VerificationDocumentRequest.php",
+      "sha256": "5bdaea475090faaa7c10b3ee7fac5b746b154b7f5736bdf557efa199d99d4b91"
+    },
+    {
+      "path": "backend/app/Http/Resources/ConversationReadResource.php",
+      "sha256": "01919b7457c9b7730d0d13f8218f466f95c9f7a826124b7bc121ba4abb0b0eff"
+    },
+    {
+      "path": "backend/app/Http/Resources/ConversationResource.php",
+      "sha256": "1815e332f0cf8bade878ea23cdac848164a3924b10889f9e743cf066b82541d0"
+    },
+    {
+      "path": "backend/app/Http/Resources/FileResource.php",
+      "sha256": "cba57b7c32ac4292f010a41e41c883e5be13d06111138a17fe854c6a139cbb89"
+    },
+    {
+      "path": "backend/app/Http/Resources/InvitationResource.php",
+      "sha256": "53377c4e6d8be706f1ae59bc1d1304b6d717027d0c7d27faf4b1ee28fc52bcc1"
+    },
+    {
+      "path": "backend/app/Http/Resources/ListingResource.php",
+      "sha256": "e4d309b34b5bf3a34896e1ea2687bd641f6e26d41b2e40cc7bc3a0d93f230eac"
+    },
+    {
+      "path": "backend/app/Http/Resources/MessageResource.php",
+      "sha256": "d298c2e41f581577100e60a9b8f45846f2bf0c92f89e2dca8fe81566f922fcfb"
+    },
+    {
+      "path": "backend/app/Http/Resources/ProgramResource.php",
+      "sha256": "36d1e43ecf6fd6a16572a4509fc8b791ea4c452a7015f28a0ce2fcaa0172c75d"
+    },
+    {
+      "path": "backend/app/Http/Resources/PublicTutorResource.php",
+      "sha256": "05bacde768cdbd4d566f4fe52b452c8f51337a3390756cdd0a3670dbaf2d4098"
+    },
+    {
+      "path": "backend/app/Http/Resources/ReadCursorResource.php",
+      "sha256": "12f185337f2fedc3af1aac418d674c7b554fcf16fa22f13aab6e007ba1a7ff6f"
+    },
+    {
+      "path": "backend/app/Http/Resources/TutorProfileResource.php",
+      "sha256": "609419ca4d1dda95c59514acb5a80632663dc9fefc2fd8b7a6c488bf0d44a378"
+    },
+    {
+      "path": "backend/app/Http/Resources/UserResource.php",
+      "sha256": "497f3d6669aa6255daf6e181647ac854fc9d9941353507ad8f996005fbc74e36"
+    },
+    {
+      "path": "backend/app/Jobs/BroadcastConversationChanged.php",
+      "sha256": "d2572f83f5d31a095e1e1d11e4d2dee07f523e8234f44a4447bab86b4e611b78"
+    },
+    {
+      "path": "backend/app/Jobs/SendSlackOperationalAlert.php",
+      "sha256": "e0723a95b53b452178786aeae55a86c69b0dfe559d49846ce64d7159756597c3"
+    },
+    {
+      "path": "backend/app/Models/AvailabilityRule.php",
+      "sha256": "fe7d16e2353e028209e29a68e1401c2d119fe632b45bf7ffa8ddc8add22e3d74"
+    },
+    {
+      "path": "backend/app/Models/Category.php",
+      "sha256": "52be7bddc4bec828110f973b6da2b8744b54ef36f2dd5dcaacccbfac3017284f"
+    },
+    {
+      "path": "backend/app/Models/Conversation.php",
+      "sha256": "1be2327f705551ae1c9a8f062a420732a254d1207cb81bcb67aeba9e0d44458b"
+    },
+    {
+      "path": "backend/app/Models/CustomerProfile.php",
+      "sha256": "c3f88d0cfc3529ca42aad2fff51b23c7bf4078435ae7624bbbce7bd8ccee8b67"
+    },
+    {
+      "path": "backend/app/Models/File.php",
+      "sha256": "11dce37b9d5dda9f52d60b2402d1fe449c46f07e4979ca6dd0b444643aa80c26"
+    },
+    {
+      "path": "backend/app/Models/Message.php",
+      "sha256": "df2e865fd3143296976c1c72f4b4638de9e77cc5f7689272c3958d7722a97e41"
+    },
+    {
+      "path": "backend/app/Models/Program.php",
+      "sha256": "87cc0cc7a7e8956151659512a4883154ca70ac839f6cab5f5be53a9a5493d4f9"
+    },
+    {
+      "path": "backend/app/Models/ServiceListing.php",
+      "sha256": "424eb8f947b81fcb36b9bb7e394cd8757db651e66322d7bd42571d18ae7136ae"
+    },
+    {
+      "path": "backend/app/Models/Specialization.php",
+      "sha256": "079e8fe09e7d84a3a95b4d1ccc6fc6f6f1caca22b93ee5868f0e00a17dfab15a"
+    },
+    {
+      "path": "backend/app/Models/Subcategory.php",
+      "sha256": "75c657e1bd1037ae9dcc9806c854203bc85d0a6927a0555f7af90f99bf420ebd"
+    },
+    {
+      "path": "backend/app/Models/TutorProfile.php",
+      "sha256": "5240e2e8ceed3ed02490f5b3511a3b778b3bf37195415d7d680db838dccba33f"
+    },
+    {
+      "path": "backend/app/Models/User.php",
+      "sha256": "6262be5905db175c184e812bac540fba5640d67c440f26d8d5704bfbfb49dc1d"
+    },
+    {
+      "path": "backend/app/Models/VerificationDocument.php",
+      "sha256": "eba0bdfbef9fefd6dd865079a8e3f6cb94fb859a4195cf80f9fc321dfbc7e3c3"
+    },
+    {
+      "path": "backend/app/Policies/ProgramPolicy.php",
+      "sha256": "4dbad23d2e166b10f3e00e240a2ad1e6abe9bbcf096d3387f49a46ef9c67b57e"
+    },
+    {
+      "path": "backend/app/Policies/TutorProfilePolicy.php",
+      "sha256": "869b17e9dd60842a96e471bef42bbb02fb98097b540a404d0b58f9b1d3c31d6f"
+    },
+    {
+      "path": "backend/app/Providers/AppServiceProvider.php",
+      "sha256": "0517259895bea44cb8ae77ccc50eb39f02879c56fd7837beee0714f04d9cffcd"
+    },
+    {
+      "path": "backend/app/Providers/FortifyServiceProvider.php",
+      "sha256": "46991a194e6cb01ad5d4354052a3411882565f20aec03e2f2f32d6827c4ef975"
+    },
+    {
+      "path": "backend/app/Support/AdminPermissions.php",
+      "sha256": "7d01d2d347831c25de6d92c85faa314d1a76506649a098a1060179d720236622"
+    },
+    {
+      "path": "backend/app/Support/ApiErrorResponse.php",
+      "sha256": "ffeaa02f14c2b37d8253f4d46ed305d2b1b1c2c1930f303b9d861f9a07a16e2c"
+    },
+    {
+      "path": "backend/app/Support/InvitationTransitionWriter.php",
+      "sha256": "344683474b50a087c698266429edd6456dd50e42ce2ca331512f480c3dd65fd0"
+    },
+    {
+      "path": "backend/app/Support/MessagingCursor.php",
+      "sha256": "74b8cc2110b12124471bdd10cae8137af4c3736bb0422b7bfcae3d5cbc828bcc"
+    },
+    {
+      "path": "backend/app/Support/NotificationOutboxAlerts.php",
+      "sha256": "cd12c57850decce5d6f72ae66945ad5b10b45995101d7f11af3507d132754699"
+    },
+    {
+      "path": "backend/app/Support/NotificationOutboxWriter.php",
+      "sha256": "5350f8d17c9df4b9ef189350451662344e8f6c3f7e47abc21935c9f6e5ba4b55"
+    },
+    {
+      "path": "backend/app/Support/RealtimeSessionChannels.php",
+      "sha256": "67488d99d9c87a63f7501a36fceb4d041d90d2f4f1bbbf42bde2f7d44dd31106"
+    },
+    {
+      "path": "backend/app/Support/TutorEligibility.php",
+      "sha256": "d9000f007cbec3b43a2a41ba78165881ba858b9ab7ea849391b0d1edf13da195"
+    },
+    {
+      "path": "backend/app/Support/TutorProfileChecklist.php",
+      "sha256": "200d5e6db8f1227738fb2bd0c379265e3c96a02bb00e52fdd0207d07172edf64"
+    },
+    {
+      "path": "backend/app/Support/TutorProfileRevisions.php",
+      "sha256": "63c325e1157f0d6fa1204aeac8d463714e8c6738af41d2ab96280a774f1fcb43"
+    },
+    {
+      "path": "backend/app/Support/TutorProfileWorkflow.php",
+      "sha256": "a0c6da908edd303e491814c2a91ef72f9aca984b01bbe47b0529db9bb9846301"
+    },
+    {
+      "path": "backend/app/Support/ZipScanGuard.php",
+      "sha256": "1255366e95c0657bdcf8023deaae2ed001ae5974e569fa3f5003652a52f5ce11"
+    },
+    {
+      "path": "backend/bootstrap/app.php",
+      "sha256": "a67c79004befb21656524c65dfc5a0fbfb2ccdee3ca4a04dfc48d9cd4ee04cda"
+    },
+    {
+      "path": "backend/bootstrap/cache/.gitignore",
+      "sha256": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d"
+    },
+    {
+      "path": "backend/bootstrap/providers.php",
+      "sha256": "62fccbe8249af9fb043b99880f6c41ac45ce4f307be830438cc7c8280178ee40"
+    },
+    {
+      "path": "backend/composer.json",
+      "sha256": "d809d1a5d66541189fd62cafc2e1832c635aebb16bb4f7a2e037a133fb7e1acc"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "be10d41231e87e08cf7b98d3a84a2f7a400272f30e4009f169d35d5add586ad2"
+    },
+    {
+      "path": "backend/config/app.php",
+      "sha256": "44890a923f04b2c4cd9e3a31da63790cf79e0b8daa2dcc80341f40418ad2f676"
+    },
+    {
+      "path": "backend/config/auth.php",
+      "sha256": "6956a73373ee21cf81c571e056ed42d2b780e853eafd48800158e521c8664494"
+    },
+    {
+      "path": "backend/config/broadcasting.php",
+      "sha256": "7f743772f69e7331dd3ce010189573b5e0286913c975fe4992fc27401edb6ba4"
+    },
+    {
+      "path": "backend/config/cache.php",
+      "sha256": "5030cdf171704e58b96f2cf17f1c6d5921b27d5c63c2cefb730eeb2da49a8240"
+    },
+    {
+      "path": "backend/config/cors.php",
+      "sha256": "ae96b8e0a378684adc563ef445d0b68e21d8d594402b3df7a93894dd1b2c9e39"
+    },
+    {
+      "path": "backend/config/database.php",
+      "sha256": "02cd62f589b43d33f9ceac740705dac1dec9740eb2bb9e6e202d4b66a15244cf"
+    },
+    {
+      "path": "backend/config/file-validation.php",
+      "sha256": "c4717abd20ddc8ef3c52a5052480e402b94f67954442023059b2f0885d9c8811"
+    },
+    {
+      "path": "backend/config/filesystems.php",
+      "sha256": "ba7060d7a23e490c3ce830656f6d24ad3ccf5b868e3293f2a12e411959dc5635"
+    },
+    {
+      "path": "backend/config/fortify.php",
+      "sha256": "d2b1e60c183b3987da146a52e3bb20a02f78072a22401e5c5964a16544acd3d3"
+    },
+    {
+      "path": "backend/config/logging.php",
+      "sha256": "beb1ffd0db910f6f0b4f75214c3d5aa385d692733ece8a450f4c169d2c99ce38"
+    },
+    {
+      "path": "backend/config/mail.php",
+      "sha256": "c43ff49a31c5f32ce21eb7159f2a4b3cd2f4074eaed5838d265646dbfedd3474"
+    },
+    {
+      "path": "backend/config/notification_outbox.php",
+      "sha256": "f06d1a3667d60da7c47d6fb1a2dc2df51a93f1c6b8ddc1836fadba772eacad45"
+    },
+    {
+      "path": "backend/config/queue.php",
+      "sha256": "6101774da7c8b79af46d0028f2b8b31a484c3f7eda10b76e5b27b6093ad364a4"
+    },
+    {
+      "path": "backend/config/reverb.php",
+      "sha256": "e3dd775aac983bc65ac57480f57001be8c05b57962ca40b53cfc7b8d14e97fcd"
+    },
+    {
+      "path": "backend/config/sanctum.php",
+      "sha256": "ccc32fe65d85acf16f2be33993373241ac9aec19a82102a07713598a30167b00"
+    },
+    {
+      "path": "backend/config/scramble.php",
+      "sha256": "2bc68efca432aa7e9b5236479792f0075435f28e49af8b320b6a028d28b3401b"
+    },
+    {
+      "path": "backend/config/services.php",
+      "sha256": "b7ee786ea1adbc92db9f229f479431c94503527c47051da3862eb0e4d7db70aa"
+    },
+    {
+      "path": "backend/config/session.php",
+      "sha256": "64272cfbef6f47c65bf857f1c5b1e853700c0d0278de46b86663fd83ef4aeed8"
+    },
+    {
+      "path": "backend/database/.gitignore",
+      "sha256": "e758642d95e83e907e010b6e46b07b3f953c7cef11fe5ebefc2a77b9d7b4d5f7"
+    },
+    {
+      "path": "backend/database/factories/UserFactory.php",
+      "sha256": "6ccc8a5507f79d9b8328ee014b216c4e363c66e023fa232c9e4a22f65242710f"
+    },
+    {
+      "path": "backend/database/migrations/0001_01_01_000000_create_users_table.php",
+      "sha256": "10d79883bc08ce46510f9ad8b1830b4d06d586dc56ae2c8bac3b3e491f69a90f"
+    },
+    {
+      "path": "backend/database/migrations/0001_01_01_000001_create_cache_table.php",
+      "sha256": "fbb4665e5a977e71df4e74ec75b3c06ca4f17ad0de7138fe9786639189978e77"
+    },
+    {
+      "path": "backend/database/migrations/0001_01_01_000002_create_jobs_table.php",
+      "sha256": "df4910687180313a14a3f96a8bddd808ae145ed1b107cd772caf865c0dc2b746"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_06_155651_create_personal_access_tokens_table.php",
+      "sha256": "c81ecde85ea5072188c468dcaf79776728b6eb8f684d63fc0d88a4908484ca75"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000050_create_sessions_table.php",
+      "sha256": "79241ffd9c7a1c15de32eff036568852861023909bd89c0cb977535649e05cee"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000100_extend_users_and_create_files_table.php",
+      "sha256": "c75b945845723f596e016432d78a4901941dd5958ae14094f85a9633b44d9ddc"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000200_create_identity_and_catalog_tables.php",
+      "sha256": "cab324498bad6e0cda152cac41ddc4ce36c8174f5bf1d527116f61ffbde18fd7"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000300_create_messaging_tables.php",
+      "sha256": "d465e67c819653d480359c945660d2ab6f91c9babb89ff15e32c4baca8b51ba2"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000400_create_program_and_learning_tables.php",
+      "sha256": "2d8c45cc70dcbce5078dc535e8c1f4e68d932840598c93bb6c08bd360b213c87"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000500_create_operations_and_trust_tables.php",
+      "sha256": "37ce7a60292b8e22d95fa86a86d4a9b9da85aa7a0c887674e6d1b3f502ddbe08"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000600_add_purpose_to_files_table.php",
+      "sha256": "d91a0a89fb8574fafdfe5ff26ac8a884752ccde0d60e1e32cb7c739e7f419dc7"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000700_add_admin_approval_fields.php",
+      "sha256": "6706acb3a84497f1c8a6ffbcaf14b05501a81967bc8b6fb4530eebae8516261b"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_07_000700_add_tutor_onboarding_file_links.php",
+      "sha256": "116206f59ee2af69ee6b50da8ad1ca82e89c1a529dc58f0b74269e6d0bc57bc6"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_12_000800_align_identity_status_constraints.php",
+      "sha256": "75ce39bc7a1bd3b047bad8f8b10009f6b576b823fadc133b6c37604587f90414"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_13_162057_add_public_slug_to_tutor_profiles_table.php",
+      "sha256": "e48d2ef16a150bf58384ebd3b1699cc5f745950ea3c4c2aa948d0b5408eb60e4"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_20_075315_align_user_and_tutor_profile_statuses.php",
+      "sha256": "202112434b02937de4e98731c10e8a9a87cdc27b2ff5ff2bc7e3d1d58353ae9e"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_20_101959_add_two_factor_columns_to_users_table.php",
+      "sha256": "f599186f5b168d4eafb9cdc19a28a3c0d68f2ddc29c77fc34faf54df52ebb0bc"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_20_102000_create_passkeys_table.php",
+      "sha256": "7f0fc4cabc5a8f28e53e21403171e8aff2ac910d4a4845b7c98f5a333fa272db"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_22_000000_align_program_schema_with_domain_design.php",
+      "sha256": "12076f92049d9099e040deb5b775d0bfabab4d615292cc85efaf95b4ed0785f9"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_22_073014_add_admin_assignment_columns_to_tutor_profiles_and_reports.php",
+      "sha256": "782532ee2399a0cac5fb4bdd96aa77b0f1593fde8b8ebb07063f4468f19a934c"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_22_073015_create_notification_outbox_and_add_event_key_to_notifications.php",
+      "sha256": "37192af068f60cd1072bff623eb7a4cbf00915a91b7fcdff6b75b4cb4d2e22ee"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_22_073016_add_submission_versioning_and_idempotency.php",
+      "sha256": "afe9e4c235fd181ad59109a719cbbe8e3ed16a7496d1b0dbd842ad678624ae41"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_22_080000_enforce_utc_timestamps_and_vnd_currency.php",
+      "sha256": "ee2b84e1be480b1bc8f8a6463b4de969e8c834b8764d5fd7c4e1e1abc65eadf5"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_25_000000_preserve_outbox_timestamp_precision.php",
+      "sha256": "ef1fb813e8329c575ed418822e6eadd6e48148e9ab21bc1bdae1fa60037d4440"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_26_212524_add_invitation_acceptance_support_tables.php",
+      "sha256": "9350dd682aa4552bbfbfd2992b3cf0f147b2d234d54aff036a029c41799b9f7f"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_27_074546_add_h02_approval_support.php",
+      "sha256": "2507c527b807c948d4c0622cf4138ef3adb60586d6a201e50de2081c0616653a"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_28_034616_align_messaging_contract.php",
+      "sha256": "b4d4119d4322a761924167ce990f076b03d7f1d84184f52997783799add137d2"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_28_140000_prepare_message_sending.php",
+      "sha256": "d9136af11d5d37b078cac686d161d8914b8c40bfee13ae9083f1b945554de59b"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_28_200000_add_file_scan_evidence.php",
+      "sha256": "db8f5ba6881dfaa105ba82dd34cc40567c66569f3aa298fafb82c202f358b66b"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_30_180000_create_realtime_sessions_table.php",
+      "sha256": "73e85d8ff0e8023877a8e9a8d7f87867dd0cfdcb23340e8dddd9eb8aadac201d"
+    },
+    {
+      "path": "backend/database/seeders/AdminSeeder.php",
+      "sha256": "00cfe4b29b6899a2b2fc986d64a0e8aa3f5e230550958ecdfc79827e7ffd9c57"
+    },
+    {
+      "path": "backend/database/seeders/CatalogSeeder.php",
+      "sha256": "39e9713a37ee3a310bd0d88cd39f5e0353ed9b7bd244bdbf7d499a8170ce2459"
+    },
+    {
+      "path": "backend/database/seeders/DatabaseSeeder.php",
+      "sha256": "b15a484012ede4084639f729191a7584b63130de0bd644bd5d0824b3e7b45599"
+    },
+    {
+      "path": "backend/database/seeders/MarketplaceDemoSeeder.php",
+      "sha256": "b9f338c347006d9703499d9673247369da5158997bac19910bac479df013b184"
+    },
+    {
+      "path": "backend/docker/uploads.ini",
+      "sha256": "266d1158430e7de7c5d840bc709497c2d4f7f488af6fa8cb4d7c091630be80bc"
+    },
+    {
+      "path": "backend/routes/api.php",
+      "sha256": "e3120bc5865bfd1204eaa7052fc9165848faf84f97da05ce6a42f5a4531b38f0"
+    },
+    {
+      "path": "backend/routes/channels.php",
+      "sha256": "29397968d215f15e8e4299f927a23772ac1c8a58a7704679a69aadfe21ed4adb"
+    },
+    {
+      "path": "backend/routes/console.php",
+      "sha256": "9cb7ddd209978cc4cd2887f86fbfbbf71c7a6ca269193ed2bf0a018adf0f56b9"
+    },
+    {
+      "path": "backend/routes/web.php",
+      "sha256": "cbf264b146c590b2967c2e4222ed5b8183e28f08e059118b5fd053da97d0595c"
+    },
+    {
+      "path": "backend/scripts/test-console.php",
+      "sha256": "a434f9f5f96654ffa2e808a7b953e4e162756964f1c4bed940ccf29613a11227"
+    },
+    {
+      "path": "backend/scripts/verify-openapi-routes.php",
+      "sha256": "cae3807ddb2f28caf9635e83e8c7aee3867075fbb6ed5ed1fd85c361af83b6bc"
+    },
+    {
+      "path": "backend/tests/Feature/AdminApprovalAuditTest.php",
+      "sha256": "0857becf07df4b3466e0d9b7d8c88fa2bb78c5bc210c4e5d9eb5e0ef3fbd3dbb"
+    },
+    {
+      "path": "backend/tests/Feature/AuthFileProfileTest.php",
+      "sha256": "122d3880e258a8a8b9cc94d4f50003d566d4046e402823d368a74f7099304adc"
+    },
+    {
+      "path": "backend/tests/Feature/ChatAttachmentDisabledTest.php",
+      "sha256": "efd2dd1101ecc10ae35ce5c7c363e1a0abf15e07bf3a25edcbc8ff1ce1ef73af"
+    },
+    {
+      "path": "backend/tests/Feature/CompleteFileApiTest.php",
+      "sha256": "7996494cadff21d6502bf947249a875ac12bb9e072d79cac71f2d236477cc467"
+    },
+    {
+      "path": "backend/tests/Feature/ConversationBroadcastAuthTest.php",
+      "sha256": "16a9e81c650ce1ddb233a461a3d4a16e17e543e47984863e4ef9ea98704b0700"
+    },
+    {
+      "path": "backend/tests/Feature/ConversationLifecycleApiTest.php",
+      "sha256": "e232e39680458c82e63c6e93d6c0cdbc0992bb4ed1e35ff44bc699f74378ceee"
+    },
+    {
+      "path": "backend/tests/Feature/DatabaseSchemaTest.php",
+      "sha256": "b4006f661b7505e43cd0c7bb8f1ad7c4177d708b45b7d8d88e334b0d4b2c1b71"
+    },
+    {
+      "path": "backend/tests/Feature/ExampleTest.php",
+      "sha256": "aaa4a192fb4aa96d4e81eda06a29968da3d9a73b71026b87a67297e66dd985b8"
+    },
+    {
+      "path": "backend/tests/Feature/FileLifecycleConcurrencyTest.php",
+      "sha256": "31015094c229c8bd1af262c136d2a22188d98d3c3ac60a36af2c373a9b2d3d87"
+    },
+    {
+      "path": "backend/tests/Feature/FileSizePolicyTest.php",
+      "sha256": "afab7c5a0c7b8a63b619cec08a3b319f773a92abc13dce527406c0dcd217c8c7"
+    },
+    {
+      "path": "backend/tests/Feature/IdentitySecurityTest.php",
+      "sha256": "29cbdab411f3026198410f4bcac3edd99d5e8c03a0ed6e01ae966a4b27d4fd4a"
+    },
+    {
+      "path": "backend/tests/Feature/IdentitySessionTest.php",
+      "sha256": "4259479d32dc2f099d86118bd4f2d4b4973b07724d218d75996fa38bf6cdd91a"
+    },
+    {
+      "path": "backend/tests/Feature/Infrastructure/PostgresConnectionsTest.php",
+      "sha256": "330f0c75d6d6b6b63d29de7ce2987a35eb603db7872f83ba945d327b5d8f2c28"
+    },
+    {
+      "path": "backend/tests/Feature/Infrastructure/PostgresRuntimeTest.php",
+      "sha256": "88ef5b0f91385aa56151d15cec4be1b74ceca790f565f9dc819866e392d20bd7"
+    },
+    {
+      "path": "backend/tests/Feature/Infrastructure/TestActorsTest.php",
+      "sha256": "a1c28681063c28e08fecb338a0f49fec86714176ef06d69c7b008af19b758199"
+    },
+    {
+      "path": "backend/tests/Feature/InvitationAcceptConcurrencyTest.php",
+      "sha256": "db18b14f64f8ff96142106c574ed670bd6932f002e27bfdd9b6053a1269624bd"
+    },
+    {
+      "path": "backend/tests/Feature/InvitationAcceptTest.php",
+      "sha256": "b700d75409736fa637214413fedf1c09279881149c19c8ffd937acd9303a34c7"
+    },
+    {
+      "path": "backend/tests/Feature/InvitationApiTest.php",
+      "sha256": "3c5603352fab0f0fd27a7c73b4626b566f862b11002881ad0732b105f4f778bf"
+    },
+    {
+      "path": "backend/tests/Feature/MarketplaceApiTest.php",
+      "sha256": "f68448f6b90d8d0b8f7c8863860ccb25ef4d09f072d6123a3312bce9f7eb4d35"
+    },
+    {
+      "path": "backend/tests/Feature/MarketplaceCloseoutTest.php",
+      "sha256": "b564f11e508da91b4cda438ac9b6a24e26e848a22fa1278aac6fbf107c321bb4"
+    },
+    {
+      "path": "backend/tests/Feature/MarketplaceSearchCompatibilityTest.php",
+      "sha256": "fd500130df9a0a996439cb40d1423dff7c8f2be6708b13575a9558370ea853c6"
+    },
+    {
+      "path": "backend/tests/Feature/MessageBroadcastTest.php",
+      "sha256": "1434fa206b9e29de13978392fc753ae55e2a4bab8a2d1e4cfd9deef2ca1194e4"
+    },
+    {
+      "path": "backend/tests/Feature/MessagingSchemaTest.php",
+      "sha256": "59ac3ab2cef93d701215073f74c5fbfabb3151db037cdbe8aefb32f0d66988b4"
+    },
+    {
+      "path": "backend/tests/Feature/NotificationOutboxRuntimeTest.php",
+      "sha256": "4c949d94cf093c79ff837b97bf85bf098dde454eded89871281050afb0e9f9af"
+    },
+    {
+      "path": "backend/tests/Feature/NotificationOutboxWriterTest.php",
+      "sha256": "b67fbdfb4756be3f6620165bcdb3e3cb416cca4f0d32eb39bdd361db1db2dcbd"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationApiTest.php",
+      "sha256": "3a813f24076894e6b1758eb4808204241f0b9f9e6304a65080929e2768db57b2"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationConcurrencyTest.php",
+      "sha256": "209bf8be1534beaa80e75b2408543ca053e718cd21ee3f87c594254df7e938e7"
+    },
+    {
+      "path": "backend/tests/Feature/PersonalAccessTokenTest.php",
+      "sha256": "4f974541f1e6a2ad6b3c47a0c79b48fe000d428029b81fc18d238bf187da0f7f"
+    },
+    {
+      "path": "backend/tests/Feature/PhaseTwoAcceptanceTest.php",
+      "sha256": "05b5d9838042906ecc7e86616f6aae27a2115052fff7c374feb076d251d5d4f5"
+    },
+    {
+      "path": "backend/tests/Feature/ProcessNotificationOutboxTest.php",
+      "sha256": "2d9c2e7beb1e9a44dff77322f8198d8d2469254dde244ee09c84ef60d4d79a74"
+    },
+    {
+      "path": "backend/tests/Feature/ProgramApiTest.php",
+      "sha256": "3463396283a5369a75fa2d4132fab7482b08ce7985cf7e4ef74607d403b6888b"
+    },
+    {
+      "path": "backend/tests/Feature/ProgramLifecycleApiTest.php",
+      "sha256": "a1c5688e70285b0e2c30ad1340986e4012f539c1f8208c4f67e749ca383e85cf"
+    },
+    {
+      "path": "backend/tests/Feature/ReadConversationApiTest.php",
+      "sha256": "4b41dabc61a33cf7a220c57d57345372227e23f6d1729e9d2a2b789b013904bc"
+    },
+    {
+      "path": "backend/tests/Feature/ReadCursorApiTest.php",
+      "sha256": "e42e40c5df998ac61f231ae21bde5adb146bf52ad71aaee250dd3a221e5316cd"
+    },
+    {
+      "path": "backend/tests/Feature/ReadCursorConcurrencyTest.php",
+      "sha256": "b49d65117b999486bd3365e7133f138455d65d6c4128e47ddef7fae7fb66097c"
+    },
+    {
+      "path": "backend/tests/Feature/RealtimeRevocationConcurrencyTest.php",
+      "sha256": "856500496c73438ae3dfa0b59320fb899d352aebd2f5e9e1eab396cbbc320ae1"
+    },
+    {
+      "path": "backend/tests/Feature/RealtimeSessionAccessTest.php",
+      "sha256": "35546a0f4d6003048a44755af7d093ba0a1b06871acb81ca06f29bb8fd524eb6"
+    },
+    {
+      "path": "backend/tests/Feature/SendSlackOperationalAlertTest.php",
+      "sha256": "e8606a91da24936e457cfc0b3c813857638380899144b02522db3c8127dfdc78"
+    },
+    {
+      "path": "backend/tests/Feature/SendTextMessageApiTest.php",
+      "sha256": "b4917faabe083c8b7976b9b6fc63162eee02fc384c1798bb6264a67092cb5c70"
+    },
+    {
+      "path": "backend/tests/Feature/SendTextMessageConcurrencyTest.php",
+      "sha256": "67326373cdc95ce60563e759f830c1ac32579e2ec97198677afe1ed751b243cc"
+    },
+    {
+      "path": "backend/tests/Feature/Task3SchemaDeltaTest.php",
+      "sha256": "376c49bd964062760dac842ee9f33587425006b29e72444335c726b3e5d3a679"
+    },
+    {
+      "path": "backend/tests/Feature/TutorProfileApprovalWorkflowTest.php",
+      "sha256": "e52b3d05aff454a9fa72c4d02c16a75e16e9689bc918c98b56d96ed10dca4d18"
+    },
+    {
+      "path": "backend/tests/Feature/ZipScanGuardTest.php",
+      "sha256": "ae9ccc4f4fbf68ef0e1d6888af7c87383187bd537ddc76849bc9b564231b87b6"
+    },
+    {
+      "path": "backend/tests/Pest.php",
+      "sha256": "2e9f94556b4bc381b00e244f1bcaa394e5851c9e0527cb202336909d3c6a9062"
+    },
+    {
+      "path": "backend/tests/Support/InteractsWithRealtimeSessions.php",
+      "sha256": "30fcabd2b463568441e8ee332f469f505230774cc825570d7d7e53241188ed3b"
+    },
+    {
+      "path": "backend/tests/Support/MessageSendFixtures.php",
+      "sha256": "f0bae1b17b7c562d597fb7f8bc4361226c53439fcbfdd8bce9605ef9f1ed50e3"
+    },
+    {
+      "path": "backend/tests/Support/PostgresConnections.php",
+      "sha256": "f8efcafea1a8c66ab3e093c3ee962db9a37f867bbf67e0d585b2b4ad31c9d931"
+    },
+    {
+      "path": "backend/tests/Support/ProgramApiFixtures.php",
+      "sha256": "fd918ca2681fa1cab50e32faa99508100884bdd5aa6f4b65134beaf24fae83cb"
+    },
+    {
+      "path": "backend/tests/Support/TestActors.php",
+      "sha256": "8d8939908c34911911a647e163f8c80814d322e1a4564d70ccca0ecfb5fdbf16"
+    },
+    {
+      "path": "backend/tests/Support/TestDatabaseGuard.php",
+      "sha256": "d510ea8f0e2a3c5ae716144d5fc048662f3786d0b2cd6974a103be2f7939ee45"
+    },
+    {
+      "path": "backend/tests/TestCase.php",
+      "sha256": "6e89d2d78c20aab0900a6316cfdcea88fa8ba731a15884fe58f8d1ead191ba8a"
+    },
+    {
+      "path": "backend/tests/Unit/ExampleTest.php",
+      "sha256": "ffacae5c1a2a44c809420af5b3b404910da1b12167d58764dac6d10b8ba8cfaf"
+    },
+    {
+      "path": "backend/tests/Unit/TestConsoleGuardTest.php",
+      "sha256": "67519fa154aa51c5767e2a2b41cfed0533c03f6fe3e0aac3aeb40a51e044487a"
+    },
+    {
+      "path": "backend/tests/Unit/TestDatabaseIsolationTest.php",
+      "sha256": "692682d7a5e88c3f29d9ce25103a985957613df735305288616ceb1d6ebd3a17"
+    },
+    {
+      "path": "compose.testing.yml",
+      "sha256": "07d2f4b8ae09106fb7bdb121212a827380eab4debce7b32baa9b4c06d8617a3c"
+    },
+    {
+      "path": "docker-compose.yml",
+      "sha256": "b81319fe28d8b10c87ba368dc3f84423d5aea1134927abd728037bb42439d49e"
+    },
+    {
+      "path": "docs/Architecture & Technical Design/API Route Catalog.md",
+      "sha256": "85320023e207dac49d76fc0d82f475f19dae04b2e48efaee41a7a21a9a6f299b"
+    },
+    {
+      "path": "docs/Architecture & Technical Design/Database Design — TutorLink.md",
+      "sha256": "3c93869381a8ffccdada1346defa9073ab7187355bd2aa526a12fb8cb4808c32"
+    },
+    {
+      "path": "docs/Architecture & Technical Design/System architech & technology Stack.md",
+      "sha256": "4900026f5b14d555f63a239fc6cea03e217e900fbfbb385435e8005fd986e6eb"
+    },
+    {
+      "path": "docs/Domain Documentation/Business Rules.md",
+      "sha256": "08237d1c9e5d6a07577bf9ad2147a5abc2e381b04d822682ce9515028471684c"
+    },
+    {
+      "path": "docs/Domain Documentation/State Lifecycles.md",
+      "sha256": "6c0263e04ac6574a7300820ad5d15ab17ce1e4ded053b45712b4322473943f9e"
+    },
+    {
+      "path": "docs/Modules Documentation/M04 — Messaging/M04 — Messaging — PRD Index.md",
+      "sha256": "8fde54f6828c4c0e27223740ea08259f9bb6298145af261fa8bf6fe6a660f641"
+    },
+    {
+      "path": "docs/Modules Documentation/M04 — Messaging/M04-F03 PRD — Đọc lịch sử tin nhắn và đồng bộ.md",
+      "sha256": "e0058d494af8620595c4c5300833925175cc3b6a40d38a6bfd51dcf3f7647919"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "8ca2611c161c4e1e7a332c29cd24a6b13593334ec4b8c13cb470e8f78056e207"
+    },
+    {
+      "path": "docs/Workflow/WF03 Chat và tệp đính kèm.md",
+      "sha256": "08d78f9f56eba7a1345721a595de60e813ecd86cdd1e411b897d366a483c2d9d"
+    },
+    {
+      "path": "docs/api/README.md",
+      "sha256": "c92403dfa9f69f496164180cfbe944ae5b2bffdeceb19b2e1aa15c4ff2d9a398"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "35e43eb29702332d723a35fcb72ad7c633dcb391dd89d34ad0e52dcf6bafae74"
+    },
+    {
+      "path": "docs/handover/BE-K03-K03.1-contract.md",
+      "sha256": "a06dfd4f92095fba83e777d131cfa87355ae48ceb3340b19b9966ec1cc761431"
+    },
+    {
+      "path": "docs/handover/BE-K03-K03.13-test-report.md",
+      "sha256": "7aba7d00925e4908639db48f0d7adb2739fdab81412d2bca70dbe428adbc2992"
+    },
+    {
+      "path": "docs/handover/BE-K03-roadmap.md",
+      "sha256": "7ce0d3e64ff969a9e16a87addf5807179015677a6a145bfe0fce399b75fdf3bd"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/contract-evidence-check.json",
+      "sha256": "52752c0bccf8912fe7b8c34ffafe699c86c4729e33409d3badf57de8a4609d91"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/diff-check.txt",
+      "sha256": "8340e64736aefc66d412f9100862d4be7659bdef11820e268724adef7c3ef4df"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/full-backend-tests.txt",
+      "sha256": "3f39de6a98174fc01f6c07d738f0a4ac25db2bcb05fef7bdb110dc80bacd5bc3"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/migration-status.txt",
+      "sha256": "16314d860f8e77c0f3edf44555f6f5203d49adf2b368856651ab2f6f9b900ec9"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/openapi-export.txt",
+      "sha256": "fd2a6a21d2e4af62040ee38fdc167987cacb0cbf760d3949cbb6c12aeba02f43"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/openapi-lint-network-attempt.txt",
+      "sha256": "f8d2e3ca6b6772b89dd66912a84e0771a859b5937493fa3a31067d425547541a"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/openapi-lint.txt",
+      "sha256": "50a22d1babfb872efd484ee9b6000f56d2b472f51a7523ff5127659a62492d7a"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/pint.txt",
+      "sha256": "777b9becec15327902dd83785307441a6eb709684c2f0bc6c49627e76bdd37f9"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/probe-attempt-1.json",
+      "sha256": "0b600c00e8b6512aa8a5cbfd5c1f413a61793ba772ac4df77ce7555bd94888d2"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/probe-attempt-1.txt",
+      "sha256": "2515ba1226ab9009737d2d6dbaf10acb6efd402634a0c080d8a1598b7ece6b6d"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/probe-attempt-2.json",
+      "sha256": "818183021872ad2ca20365ef613b02191c269144c30e97e6d014e46797fc84d1"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/probe-attempt-2.txt",
+      "sha256": "1c6a334d652c45f47fc391710547e0061950f6fb9534f05dbadf075ecc58c7cc"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/realtime-recovery-probe.cjs",
+      "sha256": "4767806b4fe78ad0e46a1194fc00d546dab01730cd85e39ebe8d5716521010b1"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/realtime-recovery.json",
+      "sha256": "3fcb094e98394866f9313e48e2068ec4300ba7d4ac193775617f2c6f88cf179a"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/realtime-recovery.txt",
+      "sha256": "65e1daaa6c867946c0520f31b75e8318eccbc1e8d87f8618f98c2c057aa08c9f"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/route-parity.txt",
+      "sha256": "88ae653f0e87c50c6626d4099ea520a33e36506ba59ac4e4143d948147dde50c"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/runtime-config.json",
+      "sha256": "628d7c62f3a08b424a19da6a034315f6ea35a208b7f02b111736d94e7cad62d8"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/services-restored.json",
+      "sha256": "3d3ae40be40dc14b05d7b65b1970745e0cb13224bbc8088a77466a106a58e73e"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/targeted-tests.txt",
+      "sha256": "c6ab9f30a985e0f64be49a7f5cdf789c22dfdb36bd490e500f992151bd6f02be"
+    },
+    {
+      "path": "docs/handover/evidence/be-k03-k03.13/working-tree.txt",
+      "sha256": "4fe9ccd84e5e217054016abff5e9141da4d8cb2a1aef7935159dc1781ba7e396"
+    }
+  ]
+}

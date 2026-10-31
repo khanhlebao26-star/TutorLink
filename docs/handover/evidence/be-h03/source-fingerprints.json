@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-31",
+  "branch": "codex/2w-be-h03",
+  "base": "9c9d746",
+  "files": {
+    "backend/app/Actions/Invitations/ResolveInvitation.php": "43aab97b3b898b43d91819df54d11b2d2b30a8a2eafd053bd1a15774f0db0453",
+    "backend/app/Console/Commands/ExpireProgramInvitations.php": "59fed229a1c4137e62a156c247503725817feff3d3d127bdd60e52e3a10a593b",
+    "backend/app/Http/Controllers/Api/V1/InvitationController.php": "ab321ecb79b59d819acf403d7dee2880d0ce9cb56acee7d6172e9fddbbcebd86",
+    "backend/app/Http/Requests/InvitationDecisionRequest.php": "58ae773792f0e57ebe0775df99ea02c1935f6132cf7a914a3053215be1bce217",
+    "backend/app/Support/InvitationTransitionWriter.php": "81b26d58f639fa52a58ac6411de3c7132a8a627fcc0d83e150d35c5e9e44218f",
+    "backend/routes/api.php": "5aa80d5c5dc04220d130ff6aef4db4f4c746474575e9dddb3a5af742144b328d",
+    "backend/routes/console.php": "3221b8a7ff748f3cb011d6432fdf5608363402943a7c5a7128261992d5839ebc",
+    "backend/tests/Feature/InvitationAcceptConcurrencyTest.php": "2e5f6500fc43697a3cf846a167cb541dfa272cb8018bf9b37775ffeb8809309c",
+    "backend/tests/Feature/InvitationDecisionApiTest.php": "5275e36fe24dab8c52db4b8dba5bfa16e3547b76e6b81be80c8f796dead3ed64",
+    "backend/tests/Feature/InvitationExpiryTest.php": "b93ecf3ca76cb4eca660f7f8986526b4a30799be748b27185e1769e7fc5e6272",
+    "backend/tests/Feature/ProgramLifecycleApiTest.php": "efb6186c8d2e8a2c8c1baad26d51c85fe7b6e98be0f8f4e5471371fb44e5c4f5",
+    "docs/api/openapi.json": "67ae0ddb0149caabbd3c2434eeaeab1f9327f6d8379a3669fd5e32d4b38bdefc",
+    "docs/handover/BE-H03-issue-75-test-report.md": "201863503253fe59d2efa6f248384510345f83d5aa0bec354ec8bb8754e12840"
+  }
+}

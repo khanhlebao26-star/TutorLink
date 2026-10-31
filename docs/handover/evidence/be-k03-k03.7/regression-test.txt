@@ -1,0 +1,85 @@
+Started: 2026-10-28 21:29:52 +07:00
+Command: php artisan test --compact --filter=PhaseTwoAcceptanceTest::test_missing_or_tampered_storage_cannot_be_completed --display-warnings --fail-on-warning --no-ansi
+time="2026-10-28T21:29:52+07:00" level=warning msg="Found orphan containers (tutorlink-src-backend-1, tutorlink-src-clamav-1, tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running
+ Image tutorlink-h01-backend-test:local Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 DONE 2.2s
+
+#4 [internal] load metadata for docker.io/library/composer:2
+#4 DONE 2.9s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919
+#6 resolve docker.io/library/php:8.3-cli@sha256:d07db734bd519927010bbc66fa42c0d6f0207a4ee8419998df40931b884a5919 0.0s done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc
+#7 resolve docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 34.51kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#9 CACHED
+
+#10 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [stage-0 6/9] COPY composer.json composer.lock ./
+#11 CACHED
+
+#12 [stage-0 5/9] WORKDIR /var/www/html
+#12 CACHED
+
+#13 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#13 CACHED
+
+#14 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#14 CACHED
+
+#15 [stage-0 8/9] COPY . .
+#15 DONE 0.2s
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 DONE 0.5s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 0.2s done
+#17 exporting manifest sha256:fb24adcd2cfc627d85425fd1df98a812310c8a34b92c835dad58af045a3b7806 0.0s done
+#17 exporting config sha256:8080dcf3335607069c0f13ec10630bc43451f3fd795126992022a4117eaadfac 0.0s done
+#17 exporting attestation manifest sha256:c2338d3060cb4092afaf53a0e4ccfa78ddb6c10263410c8302674d3eb905b10a 0.0s done
+#17 exporting manifest list sha256:e055b046f5e7fa77ae1d0b1bde5d2bb6b3280bbdf8cb170fdbf95fe06e8cdcc7 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local 0.2s done
+#17 DONE 0.5s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built
+ Container tutorlink-src-test-db-1 Waiting
+ Container tutorlink-src-test-db-1 Healthy
+ Container tutorlink-src-backend-test-run-12ebcbe94c7f Creating
+ Container tutorlink-src-backend-test-run-12ebcbe94c7f Created
+
+  .
+
+  Tests:    1 passed (9 assertions)
+  Duration: 1.25s
+
+Exit code: 0

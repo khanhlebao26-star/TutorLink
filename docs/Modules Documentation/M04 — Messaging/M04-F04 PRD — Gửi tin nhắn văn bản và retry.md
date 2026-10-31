@@ -11,13 +11,13 @@ Participant gửi tin nhắn văn bản trong Conversation active; lỗi mạng 
 * sender\_id lấy từ phiên xác thực, không tin sender ID trong body.  
 * Chỉ participant được gửi; Conversation phải active và sender phải đủ điều kiện account/relationship tại thời điểm ghi.  
 * Mỗi request có UUID client\_message\_id; unique(sender\_id,client\_message\_id) bảo đảm retry idempotent.  
-* Payload canonical gồm `conversation_id`, `message_type`, body đã chuẩn hóa CRLF/CR thành LF và file IDs; cùng key/cùng payload trả message đã persist, cùng key/khác payload trả HTTP 409.
-* Tin nhắn văn bản dùng MessageType=text, phải không trắng và tối đa 4.000 ký tự; nội dung được giữ nguyên ngoài chuẩn hóa CRLF/CR thành LF. MessageType=system chỉ do server ghi.
+* Payload canonical gồm `conversation_id`, `message_type`, body đã chuẩn hóa CRLF/CR thành LF và file_ids rỗng; cùng key/cùng payload trả message đã persist, cùng key/khác payload trả HTTP 409.
+* Tin nhắn văn bản dùng MessageType=text, phải không trắng và tối đa 4.000 ký tự; nội dung được giữ nguyên ngoài chuẩn hóa CRLF/CR thành LF. Client không được gửi system; giữ enum/schema legacy không chứng nhận writer system message đã triển khai.
 * Giới hạn 30 tin mới/phút/người dùng; retry của message đã tồn tại không tính quota. Khi vượt hạn trả 429 kèm `Retry-After` để client retry có kiểm soát.
 
 # 3\. Hành vi API đích
 
-POST message trong scope Conversation. Server kiểm tra quyền và trạng thái trong transaction, ghi message cùng idempotency key rồi trả server ID, client\_message\_id và created\_at. Không gửi khi Conversation cancelled.
+POST message trong scope Conversation. Server kiểm tra quyền và trạng thái trong transaction, ghi message cùng idempotency key rồi trả server ID, client\_message\_id và created\_at. Không tạo message mới khi Conversation cancelled; replay message cũ theo quyền đọc không reopen chat.
 
 # 4\. Tiêu chí chấp nhận
 
@@ -28,11 +28,13 @@ POST message trong scope Conversation. Server kiểm tra quyền và trạng th�
 * Outsider, sender bị đình chỉ/khóa, peer bị đình chỉ hoặc Conversation cancelled không ghi được message.
 * System message không thể được gửi bằng cách client chọn message\_type=system.
 
-# 5\. Chênh lệch/câu hỏi mở
+# 5\. Trạng thái triển khai và giới hạn (K03.14)
 
-* Migration có unique(sender\_id,client\_message\_id), nhưng chưa có endpoint/service/policy.  
-* BR-21 đã chốt response 409 và canonical payload cho message; migration/service/API vẫn chưa triển khai.
-* BR-21 chốt body 4.000 ký tự, quota 30 tin mới/phút/người dùng, 409 khi cùng key khác payload và chặn member còn active gửi khi peer bị đình chỉ. Quota cụ thể vẫn cần được cấu hình/quan sát khi triển khai; M02-F08 yêu cầu khóa account đang active cùng transaction khi đình chỉ Profile.
+* `POST /api/v1/conversations/{conversation}/messages` và action SendTextMessage đã có. Sender từ session; transaction kiểm quyền/trạng thái, canonical hóa newline và giữ unique `(sender_id,client_message_id)` trên mọi Conversation của sender.
+* Request chỉ text; body không trắng, tối đa 4.000 ký tự; không trim/Unicode-normalize. `file_ids` chỉ được bỏ qua hoặc là mảng rỗng; file/system hoặc attachment request bị 422. Canonical payload có Conversation ID, type text, body đã chuẩn hóa và file_ids rỗng.
+* Tạo mới trả 201; cùng key/canonical payload trả message cũ 200; khác payload/Conversation trả 409. Replay kiểm quyền đọc hiện tại, không reopen, không tiêu quota hoặc enqueue thêm notification, kể cả chat cancelled/peer suspended. Actor suspended bị chặn.
+* Quota đã triển khai: 30 tin mới trong cửa sổ trượt 60 giây/người gửi trên mọi Conversation; vượt hạn 429 kèm Retry-After, request thất bại không tiêu quota.
+* [K03.5](../../handover/BE-K03-K03.5-test-report.md), [K03.10](../../handover/BE-K03-K03.10-test-report.md) và [K03.13](../../handover/BE-K03-K03.13-test-report.md) có API, concurrent send/suspend và after-commit/replay/rollback evidence. Không chứng nhận UI hoặc performance/load production; K03.12 hoãn.
 
 # 6\. Nguồn
 

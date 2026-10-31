@@ -1,0 +1,6 @@
+Checked: 2026-10-30T09:36:24.945552+00:00
+Files: 300
+Mismatches: 0
+Runtime unchanged vs K03.13: 247 files
+Historical K03.13 evidence: unchanged
+Exit code: 0

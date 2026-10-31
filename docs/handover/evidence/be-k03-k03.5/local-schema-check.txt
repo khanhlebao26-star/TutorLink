@@ -1,0 +1,12 @@
+Checked: 2026-10-28 14:21:31 +07:00
+Read-only check of local development schema; no migration or data write.
+SQL: SELECT column_name, datetime_precision, EXISTS (SELECT 1 FROM migrations WHERE migration = '2026_10_28_140000_prepare_message_sending') AS k035_migration_applied, EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'messages_sender_created_id_index') AS quota_index_exists FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'messages' AND column_name IN ('created_at', 'updated_at');
+
+ column_name | datetime_precision | k035_migration_applied | quota_index_exists 
+-------------+--------------------+------------------------+--------------------
+ created_at  |                  6 | t                      | t
+ updated_at  |                  6 | t                      | t
+(2 rows)
+
+
+Exit code: 0

@@ -454,7 +454,7 @@ updated\_at — timestamptz; NULL.
 
 Khóa ghép / unique: messages: UNIQUE(sender\_id,client\_message\_id).
 
-BR-21 schema implications: inbox order and unread count derive from `(created_at,id)` and member `last_read_message_id`; report read receipts only at Conversation level. File `scan_status=clean` requires scanner approval; chat FileLink and Message commit atomically. Orphan cleanup uses pending 24h / complete-unlinked 7d; linked file retention follows owning resource.
+BR-21 schema implications (amended 29/10/2026 by [K03.1](../handover/BE-K03-K03.1-contract.md)): inbox order and unread count derive from `(created_at,id)` and member `last_read_message_id`; report read receipts only at Conversation level. Chat accepts text only and creates no attachment FileLink. File `scan_status=clean` means technical validation, not antivirus approval. Preserve historical scan-evidence columns and legacy relations; K03.7a needs no migration. CV content approval is separate and version-specific; its schema/API still requires implementation in the owning module. The new-upload target is 5,000,000 bytes/file (K03.7b technically verified on 30/10/2026; no schema migration), overriding old per-file limits below; other Workspace rules stay unchanged. Orphan cleanup remains a separate implementation target (pending 24h / complete-unlinked 7d); linked file retention follows the owning resource.
 
 # 05 · Program và lời mời
 
@@ -658,7 +658,7 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-current\_submission\_id — bigint; NULL; FK; tham chiếu task\_submissions.id; đề xuất thêm.
+current\_submission\_id — bigint; NULL; FK; tham chiếu task\_submissions.id; đã có trong migration BE-D03.
 
 ### Bảng task\_submissions
 
@@ -684,7 +684,7 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-submission\_version — integer; NOT NULL; đề xuất thêm.
+submission\_version — integer; NOT NULL; đã có trong migration BE-D03.
 
 idempotency\_key — uuid; NOT NULL; F05; khóa chống gửi trùng cùng version.
 
@@ -692,7 +692,7 @@ request\_hash — char(64); NOT NULL; SHA-256 JSON canonical RFC 8785 của `exp
 
 Khóa ghép / unique: task\_submissions: UNIQUE(task\_id,customer\_id,submission\_version); UNIQUE(task\_id,customer\_id,idempotency\_key).
 
-Mỗi lần nộp/cập nhật chủ động tạo một task\_submissions mới: content, tệp và feedback của version cũ được bảo toàn; submission\_version tăng từ 1\. tasks.current\_submission\_id chỉ tới version mới nhất của chính Task và Customer được giao. Insert, cập nhật pointer, Task state và file links thực hiện trong cùng transaction. PUT bắt buộc Idempotency-Key UUID; lưu key và SHA-256 request\_hash theo BR-20, giữ theo lịch sử submission (không hết hạn khi version còn lưu). UNIQUE(task\_id,customer\_id,idempotency\_key) giới hạn key theo người nộp và Task. Mỗi Submission tối đa 5 file, mỗi file tối đa 5 MiB; MIME PDF/JPG/PNG/DOC/DOCX. Sau khi kiểm tra quyền/assignee, cùng key \+ hash trả đúng version đã commit mà không tăng version/audit/notification; cùng key nhưng hash khác trả 409\. Key mới chỉ tạo version nếu expected\_submission\_version khớp version hiện tại; stale trả 409\. Feedback chỉ ghi cho version mới nhất và kiểm expected\_submission\_version; reviewed\_by/reviewed\_at/feedback gắn vào đúng row version.
+Mỗi lần nộp/cập nhật chủ động tạo một task\_submissions mới: content, tệp và feedback của version cũ được bảo toàn; submission\_version tăng từ 1\. tasks.current\_submission\_id chỉ tới version mới nhất của chính Task và Customer được giao. Insert, cập nhật pointer, Task state và file links thực hiện trong cùng transaction. File Task và Submission dùng purpose `task_attachment`; FileLink phân biệt `resource_type=task` và `task_submission`. PUT bắt buộc Idempotency-Key UUID; lưu key và SHA-256 request\_hash theo BR-20, giữ theo lịch sử submission (không hết hạn khi version còn lưu). UNIQUE(task\_id,customer\_id,idempotency\_key) giới hạn key theo người nộp và Task. Mỗi Submission tối đa 5 file, mỗi file tối đa 5.000.000 byte theo BR-21/K03.1; MIME PDF/JPG/PNG/DOC/DOCX. Sau khi kiểm tra quyền/assignee, cùng key \+ hash trả đúng version đã commit mà không tăng version/audit/notification; cùng key nhưng hash khác trả 409\. Key mới chỉ tạo version nếu expected\_submission\_version khớp version hiện tại; stale trả 409\. Feedback chỉ ghi cho version mới nhất và kiểm expected\_submission\_version; reviewed\_by/reviewed\_at/feedback gắn vào đúng row version.
 
 `tasks.version` theo BR-19 tăng mỗi mutation Task thành công, gồm edit/start/cancel và status change cùng Submission/feedback. PATCH/start/cancel kiểm `expected_version`; Submission/feedback giữ guard `expected_submission_version` riêng. Các thay đổi liên quan phải đồng bộ trong transaction; replay không tăng version/audit/notification.
 
@@ -744,7 +744,7 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-Progress lưu metric\_name/value/note; không thêm status. Chỉ cho `metric_name=progress_percent`, value nguyên 0–100. customer\_id phải là Customer của Program; recorded\_by là Tutor owner. Mọi PATCH kiểm `expected_version`, tăng version và ghi audit before/after; không hard-delete. `recorded_at` do server đặt; đọc/hiển thị theo Program timezone. Announcement draft/published suy ra từ published\_at; bản nháp không hiển thị với Customer. Title/body giới hạn 180/10.000 ký tự; tối đa 5 file, mỗi file tối đa 5 MiB, MIME PDF/JPG/PNG/DOC/DOCX. Chỉ thành viên phù hợp của Program được đọc nội dung và tệp workspace.
+Progress lưu metric\_name/value/note; không thêm status. Chỉ cho `metric_name=progress_percent`, value nguyên 0–100. customer\_id phải là Customer của Program; recorded\_by là Tutor owner. Mọi PATCH kiểm `expected_version`, tăng version và ghi audit before/after; không hard-delete. `recorded_at` do server đặt; đọc/hiển thị theo Program timezone. Announcement draft/published suy ra từ published\_at; bản nháp không hiển thị với Customer. Title/body giới hạn 180/10.000 ký tự; tối đa 5 file, mỗi file tối đa 5.000.000 byte theo BR-21/K03.1, MIME PDF/JPG/PNG/DOC/DOCX. Chỉ thành viên phù hợp của Program được đọc nội dung và tệp workspace.
 
 Announcement có `version` theo BR-19; PATCH Draft và publish kiểm `expected_version`. Khi published, nội dung/tệp không được sửa; đính chính bằng record mới.
 
@@ -1092,7 +1092,7 @@ batch — integer; NOT NULL.
 
 # 13 · Quy tắc liên kết và toàn vẹn
 
-## Idempotency receipts dùng chung — schema BR-23, runtime Accept Invitation
+## Idempotency receipts dùng chung — schema BR-23, runtime Accept Invitation và feedback Task
 
 ### Bảng idempotency\_receipts — migration BE-D02
 
@@ -1116,7 +1116,7 @@ created\_at — timestamptz; NOT NULL.
 
 expires\_at — timestamptz; NULL; command BR-23 có hạn 30 ngày, Fee Record theo BR-22 có thể NULL đến khi đủ điều kiện purge.
 
-UNIQUE(actor\_id,idempotency\_key). Accept Invitation ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa tích hợp bảng này. Fee Record cần tính hash/replay theo BR-22 và giữ receipt tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
+UNIQUE(actor\_id,idempotency\_key). Accept Invitation và feedback Task ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa được chứng nhận đã tích hợp bảng này. Feedback Task dùng receipt 30 ngày theo Tutor + UUID key + POST + canonical path + hash của `expected_submission_version` và `feedback` đã chuẩn hóa; replay trả response snapshot sau kiểm quyền hiện tại, không ghi lại side effect. Fee Record cần tính hash/replay theo BR-22 và giữ receipt tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
 
 ## Tham chiếu đa hình
 
@@ -1150,3 +1150,7 @@ Business Rules: [Business Rules](<../Domain Documentation/Business Rules.md>)
 
 F03 — Cột phân công Admin (thiết kế đích)  
 Các cột assignment đã được đưa vào bảng tutor\_profiles và reports ở trên. NULL assignee biểu thị chưa phân công; reviewed\_by và handled\_by tiếp tục chỉ người ra quyết định. Assignment đổi cùng audit, tăng assignment\_version; không thêm bảng lịch sử assignment riêng. Index hàng đợi theo (status, assigned\_admin\_id, submitted\_at) cho tutor\_profiles và (status, assigned\_admin\_id, created\_at) cho reports. Đây là thiết kế tài liệu, chưa phải migration đã chạy.
+
+## Realtime session registry — K03.13 (30/10/2026)
+
+Migration `2026_10_30_180000_create_realtime_sessions_table` bổ sung `realtime_sessions`: `id`, `user_id` FK User cascade delete, `session_hash` char(64) HMAC không phải session ID thô, `channel_token` char(64) ngẫu nhiên, `expires_at`, nullable `revoked_at`, `created_at`/`updated_at` timestamptz(6). Unique `(user_id,session_hash)`, unique token, index `(user_id,revoked_at,expires_at)`. Registry và database sessions dùng cùng connection. Giữ revoked tombstone để chặn request cũ tái cấp quyền; chưa có cleanup tự động. Không thay schema Conversation/Message/File hoặc xóa scan evidence lịch sử. [Contract](../handover/BE-K03-K03.1-contract.md#13-realtime) và [test/evidence](../handover/BE-K03-K03.13-test-report.md) là căn cứ cho bổ sung này; sơ đồ draw.io chưa cập nhật trong task này.

@@ -1,0 +1,13 @@
+BE-D03 PostgreSQL rollback tests — 31/10/2026
+
+Repeatable command: docker compose -f compose.testing.yml run --rm backend-test vendor/bin/pest tests/Feature/TaskWorkflowApiTest.php --filter='replays feedback from the shared receipt|rolls back submission and task state when a file link cannot be written'
+Environment: isolated PostgreSQL 16 test service from compose.testing.yml (database tutorlink_test).
+
+Result: 2 tests passed (50 assertions).
+Repeatability run: same command executed again — 2 tests passed (50 assertions); no leftover trigger/function prevented reinstall.
+
+Fault cases retained in `backend/tests/Feature/TaskWorkflowApiTest.php`:
+- A PostgreSQL trigger rejects `file_links` rows for `task_submission`. The API returns 500; `task_submissions` and submission FileLinks stay absent; Task remains `todo`, version 1, with no current Submission pointer.
+- A PostgreSQL trigger rejects the feedback `idempotency_receipts` insert. The API returns 500; the Submission remains `submitted` with no feedback, Task remains `submitted` at its prior version, and no receipt exists.
+
+Each test creates its trigger function/trigger, checks the rollback, then drops both in `finally`. The trigger DDL is test-only and uses the isolated PostgreSQL test database.

@@ -1,0 +1,57 @@
+[
+  {
+    "Service": "backend",
+    "State": "running",
+    "Health": "healthy"
+  },
+  {
+    "Service": "broadcast-worker",
+    "State": "running",
+    "Health": ""
+  },
+  {
+    "Service": "db",
+    "State": "running",
+    "Health": "healthy"
+  },
+  {
+    "Service": "frontend",
+    "State": "running",
+    "Health": ""
+  },
+  {
+    "Service": "mailpit",
+    "State": "running",
+    "Health": "healthy"
+  },
+  {
+    "Service": "outbox-worker",
+    "State": "running",
+    "Health": ""
+  },
+  {
+    "Service": "pgadmin",
+    "State": "running",
+    "Health": ""
+  },
+  {
+    "Service": "reverb",
+    "State": "running",
+    "Health": ""
+  },
+  {
+    "Service": "scheduler",
+    "State": "running",
+    "Health": ""
+  },
+  {
+    "Service": "slack-worker",
+    "State": "running",
+    "Health": ""
+  },
+  {
+    "Service": "test-db",
+    "State": "running",
+    "Health": "healthy"
+  }
+]

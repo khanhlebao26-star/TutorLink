@@ -1,0 +1,39 @@
+{
+  "head": "0bebbb574ec962dde3c02a54703c96b9a05553a4",
+  "checked_at": "2026-10-30T02:55:09.868Z",
+  "tested_state": "Current uncommitted source served by development backend/frontend. Frontend restarted after stale 2 MiB bundle was observed. No application source modified by this test run.",
+  "files": [
+    {
+      "path": "backend/app/Http/Requests/FileUploadRequest.php",
+      "sha256": "0265200b348a1d74379d87165aeaf3f2ccc77b04950e8a7c3faa85e42ad98200"
+    },
+    {
+      "path": "backend/config/file-validation.php",
+      "sha256": "c4717abd20ddc8ef3c52a5052480e402b94f67954442023059b2f0885d9c8811"
+    },
+    {
+      "path": "backend/app/Actions/Files/CompleteFile.php",
+      "sha256": "602dd1c323647f04196a4e9c3e94b0036b91b0a7e20f01664b6c61ba48c3bcdd"
+    },
+    {
+      "path": "backend/app/Models/File.php",
+      "sha256": "11dce37b9d5dda9f52d60b2402d1fe449c46f07e4979ca6dd0b444643aa80c26"
+    },
+    {
+      "path": "backend/app/Http/Resources/FileResource.php",
+      "sha256": "cba57b7c32ac4292f010a41e41c883e5be13d06111138a17fe854c6a139cbb89"
+    },
+    {
+      "path": "frontend/src/lib/data/services.ts",
+      "sha256": "6d51090d0291f944410441e26a7e1673bf92682fa1ea04d6982db18f07880a8f"
+    },
+    {
+      "path": "frontend/src/components/tutor-onboarding-form.tsx",
+      "sha256": "e234c7f13bd8ac84e14aaac6edcfbbbe58a6fc9ff8c0c2f30804c71b3f71f612"
+    },
+    {
+      "path": "outputs/be-k03/k03.7b-browser-tests/run.mjs",
+      "sha256": "27b4626b1cc061b830a2ee1ae5f86b7535bfbbeac56e8350a28af02704fba3df"
+    }
+  ]
+}

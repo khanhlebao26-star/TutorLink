@@ -1,0 +1,22 @@
+{
+    "app_env": "local",
+    "database_driver": "pgsql",
+    "session_driver": "database",
+    "session_lifetime_minutes": 120,
+    "same_session_connection": true,
+    "queue_driver": "database",
+    "broadcast_driver": "reverb",
+    "reverb_allowed_origins": [
+        "localhost",
+        "127.0.0.1"
+    ],
+    "reverb_client_events": "none",
+    "transport_options": {
+        "connect_timeout": 2,
+        "timeout": 5
+    },
+    "laravel": "v13.35.0",
+    "reverb": "v1.12.0",
+    "php": "8.3.36",
+    "export_sha256": "35e43eb29702332d723a35fcb72ad7c633dcb391dd89d34ad0e52dcf6bafae74"
+}

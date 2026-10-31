@@ -1,0 +1,90 @@
+Started: 2026-10-28 13:41:07 +07:00
+Command: docker compose -f compose.testing.yml run --rm --build -T --volume "D:/Dev/Projects/Advance Web Design/Final EM4/tutorlink-src/docs:/var/www/docs:ro" backend-test sh -c 'php artisan test --compact --filter="ReadConversationApiTest|OpenConversationApiTest|OpenConversationConcurrencyTest|MessagingSchemaTest|DatabaseSchemaTest" --display-warnings --fail-on-warning --no-ansi && php scripts/verify-openapi-routes.php'
+
+time="2026-10-28T13:41:07+07:00" level=warning msg="Found orphan containers (tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-backend-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running 
+ Image tutorlink-h01-backend-test:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 772B 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 DONE 1.8s
+
+#4 [internal] load metadata for docker.io/library/php:8.3-cli
+#4 DONE 1.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:da902a0c71f7f0f65984ed6dc8aee5596f9c90680b19ab900d947f63cedfc69c
+#6 resolve docker.io/library/php:8.3-cli@sha256:da902a0c71f7f0f65984ed6dc8aee5596f9c90680b19ab900d947f63cedfc69c 0.0s done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc
+#7 resolve docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 18.94kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 8/9] COPY . .
+#9 CACHED
+
+#10 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#10 CACHED
+
+#11 [stage-0 6/9] COPY composer.json composer.lock ./
+#11 CACHED
+
+#12 [stage-0 2/9] RUN apt-get update     && apt-get install -y --no-install-recommends git unzip libpq-dev     && docker-php-ext-install pdo_pgsql     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#13 CACHED
+
+#14 [stage-0 5/9] WORKDIR /var/www/html
+#14 CACHED
+
+#15 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#15 CACHED
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:b8ab0f8721f8f31a99de3484e3e7cb57819cbccfa8b5f7b9078e4a0b16e30f8f done
+#17 exporting config sha256:6c4f3449ead0d212c6f84432db86b4f18b6a53543678ec1d0360a7729a04056f done
+#17 exporting attestation manifest sha256:c23afa0a871a7231b2c6e4dc1c17a8d7b9ffd33f53fbe1257dd51852d4160cf1 0.0s done
+#17 exporting manifest list sha256:f35efa6e58c4072172d36214bf7d3eb90feda639e38b94cb963405c4a97abc87 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#17 DONE 0.1s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built 
+ Container tutorlink-src-test-db-1 Waiting 
+ Container tutorlink-src-test-db-1 Healthy 
+ Container tutorlink-src-backend-test-run-74ac217389f4 Creating 
+ Container tutorlink-src-backend-test-run-74ac217389f4 Created 
+
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+
+  [90mTests:[39m    [32;1m57 passed[39;22m[90m (364 assertions)[39m
+  [90mDuration:[39m [39m5.06s[39m
+
+OpenAPI route parity passed (67 operations).
+
+Finished: 2026-10-28 13:41:17 +07:00
+Exit code: 0

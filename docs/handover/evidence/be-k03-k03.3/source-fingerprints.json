@@ -1,0 +1,47 @@
+{
+  "base_head": "ddd673f10d04d3de6348987127040beb923efd84",
+  "branch": "be-k03",
+  "tested_state": "working tree, K03.3 uncommitted",
+  "files": [
+    {
+      "path": "backend/routes/api.php",
+      "sha256": "c07adea0159f94a4c377efba364fdd739b5b7ef1e5a74ca5f81e701c6807de3b"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/OpenConversation.php",
+      "sha256": "75473a2d2f0c4ca1c9e69d98602f219a38acad0c4b7148ac8a7a633eff0ba374"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ConversationController.php",
+      "sha256": "817001fe49973d65fbf7c3ec9e12d47255150737ead1c988e981447b6194ac58"
+    },
+    {
+      "path": "backend/app/Http/Requests/OpenConversationRequest.php",
+      "sha256": "e55dbb08e11b057fbdb3963f9ad7968c053effa0193717b49aff25380fdaeb44"
+    },
+    {
+      "path": "backend/app/Http/Resources/ConversationResource.php",
+      "sha256": "1815e332f0cf8bade878ea23cdac848164a3924b10889f9e743cf066b82541d0"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationApiTest.php",
+      "sha256": "3a813f24076894e6b1758eb4808204241f0b9f9e6304a65080929e2768db57b2"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationConcurrencyTest.php",
+      "sha256": "209bf8be1534beaa80e75b2408543ca053e718cd21ee3f87c594254df7e938e7"
+    },
+    {
+      "path": "backend/tests/Feature/MessagingSchemaTest.php",
+      "sha256": "59ac3ab2cef93d701215073f74c5fbfabb3151db037cdbe8aefb32f0d66988b4"
+    },
+    {
+      "path": "backend/tests/Feature/DatabaseSchemaTest.php",
+      "sha256": "b4006f661b7505e43cd0c7bb8f1ad7c4177d708b45b7d8d88e334b0d4b2c1b71"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "e93ca3a1f197e97f448b76a687f73c5f948f626a2d6b0a38c7a6d05ab37367d3"
+    }
+  ]
+}

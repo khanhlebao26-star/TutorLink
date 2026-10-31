@@ -1,0 +1,22 @@
+BE-D03 PostgreSQL backfill and RFC 8785 verification — 31/10/2026
+
+Command: docker compose -f compose.testing.yml run --build --rm backend-test vendor/bin/pest tests/Feature/TaskWorkflowApiTest.php tests/Feature/SubmissionVersioningBackfillPostgresTest.php tests/Unit/TaskSubmissionRequestHashTest.php
+Environment: isolated PostgreSQL 16 test service from compose.testing.yml (database tutorlink_test).
+
+Result: 13 tests passed (203 assertions).
+
+OpenAPI export: database migrations applied to a temporary SQLite database, then `php artisan scramble:export --no-interaction`.
+Route check: `php scripts/verify-openapi-routes.php` passed (81 operations); submission version and file ID integer bounds are present in the generated schema.
+
+Repeatable legacy migration test:
+- Backfills two representative rows: one missing Task assignee is populated from its legacy Submission; one existing assignee is preserved. Both become submission version 1 with current pointers, synthetic UUID keys, and deterministic legacy hashes. The accepted legacy row retains its status, feedback, reviewer, and review timestamp.
+- A Task/Submission assignee mismatch aborts migration; PostgreSQL transactional DDL removes the newly added columns and preserves the legacy rows.
+- The test creates and drops isolated temporary schemas and restores the original search_path. Run it again with the command above; no disposable probe script is needed.
+- Standalone repeatability run: `docker compose -f compose.testing.yml run --rm backend-test vendor/bin/pest tests/Feature/SubmissionVersioningBackfillPostgresTest.php` — 1 test passed (20 assertions).
+
+RFC 8785 JCS test vector:
+- Payload content includes quotes, slash, backslash, a C0 control character, tab/newline, U+2028/U+2029, emoji, composed é, and decomposed e + combining acute; file IDs are supplied in reverse order.
+- Expected SHA-256: `7ee712c757962f01e53c7efcfddbd6c59612cfc27db2cfa306cfd598b025945e`.
+- The HTTP workflow also verifies the stored hash for this special-Unicode payload. The vector matches ECMAScript JSON serialization for the fixed Task Submission payload shape.
+
+These tests use isolated synthetic data, not a production database copy.

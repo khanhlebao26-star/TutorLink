@@ -11,7 +11,7 @@ Cho phép đúng owner/member hoặc Admin có permission tải File private qua
 * GET /files/{id} chỉ trả metadata đã duyệt, không trả object\_key, storage path, private verification data hoặc signed URL ngoài policy.  
 * Download yêu cầu File complete, scan status clean và authorization theo owner/resource membership/purpose/visibility. Nếu object mất sau khi gắn, giữ history và trả attachment unavailable; không lộ storage path.
 * Public visibility chỉ áp dụng avatar Tutor gắn vào hồ sơ đủ điều kiện công khai theo D06/M03-F08: File complete, đúng owner/purpose `avatar`, User active/email verified, Profile approved và không suspended. Quyền tải công khai được kiểm lại khi truy cập, không trao object key hoặc URL vĩnh viễn. Avatar Customer thuộc Customer Profile riêng và chưa có đường công khai theo BR-13; verification documents luôn private.
-* Chat, Task, Submission, Announcement attachments chỉ truy cập qua đúng resource scope; report evidence cần report permission và scope.  
+* Task/Submission/Announcement chỉ truy cập theo resource scope; CV theo đúng phiên bản và policy xét duyệt. Chat không tạo attachment mới theo [K03.1 điều chỉnh 29/10](../../handover/BE-K03-K03.1-contract.md). Các điều khoản chat bên dưới chỉ áp dụng khi có dữ liệu legacy đã đối soát; không xác nhận runtime download chat đã triển khai. Report evidence cần permission/scope riêng. clean/complete không có nghĩa antivirus.
 * Admin role không tự bypass; admin.verification\_documents.download hoặc report/evidence permission được kiểm riêng.
 
 # 3\. Tiêu chí chấp nhận
@@ -25,7 +25,7 @@ Cho phép đúng owner/member hoặc Admin có permission tải File private qua
 # 4\. Implementation hiện tại và câu hỏi mở
 
 * GET metadata owner-only; download hiện cho owner hoặc reviewer có permission khi file thuộc verification\_document.  
-* Các Member/resource policies cho message/task/submission/announcement chưa được triển khai trong FileController.  
+* BE-D03 đã thêm quyền tải Task/Submission cho Tutor owner và Customer assignee trong FileController; [test tập trung](../../handover/BE-D03-issue-74-test-report.md) kiểm Tutor tải file Submission và outsider bị từ chối. Chưa chứng nhận toàn bộ quyền download, cạnh tranh membership/attach trên PostgreSQL, hoặc policy message/announcement/CV.
 * D06 đã chốt điều kiện avatar Tutor công khai; cần triển khai quyền tải và invalidation khi gate mất. Chi tiết URL hết hạn, caching và range/stream vẫn là thiết kế kỹ thuật cần hoàn thiện. Permission Admin report evidence theo BR-11 ở dưới.
 
 # 5\. Nguồn

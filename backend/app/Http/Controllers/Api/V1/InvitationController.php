@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Invitations\ResolveInvitation;
 use App\Actions\Invitations\SendInvitation;
 use App\Exceptions\ProgramActionException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\InvitationDecisionRequest;
 use App\Http\Requests\InvitationIndexRequest;
 use App\Http\Requests\SendInvitationRequest;
 use App\Http\Resources\InvitationResource;
@@ -145,6 +147,45 @@ class InvitationController extends Controller
         }
 
         return (new InvitationResource($record))->response();
+    }
+
+    /** Reject a pending, unexpired Invitation as its target Customer. */
+    #[OpenApiResponse(200, description: 'Invitation rejected; Program remains Draft without membership.', type: 'array{data:InvitationResource}')]
+    #[OpenApiResponse(403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Invitation not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Invitation is expired or terminal, or Program is no longer Draft.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'The reason or request fields are invalid.', type: self::ERROR_RESPONSE_TYPE)]
+    public function reject(InvitationDecisionRequest $request, int $invitation, ResolveInvitation $resolve): JsonResponse
+    {
+        return $this->decide($request, $invitation, 'reject', $resolve);
+    }
+
+    /** Withdraw a pending, unexpired Invitation as the Tutor owner. */
+    #[OpenApiResponse(200, description: 'Invitation cancelled; Program remains Draft without membership.', type: 'array{data:InvitationResource}')]
+    #[OpenApiResponse(403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Invitation not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Invitation is expired or terminal, or Program is no longer Draft.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'The reason or request fields are invalid.', type: self::ERROR_RESPONSE_TYPE)]
+    public function cancel(InvitationDecisionRequest $request, int $invitation, ResolveInvitation $resolve): JsonResponse
+    {
+        return $this->decide($request, $invitation, 'cancel', $resolve);
+    }
+
+    private function decide(InvitationDecisionRequest $request, int $invitation, string $action, ResolveInvitation $resolve): JsonResponse
+    {
+        $actor = $request->user();
+
+        if (! $actor instanceof User) {
+            return $this->error($request, 401, 'unauthenticated', 'Authentication is required.');
+        }
+
+        try {
+            $record = $resolve->execute($actor, $invitation, $action, $request->validated('reason'), (string) $request->attributes->get('request_id'));
+        } catch (ProgramActionException $exception) {
+            return $this->error($request, $exception->httpStatus, $exception->errorCode, $exception->getMessage(), $exception->errors);
+        }
+
+        return (new InvitationResource((object) $record))->response();
     }
 
     /** @param array<string, mixed> $errors */

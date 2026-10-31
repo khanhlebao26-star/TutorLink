@@ -1,0 +1,6 @@
+Started: 2026-10-30T11:16:12.9811022+07:00
+Scramble export: migrated SQLite :memory: in the same process; no development PostgreSQL changes.
+Command: Artisan migrate --force --no-interaction, then scramble:export --path=/tmp/tutorlink-k039-openapi.json --no-interaction
+Generated artifact unchanged: True
+SHA256: FDF5C990C182ED302738225B5666BD323F82A142E26BAC0544409F179E1A050D
+Exit code: 0

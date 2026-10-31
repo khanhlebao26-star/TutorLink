@@ -1,0 +1,65 @@
+{
+  "checked_at": "2026-10-30T13:51:16.9610905+07:00",
+  "base_head": "f61deafd1e042fff19f7ab3a6bdc57eb17bea43d",
+  "branch": "be-k03",
+  "source": "K03.9 committed at f61deaf plus updated ConversationLifecycleApiTest.php in working tree; Pint ran before build; targeted and full backend passed on that source.",
+  "api_evidence": "Original Scramble/parity/Redocly logs retained after matching previous API/artifact/Catalog hashes; see api-evidence-reuse.txt.",
+  "files": [
+    {
+      "path": "backend/app/Actions/Messaging/SyncConversationLifecycle.php",
+      "sha256": "9a92744096930bf07a85577f794a60ba765847fd194fa74babc086553da170de"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/OpenConversation.php",
+      "sha256": "75473a2d2f0c4ca1c9e69d98602f219a38acad0c4b7148ac8a7a633eff0ba374"
+    },
+    {
+      "path": "backend/app/Actions/Programs/TransitionProgram.php",
+      "sha256": "55bc6fa52f2336f0252cc93426cd81b46bbcffeb93d2b8ba650055177a89b66e"
+    },
+    {
+      "path": "backend/app/Actions/Programs/UpdateProgramDraft.php",
+      "sha256": "251dcc58883937573ff99bb08064239969d5a74c233ccabd743a4dec9990fc62"
+    },
+    {
+      "path": "backend/app/Actions/Invitations/SendInvitation.php",
+      "sha256": "70ca2dd8e22b8eb037f69a6b16d626438312ef991a121cc930deb6d4c9bf0e7c"
+    },
+    {
+      "path": "backend/app/Actions/Invitations/AcceptInvitation.php",
+      "sha256": "18d664a9e0932ca8f058a8c2691b6b916b256c2c550293db791f238d384c5462"
+    },
+    {
+      "path": "backend/app/Support/InvitationTransitionWriter.php",
+      "sha256": "344683474b50a087c698266429edd6456dd50e42ce2ca331512f480c3dd65fd0"
+    },
+    {
+      "path": "backend/tests/Feature/ConversationLifecycleApiTest.php",
+      "sha256": "e232e39680458c82e63c6e93d6c0cdbc0992bb4ed1e35ff44bc699f74378ceee"
+    },
+    {
+      "path": "backend/tests/Feature/InvitationAcceptConcurrencyTest.php",
+      "sha256": "db18b14f64f8ff96142106c574ed670bd6932f002e27bfdd9b6053a1269624bd"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "fdf5c990c182ed302738225b5666bd323f82a142e26bac0544409f179e1a050d"
+    },
+    {
+      "path": "docs/Architecture & Technical Design/API Route Catalog.md",
+      "sha256": "c2255da2d6f2e511325d6eb03f7fd573cb9bac3e5e04b1c94f5d2bf4ff466ad3"
+    },
+    {
+      "path": "docs/handover/BE-K03-roadmap.md",
+      "sha256": "3a041b74d70a479000678ebcf14cee4bbf4c43edf4718de1d6043f3315f67465"
+    },
+    {
+      "path": "docs/handover/BE-K03-K03.9-test-report.md",
+      "sha256": "f05af74aac94f8c454849124114c3a242b468657704768128f0fc14f14b7c338"
+    },
+    {
+      "path": "docs/handover/BE-K03-K03.9-issue-update.md",
+      "sha256": "d12632bb3e18147201fe074ef484dc02fe0b31553082ac0ef4f355bbf6a22208"
+    }
+  ]
+}

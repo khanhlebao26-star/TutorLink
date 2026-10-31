@@ -1,0 +1,31 @@
+Checked: 2026-10-30T10:37:12.1833483+07:00
+Source-only frontend audit; not an interactive chat E2E test.
+Upload references:
+frontend/src\lib\data\services.ts:229:export async function uploadFile(file: File, purpose: FilePurpose): Promise<FileRecord> {
+frontend/src\components\tutor-onboarding-form.tsx:12:  uploadFile,
+frontend/src\components\tutor-onboarding-form.tsx:228:      uploaded = await uploadFile(file, purpose);
+frontend/src\components\tutor-onboarding-form.tsx:444:          type="file"
+Upload search exit: 0
+Chat/API references:
+Chat search exit: 1 (1 means no matches)
+Current page files:
+frontend/src/app\admin\page.tsx
+frontend/src/app\page.tsx
+frontend/src/app\auth\forgot-password\page.tsx
+frontend/src/app\auth\verify-email\page.tsx
+frontend/src/app\auth\register\page.tsx
+frontend/src/app\auth\reset-password\page.tsx
+frontend/src/app\auth\login\page.tsx
+frontend/src/app\tutors\[slug]\page.tsx
+frontend/src/app\tutors\[slug]\reviews\page.tsx
+frontend/src/app\marketplace\[slug]\page.tsx
+frontend/src/app\marketplace\page.tsx
+frontend/src/app\me\listings\page.tsx
+frontend/src/app\me\availability\page.tsx
+frontend/src/app\me\listings\new\page.tsx
+frontend/src/app\profile\page.tsx
+frontend/src/app\settings\page.tsx
+frontend/src/app\become-a-tutor\page.tsx
+frontend/src/app\me\listings\[id]\page.tsx
+frontend/src/app\me\listings\[id]\edit\page.tsx
+Observed upload UI belongs to Tutor onboarding; no Conversation page/component/API client found. Keep profile uploads unchanged. Future chat UI needs its own E2E verification.

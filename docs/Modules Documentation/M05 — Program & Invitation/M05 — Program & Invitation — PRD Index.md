@@ -23,12 +23,13 @@ Tạo thỏa thuận riêng giữa Tutor và một Customer, gửi Invitation c�
 * Program: draft → active/paused/completed/cancelled theo lifecycle; terminal readonly; complete không tự hoàn thành Task.
 * BR-18: offer Draft version tăng theo edit, `expected_version` bảo vệ PATCH/send; pending khóa Draft. Expiry UTC chặt tại `expires_at`; Draft cancel thu hồi Invitation pending nguyên tử; Program Active/Paused chỉ cancel sau khi xử lý Session/Task mở. Invitation cũ không accept trong lúc source Listing hold, nhưng có thể accept sau khi gỡ hold trước expiry.
 
-# Implementation gaps
+# Runtime và giới hạn kiểm chứng — BE-H03, 31/10/2026
 
-* B1 Program create/list/detail/update và B2 send/read Invitation, Program lifecycle, Accept đã đăng ký. Public reject/cancel Invitation API, expiry worker/scheduler và moderation hold writer chưa được triển khai.
-* `ProgramApiTest`, `InvitationAcceptTest` và `NotificationOutboxWriterTest` đã chạy cùng nhau: 33 test, 169 assertion pass trên môi trường test hiện tại. Chưa có bằng chứng kiểm thử cạnh tranh PostgreSQL cho accept-vs-expire/cancel/suspend/hold hoặc complete/cancel-vs-child-write.
-
-Kiểm tra trạng thái repository ngày 27/10/2026: B1 và Accept có route, controller/action, request/resource và feature test trong backend. Việc route được đăng ký không xác nhận các luồng Invitation/lifecycle còn lại hoặc kiểm thử concurrency PostgreSQL đã hoàn tất.
+* B1/B2 và Accept có sẵn được kế thừa; BE-H03 đăng ký hai API reject/cancel Invitation và scheduler `invitations:expire` mỗi phút. Quyết định giữ Program Draft, snapshot và lịch sử; không tạo membership. Reason hiện tùy chọn/null, tối đa 2.000 ký tự và lưu audit; việc bắt buộc nhập chưa được Product chốt.
+* PostgreSQL tests bao phủ double accept, accept-vs-reject/cancel/expiry/suspend, worker lặp, rollback khi outbox lỗi và complete-vs-create-Task theo cả hai thứ tự. Luồng HTTP accept → Task → Paused → nộp/sửa/feedback → complete giữ membership và Submission history.
+* Complete/cancel trả `errors.blockers.sessions/tasks`; Task todo/in_progress/submitted chặn, completed/cancelled cho phép. Program.version vẫn là version offer Draft; lifecycle không tăng version.
+* Session HTTP API và Listing moderation writer vẫn ngoài phạm vi hiện tại; không suy rộng race test Task sang writer Session hoặc chứng nhận race moderation từ một ca hold tuần tự. Scheduler/outbox service cần được bật khi triển khai; không có deployment/production evidence trong lượt này.
+* [Báo cáo, lệnh tái lập và evidence BE-H03](../../handover/BE-H03-issue-75-test-report.md). OpenAPI hiện có 83 operations trên toàn backend; route registration không tự chứng minh toàn bộ target behavior.
 
 # Nguồn chuẩn
 

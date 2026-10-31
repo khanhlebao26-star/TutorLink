@@ -1,0 +1,25 @@
+Checked: 2026-10-30T14:57:03.7536694+07:00
+Base HEAD: 365d5b02a3c63d1cea96f677091c2044631c2e14
+Command: git -c core.quotepath=false status --short
+ M backend/app/Actions/Messaging/SendTextMessage.php
+ M backend/app/Providers/AppServiceProvider.php
+ M backend/composer.json
+ M backend/composer.lock
+ M backend/config/cors.php
+ M backend/routes/web.php
+ M docker-compose.yml
+ M docs/AGENTS.md
+ M "docs/Architecture & Technical Design/API Route Catalog.md"
+ M docs/README.md
+ M docs/api/README.md
+ M docs/handover/BE-K03-roadmap.md
+?? backend/app/Events/
+?? backend/app/Http/Controllers/BroadcastAuthController.php
+?? backend/app/Http/Requests/ConversationBroadcastAuthRequest.php
+?? backend/config/broadcasting.php
+?? backend/config/reverb.php
+?? backend/routes/channels.php
+?? backend/tests/Feature/ConversationBroadcastAuthTest.php
+?? backend/tests/Feature/MessageBroadcastTest.php
+?? docs/handover/BE-K03-K03.11-test-report.md
+?? docs/handover/evidence/be-k03-k03.11/

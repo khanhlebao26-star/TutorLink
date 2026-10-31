@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-10-30T09:36:24.945552+00:00",
+  "code_commit": "8e7cdaf674f7c2a8927a243eac86a5ce1bf0f004",
+  "scope": "documentation/evidence only; accepted three-group handover scope",
+  "runtime_files_matching_k0313": 247,
+  "runtime_mismatches": [],
+  "historical_k0313_evidence_changed": false,
+  "historical_documentation_changed_since_k0313": [
+    "docs/Architecture & Technical Design/API Route Catalog.md",
+    "docs/Domain Documentation/Business Rules.md",
+    "docs/Modules Documentation/M04 — Messaging/M04 — Messaging — PRD Index.md",
+    "docs/Modules Documentation/M04 — Messaging/M04-F03 PRD — Đọc lịch sử tin nhắn và đồng bộ.md",
+    "docs/README.md",
+    "docs/Workflow/WF03 Chat và tệp đính kèm.md",
+    "docs/handover/BE-K03-K03.1-contract.md",
+    "docs/handover/BE-K03-roadmap.md"
+  ],
+  "openapi_unchanged": true,
+  "openapi_sha256": "35e43eb29702332d723a35fcb72ad7c633dcb391dd89d34ad0e52dcf6bafae74",
+  "openapi_operations": 70,
+  "conversation_operations_verified": 7,
+  "broadcast_auth_outside_openapi": true,
+  "parity_exit": 0,
+  "lint_exit": 0,
+  "lint_warnings": 43,
+  "diff_check_exit": 0,
+  "reused_test_evidence": {
+    "targeted": {
+      "passed": 55,
+      "assertions": 528
+    },
+    "full_backend": {
+      "passed": 461,
+      "assertions": 3004
+    },
+    "live_probe_cases_passed": 12,
+    "executed_again_in_k0314": false
+  },
+  "local_references_checked": 247,
+  "local_reference_errors": [],
+  "review_sent": false,
+  "publication_executed": false
+}

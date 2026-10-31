@@ -1,0 +1,64 @@
+{
+  "base_head": "97748f5a561a0ee6a6934be511cc2365df884135",
+  "branch": "be-k03",
+  "tested_state": "Working tree; K03.4 changes uncommitted",
+  "checked_at": "2026-10-28 13:43:56 +07:00",
+  "files": [
+    {
+      "path": "backend/app/Actions/Messaging/ReadConversations.php",
+      "sha256": "005575eea92ec8e9eabf4457be8089f5b71d3907eb75233e52cc1d3569a03d60"
+    },
+    {
+      "path": "backend/app/Support/MessagingCursor.php",
+      "sha256": "74b8cc2110b12124471bdd10cae8137af4c3736bb0422b7bfcae3d5cbc828bcc"
+    },
+    {
+      "path": "backend/app/Http/Resources/ConversationReadResource.php",
+      "sha256": "01919b7457c9b7730d0d13f8218f466f95c9f7a826124b7bc121ba4abb0b0eff"
+    },
+    {
+      "path": "backend/app/Http/Resources/MessageResource.php",
+      "sha256": "d298c2e41f581577100e60a9b8f45846f2bf0c92f89e2dca8fe81566f922fcfb"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/ConversationController.php",
+      "sha256": "e67d8c3062bce4f821c68cdf4ba43de7981aa2f0cb2002ea19fc66a69a33eebb"
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureActiveApiActor.php",
+      "sha256": "19d3c60299f20fa8564a8708c17f957eb951e96faec641d1523475b853d4b535"
+    },
+    {
+      "path": "backend/routes/api.php",
+      "sha256": "448dc06ff2fc6ae143632cf5f0679680cec0b928bda351b7be1de32ff767df7d"
+    },
+    {
+      "path": "backend/tests/Feature/ReadConversationApiTest.php",
+      "sha256": "4b41dabc61a33cf7a220c57d57345372227e23f6d1729e9d2a2b789b013904bc"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationApiTest.php",
+      "sha256": "3a813f24076894e6b1758eb4808204241f0b9f9e6304a65080929e2768db57b2"
+    },
+    {
+      "path": "backend/tests/Feature/OpenConversationConcurrencyTest.php",
+      "sha256": "209bf8be1534beaa80e75b2408543ca053e718cd21ee3f87c594254df7e938e7"
+    },
+    {
+      "path": "backend/tests/Feature/MessagingSchemaTest.php",
+      "sha256": "59ac3ab2cef93d701215073f74c5fbfabb3151db037cdbe8aefb32f0d66988b4"
+    },
+    {
+      "path": "backend/tests/Feature/DatabaseSchemaTest.php",
+      "sha256": "b4006f661b7505e43cd0c7bb8f1ad7c4177d708b45b7d8d88e334b0d4b2c1b71"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "0f83f73a2259b373ef25b1c64c6087884f1bf9254ebfbacf97ba5b681bcc2c2a"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "b08c2cb8603a738d80e417c691a8003d2710e36a9b260b493ac1a9eaad04a29b"
+    }
+  ]
+}

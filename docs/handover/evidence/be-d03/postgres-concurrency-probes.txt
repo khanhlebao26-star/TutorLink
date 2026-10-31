@@ -1,0 +1,10 @@
+BE-D03 PostgreSQL concurrency probes — 31/10/2026
+
+Environment: compose.testing.yml, postgres:16-alpine, database tutorlink_test, APP_ENV=testing; TestDatabaseGuard passed. The database was the isolated test service, not the TutorLink app database. Both workers ran in separate PHP processes and waited on the same locked Program row; pg_blocking_pids confirmed the database lock wait before the parent transaction committed.
+
+Observed results:
+- Two submissions with expected_submission_version=1 and different keys/payloads: [201, 409]. Exactly one version 2 was created and tasks.current_submission_id pointed to it.
+- Two simultaneous retries with the same key and payload: [201, 200], same Submission ID, no duplicate version.
+- Concurrent resubmit and Tutor review for the current version: one operation committed; the competing request returned 409. Final Task/Submission state matched the winning operation and no mixed state remained.
+
+Probe script was temporary and removed after the run; this file records the observed PostgreSQL results. The persistent Task API tests separately cover the sequential HTTP cases.

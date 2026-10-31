@@ -1,0 +1,114 @@
+time="2026-10-28T11:36:53+07:00" level=warning msg="Found orphan containers (tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-backend-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Image tutorlink-h01-backend-test:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 772B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/php:8.3-cli
+#4 DONE 3.5s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 DONE 3.5s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 FROM docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc
+#6 resolve docker.io/library/composer:2@sha256:b6dcd72ca98fa19d0e5b8476de179859704891fad06dd9e0b96833d4c430a5fc 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:da902a0c71f7f0f65984ed6dc8aee5596f9c90680b19ab900d947f63cedfc69c
+#7 resolve docker.io/library/php:8.3-cli@sha256:da902a0c71f7f0f65984ed6dc8aee5596f9c90680b19ab900d947f63cedfc69c 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 31.84kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#9 CACHED
+
+#10 [stage-0 5/9] WORKDIR /var/www/html
+#10 CACHED
+
+#11 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#11 CACHED
+
+#12 [stage-0 6/9] COPY composer.json composer.lock ./
+#12 CACHED
+
+#13 [stage-0 2/9] RUN apt-get update     && apt-get install -y --no-install-recommends git unzip libpq-dev     && docker-php-ext-install pdo_pgsql     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#14 CACHED
+
+#15 [stage-0 8/9] COPY . .
+#15 DONE 0.1s
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 DONE 0.3s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 0.2s done
+#17 exporting manifest sha256:af0d9fb0742aa17373680ef69fb6ee9d67aa736d5a947d33ca9751a99f1e7955 0.0s done
+#17 exporting config sha256:df31433885160ccee9b7ade7fe2520a9a53382fc77cdb7df41239fdb63fbbbc9 0.0s done
+#17 exporting attestation manifest sha256:9c7e9ed9b466efaf08adaac8dc75067864fad933ebc8ac566ae148afe1081998 0.0s done
+#17 exporting manifest list sha256:5c258d2321da3d41328df697c90e461ead280aa2b21b6b7f23db32734bddc0e4 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local 0.3s done
+#17 DONE 0.6s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built 
+ Container tutorlink-src-backend-test-run-ef0edc39749c Creating 
+ Container tutorlink-src-backend-test-run-ef0edc39749c Created 
+
+   INFO  Preparing database.  
+
+  Creating migration table ....................................... 8.30ms DONE
+
+   INFO  Running migrations.  
+
+  0001_01_01_000000_create_users_table ........................... 2.75ms DONE
+  0001_01_01_000001_create_cache_table ........................... 1.01ms DONE
+  0001_01_01_000002_create_jobs_table ............................ 1.82ms DONE
+  2026_10_06_155651_create_personal_access_tokens_table .......... 0.64ms DONE
+  2026_10_07_000050_create_sessions_table ........................ 0.14ms DONE
+  2026_10_07_000100_extend_users_and_create_files_table .......... 4.94ms DONE
+  2026_10_07_000200_create_identity_and_catalog_tables ........... 9.79ms DONE
+  2026_10_07_000300_create_messaging_tables ...................... 3.96ms DONE
+  2026_10_07_000400_create_program_and_learning_tables ........... 4.55ms DONE
+  2026_10_07_000500_create_operations_and_trust_tables ........... 3.43ms DONE
+  2026_10_07_000600_add_purpose_to_files_table ................... 0.70ms DONE
+  2026_10_07_000700_add_admin_approval_fields .................... 2.37ms DONE
+  2026_10_07_000700_add_tutor_onboarding_file_links .............. 4.06ms DONE
+  2026_10_12_000800_align_identity_status_constraints ............ 0.06ms DONE
+  2026_10_13_162057_add_public_slug_to_tutor_profiles_table ...... 1.07ms DONE
+  2026_10_20_075315_align_user_and_tutor_profile_statuses ........ 1.99ms DONE
+  2026_10_20_101959_add_two_factor_columns_to_users_table ........ 1.82ms DONE
+  2026_10_20_102000_create_passkeys_table ........................ 6.96ms DONE
+  2026_10_22_000000_align_program_schema_with_domain_design ...... 4.97ms DONE
+  2026_10_22_073014_add_admin_assignment_columns_to_tutor_profiles_and_reports  13.71ms DONE
+  2026_10_22_073015_create_notification_outbox_and_add_event_key_to_notifications  3.93ms DONE
+  2026_10_22_073016_add_submission_versioning_and_idempotency .... 8.86ms DONE
+  2026_10_22_080000_enforce_utc_timestamps_and_vnd_currency ...... 0.06ms DONE
+  2026_10_25_000000_preserve_outbox_timestamp_precision .......... 2.95ms DONE
+  2026_10_26_212524_add_invitation_acceptance_support_tables ..... 1.94ms DONE
+  2026_10_27_074546_add_h02_approval_support ..................... 2.71ms DONE
+  2026_10_28_034616_align_messaging_contract ..................... 4.56ms DONE
+
+OpenAPI document exported to ../docs/api/openapi.json.
+OpenAPI route parity passed (64 operations).
+Export/parity exit code: 0

@@ -1,0 +1,4 @@
+Started: 2026-10-29T16:14:08.1969132+07:00
+Scramble export from current backend source; migrated SQLite :memory: in the same PHP process; no development PostgreSQL changes.
+Container artifact: /tmp/tutorlink-k037a-openapi.json; copied stdout to docs/api/openapi.json.
+Exit code: 0

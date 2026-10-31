@@ -1,0 +1,5 @@
+
+  * * * * *  php artisan invitations:expire .... Next Due: 30 seconds from now
+  * * * * *  php artisan outbox:monitor ........ Next Due: 30 seconds from now
+  0 2 * * *  php artisan outbox:purge --execute='1'  Next Due: 23 hours from now
+

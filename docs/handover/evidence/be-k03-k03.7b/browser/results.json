@@ -1,0 +1,591 @@
+{
+  "started_at": "2026-10-30T02:54:40.498Z",
+  "checks": [
+    {
+      "name": "CSRF bootstrap",
+      "passed": true
+    },
+    {
+      "name": "Create isolated local test tutor",
+      "passed": true,
+      "details": 201
+    },
+    {
+      "name": "Local Mailpit verification received",
+      "passed": true
+    },
+    {
+      "name": "Verification link stays on local frontend",
+      "passed": true
+    },
+    {
+      "name": "Browser session login",
+      "passed": true
+    },
+    {
+      "name": "Active specialization available",
+      "passed": true
+    },
+    {
+      "name": "Create editable draft for local test",
+      "passed": true,
+      "details": 201
+    },
+    {
+      "name": "Browser serves current 5 MB label after frontend restart",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 4999999: upload/complete/attach",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 4999999: exact bytes and no fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 4999999: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 5000000: upload/complete/attach",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 5000000: exact bytes and no fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 5000000: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 5000001: rejected before upload",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 5000001: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 0: rejected before upload",
+      "passed": true
+    },
+    {
+      "name": "UI avatar 0: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 4999999: upload/complete/attach",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 4999999: exact bytes and no fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 4999999: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 5000000: upload/complete/attach",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 5000000: exact bytes and no fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 5000000: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 5000001: rejected before upload",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 5000001: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 0: rejected before upload",
+      "passed": true
+    },
+    {
+      "name": "UI verification_document 0: no antivirus-success label",
+      "passed": true
+    },
+    {
+      "name": "API avatar 4999999: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API avatar 4999999: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API avatar 4999999: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API avatar 4999999: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API avatar 5000000: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API avatar 5000000: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API avatar 5000000: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API avatar 5000000: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API avatar 5000001: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    },
+    {
+      "name": "API avatar 0: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    },
+    {
+      "name": "API verification_document 4999999: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API verification_document 4999999: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API verification_document 4999999: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API verification_document 4999999: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API verification_document 5000000: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API verification_document 5000000: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API verification_document 5000000: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API verification_document 5000000: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API verification_document 5000001: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    },
+    {
+      "name": "API verification_document 0: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    },
+    {
+      "name": "API task_attachment 4999999: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API task_attachment 4999999: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API task_attachment 4999999: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API task_attachment 4999999: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API task_attachment 5000000: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API task_attachment 5000000: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API task_attachment 5000000: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API task_attachment 5000000: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API task_attachment 5000001: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    },
+    {
+      "name": "API task_attachment 0: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    },
+    {
+      "name": "API profile_document 4999999: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API profile_document 4999999: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API profile_document 4999999: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API profile_document 4999999: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API profile_document 5000000: accepts exact boundary",
+      "passed": true,
+      "details": {
+        "status": 201
+      }
+    },
+    {
+      "name": "API profile_document 5000000: complete without fabricated scan",
+      "passed": true
+    },
+    {
+      "name": "API profile_document 5000000: owner downloads same bytes",
+      "passed": true,
+      "details": {
+        "status": 200
+      }
+    },
+    {
+      "name": "API profile_document 5000000: cleanup unlinked fixture",
+      "passed": true
+    },
+    {
+      "name": "API profile_document 5000001: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    },
+    {
+      "name": "API profile_document 0: rejects direct multipart",
+      "passed": true,
+      "details": {
+        "status": 422
+      }
+    }
+  ],
+  "ui": [
+    {
+      "purpose": "avatar",
+      "size": 4999999,
+      "upload": 201,
+      "complete": 200,
+      "attachment": 200,
+      "file_id": 20,
+      "antivirus_scanned": false,
+      "scanned_at": null
+    },
+    {
+      "purpose": "avatar",
+      "size": 5000000,
+      "upload": 201,
+      "complete": 200,
+      "attachment": 200,
+      "file_id": 21,
+      "antivirus_scanned": false,
+      "scanned_at": null
+    },
+    {
+      "purpose": "avatar",
+      "size": 5000001,
+      "blocked_in_browser": true,
+      "error": "Ảnh đại diện phải là JPG hoặc PNG, không rỗng và tối đa 5 MB (5.000.000 byte)."
+    },
+    {
+      "purpose": "avatar",
+      "size": 0,
+      "blocked_in_browser": true,
+      "error": "Ảnh đại diện phải là JPG hoặc PNG, không rỗng và tối đa 5 MB (5.000.000 byte)."
+    },
+    {
+      "purpose": "verification_document",
+      "size": 4999999,
+      "upload": 201,
+      "complete": 200,
+      "attachment": 201,
+      "file_id": 22,
+      "antivirus_scanned": false,
+      "scanned_at": null
+    },
+    {
+      "purpose": "verification_document",
+      "size": 5000000,
+      "upload": 201,
+      "complete": 200,
+      "attachment": 201,
+      "file_id": 23,
+      "antivirus_scanned": false,
+      "scanned_at": null
+    },
+    {
+      "purpose": "verification_document",
+      "size": 5000001,
+      "blocked_in_browser": true,
+      "error": "Tài liệu phải là PDF, JPG, PNG, DOC hoặc DOCX, không rỗng và tối đa 5 MB (5.000.000 byte)."
+    },
+    {
+      "purpose": "verification_document",
+      "size": 0,
+      "blocked_in_browser": true,
+      "error": "Tài liệu phải là PDF, JPG, PNG, DOC hoặc DOCX, không rỗng và tối đa 5 MB (5.000.000 byte)."
+    }
+  ],
+  "api": [
+    {
+      "purpose": "avatar",
+      "size": 4999999,
+      "upload": 201,
+      "file_id": 24,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "avatar",
+      "size": 5000000,
+      "upload": 201,
+      "file_id": 25,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "avatar",
+      "size": 5000001,
+      "upload": 422
+    },
+    {
+      "purpose": "avatar",
+      "size": 0,
+      "upload": 422
+    },
+    {
+      "purpose": "verification_document",
+      "size": 4999999,
+      "upload": 201,
+      "file_id": 26,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "verification_document",
+      "size": 5000000,
+      "upload": 201,
+      "file_id": 27,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "verification_document",
+      "size": 5000001,
+      "upload": 422
+    },
+    {
+      "purpose": "verification_document",
+      "size": 0,
+      "upload": 422
+    },
+    {
+      "purpose": "task_attachment",
+      "size": 4999999,
+      "upload": 201,
+      "file_id": 28,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "task_attachment",
+      "size": 5000000,
+      "upload": 201,
+      "file_id": 29,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "task_attachment",
+      "size": 5000001,
+      "upload": 422
+    },
+    {
+      "purpose": "task_attachment",
+      "size": 0,
+      "upload": 422
+    },
+    {
+      "purpose": "profile_document",
+      "size": 4999999,
+      "upload": 201,
+      "file_id": 30,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "profile_document",
+      "size": 5000000,
+      "upload": 201,
+      "file_id": 31,
+      "complete": 200,
+      "antivirus_scanned": false,
+      "scanned_at": null,
+      "download": 200,
+      "download_matches": true
+    },
+    {
+      "purpose": "profile_document",
+      "size": 5000001,
+      "upload": 422
+    },
+    {
+      "purpose": "profile_document",
+      "size": 0,
+      "upload": 422
+    }
+  ],
+  "screenshots": [
+    "ui-avatar-4999999.png",
+    "ui-avatar-5000000.png",
+    "ui-avatar-5000001.png",
+    "ui-avatar-0.png",
+    "ui-verification_document-4999999.png",
+    "ui-verification_document-5000000.png",
+    "ui-verification_document-5000001.png",
+    "ui-verification_document-0.png"
+  ],
+  "created_file_ids": [
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "cleaned_file_ids": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "test_user_id": 67,
+  "status": "PASS",
+  "finished_at": "2026-10-30T02:55:09.868Z",
+  "summary": {
+    "passed": 68,
+    "failed": 0,
+    "ui_cases": 8,
+    "api_cases": 16
+  },
+  "fixture_note": "Dedicated synthetic local tutor and linked UI uploads remain as test evidence; direct API uploads were removed after successful checks. No personal account used. Credentials and verification URLs are not recorded."
+}

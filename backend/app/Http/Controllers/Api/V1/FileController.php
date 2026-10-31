@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Files\CompleteFile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FileLinkRequest;
 use App\Http\Requests\FileUploadRequest;
@@ -10,7 +11,9 @@ use App\Models\File;
 use App\Models\TutorProfile;
 use App\Models\VerificationDocument;
 use App\Policies\TutorProfilePolicy;
+use App\Support\ApiErrorResponse;
 use App\Support\TutorProfileWorkflow;
+use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +31,7 @@ class FileController extends Controller
         return new FileResource($file);
     }
 
+    /** Upload a private file for technical validation. */
     public function store(FileUploadRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -56,28 +60,55 @@ class FileController extends Controller
         return (new FileResource($file))->response()->setStatusCode(201);
     }
 
-    public function complete(Request $request, File $file): FileResource|JsonResponse
-    {
-        return DB::transaction(function () use ($request, $file): FileResource|JsonResponse {
-            $file = File::lockForUpdate()->findOrFail($file->id);
-            if ($file->owner_id !== $request->user()->id) {
-                return response()->json(['message' => 'Forbidden.'], 403);
+    /** Complete a private file after technical validation; no antivirus scan is performed. */
+    #[OpenApiResponse(200, description: 'File passed technical validation. Complete does not imply an antivirus scan.', type: 'array{data:FileResource}')]
+    #[OpenApiResponse(403, description: 'Actor is inactive or does not own the file; legacy account middleware may return message only.', type: 'array{message:string,code?:string,request_id?:string,errors?:object}')]
+    #[OpenApiResponse(422, description: 'File rejected by metadata or archive policy; rejection is persisted.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
+    #[OpenApiResponse(503, description: 'Storage or technical validation unavailable; file remains pending. Retry-After: 10.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
+    public function complete(
+        Request $request,
+        File $file,
+        CompleteFile $complete,
+    ): JsonResponse {
+        $requestId = (string) (
+            $request->attributes->get('request_id') ?: Str::uuid()
+        );
+
+        $result = $complete->execute(
+            $request->user(),
+            $file->id,
+            $requestId,
+        );
+
+        if ($result['status'] !== 200) {
+            $message = match ($result['code']) {
+                'file_storage_unavailable' => 'The uploaded object cannot be read. Retry later.',
+                'file_validation_unavailable' => 'File validation could not be completed. Retry later.',
+
+                default => 'The file was rejected. Upload a new valid file.',
+            };
+
+            $response = ApiErrorResponse::make(
+                $result['status'],
+                $result['code'],
+                $message,
+                $requestId,
+            );
+
+            if ($result['status'] === 503) {
+                $response->headers->set('Retry-After', '10');
             }
 
-            abort_unless(Storage::disk($file->disk)->exists($file->object_key), 409, 'Uploaded file is missing.');
-            abort_if($file->scan_status === 'rejected', 409, 'Rejected files cannot be completed.');
-            $disk = Storage::disk($file->disk);
-            abort_unless(
-                $disk->size($file->object_key) === (int) $file->size_bytes
-                && $disk->mimeType($file->object_key) === $file->mime_type
-                && hash_equals($file->checksum_sha256 ?? '', hash('sha256', $disk->get($file->object_key))),
-                409,
-                'Uploaded file does not match its metadata.'
+            return $response->header(
+                'Cache-Control',
+                'private, no-store',
             );
-            $file->update(['scan_status' => 'clean']);
+        }
 
-            return new FileResource($file->refresh());
-        });
+        return (new FileResource($result['file']))
+            ->response()
+            ->header('X-Request-ID', $requestId)
+            ->header('Cache-Control', 'private, no-store');
     }
 
     public function link(FileLinkRequest $request, File $file): JsonResponse
@@ -128,13 +159,52 @@ class FileController extends Controller
     {
         return DB::transaction(function () use ($request, $file) {
             $isOwner = $file->owner_id === $request->user()->id;
+            if (! $isOwner && $file->purpose === 'task_attachment' && $file->visibility === 'private') {
+                $taskLink = DB::table('file_links')
+                    ->where('file_id', $file->id)
+                    ->whereIn('resource_type', ['task', 'task_submission'])
+                    ->where('purpose', 'task_attachment')
+                    ->get()
+                    ->first(function ($link) use ($request) {
+                        $taskId = $link->resource_type === 'task'
+                            ? $link->resource_id
+                            : DB::table('task_submissions')->where('id', $link->resource_id)->value('task_id');
+                        $task = $taskId ? DB::table('tasks')->find($taskId) : null;
+                        if (! $task) {
+                            return false;
+                        }
+                        $program = DB::table('programs')->find($task->program_id);
+                        if (! $program) {
+                            return false;
+                        }
+                        if ($request->user()->role === 'tutor') {
+                            return DB::table('tutor_profiles')->where('id', $program->owner_tutor_profile_id)
+                                ->where('user_id', $request->user()->id)->exists();
+                        }
+
+                        return $request->user()->role === 'customer'
+                            && (int) $task->assigned_to === (int) $request->user()->id
+                            && DB::table('program_members')->where('program_id', $program->id)
+                                ->where('user_id', $request->user()->id)
+                                ->where('member_role', 'customer')->where('status', 'active')->exists();
+                    });
+                if ($taskLink) {
+                    $isOwner = true;
+                }
+            }
             if (! $isOwner) {
                 $document = VerificationDocument::where('file_id', $file->id)->first();
                 abort_unless($document, 403, 'Forbidden.');
                 [$actor, $profile] = app(TutorProfileWorkflow::class)->lock($request->user(), $document->tutor_profile_id);
                 abort_unless(app(TutorProfilePolicy::class)->download($actor, $profile), 403, 'Forbidden.');
-                app(TutorProfileWorkflow::class)->audit($actor, 'verification_document.download', 'verification_document',
-                    $document->id, [], ['file_id' => $file->id, 'tutor_profile_id' => $profile->id]);
+                app(TutorProfileWorkflow::class)->audit(
+                    $actor,
+                    'verification_document.download',
+                    'verification_document',
+                    $document->id,
+                    [],
+                    ['file_id' => $file->id, 'tutor_profile_id' => $profile->id]
+                );
             }
             abort_unless($file->isComplete(), 409, 'File is not complete.');
             abort_unless(Storage::disk($file->disk)->exists($file->object_key), 404);

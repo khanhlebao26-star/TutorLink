@@ -1,0 +1,23 @@
+[
+  {
+    "service": "backend",
+    "state": "running",
+    "health": "healthy",
+    "image": "tutorlink-src-backend",
+    "status": "Up 21 minutes (healthy)"
+  },
+  {
+    "service": "broadcast-worker",
+    "state": "running",
+    "health": "",
+    "image": "tutorlink-src-broadcast-worker",
+    "status": "Up About a minute"
+  },
+  {
+    "service": "reverb",
+    "state": "running",
+    "health": "",
+    "image": "tutorlink-src-reverb",
+    "status": "Up 20 minutes"
+  }
+]

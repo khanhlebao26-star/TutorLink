@@ -1,0 +1,3 @@
+Started: 2026-10-30T15:56:37.7424584+07:00
+{"tool":"pint","result":"fixed","files":[{"path":"config\/broadcasting.php","fixers":["concat_space","single_blank_line_at_eof"]}]}
+Exit code: 0

@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\Support\ProgramApiFixtures;
 use Tests\Support\TestActors;
 use Tests\TestCase;
@@ -168,4 +169,69 @@ it('completes a Program when Tasks are terminal and writes the member notificati
         'type' => 'program_completed',
         'resource_id' => $programId,
     ]);
+});
+
+it('reports every nonterminal Task as a blocker and preserves child state', function (string $action, string $status) {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $program = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+    ProgramApiFixtures::addMember($program, $tutor, 'tutor');
+    ProgramApiFixtures::addMember($program, $customer, 'customer');
+    $task = DB::table('tasks')->insertGetId([
+        'program_id' => $program, 'assigned_to' => $customer->id, 'title' => 'Pending work',
+        'status' => $status, 'version' => 1, 'created_at' => now(), 'updated_at' => now(),
+    ]);
+    $terminal = in_array($status, ['completed', 'cancelled'], true);
+
+    $response = $this->actingAs($tutor, 'web')->postJson("/api/v1/programs/{$program}/{$action}");
+
+    if ($terminal) {
+        $response->assertOk()->assertJsonPath('data.status', $action === 'complete' ? 'completed' : 'cancelled');
+    } else {
+        $response->assertConflict()->assertJsonPath('code', $action === 'complete' ? 'program_completion_blocked' : 'program_cancellation_blocked')
+            ->assertJsonPath('errors.blockers.sessions', [])
+            ->assertJsonPath('errors.blockers.tasks', [['id' => $task, 'status' => $status, 'required_action' => 'complete_or_cancel_task']]);
+        $this->assertDatabaseHas('programs', ['id' => $program, 'status' => 'active']);
+        $this->assertDatabaseCount('audit_logs', 0);
+        $this->assertDatabaseCount('notification_outbox', 0);
+    }
+    $this->assertDatabaseHas('tasks', ['id' => $task, 'status' => $status, 'version' => 1]);
+    $this->assertDatabaseCount('program_members', 2);
+})->with(['complete', 'cancel'])->with(['todo', 'in_progress', 'submitted', 'completed', 'cancelled']);
+
+it('grants access only after accept and completes a paused Program only after explicit Task feedback', function () {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $program = ProgramApiFixtures::draft($tutor, $customer);
+    $invitation = ProgramApiFixtures::invitation($program, $tutor, $customer, now('UTC')->addHours(72)->toDateTimeString());
+    $key = fn (): array => ['Idempotency-Key' => (string) Str::uuid()];
+    $this->actingAs($customer, 'web')->getJson("/api/v1/programs/{$program}")->assertNotFound();
+    $this->getJson("/api/v1/programs/{$program}/tasks")->assertNotFound();
+    $this->post("/api/v1/invitations/{$invitation}/accept", [], ['Accept' => 'application/json', ...$key()])->assertOk();
+    $this->getJson("/api/v1/programs/{$program}")->assertOk();
+    $this->actingAs($tutor, 'web');
+    $task = $this->postJson("/api/v1/programs/{$program}/tasks", ['title' => 'Write a paragraph', 'assigned_to' => $customer->id])
+        ->assertCreated()->json('data.id');
+    $this->postJson("/api/v1/programs/{$program}/pause")->assertOk();
+    $this->postJson("/api/v1/programs/{$program}/tasks", ['title' => 'Blocked', 'assigned_to' => $customer->id])->assertConflict();
+    $this->postJson("/api/v1/programs/{$program}/complete")->assertConflict()->assertJsonPath('errors.blockers.tasks.0.status', 'todo');
+    $this->actingAs($customer, 'web')->postJson("/api/v1/tasks/{$task}/start", ['expected_version' => 1])->assertOk();
+    $this->putJson("/api/v1/tasks/{$task}/submission", ['expected_submission_version' => 0, 'content' => 'First answer'], $key())->assertCreated();
+    $this->actingAs($tutor, 'web')->postJson("/api/v1/programs/{$program}/complete")->assertConflict()->assertJsonPath('errors.blockers.tasks.0.status', 'submitted');
+    $this->postJson("/api/v1/tasks/{$task}/submission/request-revision", ['expected_submission_version' => 1, 'feedback' => 'Add an example.'], $key())->assertOk();
+    $this->postJson("/api/v1/programs/{$program}/complete")->assertConflict()->assertJsonPath('errors.blockers.tasks.0.status', 'in_progress');
+    $this->actingAs($customer, 'web')->putJson("/api/v1/tasks/{$task}/submission", ['expected_submission_version' => 1, 'content' => 'Answer with example'], $key())->assertCreated();
+    $this->actingAs($tutor, 'web')->postJson("/api/v1/tasks/{$task}/submission/review", ['expected_submission_version' => 2, 'feedback' => 'Accepted.'], $key())->assertOk();
+
+    $this->postJson("/api/v1/programs/{$program}/complete")->assertOk()->assertJsonPath('data.status', 'completed');
+
+    $this->assertDatabaseHas('tasks', ['id' => $task, 'status' => 'completed']);
+    $this->assertDatabaseCount('task_submissions', 2);
+    $this->assertDatabaseHas('task_submissions', ['task_id' => $task, 'submission_version' => 1, 'status' => 'revision_requested', 'feedback' => 'Add an example.']);
+    $this->assertDatabaseHas('task_submissions', ['task_id' => $task, 'submission_version' => 2, 'status' => 'accepted']);
+    $this->assertDatabaseCount('program_members', 2);
+    $this->postJson("/api/v1/programs/{$program}/resume")->assertConflict();
+    $this->postJson("/api/v1/programs/{$program}/tasks", ['title' => 'Blocked', 'assigned_to' => $customer->id])->assertConflict();
+    $this->actingAs($customer, 'web')->getJson("/api/v1/programs/{$program}")->assertOk();
+    $this->getJson("/api/v1/tasks/{$task}/submission/versions")->assertOk()->assertJsonCount(2, 'data');
 });

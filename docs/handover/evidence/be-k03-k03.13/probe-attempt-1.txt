@@ -1,0 +1,10 @@
+Started: 2026-10-30T15:55:19.0857329+07:00
+PASS 1: Two participants and two receiver sessions subscribe to distinct session channels
+PASS 2: Outsider/Admin/cross-session auth and legacy channel are denied; live CSRF and socket-bound signature enforced
+PASS 3: REST message commits and active session sockets receive only conversation_id
+Expected values to be strictly equal:
+
+419 !== 401
+
+Result: 3/12; passed=false; cleanup={"users_removed":4,"remaining_users":0,"remaining_conversations":0,"remaining_messages":0,"remaining_files":0,"remaining_sessions":0,"remaining_realtime_sessions":0,"probe_jobs_removed":0}
+Exit code: 1

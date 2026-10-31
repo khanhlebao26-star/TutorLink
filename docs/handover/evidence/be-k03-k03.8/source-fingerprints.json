@@ -1,0 +1,109 @@
+{
+  "base_head": "3d9621d42dadb2f267d0df79aaa49c13290bd1e1",
+  "branch": "be-k03",
+  "checked_at": "2026-10-30T10:40:16.8341320+07:00",
+  "tested_state": "Final uncommitted K03.8 source after removal of duplicate resource_type rule and final rule PHPDoc; Pint passed before full PostgreSQL backend test run. Only documentation/evidence edited after tests.",
+  "full_backend": {
+    "passed": 416,
+    "assertions": 2579,
+    "exit_code": 0,
+    "duration_seconds": 48.67,
+    "new_k038_cases": 18,
+    "database": "isolated PostgreSQL via compose.testing.yml"
+  },
+  "openapi": {
+    "operations": 69,
+    "parity": "pass",
+    "redocly": "2.60.0",
+    "lint_exit_code": 0,
+    "warnings": 43
+  },
+  "local_legacy": {
+    "messages": 0,
+    "message_attachment_files": 0,
+    "message_links": 0,
+    "mutation": "none; inventory only"
+  },
+  "frontend": {
+    "verification": "source audit only",
+    "conversation_ui": "not implemented",
+    "chat_e2e": "not performed",
+    "profile_upload": "unchanged"
+  },
+  "schema_delta": "none",
+  "publication": "Local only; user commits/pushes/requests review",
+  "files": [
+    {
+      "path": "backend/app/Http/Requests/FileLinkRequest.php",
+      "sha256": "a5cbe9c6881c0bd45a7e0e92a923dcdd5bcb2801b378083f84c9a72b871d87b0"
+    },
+    {
+      "path": "backend/app/Http/Requests/SendTextMessageRequest.php",
+      "sha256": "dbef0e3a7ad1cb8e44ec58fca7e0cd0fb2a6c781fd1b0463e4987786e37f4b05"
+    },
+    {
+      "path": "backend/app/Http/Requests/FileUploadRequest.php",
+      "sha256": "9e41b11ce84a0b7cb0e6ff600a27bb4b82c51fef1f0ee8d743f092bd65afd746"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/FileController.php",
+      "sha256": "c1495fbb3b96203a9971e33966500bbd5de5597e72852162fdf2a3bb0daff205"
+    },
+    {
+      "path": "backend/app/Actions/Messaging/SendTextMessage.php",
+      "sha256": "57316cbbea004bd35d3bf539ac0f40df786db2253f9a9c0ec3d6633415416783"
+    },
+    {
+      "path": "backend/app/Models/Message.php",
+      "sha256": "df2e865fd3143296976c1c72f4b4638de9e77cc5f7689272c3958d7722a97e41"
+    },
+    {
+      "path": "backend/app/Models/File.php",
+      "sha256": "11dce37b9d5dda9f52d60b2402d1fe449c46f07e4979ca6dd0b444643aa80c26"
+    },
+    {
+      "path": "backend/tests/Feature/ChatAttachmentDisabledTest.php",
+      "sha256": "efd2dd1101ecc10ae35ce5c7c363e1a0abf15e07bf3a25edcbc8ff1ce1ef73af"
+    },
+    {
+      "path": "backend/tests/Feature/SendTextMessageApiTest.php",
+      "sha256": "b4917faabe083c8b7976b9b6fc63162eee02fc384c1798bb6264a67092cb5c70"
+    },
+    {
+      "path": "backend/tests/Feature/SendTextMessageConcurrencyTest.php",
+      "sha256": "67326373cdc95ce60563e759f830c1ac32579e2ec97198677afe1ed751b243cc"
+    },
+    {
+      "path": "backend/tests/Feature/PhaseTwoAcceptanceTest.php",
+      "sha256": "05b5d9838042906ecc7e86616f6aae27a2115052fff7c374feb076d251d5d4f5"
+    },
+    {
+      "path": "backend/tests/Feature/MessagingSchemaTest.php",
+      "sha256": "59ac3ab2cef93d701215073f74c5fbfabb3151db037cdbe8aefb32f0d66988b4"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "0f83f73a2259b373ef25b1c64c6087884f1bf9254ebfbacf97ba5b681bcc2c2a"
+    },
+    {
+      "path": "compose.testing.yml",
+      "sha256": "07d2f4b8ae09106fb7bdb121212a827380eab4debce7b32baa9b4c06d8617a3c"
+    },
+    {
+      "path": "docker-compose.yml",
+      "sha256": "d9f249e5c674fe4d59cbe8168a74bb20df8e0ca2a2d8d20697da94f01959e27f"
+    },
+    {
+      "path": "frontend/src/components/tutor-onboarding-form.tsx",
+      "sha256": "e234c7f13bd8ac84e14aaac6edcfbbbe58a6fc9ff8c0c2f30804c71b3f71f612"
+    },
+    {
+      "path": "frontend/src/lib/data/services.ts",
+      "sha256": "fbf73d715ba4b7e99456002a57ee0bb821a37e2ce317c635793dc1da4a032da7"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "fdf5c990c182ed302738225b5666bd323f82a142e26bac0544409f179e1a050d"
+    }
+  ]
+}

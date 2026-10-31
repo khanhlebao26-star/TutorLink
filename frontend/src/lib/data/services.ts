@@ -15,6 +15,7 @@ import type {
   User,
   VerificationDocument
 } from "./types";
+export const MAX_UPLOAD_BYTES = 5_000_000;
 
 const unwrap = <T>(value: ApiEnvelope<T> | T): T =>
   typeof value === "object" && value !== null && "data" in value
@@ -226,6 +227,12 @@ export async function submitTutorProfile(): Promise<TutorProfile> {
 }
 
 export async function uploadFile(file: File, purpose: FilePurpose): Promise<FileRecord> {
+  if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
+    throw new Error(
+      "File phải có dung lượng từ 1 đến 5.000.000 byte (5 MB).",
+    );
+  }
+
   if (dataMode === "mock") {
     await delay();
     return {

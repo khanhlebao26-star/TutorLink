@@ -1,0 +1,18 @@
+Checked: 2026-10-30T13:58:02.3833641+07:00
+Base HEAD: f61deafd1e042fff19f7ab3a6bdc57eb17bea43d
+OpenAPI operations: 69
+OpenAPI SHA256: fdf5c990c182ed302738225b5666bd323f82a142e26bac0544409f179e1a050d
+API actions/artifact compared with K03.9 evidence:
+
+Path                                                        Unchanged
+----                                                        ---------
+backend/app/Actions/Messaging/SyncConversationLifecycle.php      True
+backend/app/Actions/Messaging/OpenConversation.php               True
+backend/app/Actions/Programs/TransitionProgram.php               True
+backend/app/Actions/Programs/UpdateProgramDraft.php              True
+backend/app/Actions/Invitations/SendInvitation.php               True
+backend/app/Actions/Invitations/AcceptInvitation.php             True
+backend/app/Support/InvitationTransitionWriter.php               True
+docs/api/openapi.json                                            True
+Runtime/schema/API/Compose changes relative to HEAD:
+No export/lint rerun claimed: this task adds tests and handover only; previous API export/parity/lint evidence is linked in the report.

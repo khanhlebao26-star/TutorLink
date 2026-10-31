@@ -4,17 +4,12 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        if (DB::table('task_submissions')->exists()) {
-            throw new RuntimeException(
-                'Cannot safely add submission idempotency metadata while legacy submissions exist. Review the legacy migration policy first.'
-            );
-        }
-
         DB::transaction(function (): void {
             Schema::table('tasks', function (Blueprint $table): void {
                 $table->integer('version')->default(1);
@@ -25,6 +20,27 @@ return new class extends Migration
                 $table->integer('submission_version')->nullable();
                 $table->uuid('idempotency_key')->nullable();
                 $table->char('request_hash', 64)->nullable();
+            });
+
+            // Legacy rows each represented the sole current submission. Synthetic keys
+            // preserve them without claiming an old client request can be replayed.
+            DB::table('task_submissions')->orderBy('id')->chunkById(100, function ($rows): void {
+                foreach ($rows as $row) {
+                    $task = DB::table('tasks')->where('id', $row->task_id)->first();
+                    if ($task === null || ($task->assigned_to !== null && (int) $task->assigned_to !== (int) $row->customer_id)
+                        || $task->current_submission_id !== null) {
+                        throw new RuntimeException('Legacy submission does not match a single Task assignee. Review the data before migrating.');
+                    }
+                    DB::table('task_submissions')->where('id', $row->id)->update([
+                        'submission_version' => 1,
+                        'idempotency_key' => (string) Str::uuid(),
+                        'request_hash' => hash('sha256', 'legacy:'.$row->id),
+                    ]);
+                    DB::table('tasks')->where('id', $row->task_id)->update([
+                        'assigned_to' => $row->customer_id,
+                        'current_submission_id' => $row->id,
+                    ]);
+                }
             });
 
             Schema::table('task_submissions', function (Blueprint $table): void {

@@ -1,0 +1,4 @@
+Started: 2026-10-30T10:03:54.5260837+07:00
+Final Scramble export: FormRequest rule PHPDoc; migrated SQLite :memory: in the same PHP process; no development PostgreSQL changes.
+Container artifact /tmp/tutorlink-k037b-openapi.json copied from stdout without editing JSON.
+Exit code: 0

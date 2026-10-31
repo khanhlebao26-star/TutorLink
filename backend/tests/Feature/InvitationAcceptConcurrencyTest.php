@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+use Tests\Support\MessageSendFixtures;
 use Tests\Support\ProgramApiFixtures;
 use Tests\Support\TestActors;
 use Tests\TestCase;
@@ -235,6 +236,263 @@ class InvitationAcceptConcurrencyTest extends TestCase
         $this->assertDatabaseCount('notification_outbox', 0);
     }
 
+    public function test_two_completions_close_the_chat_only_after_both_programs_end(): void
+    {
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+
+        $chat = MessageSendFixtures::conversation(
+            $customer,
+            $tutor,
+        );
+
+        $messageId = MessageSendFixtures::seed(
+            $chat,
+            $customer,
+        );
+
+        $programs = [];
+
+        for ($index = 0; $index < 2; $index++) {
+            $programId = ProgramApiFixtures::draft(
+                $tutor,
+                $customer,
+                ['status' => 'active'],
+            );
+
+            ProgramApiFixtures::addMember(
+                $programId,
+                $tutor,
+                'tutor',
+            );
+
+            ProgramApiFixtures::addMember(
+                $programId,
+                $customer,
+                'customer',
+            );
+
+            $programs[] = $programId;
+        }
+
+        $actions = array_map(
+            fn (int $programId): array => [
+                'operation' => 'complete',
+                'actor_id' => $tutor->id,
+                'program_id' => $programId,
+                'invitation_id' => 0,
+            ],
+            $programs,
+        );
+
+        $processes = $this->runBehindUserLocks(
+            [$customer->id, $tutor->id],
+            $actions,
+        );
+
+        foreach ($processes as $process) {
+            $this->assertSame(200, $this->resultStatus($process));
+        }
+
+        foreach ($programs as $programId) {
+            $this->assertDatabaseHas('programs', [
+                'id' => $programId,
+                'status' => 'completed',
+            ]);
+        }
+
+        $this->assertDatabaseHas('conversations', [
+            'id' => $chat,
+            'status' => 'cancelled',
+        ]);
+
+        $this->assertDatabaseCount('conversation_members', 2);
+        $this->assertDatabaseCount('messages', 1);
+        $this->assertDatabaseHas('messages', [
+            'id' => $messageId,
+            'body' => 'Existing text',
+        ]);
+    }
+
+    public function test_completion_and_invitation_send_follow_serialized_order(): void
+    {
+        $observedOrders = [];
+
+        foreach ([true, false] as $sendFirst) {
+            $customer = TestActors::customer();
+            $tutor = ProgramApiFixtures::eligibleTutor();
+            $chat = MessageSendFixtures::conversation($customer, $tutor);
+            $messageId = MessageSendFixtures::seed($chat, $customer);
+            $membersBefore = DB::table('conversation_members')->where('conversation_id', $chat)
+                ->orderBy('user_id')->get()->toJson();
+            $activeProgram = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+            ProgramApiFixtures::addMember($activeProgram, $tutor, 'tutor');
+            ProgramApiFixtures::addMember($activeProgram, $customer, 'customer');
+            $draft = ProgramApiFixtures::draft($tutor, $customer);
+
+            $complete = [
+                'operation' => 'complete', 'actor_id' => $tutor->id,
+                'program_id' => $activeProgram, 'invitation_id' => 0,
+            ];
+            $send = [
+                'operation' => 'send', 'actor_id' => $tutor->id,
+                'program_id' => $draft, 'invitation_id' => 0,
+            ];
+
+            $processes = $this->runBehindUserLocks(
+                [$customer->id, $tutor->id],
+                $sendFirst ? [$send, $complete] : [$complete, $send],
+            );
+
+            foreach ($processes as $process) {
+                $this->assertSame(200, $this->resultStatus($process));
+            }
+
+            $invitation = DB::table('program_invitations')->where('program_id', $draft)
+                ->where('status', 'pending')->first();
+            $this->assertNotNull($invitation);
+            $completeAudit = DB::table('audit_logs')->where('action', 'program.complete')
+                ->where('resource_type', 'program')->where('resource_id', $activeProgram)->value('id');
+            $sendAudit = DB::table('audit_logs')->where('action', 'invitation.send')
+                ->where('resource_type', 'program_invitation')->where('resource_id', $invitation->id)->value('id');
+            $this->assertNotNull($completeAudit);
+            $this->assertNotNull($sendAudit);
+
+            $sentBeforeCompletion = (int) $sendAudit < (int) $completeAudit;
+            $observedOrders[] = $sentBeforeCompletion;
+            $this->assertDatabaseHas('programs', ['id' => $activeProgram, 'status' => 'completed']);
+            $this->assertDatabaseHas('conversations', [
+                'id' => $chat, 'status' => $sentBeforeCompletion ? 'active' : 'cancelled',
+            ]);
+            $conversation = DB::table('conversations')->where('id', $chat)->first();
+            $this->assertSame(! $sentBeforeCompletion, $conversation->ended_at !== null);
+            $this->assertSame($membersBefore, DB::table('conversation_members')
+                ->where('conversation_id', $chat)->orderBy('user_id')->get()->toJson());
+            $this->assertSame(1, DB::table('messages')->where('conversation_id', $chat)->count());
+            $this->assertDatabaseHas('messages', ['id' => $messageId, 'body' => 'Existing text']);
+        }
+
+        $this->assertContains(true, $observedOrders);
+        $this->assertContains(false, $observedOrders);
+    }
+
+    public function test_accept_and_invitation_decisions_commit_only_one_outcome(): void
+    {
+        foreach (['reject', 'cancel'] as $decision) {
+            foreach ([true, false] as $acceptFirst) {
+                $customer = TestActors::customer();
+                $tutor = ProgramApiFixtures::eligibleTutor();
+                $program = ProgramApiFixtures::draft($tutor, $customer);
+                $invitation = ProgramApiFixtures::invitation($program, $tutor, $customer, now('UTC')->addHours(72)->toDateTimeString());
+                $accept = ['operation' => 'accept', 'actor_id' => $customer->id, 'program_id' => $program, 'invitation_id' => $invitation];
+                $resolve = ['operation' => 'decision_'.$decision, 'actor_id' => $decision === 'reject' ? $customer->id : $tutor->id,
+                    'program_id' => $program, 'invitation_id' => $invitation];
+
+                $processes = $this->runBehindUserLocks([$customer->id, $tutor->id], $acceptFirst ? [$accept, $resolve] : [$resolve, $accept]);
+                $statuses = array_map(fn (Process $process): int => $this->resultStatus($process), $processes);
+                sort($statuses);
+
+                $this->assertSame([200, 409], $statuses);
+                $accepted = DB::table('program_invitations')->where('id', $invitation)->value('status') === 'accepted';
+                $this->assertSame($acceptFirst, $accepted);
+                $this->assertDatabaseHas('programs', ['id' => $program, 'status' => $accepted ? 'active' : 'draft']);
+                $this->assertSame($accepted ? 2 : 0, DB::table('program_members')->where('program_id', $program)->count());
+                $this->assertSame(1, DB::table('audit_logs')->where('resource_type', 'program_invitation')->where('resource_id', $invitation)->count());
+                $this->assertSame(1, DB::table('notification_outbox')->where('resource_type', 'program_invitation')->where('resource_id', $invitation)->count());
+                if (! $accepted) {
+                    $this->assertDatabaseHas('program_invitations', ['id' => $invitation, 'status' => $decision === 'reject' ? 'rejected' : 'cancelled']);
+                }
+            }
+        }
+    }
+
+    public function test_expiry_worker_competes_with_accept_and_another_worker_without_duplicate_events(): void
+    {
+        foreach ([true, false] as $overdue) {
+            $customer = TestActors::customer();
+            $tutor = ProgramApiFixtures::eligibleTutor();
+            $program = ProgramApiFixtures::draft($tutor, $customer);
+            $invitation = ProgramApiFixtures::invitation($program, $tutor, $customer,
+                ($overdue ? now('UTC')->subMinute() : now('UTC')->addHour())->toDateTimeString());
+            $processes = $this->runBehindUserLocks([$customer->id, $tutor->id], [
+                ['operation' => 'worker_expire', 'actor_id' => $tutor->id, 'program_id' => $program, 'invitation_id' => $invitation],
+                ['operation' => 'accept', 'actor_id' => $customer->id, 'program_id' => $program, 'invitation_id' => $invitation],
+                ['operation' => 'worker_expire', 'actor_id' => $tutor->id, 'program_id' => $program, 'invitation_id' => $invitation],
+            ]);
+            $statuses = array_map(fn (Process $process): int => $this->resultStatus($process), $processes);
+
+            $this->assertSame([200, $overdue ? 409 : 200, 200], $statuses);
+            $this->assertDatabaseHas('program_invitations', ['id' => $invitation, 'status' => $overdue ? 'expired' : 'accepted']);
+            $this->assertDatabaseHas('programs', ['id' => $program, 'status' => $overdue ? 'draft' : 'active']);
+            $this->assertSame($overdue ? 0 : 2, DB::table('program_members')->where('program_id', $program)->count());
+            $this->assertSame(1, DB::table('audit_logs')->where('resource_type', 'program_invitation')->where('resource_id', $invitation)->count());
+            $this->assertSame(1, DB::table('notification_outbox')->where('resource_type', 'program_invitation')->where('resource_id', $invitation)->count());
+        }
+    }
+
+    public function test_expiry_and_invitation_cancellation_keep_the_expired_outcome(): void
+    {
+        $customer = TestActors::customer();
+        $tutor = ProgramApiFixtures::eligibleTutor();
+        $program = ProgramApiFixtures::draft($tutor, $customer);
+        $invitation = ProgramApiFixtures::invitation($program, $tutor, $customer, now('UTC')->subMinute()->toDateTimeString());
+
+        $processes = $this->runBehindUserLocks([$customer->id, $tutor->id], [
+            ['operation' => 'decision_cancel', 'actor_id' => $tutor->id, 'program_id' => $program, 'invitation_id' => $invitation],
+            ['operation' => 'worker_expire', 'actor_id' => $tutor->id, 'program_id' => $program, 'invitation_id' => $invitation],
+        ]);
+
+        $this->assertSame([409, 200], array_map(fn (Process $process): int => $this->resultStatus($process), $processes));
+        $this->assertDatabaseHas('program_invitations', ['id' => $invitation, 'status' => 'expired']);
+        $this->assertDatabaseCount('program_members', 0);
+        $this->assertDatabaseCount('audit_logs', 1);
+        $this->assertDatabaseCount('notification_outbox', 1);
+    }
+
+    public function test_program_completion_and_task_creation_serialize_on_the_program_lock(): void
+    {
+        foreach ([true, false] as $completeFirst) {
+            $customer = TestActors::customer();
+            $tutor = ProgramApiFixtures::eligibleTutor();
+            $program = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+            ProgramApiFixtures::addMember($program, $tutor, 'tutor');
+            ProgramApiFixtures::addMember($program, $customer, 'customer');
+            $complete = ['operation' => 'complete', 'actor_id' => $tutor->id, 'program_id' => $program, 'invitation_id' => 0];
+            $createTask = ['operation' => 'create_task', 'actor_id' => $tutor->id, 'program_id' => $program, 'invitation_id' => $customer->id];
+            $processes = [];
+
+            DB::beginTransaction();
+            try {
+                DB::table('programs')->where('id', $program)->lockForUpdate()->first();
+                foreach ($completeFirst ? [$complete, $createTask] : [$createTask, $complete] as $action) {
+                    $process = $this->startActionProcess(DB::connection()->getDatabaseName(), $action);
+                    $processes[] = $process;
+                    $this->waitUntilBlockedOnUserLock([$process]);
+                }
+                DB::commit();
+                foreach ($processes as $process) {
+                    $process->wait();
+                }
+            } finally {
+                if (DB::transactionLevel() > 0) {
+                    DB::rollBack();
+                }
+                foreach ($processes as $process) {
+                    if ($process->isRunning()) {
+                        $process->stop(0, 9);
+                    }
+                }
+            }
+
+            $this->assertSame($completeFirst ? [200, 409] : [201, 409], array_map(fn (Process $process): int => $this->resultStatus($process), $processes));
+            $this->assertDatabaseHas('programs', ['id' => $program, 'status' => $completeFirst ? 'completed' : 'active']);
+            $this->assertSame($completeFirst ? 0 : 1, DB::table('tasks')->where('program_id', $program)->where('status', 'todo')->count());
+            $this->assertSame($completeFirst ? 1 : 0, DB::table('audit_logs')->where('resource_type', 'program')->where('resource_id', $program)->count());
+            $this->assertSame($completeFirst ? 1 : 0, DB::table('notification_outbox')->where('resource_type', 'program')->where('resource_id', $program)->count());
+            $this->assertSame(2, DB::table('program_members')->where('program_id', $program)->count());
+        }
+    }
+
     /** @param list<int> $userIds
      * @param  list<array{operation: string, actor_id: int, program_id: int, invitation_id: int, target_id?: int}>  $actions
      * @return list<Process>
@@ -299,6 +557,7 @@ class InvitationAcceptConcurrencyTest extends TestCase
             fflush(STDOUT);
 
             try {
+                $resultStatus = 200;
                 if ($argv[2] === 'accept') {
                     app(\App\Actions\Invitations\AcceptInvitation::class)->execute(
                         $actor,
@@ -306,11 +565,31 @@ class InvitationAcceptConcurrencyTest extends TestCase
                         $argv[6],
                         $argv[7],
                     );
-                } elseif ($argv[2] === 'cancel') {
+                } elseif (in_array($argv[2], ['cancel', 'complete'], true)) {
                     app(\App\Actions\Programs\TransitionProgram::class)->execute(
                         $actor,
                         (int) $argv[4],
-                        'cancel',
+                        $argv[2],
+                        $argv[7],
+                    );
+                } elseif ($argv[2] === 'create_task') {
+                    $request = \Illuminate\Http\Request::create('/api/v1/programs/'.$argv[4].'/tasks', 'POST', [
+                        'title' => 'Concurrent task', 'assigned_to' => (int) $argv[5],
+                    ]);
+                    $request->setUserResolver(fn () => $actor);
+                    $resultStatus = app(\App\Http\Controllers\Api\V1\TaskController::class)->store($request, (int) $argv[4])->getStatusCode();
+                } elseif ($argv[2] === 'worker_expire') {
+                    app(\App\Actions\Invitations\ResolveInvitation::class)->expire((int) $argv[5], $argv[7]);
+                } elseif (str_starts_with($argv[2], 'decision_')) {
+                    app(\App\Actions\Invitations\ResolveInvitation::class)->execute(
+                        $actor, (int) $argv[5], substr($argv[2], 9), null, $argv[7],
+                    );
+                } elseif ($argv[2] === 'send') {
+                    app(\App\Actions\Invitations\SendInvitation::class)->execute(
+                        $actor,
+                        (int) $argv[4],
+                        ['expected_version' => 1],
+                        $argv[6],
                         $argv[7],
                     );
                 } elseif ($argv[2] === 'expire') {
@@ -344,7 +623,7 @@ class InvitationAcceptConcurrencyTest extends TestCase
                 } else {
                     exit(3);
                 }
-                fwrite(STDOUT, "RESULT:200\n");
+                fwrite(STDOUT, "RESULT:{$resultStatus}\n");
             } catch (\Illuminate\Http\Exceptions\HttpResponseException $exception) {
                 fwrite(STDOUT, "RESULT:{$exception->getResponse()->getStatusCode()}\n");
             } catch (\App\Exceptions\InvitationAcceptException $exception) {

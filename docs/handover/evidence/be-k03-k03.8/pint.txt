@@ -1,0 +1,4 @@
+Started: 2026-10-30T10:36:00.1698733+07:00
+Command: docker compose exec -T backend vendor/bin/pint --format agent app/Http/Requests/FileLinkRequest.php app/Http/Requests/SendTextMessageRequest.php tests/Feature/ChatAttachmentDisabledTest.php
+{"tool":"pint","result":"passed"}
+Exit code: 0

@@ -20,15 +20,44 @@ class PhaseTwoAcceptanceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_avatar_rejects_documents_and_files_over_two_mib(): void
+    public function test_avatar_rejects_documents_and_files_over_five_million_bytes(): void
     {
         Storage::fake('local');
+
         $user = User::factory()->create();
-        foreach ([UploadedFile::fake()->create('avatar.pdf', 100, 'application/pdf'), UploadedFile::fake()->create('avatar.jpg', 2049, 'image/jpeg')] as $file) {
-            $this->actingAs($user)->postJson('/api/v1/files', ['file' => $file, 'purpose' => 'avatar'])
-                ->assertUnprocessable()->assertJsonValidationErrors('file');
+
+        $png = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jAZkAAAAASUVORK5CYII=',
+            true,
+        );
+
+        $oversizedAvatar = UploadedFile::fake()->createWithContent(
+            'avatar.png',
+            str_pad($png, 5_000_001, ' '),
+        );
+
+        $this->assertSame(5_000_001, $oversizedAvatar->getSize());
+
+        $files = [
+            UploadedFile::fake()->createWithContent(
+                'avatar.pdf',
+                "%PDF-1.4\nSynthetic document.\n%%EOF",
+            ),
+            $oversizedAvatar,
+        ];
+
+        foreach ($files as $file) {
+            $this->actingAs($user)
+                ->postJson('/api/v1/files', [
+                    'file' => $file,
+                    'purpose' => 'avatar',
+                ])
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('file');
         }
+
         $this->assertDatabaseCount('files', 0);
+        $this->assertSame([], Storage::disk('local')->allFiles());
     }
 
     public function test_missing_or_tampered_storage_cannot_be_completed(): void
@@ -38,10 +67,18 @@ class PhaseTwoAcceptanceTest extends TestCase
         $file = $this->file($user, 'verification_document');
         $file->update(['scan_status' => 'pending']);
         Storage::disk('local')->delete($file->object_key);
-        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")->assertConflict();
-        Storage::disk('local')->put($file->object_key, 'tampered');
-        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")->assertConflict();
+        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")
+            ->assertStatus(503)
+            ->assertHeader('Retry-After', '10')
+            ->assertJsonPath('code', 'file_storage_unavailable');
         $this->assertSame('pending', $file->refresh()->scan_status);
+
+        Storage::disk('local')->put($file->object_key, 'tampered');
+        $this->actingAs($user)->postJson("/api/v1/files/{$file->id}/complete")
+            ->assertUnprocessable()
+            ->assertJsonPath('code', 'file_rejected');
+        $this->assertSame('rejected', $file->refresh()->scan_status);
+        $this->actingAs($user)->get("/api/v1/files/{$file->id}/download")->assertConflict();
     }
 
     public function test_attached_files_cannot_be_deleted_and_storage_is_preserved(): void

@@ -1,0 +1,42 @@
+Captured: 2026-10-30T16:14:56.7029402+07:00
+Base HEAD: e6ffd0575e954be3e46448142bf8cd972477b437
+Branch: be-k03
+K03.13 changes are not committed or pushed.
+ M backend/app/Actions/Auth/RevokeUserSessions.php
+ M backend/app/Actions/Fortify/UpdateUserPassword.php
+ M backend/app/Actions/TutorProfiles/SuspendTutorProfile.php
+ M backend/app/Events/ConversationMessagesChanged.php
+ M backend/app/Http/Controllers/Api/V1/AuthController.php
+ M backend/app/Http/Middleware/EnsureActiveAccount.php
+ M backend/app/Http/Middleware/EnsureActiveApiActor.php
+ M backend/app/Http/Requests/ConversationBroadcastAuthRequest.php
+ M backend/app/Providers/AppServiceProvider.php
+ M backend/config/broadcasting.php
+ M backend/routes/api.php
+ M backend/routes/channels.php
+ M backend/tests/Feature/ConversationBroadcastAuthTest.php
+ M backend/tests/Feature/MessageBroadcastTest.php
+ M "docs/Architecture & Technical Design/API Route Catalog.md"
+ M "docs/Architecture & Technical Design/Database Design — TutorLink.md"
+ M "docs/Architecture & Technical Design/System architech & technology Stack.md"
+ M "docs/Domain Documentation/Business Rules.md"
+ M "docs/Domain Documentation/State Lifecycles.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04 — Messaging — PRD Index.md"
+ M "docs/Modules Documentation/M04 — Messaging/M04-F03 PRD — Đọc lịch sử tin nhắn và đồng bộ.md"
+ M docs/README.md
+ M "docs/Workflow/WF03 Chat và tệp đính kèm.md"
+ M docs/api/README.md
+ M docs/api/openapi.json
+ M docs/handover/BE-K03-K03.1-contract.md
+ M docs/handover/BE-K03-roadmap.md
+?? backend/app/Actions/Messaging/IssueConversationRealtime.php
+?? backend/app/Http/Controllers/Api/V1/ConversationRealtimeController.php
+?? backend/app/Http/Requests/IssueConversationRealtimeRequest.php
+?? backend/app/Jobs/BroadcastConversationChanged.php
+?? backend/app/Support/RealtimeSessionChannels.php
+?? backend/database/migrations/2026_10_30_180000_create_realtime_sessions_table.php
+?? backend/tests/Feature/RealtimeRevocationConcurrencyTest.php
+?? backend/tests/Feature/RealtimeSessionAccessTest.php
+?? backend/tests/Support/InteractsWithRealtimeSessions.php
+?? docs/handover/BE-K03-K03.13-test-report.md
+?? docs/handover/evidence/be-k03-k03.13/

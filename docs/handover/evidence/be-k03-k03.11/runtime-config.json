@@ -1,0 +1,21 @@
+{
+    "app_env": "local",
+    "broadcast_connection": "reverb",
+    "queue_connection": "database",
+    "reverb_host": "reverb",
+    "reverb_port": "8080",
+    "allowed_origins": [
+        "localhost",
+        "127.0.0.1"
+    ],
+    "client_events": "none",
+    "credentials_present": true,
+    "versions": {
+        "laravel\/framework": "v13.35.0",
+        "laravel\/reverb": "v1.12.0",
+        "pusher\/pusher-php-server": "7.3.0",
+        "guzzlehttp\/guzzle": "7.16.1",
+        "guzzlehttp\/psr7": "2.13.2",
+        "symfony\/mime": "v7.4.22"
+    }
+}

@@ -1,0 +1,103 @@
+{
+  "base_head": "45986392c2ab2dda71e4d3a9a80452acfc926e89",
+  "branch": "be-k03",
+  "checked_at": "2026-10-29T16:23:01.0290166+07:00",
+  "tested_state": "Uncommitted K03.7a working tree after the validation-unavailable fix; Pint passed before full backend run. Only generated API and documentation/evidence changed after tests.",
+  "full_backend": {
+    "passed": 384,
+    "assertions": 2367,
+    "exit_code": 0,
+    "duration_seconds": 53.46,
+    "database": "isolated PostgreSQL via compose.testing.yml",
+    "clamav": "absent"
+  },
+  "openapi": {
+    "operations": 69,
+    "parity": "pass",
+    "redocly_version": "2.60.0",
+    "lint_exit_code": 0,
+    "warnings": 44
+  },
+  "publication": "Local only; user commits/pushes/requests review",
+  "removed_paths": [
+    "backend/app/Support/ClamAvScanner.php",
+    "backend/config/file-scanning.php",
+    "backend/tests/Feature/ClamAvProtocolTest.php",
+    "backend/tests/Feature/ClamAvIntegrationTest.php",
+    "compose.clamav-testing.yml"
+  ],
+  "files": [
+    {
+      "path": "backend/app/Actions/Files/CompleteFile.php",
+      "sha256": "6d300e1b74b1ec9b140928b1a1b22a224886d00a25f1b596426d2f42d3643747"
+    },
+    {
+      "path": "backend/app/Support/ZipScanGuard.php",
+      "sha256": "1255366e95c0657bdcf8023deaae2ed001ae5974e569fa3f5003652a52f5ce11"
+    },
+    {
+      "path": "backend/app/Http/Controllers/Api/V1/FileController.php",
+      "sha256": "1ff627a0bbf1538baa1f3995059f50982ab3849ddc5380d1d0959165d59fac4f"
+    },
+    {
+      "path": "backend/app/Http/Requests/FileUploadRequest.php",
+      "sha256": "2d6c6b32ed53acd662b5023de8bacd744f2dfa98769ec70f2b8ecd3ea4ee6f74"
+    },
+    {
+      "path": "backend/app/Models/File.php",
+      "sha256": "11dce37b9d5dda9f52d60b2402d1fe449c46f07e4979ca6dd0b444643aa80c26"
+    },
+    {
+      "path": "backend/app/Http/Resources/FileResource.php",
+      "sha256": "cba57b7c32ac4292f010a41e41c883e5be13d06111138a17fe854c6a139cbb89"
+    },
+    {
+      "path": "backend/config/file-validation.php",
+      "sha256": "9a681944f3819d57235ff464884e0935fa34b15d9b5dd7fbd7450fb9e3b4c0d9"
+    },
+    {
+      "path": "backend/tests/Feature/CompleteFileApiTest.php",
+      "sha256": "7996494cadff21d6502bf947249a875ac12bb9e072d79cac71f2d236477cc467"
+    },
+    {
+      "path": "backend/tests/Feature/ZipScanGuardTest.php",
+      "sha256": "ae9ccc4f4fbf68ef0e1d6888af7c87383187bd537ddc76849bc9b564231b87b6"
+    },
+    {
+      "path": "backend/tests/Feature/AuthFileProfileTest.php",
+      "sha256": "122d3880e258a8a8b9cc94d4f50003d566d4046e402823d368a74f7099304adc"
+    },
+    {
+      "path": "backend/tests/Feature/PhaseTwoAcceptanceTest.php",
+      "sha256": "2648e3d148a53cdd887f71f17dae709249fcb611b827696aefa159b9cd6b82cf"
+    },
+    {
+      "path": "backend/database/migrations/2026_10_28_200000_add_file_scan_evidence.php",
+      "sha256": "db8f5ba6881dfaa105ba82dd34cc40567c66569f3aa298fafb82c202f358b66b"
+    },
+    {
+      "path": "backend/Dockerfile",
+      "sha256": "e8b9a39afab5e059de62faa7852bcd9638c83bac20892c242d72b1b8e3e69f96"
+    },
+    {
+      "path": "backend/Dockerfile.testing",
+      "sha256": "dba016eddec7468a28cee8bbd10287f507c0a8e5e4c954de48541391bfc75734"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "0f83f73a2259b373ef25b1c64c6087884f1bf9254ebfbacf97ba5b681bcc2c2a"
+    },
+    {
+      "path": "docker-compose.yml",
+      "sha256": "d9f249e5c674fe4d59cbe8168a74bb20df8e0ca2a2d8d20697da94f01959e27f"
+    },
+    {
+      "path": "compose.testing.yml",
+      "sha256": "07d2f4b8ae09106fb7bdb121212a827380eab4debce7b32baa9b4c06d8617a3c"
+    },
+    {
+      "path": "docs/api/openapi.json",
+      "sha256": "ef41d707dc02fff2c4f9863edfe73c220cc98a859c9501352da4809f728f208d"
+    }
+  ]
+}

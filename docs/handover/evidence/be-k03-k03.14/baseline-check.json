@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-10-30T09:25:58.513316+00:00",
+  "branch": "be-k03",
+  "handover_code_commit": "8e7cdaf674f7c2a8927a243eac86a5ce1bf0f004",
+  "k0313_manifest_sha256": "495921e39ed14aeea0205793c2dda8f200c34d615c7831f458833cfea27355b6",
+  "k0313_files_verified": 281,
+  "baseline_mismatches": [],
+  "openapi_sha256": "35e43eb29702332d723a35fcb72ad7c633dcb391dd89d34ad0e52dcf6bafae74",
+  "scope_accepted": "Backend verified; K03.12 Echo/UI deferred; Task/Submission/CV approval, cleanup/compensation and production TLS/load not certified by BE-K03."
+}

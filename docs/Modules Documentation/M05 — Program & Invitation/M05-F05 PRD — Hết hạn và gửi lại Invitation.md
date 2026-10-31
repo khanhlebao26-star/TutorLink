@@ -26,8 +26,8 @@ Hệ thống tự hết hạn Invitation pending sau 72 giờ và giữ đườn
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Baseline chưa có worker/scheduler; cần chọn cách dispatch, retry, queue failure và giám sát theo NFR.  
-* Biên 72 giờ UTC và so sánh tại expires_at đã chốt tại BR-18. Cơ chế scheduler, retry queue và giám sát vẫn là việc vận hành trước rollout.
+* BE-H03 đã bổ sung command `invitations:expire` mỗi phút, không overlap. Từng Invitation được khóa theo protocol accept, kiểm lại pending và expires_at rồi ghi expiry/audit/outbox/chat nguyên tử. Lỗi từng row rollback, command trả failure và row được retry ở lần chạy tiếp theo. Audit hệ thống actor null, Tutor nhận notification qua outbox hiện hữu. Service scheduler/outbox ở compose.workers.yml phải chạy khi rollout; chưa có production evidence.
+* Biên 72 giờ UTC và so sánh tại expires_at đã chốt tại BR-18. Scheduler dùng retry ở lượt tiếp theo; vận hành service và theo dõi command failure vẫn phải được xác nhận trước rollout. Xem [BE-H03](../../handover/BE-H03-issue-75-test-report.md).
 
 # 5\. Nguồn
 

@@ -13,6 +13,9 @@
 * **Điều kiện dành cho Tutor:** Những thao tác yêu cầu Tutor đã được duyệt chỉ được phép thực hiện khi hồ sơ Tutor đáp ứng điều kiện tương ứng. Trạng thái tài khoản và trạng thái hồ sơ Tutor phải được kiểm tra riêng.  
 * **Quyền do server quản lý:** Người dùng không được tự thay đổi role, permissions hoặc trạng thái tài khoản bằng dữ liệu gửi từ frontend.
 
+* **Realtime theo phiên (K03.13):** Channel gắn Conversation và phiên browser. Logout thu hồi phiên hiện tại, giữ phiên khác; suspend account/Profile thu hồi mọi phiên. Restore không hồi sinh session/token cũ; đăng nhập lại để lấy channel mới. Dấu revoked được giữ để chặn request cũ tái cấp quyền.
+* **Hiệu lực HTTP/CSRF:** Cookie logout GET bị từ chối; mutation có thể bị CSRF chặn 419 trước bước authentication. Không tự retry mutation sau 419. Đổi mật khẩu có rotation session ID thu hồi grant realtime gắn ID cũ; reset theo policy thu hồi phiên Identity.
+
 ### **Cách kiểm chứng**
 
 * Đăng xuất rồi gửi lại cookie phiên cũ. Request không được truy cập dữ liệu riêng tư.  
@@ -20,6 +23,8 @@
 * Thử thực hiện chức năng dành riêng cho Tutor đã xác minh hoặc được duyệt bằng tài khoản chưa đáp ứng điều kiện. Server phải từ chối.  
 * Thử gửi role, permissions hoặc status giả trong request. Người dùng không được tự cấp quyền cho mình.
 * Sau đăng ký không có session xác thực; login trước xác minh bị từ chối, link hợp lệ xác minh email, sau đó login mới tạo session. Resend không cần login và không phân biệt email không tồn tại/đã xác minh trong phản hồi.
+
+**Evidence backend hiện có:** [K03.13](../handover/BE-K03-K03.13-test-report.md) kiểm hai session, logout riêng một phiên, job chờ qua logout/suspend account/Profile, restore/login lại, stale request và rollback. Cookie/session/CSRF thật qua probe local; điều này không chứng nhận toàn bộ mục tiêu SP-01/SP-02 hoặc cấu hình production.
 
 ## SP-02 · HTTPS, cookie và CSRF
 
@@ -83,7 +88,7 @@ Không chỉ dựa vào unit test khi middleware CSRF hoặc các lớp bảo v�
 | Gửi Report | Tối đa 10 lần/giờ và 30 lần/ngày cho mỗi reporter (BR-24) |
 | Upload tệp | Tối đa 10 lần cho mỗi user trong 1 phút |
 
-Các giới hạn trên phải được áp dụng theo đúng cách tính đã thống nhất. Ví dụ, một lần gửi tin nhắn cần được tính nhất quán ở cả giới hạn theo Conversation và giới hạn tổng của user.
+Các giới hạn trên phải được áp dụng theo đúng cách tính đã thống nhất. Messaging tính 30 tin mới trong cửa sổ trượt 60 giây trên tất cả Conversation của sender; replay idempotent không tính quota. Các quota mục tiêu khác vẫn cần implementation/evidence riêng.
 
 * Khi vượt giới hạn, API trả về HTTP `429 Too Many Requests` và header `Retry-After` để thông báo thời gian chờ nếu phù hợp.  
 * Bộ đếm phải hoạt động nhất quán giữa nhiều worker. Không chỉ lưu giới hạn trong session của người dùng vì session có thể thay đổi.  
@@ -142,6 +147,10 @@ Các quy tắc bổ sung:
 * Nếu thao tác đình chỉ hồ sơ Tutor đồng thời giữ tài khoản ở trạng thái active hoặc thay đổi trạng thái tài khoản, phải kiểm tra đủ hai permission theo chính sách và thực hiện các thay đổi liên quan trong cùng transaction.  
 * Theo BR-11, chỉ Admin active có `admin.reports.view` và assignment hiện tại được đọc evidence khi Report còn `open`; Report đóng hoặc assignment đổi/thu hồi chặn từ request tiếp theo. Với message, giới hạn message bị báo cáo cùng tối đa 10 tin trước/5 tin sau; mỗi lần đọc phải audit. BR-27 đã chốt exact lookup, allow-list DTO và quyền riêng cho Admin directory; runtime chưa triển khai.
 
+* **Private channel theo phiên:** POST Conversation realtime và POST /broadcasting/auth kiểm account/role, Profile, membership, session database còn sống, token thuộc đúng User và đúng session, registry chưa revoked/hết hạn. Session khác của cùng User, outsider/Admin và channel chung cũ không được ký theo quyền participant.
+* **Quyền lúc publish:** Worker chỉ giữ Conversation ID, đọc lại quyền lúc thực sự phát; publisher và logout/suspend dùng khóa User theo ID tăng dần. Giữ khóa qua kiểm quyền và transport, có timeout giới hạn. Không đổi chat/member/read cursor khi revoke.
+* **Ranh giới thu hồi:** Nếu revoke commit trước, không publish mới tới channel cũ. TCP có thể còn mở; frame giao thức và notification đã publish trước thu hồi có thể đến muộn. Payload nghiệp vụ chỉ có conversation_id; không nhúng body tin nhắn hoặc metadata file.
+
 ### **Cách kiểm chứng**
 
 * Đổi ID hoặc cursor trong URL/request để thử truy cập tài nguyên của người khác.  
@@ -150,23 +159,21 @@ Các quy tắc bổ sung:
 * Thu hồi assignment rồi thử truy cập lại bằng tài khoản cũ.  
 * Kiểm tra không thể dùng `allowed_actions` hoặc dữ liệu gửi từ frontend để vượt qua authorization.
 
+**Evidence và giới hạn:** [K03.13](../handover/BE-K03-K03.13-test-report.md) có auth/HMAC/CSRF thật, outsider/cross-session denied, hai race PostgreSQL và Reverb/worker outage. Notification best effort; REST after/resync phục hồi. K03.12 Echo/UI, TLS production và load/soak chưa nghiệm thu; không suy ra Admin report evidence hoặc mọi resource module đã hoàn tất.
+
 ## SP-07 · Tệp và nội dung không tin cậy
 
 ### **Yêu cầu**
 
 * **Lưu trữ riêng tư:** Storage phải ở chế độ private theo mặc định. Việc tải xuống phải được kiểm tra quyền truy cập đối với người dùng, mục đích sử dụng và tài nguyên liên quan.  
 * **Kiểm tra file:** Trước khi gắn file vào tài nguyên hoặc cho phép tải xuống, phải kiểm tra quyền sở hữu, mục đích sử dụng (`purpose`), MIME type thực tế, extension, dung lượng, checksum và tài nguyên liên quan.  
-* **Giới hạn file theo purpose:**
-  * Avatar: JPG/PNG, tối đa 2 MiB.  
-  * Chat: PDF/JPG/PNG/DOC/DOCX, tối đa 5 MiB/tệp và một tệp/message.
-  * Submission/Announcement: PDF/JPG/PNG/DOC/DOCX, tối đa 5 MiB/tệp, tối đa 5 tệp/resource.
-  * Purpose khác: giới hạn hiện hành tối đa 10 MiB, PDF/JPG/PNG/DOC/DOCX, trừ quy định riêng của purpose.
+* **Giới hạn điều chỉnh 29/10/2026:** Theo [K03.1](../handover/BE-K03-K03.1-contract.md), mọi upload mới tối đa 5.000.000 byte/file; avatar JPG/JPEG/PNG, tài liệu bài tập/bài nộp/CV PDF/JPG/JPEG/PNG/DOC/DOCX. Chat chỉ text, không upload/gắn file. Giới hạn số file/resource và quyền nghiệp vụ vẫn theo module. [K03.7b](../handover/BE-K03-K03.7b-test-report.md) đã kiểm tra kỹ thuật giới hạn byte tại frontend/upload/complete; không dùng kiểm client thay cho backend validation.
 * **Loại file được phép:** Mỗi `FilePurpose` phải có danh sách định dạng được phép rõ ràng. Không tự cho phép định dạng mới nếu chưa có quy định.  
 * **Trạng thái upload:** Chỉ file đã upload hoàn tất và vượt qua các kiểm tra bắt buộc mới được sử dụng.  
 * **Bảo vệ đường dẫn:** Không trả object key hoặc đường dẫn storage nội bộ trong API công khai.  
 * **Xử lý file rủi ro:** File có thể chứa nội dung nguy hiểm phải được cung cấp theo cách hạn chế thực thi, chẳng hạn tải về dưới dạng attachment khi phù hợp. Server không được thực thi HTML, script hoặc macro Office từ file người dùng tải lên.  
 * **Nội dung do người dùng nhập:** Không hiển thị nội dung người dùng dưới dạng HTML không được lọc hoặc mã hóa phù hợp.  
-* **Quarantine và quét malware:** Mọi file phải ở trạng thái cách ly cho đến khi scanner malware được cấu hình thực tế trả kết quả clean. Scanner không sẵn sàng/lỗi thì file giữ pending và không được attach hoặc download; phát hiện malware chuyển rejected. `clean` chỉ biểu thị đã qua các kiểm tra được triển khai, không bảo đảm file hoàn toàn không có malware. Không tuyên bố đã scan nếu chưa tích hợp scanner.
+* **Complete và nội dung:** Không có scanner antivirus tự động theo K03.1 mới. File pending chưa được sử dụng; kiểm tra kỹ thuật đạt mới clean. Vi phạm metadata/archive → rejected; storage/validation tạm không khả dụng → pending và cho retry. clean/complete không xác nhận không có malware. Không giả evidence quét; giữ evidence thật hợp lệ trước đây. Task/Submission không chờ duyệt thủ công; CV duyệt nội dung theo đúng file/version và permission/assignment, độc lập với complete. Duyệt CV không đồng nghĩa antivirus-scan. Các luồng nghiệp vụ này phải có implementation/evidence riêng.
 
 ### **Cách kiểm chứng**
 

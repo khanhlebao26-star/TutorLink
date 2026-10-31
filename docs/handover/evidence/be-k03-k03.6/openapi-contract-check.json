@@ -1,0 +1,56 @@
+{
+  "checked_at": "2026-10-28 19:58:27 +07:00",
+  "operation_count": 69,
+  "method": "PATCH",
+  "path": "/api/v1/conversations/{conversation}/read",
+  "openapi_path": "/conversations/{conversation}/read",
+  "server_url": "http://localhost:8000/api/v1",
+  "operation_id": "conversations.read",
+  "request_schema": {
+    "type": "object",
+    "properties": {
+      "last_read_message_id": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "required": [
+      "last_read_message_id"
+    ],
+    "title": "UpdateReadCursorRequest"
+  },
+  "success_dto": {
+    "type": "object",
+    "properties": {
+      "conversation_id": {
+        "type": "integer"
+      },
+      "last_read_message_id": {
+        "type": "integer"
+      },
+      "last_read_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "required": [
+      "conversation_id",
+      "last_read_message_id",
+      "last_read_at"
+    ],
+    "title": "ReadCursorResource"
+  },
+  "response_codes": [
+    "200",
+    "422",
+    "401",
+    "403",
+    "404",
+    "409"
+  ],
+  "authentication": "Inherited document sessionCookie; SPA writes also require CSRF",
+  "runtime_validation": "API tests additionally reject null, numeric string and unknown fields; schema inference does not express every runtime rule",
+  "result": "PASS"
+}
