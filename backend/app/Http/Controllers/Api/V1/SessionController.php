@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Sessions\SaveSession;
+use App\Actions\Sessions\TransitionSession;
 use App\Exceptions\SessionActionException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CancelSessionRequest;
+use App\Http\Requests\CompleteSessionRequest;
 use App\Http\Requests\CreateSessionRequest;
 use App\Http\Requests\ProgramIndexRequest;
 use App\Http\Requests\SessionApiRequest;
@@ -142,6 +145,87 @@ class SessionController extends Controller
             $session,
             $saveSession,
         );
+    }
+
+    /** Complete a scheduled Session and create its actual record. */
+    #[OpenApiResponse(
+        status: 200,
+        type: 'array{data: SessionResource}',
+    )]
+    #[HeaderParameter(
+        'Idempotency-Key',
+        'UUID for request replay; the receipt is retained for 30 days.',
+        required: true,
+        type: 'string',
+        format: 'uuid',
+    )]
+    public function complete(
+        CompleteSessionRequest $request,
+        int $session,
+        TransitionSession $transitionSession,
+    ): JsonResponse {
+        return $this->transition(
+            $request,
+            $session,
+            'complete',
+            $transitionSession,
+        );
+    }
+
+    /** Cancel a scheduled Session without creating an actual record. */
+    #[OpenApiResponse(
+        status: 200,
+        type: 'array{data: SessionResource}',
+    )]
+    #[HeaderParameter(
+        'Idempotency-Key',
+        'UUID for request replay; the receipt is retained for 30 days.',
+        required: true,
+        type: 'string',
+        format: 'uuid',
+    )]
+    public function cancel(
+        CancelSessionRequest $request,
+        int $session,
+        TransitionSession $transitionSession,
+    ): JsonResponse {
+        return $this->transition(
+            $request,
+            $session,
+            'cancel',
+            $transitionSession,
+        );
+    }
+
+    private function transition(
+        CompleteSessionRequest $request,
+        int $sessionId,
+        string $transition,
+        TransitionSession $transitionSession,
+    ): JsonResponse {
+        try {
+            $result = $transitionSession->execute(
+                $request->user(),
+                $sessionId,
+                $transition,
+                $request->validated(),
+                $request->idempotencyKey(),
+                (string) $request->attributes->get('request_id'),
+            );
+
+            return response()->json(
+                $result['body'],
+                $result['status'],
+            );
+        } catch (SessionActionException $exception) {
+            return $this->error(
+                $request,
+                $exception->httpStatus,
+                $exception->errorCode,
+                $exception->getMessage(),
+                $exception->errors,
+            );
+        }
     }
 
     private function save(

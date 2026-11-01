@@ -8916,6 +8916,130 @@
                 }
             }
         },
+        "/sessions/{session}/complete": {
+            "post": {
+                "operationId": "sessions.complete",
+                "summary": "Complete a scheduled Session and create its actual record",
+                "tags": [
+                    "Session"
+                ],
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "UUID for request replay; the receipt is retained for 30 days.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteSessionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/sessions/{session}/cancel": {
+            "post": {
+                "operationId": "sessions.cancel",
+                "summary": "Cancel a scheduled Session without creating an actual record",
+                "tags": [
+                    "Session"
+                ],
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "UUID for request replay; the receipt is retained for 30 days.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CancelSessionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/programs/{program}/tasks": {
             "get": {
                 "operationId": "task.index",
@@ -11032,6 +11156,27 @@
                 ],
                 "title": "AvailabilityRuleRequest"
             },
+            "CancelSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "expected_version": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2147483647
+                    },
+                    "reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "maxLength": 2000
+                    }
+                },
+                "required": [
+                    "expected_version"
+                ],
+                "title": "CancelSessionRequest"
+            },
             "Category": {
                 "type": "object",
                 "properties": {
@@ -11075,6 +11220,20 @@
                     "updated_at"
                 ],
                 "title": "Category"
+            },
+            "CompleteSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "expected_version": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2147483647
+                    }
+                },
+                "required": [
+                    "expected_version"
+                ],
+                "title": "CompleteSessionRequest"
             },
             "ConversationReadResource": {
                 "type": "object",

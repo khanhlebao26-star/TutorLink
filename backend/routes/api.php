@@ -119,6 +119,16 @@ Route::prefix('v1')->group(function () {
             '/sessions/{session}',
             [SessionController::class, 'update'],
         )->whereNumber('session')->name('sessions.update');
+
+        Route::post(
+            '/sessions/{session}/complete',
+            [SessionController::class, 'complete'],
+        )->whereNumber('session')->name('sessions.complete');
+
+        Route::post(
+            '/sessions/{session}/cancel',
+            [SessionController::class, 'cancel'],
+        )->whereNumber('session')->name('sessions.cancel');
     });
 
     Route::prefix('auth')->group(function () {
