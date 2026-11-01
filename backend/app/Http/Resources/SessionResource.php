@@ -2,16 +2,21 @@
 
 namespace App\Http\Resources;
 
+use App\Models\ProgramSession;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property-read ProgramSession $resource
+ */
 class SessionResource extends JsonResource
 {
     /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
+        /** @var ProgramSession $session */
         $session = $this->resource;
         $actual = $session->actual;
 

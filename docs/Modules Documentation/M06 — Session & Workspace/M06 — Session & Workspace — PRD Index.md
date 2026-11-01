@@ -21,8 +21,9 @@ Tổ chức Workspace của Program và điều phối Session, với quyền đ
 
 # Implementation gaps
 
-* Migration program\_sessions/lesson\_sessions có; Program/Workspace/Session API và UI chưa có.  
-* ID mapping, transition và policy Paused đã chốt ở M06-F02/F03/BR-19: API dùng program\_sessions.id; hoàn tất tạo actual 0..1 nguyên tử, hủy không tạo actual. BR-20 chốt timezone, Overview shape và URL validation. Khoảng trống còn lại là triển khai version/API và bằng chứng kiểm thử, không phải chọn lại mô hình.
+* Cập nhật runtime BE-K04 ngày 01/11/2026: sáu Session API đọc/tạo/sửa/complete/cancel đã đăng ký; planned ID, version, policy, validation, transaction/replay và race PostgreSQL có evidence. Xem [bàn giao BE-K04](../../handover/BE-K04-handover.md) và [báo cáo K04.6](../../handover/BE-K04-K04.6-test-report.md).
+* Program lifecycle và Workspace Overview có route trong Catalog/OpenAPI; BE-K04 không chứng nhận toàn bộ hành vi của Overview hoặc giao diện sáu tab. UI và triển khai staging/production chưa được nghiệm thu trong bộ evidence này.
+* Metadata terminal legacy có thể null; không coi trạng thái giống nhau là đủ để replay. Session không thêm attendance, video integration hoặc attachment.
 
 F19 — Bằng chứng current-state (18/10/2026): nội dung mục này là baseline của lượt rà soát trước, chưa được kiểm tra lại repository/commit trong lượt Drive-only này. Owner xác minh: chưa gán; ngày/commit kiểm chứng: chưa có; trạng thái: chưa xác minh. Migration tồn tại không tự chứng minh API, transaction hoặc UI đã được triển khai. Phân biệt ghi nhận này với “Quy tắc đích”; mô tả nháp ADR-09/BR-10 nằm trong Business Rules.
 

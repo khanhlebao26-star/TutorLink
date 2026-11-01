@@ -584,9 +584,9 @@ sequence\_number — integer; NOT NULL.
 
 title — varchar(180); NOT NULL.
 
-planned\_starts\_at — timestamptz; NOT NULL.
+planned\_starts\_at — timestamptz(6); NOT NULL.
 
-planned\_ends\_at — timestamptz; NOT NULL.
+planned\_ends\_at — timestamptz(6); NOT NULL.
 
 timezone — varchar(64); NOT NULL; snapshot `Program.timezone` tại lúc lập Session; mọi instant lưu UTC.
 
@@ -596,13 +596,15 @@ location\_text — text; NULL.
 
 meeting\_url — text; NULL.
 
-status — varchar(20); NOT NULL; mặc định: scheduled; enum: SessionStatus; cần điều chỉnh.
+status — varchar(20); NOT NULL; mặc định: scheduled; enum: SessionStatus (scheduled/completed/cancelled).
 
-version — integer; NOT NULL DEFAULT 1; BR-19, optimistic concurrency cho Session.
+version — integer; NOT NULL DEFAULT 1; CHECK version >= 1 trên PostgreSQL; BR-19, optimistic concurrency cho Session.
 
-created\_at — timestamptz; NULL.
+terminal\_replay — jsonb; NULL; metadata nội bộ gồm actor/action/hash của payload gốc và response snapshot cho replay terminal; không trả trực tiếp qua API.
 
-updated\_at — timestamptz; NULL.
+created\_at — timestamptz(6); NULL.
+
+updated\_at — timestamptz(6); NULL.
 
 ### Bảng lesson\_sessions
 
@@ -630,7 +632,9 @@ Khóa ghép / unique: program\_sessions: UNIQUE(program\_id,program\_version,seq
 
 program\_sessions lưu kế hoạch; lesson\_sessions lưu kết quả thực hiện, quan hệ 1 → 0..1. Hai cột status dùng SessionStatus scheduled/completed/cancelled và được cập nhật nhất quán trong một transaction. Không dùng planned/in\_progress/no\_show làm enum đích. tutor\_joined\_at/customer\_joined\_at là cột legacy được giữ lại, không suy ra chức năng điểm danh. program\_version là số phiên bản lịch sử, không đặt FK ghép tới version hiện tại của programs.
 
-Theo BR-19, mọi mutation Session kiểm `expected_version` dưới cùng transaction với state gate; PATCH lịch chỉ khi Program Active và Session scheduled. Complete/cancel trong Active/Paused tăng version, cùng với tạo lesson\_sessions nguyên tử khi complete. Replay request hợp lệ trả kết quả đã lưu mà không tăng version/audit lần hai. `Program.timezone` authoritative; program\_sessions.timezone snapshot giá trị đó, instant lưu UTC. `meeting_url` chỉ nhận HTTPS, tối đa 2.048 ký tự, không credentials.
+Theo BR-19, edit/complete/cancel Session kiểm `expected_version` dưới cùng transaction với state gate; create khởi tạo version 1. PATCH lịch chỉ khi Program Active và Session scheduled; PATCH không đổi dữ liệu không tăng version/audit. Complete/cancel trong Active/Paused tăng version, cùng với tạo lesson\_sessions nguyên tử khi complete. Replay request hợp lệ trả snapshot đã lưu mà không tăng version/audit lần hai, kể cả khi Program đã terminal, sau khi kiểm identity/scope/quyền hiện tại. `Program.timezone` authoritative; program\_sessions.timezone snapshot giá trị đó, instant lưu UTC. `meeting_url` chỉ nhận HTTPS, tối đa 2.048 ký tự, không credentials.
+
+**Runtime BE-K04, 01/11/2026:** hai migration bổ sung version/terminal replay/default scheduled và giữ microseconds cho bốn timestamp planned. FK + UNIQUE `lesson_sessions.program_session_id` đã có từ schema trước, không được thêm lại. Complete tạo actual `completed` với actual times nullable; cancel không tạo actual. Status default `scheduled` của bảng actual vẫn là cấu trúc legacy, không phải luồng tạo actual của API. Metadata terminal cũ có thể null; không tự suy replay hoặc backfill khi thiếu payload gốc. Xem [bàn giao BE-K04](../handover/BE-K04-handover.md) để biết migration, evidence và giới hạn môi trường.
 
 # 07 · Nhiệm vụ và bài nộp
 

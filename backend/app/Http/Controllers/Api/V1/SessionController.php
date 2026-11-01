@@ -25,7 +25,30 @@ use Illuminate\Http\Request;
 
 class SessionController extends Controller
 {
+    private const ERROR_RESPONSE_TYPE =
+        'array{code: string, message: string, request_id: string, errors: array<string, mixed>}';
+
     /** List Sessions visible to the Program owner or member. */
+    #[OpenApiResponse(
+        status: 401,
+        description: 'Authentication is required.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 403,
+        description: 'The account or action is forbidden.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 404,
+        description: 'The resource was not found in the actor scope.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 422,
+        description: 'The request data is invalid.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
     public function index(
         ProgramIndexRequest $request,
         int $program,
@@ -58,6 +81,21 @@ class SessionController extends Controller
     #[OpenApiResponse(
         status: 200,
         type: 'array{data: SessionResource}',
+    )]
+    #[OpenApiResponse(
+        status: 401,
+        description: 'Authentication is required.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 403,
+        description: 'The account or action is forbidden.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 404,
+        description: 'The resource was not found in the actor scope.',
+        type: self::ERROR_RESPONSE_TYPE,
     )]
     public function show(
         Request $request,
@@ -96,6 +134,31 @@ class SessionController extends Controller
         type: 'string',
         format: 'uuid',
     )]
+    #[OpenApiResponse(
+        status: 401,
+        description: 'Authentication is required.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 403,
+        description: 'The account or action is forbidden.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 404,
+        description: 'The resource was not found in the actor scope.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 409,
+        description: 'State, version or idempotency conflict.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 422,
+        description: 'The request data is invalid.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
     public function store(
         CreateSessionRequest $request,
         int $program,
@@ -113,6 +176,31 @@ class SessionController extends Controller
     #[OpenApiResponse(
         status: 200,
         type: 'array{data: SessionResource}',
+    )]
+    #[OpenApiResponse(
+        status: 401,
+        description: 'Authentication is required.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 403,
+        description: 'The account or action is forbidden.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 404,
+        description: 'The resource was not found in the actor scope.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 409,
+        description: 'State, version or idempotency conflict.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 422,
+        description: 'The request data is invalid.',
+        type: self::ERROR_RESPONSE_TYPE,
     )]
     #[HeaderParameter(
         'Idempotency-Key',
@@ -152,6 +240,31 @@ class SessionController extends Controller
         status: 200,
         type: 'array{data: SessionResource}',
     )]
+    #[OpenApiResponse(
+        status: 401,
+        description: 'Authentication is required.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 403,
+        description: 'The account or action is forbidden.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 404,
+        description: 'The resource was not found in the actor scope.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 409,
+        description: 'State, version or idempotency conflict.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 422,
+        description: 'The request data is invalid.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
     #[HeaderParameter(
         'Idempotency-Key',
         'UUID for request replay; the receipt is retained for 30 days.',
@@ -176,6 +289,31 @@ class SessionController extends Controller
     #[OpenApiResponse(
         status: 200,
         type: 'array{data: SessionResource}',
+    )]
+    #[OpenApiResponse(
+        status: 401,
+        description: 'Authentication is required.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 403,
+        description: 'The account or action is forbidden.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 404,
+        description: 'The resource was not found in the actor scope.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 409,
+        description: 'State, version or idempotency conflict.',
+        type: self::ERROR_RESPONSE_TYPE,
+    )]
+    #[OpenApiResponse(
+        status: 422,
+        description: 'The request data is invalid.',
+        type: self::ERROR_RESPONSE_TYPE,
     )]
     #[HeaderParameter(
         'Idempotency-Key',
