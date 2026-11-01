@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class Program extends Model
@@ -25,7 +26,18 @@ class Program extends Model
 
     public function ownerTutorProfile(): BelongsTo
     {
-        return $this->belongsTo(TutorProfile::class, 'owner_tutor_profile_id');
+        return $this->belongsTo(
+            TutorProfile::class,
+            'owner_tutor_profile_id',
+        );
+    }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(
+            ProgramSession::class,
+            'program_id',
+        );
     }
 
     public function scopeVisibleTo(Builder $query, User $actor): Builder
@@ -33,7 +45,10 @@ class Program extends Model
         return match ($actor->role) {
             'tutor' => $query->whereHas(
                 'ownerTutorProfile',
-                fn (Builder $profile) => $profile->where('user_id', $actor->id),
+                fn (Builder $profile) => $profile->where(
+                    'user_id',
+                    $actor->id,
+                ),
             ),
             'customer' => $query->whereExists(fn ($membership) => $membership
                 ->selectRaw('1')
@@ -53,8 +68,8 @@ class Program extends Model
                 'has_unexpired_pending_invitation' => DB::table('program_invitations')
                     ->selectRaw('1')
                     ->whereColumn('program_invitations.program_id', 'programs.id')
-                    ->where('program_invitations.status', 'pending')
-                    ->where('program_invitations.expires_at', '>', now('UTC'))
+                    ->where('status', 'pending')
+                    ->where('expires_at', '>', now('UTC'))
                     ->limit(1),
             ]);
     }
