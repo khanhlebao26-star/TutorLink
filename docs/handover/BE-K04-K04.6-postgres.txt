@@ -1,0 +1,219 @@
+time="2026-11-01T10:08:18+07:00" level=warning msg="Found orphan containers (tutorlink-src-backend-1, tutorlink-src-reverb-1, tutorlink-src-broadcast-worker-1, tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running 
+ Image tutorlink-h01-backend-test:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/php:8.3-cli
+#4 DONE 1.2s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 DONE 1.2s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 FROM docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a
+#6 resolve docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a
+#7 resolve docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 23.50kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#9 CACHED
+
+#10 [stage-0 8/9] COPY . .
+#10 CACHED
+
+#11 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#11 CACHED
+
+#12 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [stage-0 5/9] WORKDIR /var/www/html
+#13 CACHED
+
+#14 [stage-0 6/9] COPY composer.json composer.lock ./
+#14 CACHED
+
+#15 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#15 CACHED
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:0b7ebae02786b90cf4e0d31bc67de918e127aa823884f6b423c03683dae2fa76 done
+#17 exporting config sha256:49b2579fbcee37e910d99f833e7e34d2d245f4d3a43e35c5ae7eb0b08b068a1a done
+#17 exporting attestation manifest sha256:436adc6bdc467f8abfc57f72bb2a309b7f58015534a088a45c70f49b3fb9f7e4 0.0s done
+#17 exporting manifest list sha256:02313798c46759ff831f08e02069984656e2187ebe13b63244d240bd1bf506f7 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#17 DONE 0.1s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built 
+ Container tutorlink-src-test-db-1 Waiting 
+ Container tutorlink-src-test-db-1 Healthy 
+ Container tutorlink-src-backend-test-run-a8f447bc3486 Creating 
+ Container tutorlink-src-backend-test-run-a8f447bc3486 Created 
+K04_RACE:{"program_id":1,"operations":["complete","complete"],"block_chain":[13248,13241,13240],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","complete"],"block_chain":[13252,13251,13250],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","cancel"],"block_chain":[13255,13254,13253],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["cancel","complete"],"block_chain":[13258,13257,13256],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_complete"],"block_chain":[13261,13260,13259],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_complete","create"],"block_chain":[13264,13263,13262],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_cancel"],"block_chain":[13274,13273,13265],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","create"],"block_chain":[13278,13276,13275],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["complete","program_complete"],"block_chain":[13281,13280,13279],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","complete"],"block_chain":[13284,13283,13282],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["complete","program_cancel"],"block_chain":[13287,13286,13285],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","complete"],"block_chain":[13297,13289,13288],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_complete"],"block_chain":[13300,13299,13298],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","cancel"],"block_chain":[13303,13302,13301],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_cancel"],"block_chain":[13306,13305,13304],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","cancel"],"block_chain":[13309,13308,13307],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["edit","edit"],"block_chain":[13312,13311,13310],"statuses":[200,409]}
+
+   PASS  Tests\Feature\SessionConcurrencyTest
+  ✓ concurrent complete has one actual and one audit with data set "sam… 1.66s  
+  ✓ concurrent complete has one actual and one audit with data set "dif… 0.55s  
+  ✓ complete and cancel have one winner with data set "complete first"   0.54s  
+  ✓ complete and cancel have one winner with data set "cancel first"     0.57s  
+  ✓ create and program terminal have a consistent order with data set "… 0.54s  
+  ✓ create and program terminal have a consistent order with data set "… 0.53s  
+  ✓ create and program terminal have a consistent order with data set "… 0.54s  
+  ✓ create and program terminal have a consistent order with data set "… 0.54s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.57s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.55s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.57s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.55s  
+  ✓ session and program terminal respect blockers with data set "cancel… 0.55s  
+  ✓ session and program terminal respect blockers with data set "cancel… 0.55s  
+  ✓ session and program terminal respect blockers with data set "cancel… 0.58s  
+  ✓ session and program terminal respect blockers with data set "cancel… 0.59s  
+  ✓ concurrent edits cannot overwrite the same version                   0.57s  
+
+   PASS  Tests\Feature\SessionTransitionApiTest
+  ✓ it completes a Session and creates one actual                        0.12s  
+  ✓ it cancels a Session without creating an actual                      0.07s  
+  ✓ it allows scheduled transitions while the Program is paused with ('… 0.07s  
+  ✓ it allows scheduled transitions while the Program is paused with ('… 0.07s  
+  ✓ it rejects the opposite transition after a terminal result with ('c… 0.09s  
+  ✓ it rejects the opposite transition after a terminal result with ('c… 0.09s  
+  ✓ it replays the same command with the same or a new key with ('compl… 0.10s  
+  ✓ it replays the same command with the same or a new key with ('cance… 0.10s  
+  ✓ it uses durable metadata after the receipt expires with ('complete'… 0.09s  
+  ✓ it uses durable metadata after the receipt expires with ('cancel')   0.09s  
+  ✓ it replays after the Program completes without repeating business e… 0.12s  
+  ✓ it replays after the Program completes without repeating business e… 0.10s  
+  ✓ it blocks new transitions on a terminal Program with ('completed')   0.09s  
+  ✓ it blocks new transitions on a terminal Program with ('cancelled')   0.08s  
+  ✓ it rejects stale versions before creating an actual                  0.07s  
+  ✓ it rejects key reuse with another payload or action                  0.09s  
+  ✓ it rejects a different cancel reason with a new key                  0.08s  
+  ✓ it checks current authorization before returning replay              0.08s  
+  ✓ it does not infer replay from a legacy terminal status alone         0.06s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.07s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.07s  
+
+   PASS  Tests\Feature\SessionApiTest
+  ✓ it creates only a planned Session with UTC timestamps                0.07s  
+  ✓ it allows member reads and rejects outsider reads                    0.08s  
+  ✓ it increments version once and rejects stale edits                   0.08s  
+  ✓ it does not increase version or audit for a no-op edit               0.07s  
+  ✓ it checks the merged schedule for a partial edit                     0.07s  
+  ✓ it blocks new writes when the Program is not active with ('paused')  0.07s  
+  ✓ it blocks new writes when the Program is not active with ('complete… 0.07s  
+  ✓ it blocks new writes when the Program is not active with ('cancelle… 0.08s  
+  ✓ it blocks new writes when the Program is not active with ('draft')   0.08s  
+  ✓ it replays create and edit before terminal Program state checks      0.09s  
+  ✓ it canonicalizes key order and equivalent timestamp offsets          0.08s  
+  ✓ it checks current authorization before replay                        0.07s  
+  ✓ it rolls back the planned Session when audit writing fails           0.06s  
+
+   PASS  Tests\Feature\SessionPolicyValidationTest
+  ✓ it allows reading only for the owner and current member              0.06s  
+  ✓ it applies the Program state matrix with dataset "active"            0.05s  
+  ✓ it applies the Program state matrix with dataset "paused"            0.05s  
+  ✓ it applies the Program state matrix with dataset "completed"         0.05s  
+  ✓ it applies the Program state matrix with dataset "cancelled"         0.04s  
+  ✓ it applies the Program state matrix with dataset "draft"             0.04s  
+  ✓ it blocks new mutations on terminal Sessions with ('completed')      0.04s  
+  ✓ it blocks new mutations on terminal Sessions with ('cancelled')      0.04s  
+  ✓ it rejects unauthenticated, outsider and member mutations            0.05s  
+  ✓ it rejects inactive actors                                           0.05s  
+  ✓ it accepts a valid schedule and requires an idempotency header       0.06s  
+  ✓ it rejects invalid schedule data with dataset "blank title"          0.06s  
+  ✓ it rejects invalid schedule data with dataset "missing offset"       0.06s  
+  ✓ it rejects invalid schedule data with dataset "invalid date"         0.05s  
+  ✓ it rejects invalid schedule data with dataset "equal times"          0.04s  
+  ✓ it rejects invalid schedule data with dataset "end before start"     0.04s  
+  ✓ it rejects invalid schedule data with dataset "http URL"             0.05s  
+  ✓ it rejects invalid schedule data with dataset "URL credentials"      0.05s  
+  ✓ it rejects invalid schedule data with dataset "long URL"             0.05s  
+  ✓ it rejects invalid schedule data with dataset "server-owned status"  0.05s  
+  ✓ it rejects invalid schedule data with dataset "client timezone"      0.05s  
+  ✓ it requires an integer expected version for edit and actions         0.12s  
+  ✓ it accepts a partial edit and rejects an edit without content field… 0.05s  
+  ✓ it allows only the contracted complete and cancel payloads           0.06s  
+
+   PASS  Tests\Feature\SessionSchemaTest
+  ✓ it defaults a planned Session to scheduled with version one          0.06s  
+  ✓ it connects Program, planned Session and actual in both directions   0.05s  
+  ✓ it rejects a second actual for the same planned Session              0.04s  
+  ✓ it rejects an actual referencing a missing planned Session           0.04s  
+  ✓ it rejects invalid planned Session statuses on PostgreSQL with ('pl… 0.04s  
+  ✓ it rejects invalid planned Session statuses on PostgreSQL with ('in… 0.04s  
+  ✓ it rejects invalid planned Session statuses on PostgreSQL with ('no… 0.04s  
+  ✓ it rejects nonpositive Session versions on PostgreSQL with (0)       0.04s  
+  ✓ it rejects nonpositive Session versions on PostgreSQL with (-1)      0.04s  
+  ✓ it stores terminal replay metadata without serializing it            0.04s  
+  ✓ it does not allow mass assignment of server-managed Session fields   0.02s  
+  ✓ it hides legacy attendance fields on actual serialization            0.02s  
+
+   PASS  Tests\Feature\ProgramLifecycleApiTest
+  ✓ it records distinct lifecycle events without changing the offer ver… 0.08s  
+  ✓ it returns Session and Task blockers without completing the Program  0.06s  
+  ✓ it returns 404 when another Tutor attempts a Program lifecycle acti… 0.05s  
+  ✓ it rejects a transition outside the allowed state without side effe… 0.05s  
+  ✓ it cancels a Draft and its unexpired Invitation in one transaction   0.07s  
+  ✓ it completes a Program when Tasks are terminal and writes the membe… 0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.07s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.07s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.05s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it grants access only after accept and completes a paused Program o… 0.16s  
+
+  Tests:    109 passed (913 assertions)
+  Duration: 16.71s
+
