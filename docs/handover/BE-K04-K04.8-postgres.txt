@@ -1,0 +1,219 @@
+time="2026-11-01T13:42:47+07:00" level=warning msg="Found orphan containers (tutorlink-src-backend-1, tutorlink-src-reverb-1, tutorlink-src-broadcast-worker-1, tutorlink-src-slack-worker-1, tutorlink-src-outbox-worker-1, tutorlink-src-scheduler-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running 
+ Image tutorlink-h01-backend-test:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/composer:2
+#4 DONE 1.3s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 DONE 1.3s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a
+#6 resolve docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a 0.0s done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a
+#7 resolve docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 23.50kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#9 CACHED
+
+#10 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [stage-0 6/9] COPY composer.json composer.lock ./
+#11 CACHED
+
+#12 [stage-0 8/9] COPY . .
+#12 CACHED
+
+#13 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#13 CACHED
+
+#14 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#14 CACHED
+
+#15 [stage-0 5/9] WORKDIR /var/www/html
+#15 CACHED
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:d17ec1167ad89dd67c4056ef3fe4eb01f59223914513d5c36498bc09726e7a2f done
+#17 exporting config sha256:52eca45934070cb29947e1c065f86c57de8d8bf99388f849d228fab462a07197 done
+#17 exporting attestation manifest sha256:b76b9f7616f8aa1c58bd3d3b3df1c99fde7c6ec98d28b8ccb73b81f55a25e0b7 0.0s done
+#17 exporting manifest list sha256:70d44c0a9d2e3db6071f1a1a77d79963c3d2edf55a366cd8147eebfc757fe154 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#17 DONE 0.1s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built 
+ Container tutorlink-src-test-db-1 Waiting 
+ Container tutorlink-src-test-db-1 Healthy 
+ Container tutorlink-src-backend-test-run-4400c90d0173 Creating 
+ Container tutorlink-src-backend-test-run-4400c90d0173 Created 
+K04_RACE:{"program_id":1,"operations":["complete","complete"],"block_chain":[644,643,642],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","complete"],"block_chain":[647,646,645],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","cancel"],"block_chain":[650,649,648],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["cancel","complete"],"block_chain":[660,659,658],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_complete"],"block_chain":[663,662,661],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_complete","create"],"block_chain":[666,665,664],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_cancel"],"block_chain":[669,668,667],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","create"],"block_chain":[680,672,670],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["complete","program_complete"],"block_chain":[683,682,681],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","complete"],"block_chain":[686,685,684],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["complete","program_cancel"],"block_chain":[689,688,687],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","complete"],"block_chain":[692,691,690],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_complete"],"block_chain":[702,694,693],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","cancel"],"block_chain":[705,704,703],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_cancel"],"block_chain":[708,707,706],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","cancel"],"block_chain":[711,710,709],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["edit","edit"],"block_chain":[714,713,712],"statuses":[200,409]}
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SessionConcurrencyTest[39m
+  [32;1m✓[39;22m[90m [39m[90mconcurrent complete has one actual and one audit with data set "sam[39m[90m…[39m [90m1.72s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconcurrent complete has one actual and one audit with data set "dif[39m[90m…[39m [90m0.72s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcomplete and cancel have one winner with data set "complete first"[39m[90m  [39m [90m0.71s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcomplete and cancel have one winner with data set "cancel first"[39m[90m    [39m [90m0.68s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcreate and program terminal have a consistent order with data set "[39m[90m…[39m [90m0.67s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcreate and program terminal have a consistent order with data set "[39m[90m…[39m [90m0.57s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcreate and program terminal have a consistent order with data set "[39m[90m…[39m [90m0.66s[39m  
+  [32;1m✓[39;22m[90m [39m[90mcreate and program terminal have a consistent order with data set "[39m[90m…[39m [90m0.61s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "comple[39m[90m…[39m [90m0.68s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "comple[39m[90m…[39m [90m0.58s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "comple[39m[90m…[39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "comple[39m[90m…[39m [90m0.56s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "cancel[39m[90m…[39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "cancel[39m[90m…[39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "cancel[39m[90m…[39m [90m0.64s[39m  
+  [32;1m✓[39;22m[90m [39m[90msession and program terminal respect blockers with data set "cancel[39m[90m…[39m [90m0.59s[39m  
+  [32;1m✓[39;22m[90m [39m[90mconcurrent edits cannot overwrite the same version[39m[90m                  [39m [90m0.58s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SessionTransitionApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit completes a Session and creates one actual[39m[90m                       [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cancels a Session without creating an actual[39m[90m                     [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows scheduled transitions while the Program is paused with ('[39m[90m…[39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows scheduled transitions while the Program is paused with ('[39m[90m…[39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects the opposite transition after a terminal result with ('c[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects the opposite transition after a terminal result with ('c[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays the same command with the same or a new key with ('compl[39m[90m…[39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays the same command with the same or a new key with ('cance[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit uses durable metadata after the receipt expires with ('complete'[39m[90m…[39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit uses durable metadata after the receipt expires with ('cancel')[39m[90m  [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays after the Program completes without repeating business e[39m[90m…[39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays after the Program completes without repeating business e[39m[90m…[39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new transitions on a terminal Program with ('completed')[39m[90m  [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new transitions on a terminal Program with ('cancelled')[39m[90m  [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects stale versions before creating an actual[39m[90m                 [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects key reuse with another payload or action[39m[90m                 [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects a different cancel reason with a new key[39m[90m                 [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks current authorization before returning replay[39m[90m             [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not infer replay from a legacy terminal status alone[39m[90m        [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back all transition writes when a required write fails wit[39m[90m…[39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back all transition writes when a required write fails wit[39m[90m…[39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back all transition writes when a required write fails wit[39m[90m…[39m [90m0.14s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back all transition writes when a required write fails wit[39m[90m…[39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back all transition writes when a required write fails wit[39m[90m…[39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back all transition writes when a required write fails wit[39m[90m…[39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back all transition writes when a required write fails wit[39m[90m…[39m [90m0.14s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SessionApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit creates only a planned Session with UTC timestamps[39m[90m               [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows member reads and rejects outsider reads[39m[90m                   [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit increments version once and rejects stale edits[39m[90m                  [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not increase version or audit for a no-op edit[39m[90m              [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks the merged schedule for a partial edit[39m[90m                    [39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new writes when the Program is not active with ('paused')[39m[90m [39m [90m0.12s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new writes when the Program is not active with ('complete[39m[90m…[39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new writes when the Program is not active with ('cancelle[39m[90m…[39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new writes when the Program is not active with ('draft')[39m[90m  [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit replays create and edit before terminal Program state checks[39m[90m     [39m [90m0.11s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit canonicalizes key order and equivalent timestamp offsets[39m[90m         [39m [90m0.10s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit checks current authorization before replay[39m[90m                       [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rolls back the planned Session when audit writing fails[39m[90m          [39m [90m0.07s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SessionPolicyValidationTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit allows reading only for the owner and current member[39m[90m             [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies the Program state matrix with dataset "active"[39m[90m           [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies the Program state matrix with dataset "paused"[39m[90m           [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies the Program state matrix with dataset "completed"[39m[90m        [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies the Program state matrix with dataset "cancelled"[39m[90m        [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit applies the Program state matrix with dataset "draft"[39m[90m            [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new mutations on terminal Sessions with ('completed')[39m[90m     [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit blocks new mutations on terminal Sessions with ('cancelled')[39m[90m     [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects unauthenticated, outsider and member mutations[39m[90m           [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects inactive actors[39m[90m                                          [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts a valid schedule and requires an idempotency header[39m[90m      [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "blank title"[39m[90m         [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "missing offset"[39m[90m      [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "invalid date"[39m[90m        [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "equal times"[39m[90m         [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "end before start"[39m[90m    [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "http URL"[39m[90m            [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "URL credentials"[39m[90m     [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "long URL"[39m[90m            [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "server-owned status"[39m[90m [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid schedule data with dataset "client timezone"[39m[90m     [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit requires an integer expected version for edit and actions[39m[90m        [39m [90m0.16s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit accepts a partial edit and rejects an edit without content field[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit allows only the contracted complete and cancel payloads[39m[90m          [39m [90m0.07s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\SessionSchemaTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit defaults a planned Session to scheduled with version one[39m[90m         [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit connects Program, planned Session and actual in both directions[39m[90m  [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects a second actual for the same planned Session[39m[90m             [39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects an actual referencing a missing planned Session[39m[90m          [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid planned Session statuses on PostgreSQL with ('pl[39m[90m…[39m [90m0.05s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid planned Session statuses on PostgreSQL with ('in[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects invalid planned Session statuses on PostgreSQL with ('no[39m[90m…[39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects nonpositive Session versions on PostgreSQL with (0)[39m[90m      [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects nonpositive Session versions on PostgreSQL with (-1)[39m[90m     [39m [90m0.04s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit stores terminal replay metadata without serializing it[39m[90m           [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit does not allow mass assignment of server-managed Session fields[39m[90m  [39m [90m0.03s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit hides legacy attendance fields on actual serialization[39m[90m           [39m [90m0.03s[39m  
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ProgramLifecycleApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit records distinct lifecycle events without changing the offer ver[39m[90m…[39m [90m0.13s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns Session and Task blockers without completing the Program[39m[90m [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit returns 404 when another Tutor attempts a Program lifecycle acti[39m[90m…[39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit rejects a transition outside the allowed state without side effe[39m[90m…[39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit cancels a Draft and its unexpired Invitation in one transaction[39m[90m  [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit completes a Program when Tasks are terminal and writes the membe[39m[90m…[39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.06s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.07s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.08s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit reports every nonterminal Task as a blocker and preserves child[39m[90m… [39m [90m0.09s[39m  
+  [32;1m✓[39;22m[90m [39m[90mit grants access only after accept and completes a paused Program o[39m[90m…[39m [90m0.19s[39m  
+
+  [90mTests:[39m    [32;1m109 passed[39;22m[90m (913 assertions)[39m
+  [90mDuration:[39m [39m19.49s[39m
+
