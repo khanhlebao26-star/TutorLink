@@ -8451,6 +8451,471 @@
                 "security": []
             }
         },
+        "/programs/{program}/sessions": {
+            "get": {
+                "operationId": "programs.sessions.index",
+                "summary": "List Sessions visible to the Program owner or member",
+                "tags": [
+                    "Session"
+                ],
+                "parameters": [
+                    {
+                        "name": "program",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `SessionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/SessionResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object",
+                                            "properties": {
+                                                "first": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "last": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "prev": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "first",
+                                                "last",
+                                                "prev",
+                                                "next"
+                                            ]
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "links": {
+                                                    "type": "array",
+                                                    "description": "Generated paginator links.",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "url": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "active": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "url",
+                                                            "label",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ],
+                                                    "description": "Base path for paginator generated URLs."
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "description": "Number of items shown per page.",
+                                                    "minimum": 0
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "description": "Number of the last item in the slice.",
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "description": "Total number of items being paginated.",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "from",
+                                                "last_page",
+                                                "links",
+                                                "path",
+                                                "per_page",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "program_not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "const": "Program not found."
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": [
+                                                "object",
+                                                "string"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "programs.sessions.store",
+                "summary": "Create a scheduled Session without an actual occurrence",
+                "tags": [
+                    "Session"
+                ],
+                "parameters": [
+                    {
+                        "name": "program",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "UUID used to replay the same request for 30 days.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateSessionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sessions/{session}": {
+            "get": {
+                "operationId": "sessions.show",
+                "summary": "Retrieve a Session using its planned ID",
+                "tags": [
+                    "Session"
+                ],
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "`SessionResource`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "session_not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "const": "Session not found."
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": [
+                                                "object",
+                                                "string"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "sessions.update",
+                "summary": "Edit a scheduled Session with an expected version",
+                "tags": [
+                    "Session"
+                ],
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true,
+                        "description": "UUID used to replay the same request for 30 days.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateSessionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/SessionResource"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string",
+                                            "const": "session_not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "const": "Session not found."
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": [
+                                                "object",
+                                                "string"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-Request-ID": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
         "/programs/{program}/tasks": {
             "get": {
                 "operationId": "task.index",
@@ -10923,6 +11388,55 @@
                 ],
                 "title": "CreateProgramRequest"
             },
+            "CreateSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string",
+                        "pattern": "[^\\s\\p{Z}]",
+                        "maxLength": 180
+                    },
+                    "planned_starts_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d{1,6})?(?:Z|[+-](?:[01]\\d|2[0-3]):[0-5]\\d)$"
+                    },
+                    "planned_ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d{1,6})?(?:Z|[+-](?:[01]\\d|2[0-3]):[0-5]\\d)$"
+                    },
+                    "delivery_mode": {
+                        "type": "string",
+                        "enum": [
+                            "online",
+                            "offline",
+                            "hybrid"
+                        ]
+                    },
+                    "location_text": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "meeting_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uri",
+                        "maxLength": 2048
+                    }
+                },
+                "required": [
+                    "title",
+                    "planned_starts_at",
+                    "planned_ends_at",
+                    "delivery_mode"
+                ],
+                "title": "CreateSessionRequest"
+            },
             "CustomerProfile": {
                 "type": "object",
                 "properties": {
@@ -12018,6 +12532,119 @@
                 ],
                 "title": "SendTextMessageRequest"
             },
+            "SessionResource": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "program_id": {
+                        "type": "integer"
+                    },
+                    "program_version": {
+                        "type": "integer"
+                    },
+                    "sequence_number": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "planned_starts_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "planned_ends_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "timezone": {
+                        "type": "string"
+                    },
+                    "delivery_mode": {
+                        "type": "string"
+                    },
+                    "location_text": {
+                        "type": "string"
+                    },
+                    "meeting_url": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "version": {
+                        "type": "integer"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "actual": {
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "integer"
+                            },
+                            "status": {
+                                "type": "string"
+                            },
+                            "started_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "ended_at": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "id",
+                            "status",
+                            "started_at",
+                            "ended_at"
+                        ]
+                    }
+                },
+                "required": [
+                    "id",
+                    "program_id",
+                    "program_version",
+                    "sequence_number",
+                    "title",
+                    "planned_starts_at",
+                    "planned_ends_at",
+                    "timezone",
+                    "delivery_mode",
+                    "location_text",
+                    "meeting_url",
+                    "status",
+                    "version",
+                    "created_at",
+                    "updated_at",
+                    "actual"
+                ],
+                "title": "SessionResource"
+            },
             "Specialization": {
                 "type": "object",
                 "properties": {
@@ -12464,6 +13091,57 @@
                     "last_read_message_id"
                 ],
                 "title": "UpdateReadCursorRequest"
+            },
+            "UpdateSessionRequest": {
+                "type": "object",
+                "properties": {
+                    "expected_version": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2147483647
+                    },
+                    "title": {
+                        "type": "string",
+                        "pattern": "[^\\s\\p{Z}]",
+                        "maxLength": 180
+                    },
+                    "planned_starts_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d{1,6})?(?:Z|[+-](?:[01]\\d|2[0-3]):[0-5]\\d)$"
+                    },
+                    "planned_ends_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d{1,6})?(?:Z|[+-](?:[01]\\d|2[0-3]):[0-5]\\d)$"
+                    },
+                    "delivery_mode": {
+                        "type": "string",
+                        "enum": [
+                            "online",
+                            "offline",
+                            "hybrid"
+                        ]
+                    },
+                    "location_text": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "meeting_url": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uri",
+                        "maxLength": 2048
+                    }
+                },
+                "required": [
+                    "expected_version"
+                ],
+                "title": "UpdateSessionRequest"
             },
             "UserResource": {
                 "type": "object",

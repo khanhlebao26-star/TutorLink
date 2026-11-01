@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\ProgramController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
+use App\Http\Controllers\Api\V1\SessionController;
 use App\Http\Controllers\Api\V1\TaskController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
@@ -98,6 +99,26 @@ Route::prefix('v1')->group(function () {
         )
             ->whereNumber('conversation')
             ->name('conversations.realtime');
+
+        Route::get(
+            '/programs/{program}/sessions',
+            [SessionController::class, 'index'],
+        )->whereNumber('program')->name('programs.sessions.index');
+
+        Route::post(
+            '/programs/{program}/sessions',
+            [SessionController::class, 'store'],
+        )->whereNumber('program')->name('programs.sessions.store');
+
+        Route::get(
+            '/sessions/{session}',
+            [SessionController::class, 'show'],
+        )->whereNumber('session')->name('sessions.show');
+
+        Route::patch(
+            '/sessions/{session}',
+            [SessionController::class, 'update'],
+        )->whereNumber('session')->name('sessions.update');
     });
 
     Route::prefix('auth')->group(function () {
