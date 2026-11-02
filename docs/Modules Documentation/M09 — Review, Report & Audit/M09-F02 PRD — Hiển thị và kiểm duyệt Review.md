@@ -25,8 +25,10 @@ Hiển thị đánh giá hợp lệ cho công chúng và cho Admin có quyền m
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Sorting, pagination, hiển thị hidden Review và identity đã chốt ngày 21/10/2026; Review API/UI và public aggregate chưa triển khai.
+* Sorting, pagination, hiển thị hidden Review và identity đã chốt ngày 21/10/2026; BE-H04 đã triển khai API và public aggregate; UI chưa được nghiệm thu.
 
 # 5\. Nguồn
 
 Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-06 Review và moderation. Link nguồn: [Project Overview](<../../Product Document/Project Overview.md>) · [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)
+
+Runtime/evidence BE-H04 (02/11/2026): xem [báo cáo](../../handover/BE-H04-test-report.md), [API README](../../api/README.md) và generated OpenAPI. Đây là backend local/test, chưa phải nghiệm thu UI hoặc production.

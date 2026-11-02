@@ -126,10 +126,7 @@ jobs:
           test -s build/reports/junit.xml
           test -s build/reports/coverage.txt
 
-      - name: Export OpenAPI from guarded SQLite memory schema
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
+      - name: Export OpenAPI from guarded PostgreSQL test schema
         run: php scripts/test-console.php openapi:export
 
       - name: Set up Node for OpenAPI validation

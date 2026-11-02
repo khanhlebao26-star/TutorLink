@@ -1,0 +1,7 @@
+
+   INFO  Seeding database.  
+
+  Database\Seeders\BeD04FixtureSeeder ................................ RUNNING  
+BE-D04 fixtures ready: 8 actors, 4 Programs, 59 Fees, 55 Progress records, 4 Announcements, 5 files.
+  Database\Seeders\BeD04FixtureSeeder ............................ 329 ms DONE  
+

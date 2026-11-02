@@ -27,9 +27,11 @@ Người dùng đăng nhập báo cáo tài nguyên thuộc allow-list để Adm
 # 4\. Chênh lệch/câu hỏi mở
 
 * `message` là ReportResourceType; `conversation` không phải resource type được report. BR-11/BR-24 chốt chỉ Admin active có `admin.reports.view`, assignment hiện tại và Report `open` được đọc evidence allow-list; với message chỉ gồm message bị báo cáo cùng tối đa 10 tin trước/5 tin sau trong đúng Conversation. Mỗi lần đọc phải audit; đóng Report hoặc đổi assignment thì ngừng quyền evidence. M09-F04/M04-F08 mô tả chi tiết.
-* Quyền gửi thuộc Customer/Tutor đã đăng nhập theo Roles & Actors; guest không được gửi Report. Các giới hạn trên đã chốt ngày 21/10/2026; API còn phải triển khai.
-* Report API chưa có trong repo.
+* Quyền gửi thuộc Customer/Tutor đã đăng nhập theo Roles & Actors; guest không được gửi Report. Các giới hạn trên đã chốt ngày 21/10/2026; BE-H04 đã có API và PostgreSQL tests theo contract/runtime.
+* Report API đã đăng ký trong BE-H04; UI và production chưa được chứng nhận.
 
 # 5\. Nguồn
 
 Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-06 Review và moderation. Link nguồn: [Project Overview](<../../Product Document/Project Overview.md>) · [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)
+
+Runtime/evidence BE-H04 (02/11/2026): xem [báo cáo](../../handover/BE-H04-test-report.md), [API README](../../api/README.md) và generated OpenAPI. Đây là backend local/test, chưa phải nghiệm thu UI hoặc production.

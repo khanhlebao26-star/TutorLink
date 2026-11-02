@@ -11,7 +11,7 @@ The Markdown files are the local working documentation for TutorLink. Modules re
 - [Business Rules](<Domain Documentation/Business Rules.md>) and the module PRDs define intended behavior. A policy decision can precede backend implementation. The [OpenAPI 0.2.0 draft guide](<Architecture & Technical Design/TutorLink — OpenAPI 0.2.0 draft - hướng dẫn, thay đổi và điểm cần chốt.md>) is a historical target snapshot, not the current generated contract.
 - [Decision register](UNRESOLVED_DECISIONS_2026-10-20.md) records the Product rules approved through 21/10/2026 and distinguishes them from implementation gaps. BR-23–BR-27 close the five groups previously listed as open; this does not certify API or migration completion.
 
-**Realtime 30/10/2026:** [K03.13](handover/BE-K03-K03.13-test-report.md) kiểm backend bằng session/CSRF và WebSocket thật: channel theo phiên, logout/suspend/restore, reconnect/resync và outage Reverb/worker. Artifact tại thời điểm K03.13 có 70 operations; trước D04 có 89 sau 11 route BE-D03, hai route reject/cancel BE-H03 và sáu route Session BE-K04. Artifact hiện có 105 operations sau khi thêm 16 route BE-D04. D04-18 ghi nhận export/parity/lint ở test; [BE-D04 handover](handover/BE-D04-handover.md) tổng hợp thêm kết quả local từ D04-21..24. Không có staging/production hoặc UI Workspace acceptance trong scope đã nghiệm thu.
+**Realtime 30/10/2026:** [K03.13](handover/BE-K03-K03.13-test-report.md) kiểm backend bằng session/CSRF và WebSocket thật: channel theo phiên, logout/suspend/restore, reconnect/resync và outage Reverb/worker. Artifact tại thời điểm K03.13 có 70 operations; trước D04 có 89 sau 11 route BE-D03, hai route reject/cancel BE-H03 và sáu route Session BE-K04. Snapshot D04 có 105 operations sau khi thêm 16 route BE-D04; artifact hiện hành có 122 sau 17 route BE-H04. D04-18 ghi nhận export/parity/lint ở test; [BE-D04 handover](handover/BE-D04-handover.md) tổng hợp thêm kết quả local từ D04-21..24. Không có staging/production hoặc UI Workspace acceptance trong scope đã nghiệm thu.
 
 ## Folder map
 
@@ -25,6 +25,8 @@ The Markdown files are the local working documentation for TutorLink. Modules re
 Architecture also contains `Other source files.md` with links to its five non-Google-Docs files.
 
 ## Issue handover
+
+- [BE-H04 — Review, Report và Audit](handover/BE-H04-test-report.md): 17 API mới, OpenAPI 122 operations, migration/permission và bằng chứng kiểm thử theo nhóm. Chờ review; không chứng nhận production.
 
 - [BE-K04 — Sessions planned/actual và replay](handover/BE-K04-handover.md): sáu API Session, hai migration, policy/version/replay, 109 test liên quan và 625 test toàn backend với 17 race cases PostgreSQL. K04.7 đồng bộ OpenAPI/Catalog/schema và chuẩn bị bàn giao; chờ Hoàng review, chưa chứng nhận staging/production.
 

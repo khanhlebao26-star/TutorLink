@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AdminController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
+use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
@@ -19,6 +20,8 @@ use App\Http\Controllers\Api\V1\ProgramOverviewController;
 use App\Http\Controllers\Api\V1\ProgressRecordController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
+use App\Http\Controllers\Api\V1\ReportController;
+use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\SessionController;
 use App\Http\Controllers\Api\V1\TaskController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
@@ -28,6 +31,23 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::middleware(EnsureActiveApiActor::class)->group(function () {
+        Route::get('/programs/{program}/review', [ReviewController::class, 'show'])->whereNumber('program');
+        Route::get('/admin/reviews', [ReviewController::class, 'index']);
+        Route::get('/admin/reviews/{review}', [ReviewController::class, 'detail'])->whereNumber('review');
+        Route::get('/me/reports', [ReportController::class, 'mine']);
+        Route::get('/me/reports/{report}', [ReportController::class, 'ownDetail'])->whereNumber('report');
+        Route::get('/admin/reports', [ReportController::class, 'index']);
+        Route::get('/admin/reports/{report}', [ReportController::class, 'show'])->whereNumber('report');
+        Route::get('/admin/reports/{report}/evidence', [ReportController::class, 'evidence'])->whereNumber('report');
+        Route::get('/admin/audit-logs', [AuditLogController::class, 'index']);
+        Route::get('/admin/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->whereNumber('auditLog');
+        Route::post('/programs/{program}/review', [ReviewController::class, 'store'])->whereNumber('program');
+        Route::post('/admin/reviews/{review}/hide', [ReviewController::class, 'hide'])->whereNumber('review');
+        Route::post('/admin/reviews/{review}/restore', [ReviewController::class, 'restore'])->whereNumber('review');
+        Route::post('/reports', [ReportController::class, 'store']);
+        Route::post('/admin/reports/{report}/resolve', [ReportController::class, 'resolve'])->whereNumber('report');
+        Route::post('/admin/reports/{report}/dismiss', [ReportController::class, 'dismiss'])->whereNumber('report');
+        Route::put('/admin/reports/{report}/assignment', [ReportController::class, 'assign'])->whereNumber('report');
         Route::get('/programs', [ProgramController::class, 'index'])
             ->name('programs.index');
         Route::post('/programs', [ProgramController::class, 'store'])

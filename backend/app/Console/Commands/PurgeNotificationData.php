@@ -46,9 +46,15 @@ class PurgeNotificationData extends Command
         try {
             $now = CarbonImmutable::parse(DB::selectOne('SELECT clock_timestamp() AS value')->value);
 
-            foreach (['notification_outbox', 'notifications', 'audit_logs'] as $table) {
+            foreach (['notification_outbox', 'notifications', 'audit_logs', 'reports'] as $table) {
                 if (! $execute) {
                     $this->line($table.': '.$this->eligible($table, $now)->count().' eligible (preview)');
+
+                    continue;
+                }
+
+                if ($table === 'reports' && ! $actor->hasPermission(AdminPermissions::PURGE_REPORTS)) {
+                    $this->line('reports: skipped (permission required)');
 
                     continue;
                 }
@@ -68,7 +74,7 @@ class PurgeNotificationData extends Command
 
                         DB::table('audit_logs')->insert([
                             'actor_id' => $actor->id,
-                            'action' => $table === 'audit_logs' ? 'audit.purge' : 'outbox.purge',
+                            'action' => $table === 'audit_logs' ? 'audit.purge' : ($table === 'reports' ? 'report.purge' : 'outbox.purge'),
                             'resource_type' => 'user',
                             'resource_id' => $actor->id,
                             'before' => json_encode([
@@ -114,6 +120,7 @@ class PurgeNotificationData extends Command
                 });
             }),
             'notifications' => DB::table($table)->where('created_at', '<', $stamp($now->subDays(180))),
+            'reports' => DB::table($table)->whereIn('status', ['resolved', 'dismissed'])->whereNotNull('handled_at')->where('handled_at', '<', $stamp($now->subMonthsNoOverflow(24))),
             'audit_logs' => DB::table($table)->where('created_at', '<', $stamp($now->subMonthsNoOverflow(24))),
         };
     }

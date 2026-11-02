@@ -29,7 +29,7 @@ Admin có quyền được phân công triage Report, xem evidence tối thiểu
 
 * BR-11 cùng quyết định 21/10/2026 chốt permission, assignment hiện tại, allow-list evidence, thời hạn lưu, quyền xem kết luận và DTO cho evidence ngoài message.
 * Enum có open/resolved/dismissed; local legacy notes chứa pending/reviewing. Cần mapping migration trước API.  
-* Admin report endpoints chưa có; không xây dashboard BI hoặc report evidence tables riêng khi chưa cần.
+* BE-H04 đã đăng ký Admin Report/assignment/evidence/decision endpoints; không xây dashboard BI hoặc report evidence tables riêng khi chưa cần.
 
 # 5\. Nguồn
 
@@ -38,3 +38,5 @@ Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model,
 F03 — Nguồn assignment và giới hạn evidence  
 Nguồn current assignment là reports.assigned\_admin\_id; permission để giao là admin.reports.assign, xem/triage cần admin.reports.view, resolve/dismiss cần admin.reports.decide. Assignment không tự cấp quyền đọc toàn bộ Conversation, File hoặc giấy tờ Tutor. Evidence chỉ trả tối thiểu theo allow-list và còn phải qua permission/resource policy của M04/M10. Reassignment/revoke thu hồi quyền cũ ở request kế tiếp; resolve/dismiss giữ handled\_by/handled\_at như lịch sử quyết định. BR-11 chặn đọc evidence sau khi Report đóng; retention Report/audit là 24 tháng theo quyết định 21/10/2026.
 `GET /api/v1/admin/users` vẫn là route Dự kiến; permission, exact lookup, DTO tối thiểu và điều kiện Admin active để phân công đã chốt tại BR-27/Catalog. Assignment mutation nhận assigned_admin_id; server luôn kiểm active status và permission xử lý Report.
+
+Runtime/evidence BE-H04 (02/11/2026): xem [báo cáo](../../handover/BE-H04-test-report.md), [API README](../../api/README.md) và generated OpenAPI. Đây là backend local/test, chưa phải nghiệm thu UI hoặc production.

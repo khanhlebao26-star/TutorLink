@@ -72,14 +72,15 @@ try {
     if (
         $command === 'openapi:export'
         && (
-            $app['config']->get('database.default') !== 'sqlite'
-            || $app['config']->get(
-                'database.connections.sqlite.database',
-            ) !== ':memory:'
+            $app['config']->get('database.default') !== 'pgsql'
+            && (
+                $app['config']->get('database.default') !== 'sqlite'
+                || $app['config']->get('database.connections.sqlite.database') !== ':memory:'
+            )
         )
     ) {
         throw new RuntimeException(
-            'OpenAPI export requires SQLite :memory:.',
+            'OpenAPI export requires a guarded PostgreSQL test database or SQLite :memory:.',
         );
     }
 
