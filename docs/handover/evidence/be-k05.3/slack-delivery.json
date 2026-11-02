@@ -1,0 +1,44 @@
+{
+    "run_id": "f7a95fe8d4e2",
+    "checked_at": "2026-11-02T16:30:24.812081Z",
+    "environment": "local-k05-f7a95fe8d4e2",
+    "queue": "k05-smoke-f7a95fe8d4e2",
+    "critical_events": 3,
+    "critical_intents": 1,
+    "slow_query_events": 8,
+    "slow_alerts_before_fifth": 0,
+    "slow_alerts_after_fifth": 1,
+    "slow_alerts_after_repeats": 1,
+    "cooldown_seconds": 600,
+    "queue_payloads_safe": true,
+    "transport": "real Slack Bot API via native database queue worker; collector intents captured before dispatch to an isolated smoke queue",
+    "receipts": [
+        {
+            "kind": "critical",
+            "alert_id": "8035302a-9dec-4ff2-8cb0-042d87ba0f60",
+            "http_status": 200,
+            "slack_ok": true,
+            "channel": "C0C8BM660TB",
+            "ts": "1793637025.785779",
+            "error_code": null,
+            "message_safe": true,
+            "count": 1,
+            "max_ms": 0
+        },
+        {
+            "kind": "slow_query",
+            "alert_id": "99684e87-55e0-4784-9889-6c4a5cd3781d",
+            "http_status": 200,
+            "slack_ok": true,
+            "channel": "C0C8BM660TB",
+            "ts": "1793637026.255649",
+            "error_code": null,
+            "message_safe": true,
+            "count": 5,
+            "max_ms": 604
+        }
+    ],
+    "pending_jobs": 0,
+    "failed_jobs": 0,
+    "passed": true
+}

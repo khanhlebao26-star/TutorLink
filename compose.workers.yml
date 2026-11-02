@@ -40,7 +40,18 @@ services:
 
   slack-worker:
     <<: *backend-worker
-    command: ["php", "artisan", "queue:work", "database", "--queue=slack", "--sleep=1", "--tries=10", "--timeout=20", "--max-time=3600"]
+    command:
+      - env
+      - MONITORING_ALERTS_SUPPRESSED=true
+      - php
+      - artisan
+      - queue:work
+      - database
+      - --queue=slack
+      - --sleep=1
+      - --tries=10
+      - --timeout=20
+      - --max-time=3600
 
   scheduler:
     <<: *backend-worker

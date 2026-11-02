@@ -28,5 +28,6 @@
         <env name="PULSE_ENABLED" value="false" force="true"/>
         <env name="TELESCOPE_ENABLED" value="false" force="true"/>
         <env name="NIGHTWATCH_ENABLED" value="false" force="true"/>
+        <env name="MONITORING_ALERTS_ENABLED" value="false" force="true"/>
     </php>
 </phpunit>

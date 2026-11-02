@@ -1,0 +1,38 @@
+{
+  "command": "docker compose -f compose.testing.yml run --rm --build -T backend-test php scripts/test-suite.php",
+  "exit_code": 0,
+  "tests": 790.0,
+  "assertions": 6910.0,
+  "failures": 0.0,
+  "errors": 0.0,
+  "groups": [
+    {
+      "Group": "d04-junit",
+      "Tests": 77,
+      "Assertions": 1077,
+      "Failures": 0,
+      "Errors": 0
+    },
+    {
+      "Group": "d04-preflight-junit",
+      "Tests": 7,
+      "Assertions": 27,
+      "Failures": 0,
+      "Errors": 0
+    },
+    {
+      "Group": "d04-race-junit",
+      "Tests": 1,
+      "Assertions": 893,
+      "Failures": 0,
+      "Errors": 0
+    },
+    {
+      "Group": "regression-junit",
+      "Tests": 705,
+      "Assertions": 4913,
+      "Failures": 0,
+      "Errors": 0
+    }
+  ]
+}

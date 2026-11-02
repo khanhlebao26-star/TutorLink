@@ -6,6 +6,8 @@ final class AdminPermissions
 {
     public const VIEW_REPORTS = 'admin.reports.view';
 
+    public const VIEW_MONITORING = 'admin.monitoring.view';
+
     public const ASSIGN_REPORTS = 'admin.reports.assign';
 
     public const DECIDE_REPORTS = 'admin.reports.decide';
@@ -45,6 +47,7 @@ final class AdminPermissions
     {
         return [
             self::VIEW_REPORTS,
+            self::VIEW_MONITORING,
             self::ASSIGN_REPORTS,
             self::DECIDE_REPORTS,
             self::MODERATE_REVIEWS,

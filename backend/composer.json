@@ -9,8 +9,10 @@
         "php": "^8.3",
         "laravel/fortify": "^1.41",
         "laravel/framework": "^13.17",
+        "laravel/pulse": "^1.0",
         "laravel/reverb": "^1.12",
         "laravel/sanctum": "^4.0",
+        "laravel/telescope": "^5.0",
         "laravel/tinker": "^3.0"
     },
     "require-dev": {

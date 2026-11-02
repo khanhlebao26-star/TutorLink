@@ -1,0 +1,56 @@
+{
+  "task": "BE-K05.3",
+  "checked_at": "2026-11-02T16:32:00.5221794Z",
+  "result": "passed-local",
+  "format": "Pint passed before tests; host Pint --dirty also passed",
+  "regression": {
+    "tests": 100,
+    "assertions": 413,
+    "failures": 0,
+    "errors": 0,
+    "classes": [
+      {
+        "class": "Tests.Feature.MonitoringAlertsTest",
+        "tests": 33
+      },
+      {
+        "class": "Tests.Feature.MonitoringTest",
+        "tests": 27
+      },
+      {
+        "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+        "tests": 12
+      },
+      {
+        "class": "Tests.Feature.SendSlackOperationalAlertTest",
+        "tests": 28
+      }
+    ],
+    "evidence": "regression.xml"
+  },
+  "live_slack": {
+    "evidence": "slack-delivery.json",
+    "messages": 2,
+    "critical": 1,
+    "slow_query": 1,
+    "accepted_by_slack_api": true,
+    "pending_smoke_jobs": 0,
+    "failed_smoke_jobs": 0
+  },
+  "checked_behaviors": [
+    "critical detection and safe queued context",
+    "600 second cooldown and expiration with controlled clock",
+    "four concurrent PHP processes produce one critical job",
+    "500ms inclusive slow query threshold, fifth occurrence, rolling 300 second window",
+    "HTTP 503 release, attempt 10 failure, HTTP 429 Retry-After",
+    "actual database worker retry and permanent failure do not produce recursive alerts",
+    "transaction rollback permits enqueue retry",
+    "Telescope/Pulse and BE-K02 regression"
+  ],
+  "limitations": [
+    "Real delivery tested on local Docker runtime, not production hosting.",
+    "Queue/cache depend on the database; database outages require external monitoring.",
+    "Critical logs without a Throwable share one fingerprint per environment.",
+    "Slack API acceptance recorded; no manual screenshot or user read receipt claimed."
+  ]
+}
