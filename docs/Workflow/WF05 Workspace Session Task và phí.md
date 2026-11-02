@@ -62,9 +62,9 @@ MVP chỉ ghi `progress_percent` nguyên 0–100 do Tutor tự đánh giá. Sử
 
 **![Sơ đồ image10](assets/wf05-workspace-session-task-va-phi-image10.png)**
 
-Draft chỉ Tutor owner đọc. Member hiện tại đọc Published; quyền đọc và tải file kiểm tra membership hiện tại. Attachment phải complete, scan clean và gắn đúng resource/purpose. Draft được tạo/sửa/publish khi Active/Paused; published bất biến, đính chính bằng Announcement mới. Khi publish, chốt recipient notification là các member hiện tại khác Tutor owner; member gia nhập sau đọc bài nhưng không nhận thông báo hồi tố. Cập nhật Published, audit và outbox là nguyên tử; retry không nhân đôi notification, stale `expected_version` trả 409. Danh sách mới nhất trước theo `(published_at,id)`; không có read state riêng cho Announcement.
+Draft chỉ Tutor owner đọc. Member hiện tại đọc Published; quyền đọc và tải file kiểm tra membership hiện tại. Attachment phải complete qua kiểm tra kỹ thuật và gắn đúng resource/purpose; đây không phải chứng nhận antivirus. Draft được tạo/sửa/publish khi Active/Paused; published bất biến, đính chính bằng Announcement mới. Khi publish, chốt recipient notification là các member hiện tại khác Tutor owner; member gia nhập sau đọc bài nhưng không nhận thông báo hồi tố. Cập nhật Published, audit và outbox là nguyên tử; retry không nhân đôi notification, stale `expected_version` trả 409. Danh sách mới nhất trước theo `(published_at,id)`; không có read state riêng cho Announcement.
 
-Draft chỉ nhận title (1–180 ký tự), body (1–10.000 ký tự) và tối đa 5 tệp, 5 MiB/tệp.
+Draft chỉ nhận title (1–180 ký tự), body (1–10.000 ký tự) và tối đa 5 tệp, 5.000.000 byte/tệp. Owner có thể lọc `state=draft|all`; Customer chỉ xem Published. Sort Published `(published_at DESC,id DESC)`, Draft `(created_at DESC NULLS LAST,id DESC)`.
 
 ## 11 Khai báo phí tháng
 
@@ -72,7 +72,7 @@ Draft chỉ nhận title (1–180 ký tự), body (1–10.000 ký tự) và tố
 
 Mặc định status declared \+ tutor\_payment\_mark unmarked; một Program/tháng, VND nhập tay. Chỉ tạo khi Program Active, từ tháng kích hoạt tới tháng hiện tại theo timezone; cho khai báo bù, không ghi kỳ tương lai. Khi Paused không tạo record mới; record declared chưa marked_paid có thể sửa, không đổi kỳ. 0 đồng nghĩa miễn phí và giữ unmarked; chỉ sửa về 0 khi mark vẫn unmarked; không có record nghĩa chưa khai báo.
 
-Kỳ `YYYY-MM` theo Program timezone, với period_start ngày đầu và period_end ngày cuối tháng.
+Kỳ `YYYY-MM` theo Program timezone, với period_start ngày đầu và period_end ngày cuối tháng. List Fee hỗ trợ AND filter `period`, `status`, `tutor_payment_mark`, sort `(period_start DESC,id DESC)`; Progress sort `(recorded_at DESC NULLS LAST,id DESC)`. Cả ba list áp BR-26: `page` mặc định 1, `per_page` mặc định 20, tối đa 50; `data` + `meta` envelope.
 
 ## 12 Đánh dấu thu phí
 
@@ -91,3 +91,8 @@ marked\_paid → marked\_unpaid phải có reason/audit trước sửa amount. A
 ![Sơ đồ image14](assets/wf05-workspace-session-task-va-phi-image14.png)
 
 Xử lý hết Session/Task trước complete; không tự complete việc chưa làm. paused không tạo Session/Task/Fee mới; Tutor owner vẫn được tạo, sửa Draft và publish Announcement theo BR-10; các quyền xử lý resource đã có theo BR-19. Terminal chỉ đọc, ngoại trừ Review hợp lệ sau completed.
+
+
+## 15 Đồng bộ BE-D04 (02/11/2026)
+
+API Progress, Overview, Announcement và Fee đã có trong branch và regression/OpenAPI đã kiểm trên `tutorlink_test`; actual local runtime đã được áp dụng và smoke-tested tại D04-22/23; phạm vi này không chứng nhận staging/production. Request/response, filters/order, PATCH null/omission, error envelope, idempotency/hash/receipt, no-op, lock order, Fee schema/checks, audit projections, và file attach/download permissions được quy định trong [BE-D04 contract](../handover/BE-D04-contract.md) mục 13–17. Chi tiết kiểm chứng tại [D04-18 report](../handover/evidence/be-d04/consolidated/test-assurance-release-15-20.md#d04-18).

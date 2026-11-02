@@ -9,9 +9,9 @@ Tutor ghi nhận tiến độ học theo thời gian; Tutor owner quản lý rec
 # 2\. Dữ liệu và quyền
 
 * Progress MVP chỉ dùng `metric_name=progress_percent`; `value` là số nguyên 0–100 do Tutor tự đánh giá, không suy từ điểm hoặc số Session. `note` tùy chọn; `recorded_at` do server đặt. Không thêm ProgressStatus enum.
-* Tutor owner tạo/sửa record trong Program; Tutor và Customer member đọc; outsider bị từ chối. PATCH yêu cầu `expected_version`; sửa ghi audit before/after. Không có DELETE.
+* Tutor owner tạo/sửa record trong Program; Tutor và Customer member đọc; outsider bị từ chối. PATCH yêu cầu `expected_version`; sửa thực tế ghi audit before/after. PATCH cùng dữ liệu, đúng version trả projection hiện tại, không đổi `updated_at`/version/audit; stale vẫn 409. Không có DELETE.
 * Active/Paused cho phép ghi/sửa Progress theo BR-10/BR-20; Completed/Cancelled readonly.
-* Timestamp lưu theo UTC và hiển thị theo `Program.timezone`.
+* Timestamp lưu theo UTC và hiển thị theo `Program.timezone`. List chỉ lọc theo Program scope, sort ổn định `(recorded_at DESC NULLS LAST,id DESC)`; `page` mặc định 1, `per_page` mặc định 20/tối đa 50 theo BR-26, response có `data` và `meta`.
 * MVP không có chart nâng cao hoặc grading engine.
 
 # 3\. Tiêu chí chấp nhận
@@ -24,8 +24,8 @@ Tutor ghi nhận tiến độ học theo thời gian; Tutor owner quản lý rec
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Kiểu metric, timezone, lịch sử sửa và stale update được chốt tại BR-20. Schema/endpoint/UI chưa có đầy đủ và cần đồng bộ.
-* Schema hiện cần chuyển value sang số nguyên 0–100 và thêm version; endpoint và UI chưa có. Runtime/schema chưa đồng bộ BR-20.
+* BE-D04 branch (02/11/2026) đã có API/schema Progress và Overview; migration cùng regression đã chạy trên `tutorlink_test`. Đây là bằng chứng của test DB, không xác nhận runtime môi trường thực tế.
+* UI Progress vẫn ngoài phạm vi backend D04. Contract cụ thể về request/response, no-op, audit, error và đồng bộ lifecycle nằm tại [BE-D04 contract](../../handover/BE-D04-contract.md) mục 13–16.
 
 # 5\. Nguồn
 

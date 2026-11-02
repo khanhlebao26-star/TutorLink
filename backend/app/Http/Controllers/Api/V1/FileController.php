@@ -11,6 +11,7 @@ use App\Models\File;
 use App\Models\TutorProfile;
 use App\Models\VerificationDocument;
 use App\Policies\TutorProfilePolicy;
+use App\Support\AnnouncementFileAccess;
 use App\Support\ApiErrorResponse;
 use App\Support\TutorProfileWorkflow;
 use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
@@ -24,6 +25,18 @@ class FileController extends Controller
 {
     public function show(Request $request, File $file): FileResource|JsonResponse
     {
+        $authorizedAnnouncementFile = app(AnnouncementFileAccess::class)->authorizeIfLinked(
+            $request->user(),
+            (int) $file->id,
+            (string) $request->attributes->get('request_id'),
+        );
+
+        if ($authorizedAnnouncementFile !== null) {
+            return (new FileResource($authorizedAnnouncementFile))
+                ->response()
+                ->header('Cache-Control', 'private, no-store');
+        }
+
         if ($file->owner_id !== $request->user()->id) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
@@ -157,6 +170,34 @@ class FileController extends Controller
 
     public function download(Request $request, File $file)
     {
+        $authorizedAnnouncementFile = app(AnnouncementFileAccess::class)->authorizeIfLinked(
+            $request->user(),
+            (int) $file->id,
+            (string) $request->attributes->get('request_id'),
+        );
+
+        if ($authorizedAnnouncementFile !== null) {
+            abort_unless(Storage::disk($authorizedAnnouncementFile->disk)->exists($authorizedAnnouncementFile->object_key), 404);
+
+            return response()->streamDownload(function () use ($authorizedAnnouncementFile): void {
+                $stream = Storage::disk($authorizedAnnouncementFile->disk)
+                    ->readStream($authorizedAnnouncementFile->object_key);
+
+                if (! is_resource($stream)) {
+                    throw new \RuntimeException('Announcement attachment is unavailable.');
+                }
+
+                try {
+                    fpassthru($stream);
+                } finally {
+                    fclose($stream);
+                }
+            }, $authorizedAnnouncementFile->original_name, [
+                'Cache-Control' => 'private, no-store',
+                'Content-Type' => $authorizedAnnouncementFile->mime_type,
+            ]);
+        }
+
         return DB::transaction(function () use ($request, $file) {
             $isOwner = $file->owner_id === $request->user()->id;
             if (! $isOwner && $file->purpose === 'task_attachment' && $file->visibility === 'private') {

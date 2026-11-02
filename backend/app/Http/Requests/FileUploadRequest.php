@@ -57,7 +57,7 @@ class FileUploadRequest extends FormRequest
             'purpose' => [
                 'required',
                 'string',
-                'in:avatar,verification_document,task_attachment,profile_document',
+                'in:avatar,verification_document,task_attachment,profile_document,announcement_attachment',
             ],
         ];
     }

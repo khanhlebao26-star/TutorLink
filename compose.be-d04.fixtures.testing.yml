@@ -1,0 +1,5 @@
+services:
+  backend-test:
+    volumes:
+      - ./docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03:/evidence
+      - ./docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage:/var/www/html/storage/app

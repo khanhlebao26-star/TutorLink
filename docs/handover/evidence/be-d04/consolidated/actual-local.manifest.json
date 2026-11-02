@@ -1,0 +1,784 @@
+{
+  "group": "actual-local",
+  "archive": "actual-local.zip",
+  "archive_sha256": "ce67ee675e10594e2302460761807792b675a077ae57af1024fb330dec3276e2",
+  "member_count": 155,
+  "uncompressed_bytes": 1633327,
+  "members": [
+    {
+      "path": "actual/D04-01-report.md",
+      "size_bytes": 3164,
+      "sha256": "8c6cd3d60103a6c081466bde40286c9f4dd73b380fdc84dd96627da4210107fd"
+    },
+    {
+      "path": "actual/evidence-index.md",
+      "size_bytes": 2404,
+      "sha256": "25e4ebf68616fe17e40e20ee975f24824f5977d3edc77953aa5b755ce1ea36fc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/D04-21-report.md",
+      "size_bytes": 5544,
+      "sha256": "f2d93ebc0a6386704c5a684b0c55461003f90b7a03fa50cf167345115eb2ac65"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/application-environment.txt",
+      "size_bytes": 893,
+      "sha256": "0dc92cbd6cfafa1459a296a16673e3c44e8911a6fc44a293386387535c8ecc46"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/backend-dirty-path-count.txt",
+      "size_bytes": 3,
+      "sha256": "2a62cf402cd3396aa00f55f892f4545f308f74d01c8caa0f2837b1982f821595"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/backend-runtime.txt",
+      "size_bytes": 573,
+      "sha256": "4b35cdb0862b7fe30c752436ba81eb201479e56b8a8bac4893f5cc6ad3885952"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/backup-archive-list.txt",
+      "size_bytes": 28904,
+      "sha256": "2dfdd18d932573895e225f7108d83c6e707ce67e3533df78c0f2cb423dfe4b44"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/backup-decode-check.txt",
+      "size_bytes": 63,
+      "sha256": "0d5c053a85c12a0168085a4e42d48a6d985c252c10b8c743cdfdcfa9223a809d"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/backup-filesystem-check.txt",
+      "size_bytes": 267,
+      "sha256": "8f41c2c1e23acfa75a1d0351b09828ef3546777edc61ac796b1b1ab1a0e5acbe"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/backup-manifest.json",
+      "size_bytes": 1399,
+      "sha256": "dd6bc06a5c296e979c2a90c1c03842e2296c431004f15e8a4a1343c9e4c513d0"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/constraint-inventory.txt",
+      "size_bytes": 3975,
+      "sha256": "6238324f54431639854407bf83ca7c290af5d174c4a5242d49842e4e2f1af9b5"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/database-identity-and-tables.txt",
+      "size_bytes": 1702,
+      "sha256": "d98183a8894c778bb12c0ea8aec830fe945c58d01d5a7098ac224fee8410f039"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/database-runtime.txt",
+      "size_bytes": 241,
+      "sha256": "563faa1e15d1f0607ea7170d1e064e45a751c4f1e942007b0aaf3b10f90ec9a3"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/deployment-manifest.json",
+      "size_bytes": 4409,
+      "sha256": "6218966fac2193473e2f92ea68919b55c113e3bce3946a49546872515b8d4542"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/final-migration-count.txt",
+      "size_bytes": 24,
+      "sha256": "2f2ec05307c26495256187027eba3ca9fc68cc2520738063ff05c8eb5f4b75d3"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/git-branch.txt",
+      "size_bytes": 7,
+      "sha256": "f63d1f769b0604b2917b8e738474b9a7cebaab75f626ca450451a550b8831cd4"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/git-commit.txt",
+      "size_bytes": 41,
+      "sha256": "434d451d31513019ef9cf9b65fb407509ce599acc528292cab9c2b79f536b62a"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/graph-update.txt",
+      "size_bytes": 622,
+      "sha256": "68b0d24fb4ad11f8674095e8a770cfc64944a4cdb1c392c3550a86a0c8fd4ae3"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/laravel-database-identity.txt",
+      "size_bytes": 171,
+      "sha256": "b75d64ddad0231a912fe14867c85c0b5d5a2768dfa215af4db71b6c86736740c"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/laravel-version.txt",
+      "size_bytes": 26,
+      "sha256": "e8c2a057f29a72f9c5297ef29f83feed5c79adadc01d0f4475526d175a156af3"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/migration-rows-direct-db.txt",
+      "size_bytes": 2502,
+      "sha256": "fc8f3bb5aca9854cdf6e3aa2bcdab2973250032e4d00f384912048eb22b0ce89"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/migration-status-confirmation.txt",
+      "size_bytes": 2860,
+      "sha256": "a232da561713a55e0472203ecb5207c209b5e470ec7cb52721b24ccb7e87c934"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/migration-status.txt",
+      "size_bytes": 2860,
+      "sha256": "a232da561713a55e0472203ecb5207c209b5e470ec7cb52721b24ccb7e87c934"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/node-version.txt",
+      "size_bytes": 9,
+      "sha256": "33e26f35db6e57ce0c486ddc815fe966867e4f649e418eaf323f75f4720eb8e9"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/pending-migration-classification.md",
+      "size_bytes": 3379,
+      "sha256": "a2d1e7be13b930df52fa1bb0fb853c233601638a779767bfd7d2e9e283c8c71f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/php-version.txt",
+      "size_bytes": 201,
+      "sha256": "328e34ba6a30660e6f0bf28224ec6a106e5856f2ef44d4d7a0b0c6295248d64b"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/read-only-inventory.sql",
+      "size_bytes": 6500,
+      "sha256": "fb47a1a5a44e4ab0b79d8c4c70b23902429fb3f25be2a4c7fbb6d3e772901f30"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/read-only-inventory.txt",
+      "size_bytes": 2263,
+      "sha256": "b467fefd1e0818dfe0ec492eb49cc04c63cedd4a3f098667e43adf855936eb2b"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/run-info.txt",
+      "size_bytes": 108,
+      "sha256": "b141dde26b0dbb7f7bb9c37651e61945ebf30fb7caebd468b0efa8003fac1e2b"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/runtime-config.txt",
+      "size_bytes": 345,
+      "sha256": "011d20bfe47eb83f75068816725df5559fb931c6cb35e9c054d3f4bfa0d85bb0"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/schema-inventory.txt",
+      "size_bytes": 14036,
+      "sha256": "7d889025eb1a634b0703ef9dff02f8d4803c8369764746bdf8a6f5e304292599"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/source-checksum-verification-file.sha256",
+      "size_bytes": 165,
+      "sha256": "6fbc8a3e2f54319eedeccf6ebde0be008d94ac30e4c6f4640c8c8853c5bafa57"
+    },
+    {
+      "path": "actual/local/2026-11-02-0552/D04-21/source-checksum-verification.txt",
+      "size_bytes": 19351,
+      "sha256": "24069b6439dd30a840f4f623cade1c6dcb839396ccb0085de9afb57438e60ee2"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/D04-22-report.md",
+      "size_bytes": 2475,
+      "sha256": "f1cfb082e7e139815f9d4d078c5ce0166c5c5ee0d442d57601489766d1b63fa6"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/actual-migration-status-after.txt",
+      "size_bytes": 2861,
+      "sha256": "b0406ef06ce96fd2c2769af6a086285e9e0d6bd724c2fa107ee4c460d6a9ccbc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/actual-migration.txt",
+      "size_bytes": 763,
+      "sha256": "43f39e173c9d57fb7caef2045f2940965cf2ea614f1b79eb59caec841107190c"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/actual-post-migration-inventory.txt",
+      "size_bytes": 5745,
+      "sha256": "eac6ac12fec9134688d0b3514eebeecfdf508b0f5ac0ea2623ddd2760879898e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/backend-build-context-after-fix.sha256",
+      "size_bytes": 41609,
+      "sha256": "4c2a8aa4fece5be88017ea299c93fb8b243a531eb1c512b8099b5514e3fed2de"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-d04-focused-tests.txt",
+      "size_bytes": 254828,
+      "sha256": "ea528465f8d82569bfd0811a981bbdd79432288edd5ec2544a91e2a678c7acc1"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-d04-regression-after-fix.txt",
+      "size_bytes": 399173,
+      "sha256": "c5626ebe430aef8da15d500fbda83fe57fc74f8823387a09fd354ab8965e7f48"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-d04-regression-fixture-missing.txt",
+      "size_bytes": 63633,
+      "sha256": "3d4d2b11f92ffb343d9b841426adf34353482c6bf402566c5d99b11ee4bc134c"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-legacy-clone-prepare.txt",
+      "size_bytes": 163,
+      "sha256": "4583f7c415d9398438a1f87cf480cfe36af257d45b14d3dead54efd50daaf13c"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-migration-preflight.txt",
+      "size_bytes": 1165,
+      "sha256": "2ed0ca0998128f4bec7f17e02dc40b7efcbe388a456b8e2a97621ab44f09b9aa"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-migration-rehearsal-after-fix.txt",
+      "size_bytes": 751,
+      "sha256": "baeea28bf9a6cece632a96ab4a7231d0073fc4effbe6e1bbe7b4dd79918bd90e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-migration-status-after.txt",
+      "size_bytes": 2861,
+      "sha256": "b0406ef06ce96fd2c2769af6a086285e9e0d6bd724c2fa107ee4c460d6a9ccbc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-migration-status-before.txt",
+      "size_bytes": 2860,
+      "sha256": "a232da561713a55e0472203ecb5207c209b5e470ec7cb52721b24ccb7e87c934"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-overview-after-fix.txt",
+      "size_bytes": 10799,
+      "sha256": "00d8ea0d11fe6c2b70242a446e96a5624b116b31b56830b0f419921a3d929737"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-overview-isolated.txt",
+      "size_bytes": 10551,
+      "sha256": "c7f123094ea1b809ffa4236fc1cfe91d6c90fb1eaee2fd4b0cd4470542deab71"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/candidate-runtime-identity.txt",
+      "size_bytes": 223,
+      "sha256": "46d0d2eb18c98720ef09f037609e900aa7662731d9cb4a0f93bc2daa9c1d0bbb"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/download-E03-member-published-file-download.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/download-E03-owner-download-detached-file.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/download-E03-owner-download-draft-file.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/download-E03-owner-published-file-download.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/fixture-ids.json",
+      "size_bytes": 363,
+      "sha256": "ba64bd4e7c9e9ea7bbcb7afe421516db0cbbbbd31e351505760926086990e6f7"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/full-backend-regression-after-fix.txt",
+      "size_bytes": 93719,
+      "sha256": "1f8432efe8ba16b3bccdb53c6db84fb74eddac79a28d17974bbd40640fdb8208"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/full-backend-regression.txt",
+      "size_bytes": 93719,
+      "sha256": "15d3f9492aa8f8ebfc919ae19654dbe3385f6f0fd0160bb1db296fddc9966c78"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-attachment-a.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-attachment-b.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-demo.php",
+      "size_bytes": 31035,
+      "sha256": "82a184ab4876e017f46fb2614f3239b2e3748d8f9933e0f394e44cc93735c443"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-fixture-adjustment.json",
+      "size_bytes": 456,
+      "sha256": "a438669ef19fe09ce8e9e1588c77868525c88b35a55ff3aafef8ef5e2065cb7f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-run-after-fix.txt",
+      "size_bytes": 1572,
+      "sha256": "d447fea523bee5305fd8bda4982d02c864ed288a6db0c9712bdc0430e51a45d0"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-run.txt",
+      "size_bytes": 1572,
+      "sha256": "0884dc783c99ee57d9d04ac04c99fae87d773537550fbcbaafef8eafff34334f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-server.log",
+      "size_bytes": 6565,
+      "sha256": "9f9282efa8be8554e079722d278df9abbc7a5e2e7d0e1251556d09311d05bde6"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-summary.json",
+      "size_bytes": 819,
+      "sha256": "a56e27d24e4b137fcfc783557af41a04e154daafc0cb09fa6a14b628e35bf854"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/http-transcript.jsonl",
+      "size_bytes": 85273,
+      "sha256": "69ab886daa31166e7d4f4826690810b51da8b9c003c29daa403e11538137eea1"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/membership-revocation.json",
+      "size_bytes": 140,
+      "sha256": "48a1014fb8cdbf9539063dfb62bf499d59dd6cc0a9755de4fbc2506ec0129e69"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/migration-rehearsal.txt",
+      "size_bytes": 763,
+      "sha256": "82fe429b7490a803e675012bc264f73e5afd771aab4eda5a16cb7bfa831e8913"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/migration-status-post-rehearsal.txt",
+      "size_bytes": 2861,
+      "sha256": "b0406ef06ce96fd2c2769af6a086285e9e0d6bd724c2fa107ee4c460d6a9ccbc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/post-migration-inventory-after-fix.txt",
+      "size_bytes": 5745,
+      "sha256": "eac6ac12fec9134688d0b3514eebeecfdf508b0f5ac0ea2623ddd2760879898e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/post-migration-inventory.sql",
+      "size_bytes": 3028,
+      "sha256": "1331040dde1256ee3e256dd729fd3de395d82d3e94af1085ba7cbe3631cffea4"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/post-migration-inventory.txt",
+      "size_bytes": 5745,
+      "sha256": "eac6ac12fec9134688d0b3514eebeecfdf508b0f5ac0ea2623ddd2760879898e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/pre-deployment-worker-state.txt",
+      "size_bytes": 160,
+      "sha256": "f287a342aacc346c7a591fd9d2b91b5fba72c297298d7d370a1da45379e0dfd0"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/prepare-http-fee-fixture.php",
+      "size_bytes": 1996,
+      "sha256": "e3575879e1071faa0d2143a3372b5fd3c3b3538cf439d80dd5389661063112b0"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/release-manifest.json",
+      "size_bytes": 5042,
+      "sha256": "b2cc828cb6f16402fa3355f2c486bc6341e4d49b0e447ed1493e5edd62551a55"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/route-coverage-actual.txt",
+      "size_bytes": 985,
+      "sha256": "863fac041faaebf84581b4345e2dfb7a8e58a7b95f962b54bd44f34b2326b00e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/route-list-actual.json",
+      "size_bytes": 31782,
+      "sha256": "01bd3c0034b8e05698b470a14b5da7ed895d66588ba093714e7b4b77f65e5328"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/run-http-demo.sh",
+      "size_bytes": 708,
+      "sha256": "c4ec07c29021bece1f878b5042835dd89c5c2c223f5099a3be1dd44360c71f0e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/run-info.txt",
+      "size_bytes": 121,
+      "sha256": "b6a36e653c5a10690ef145d0382d250d1ad9542436db654d7e2979cff7e0ec61"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-backend-check.txt",
+      "size_bytes": 2907,
+      "sha256": "20b38b71f923e521d4761c7b31da09426e0fff70354b46805fe59b634545f19f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-config-targets.txt",
+      "size_bytes": 95,
+      "sha256": "40191a1fdcfea5c2df691f9d546543927debf8325252c009ef14f1613348aecd"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-health-http.txt",
+      "size_bytes": 34,
+      "sha256": "c26b613e7e43f8a2f4fb8fcd0f710a7aecdadf1a0c0238b9e68db5dd5c9d96d3"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-health.txt",
+      "size_bytes": 617,
+      "sha256": "d3058a6e0f477948c77cb0f903be0c4d73b083762a5ef62dcf1b58d3c00d922c"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-image-build-after-fix.txt",
+      "size_bytes": 2879,
+      "sha256": "888cb052f0e68fd246c21a25797c6ba2f581be30e1eb2f9d83f0751ea0267961"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-image-build.txt",
+      "size_bytes": 66769,
+      "sha256": "dd6506f0decbe187af7a9dfc602036ed94337f9c96ed17f1bbfa6a0fdcc91c2e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-image-identity.txt",
+      "size_bytes": 842,
+      "sha256": "5a6b11683174e65a2de305b6cf840c06e7385918179daef6a1174e6165091bf8"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-log-summary.txt",
+      "size_bytes": 365,
+      "sha256": "be2712f812fbbbbbc6c5d21ef557daed9ff7dd7884db22fdfcea8b0596418327"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-rollout.txt",
+      "size_bytes": 1966,
+      "sha256": "d4d0469aca7afabb433fb3ec8d7d66caf19e3f51f43a4023f5ccc148e3378a6e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/runtime-source-hash.txt",
+      "size_bytes": 138,
+      "sha256": "ee1a6d2996a69e4e8b008bec783864ee1553135617809b3735f883e1f15c5f85"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/support-migrations-on-test.txt",
+      "size_bytes": 429,
+      "sha256": "233de4d2060076bfde79b19783c2a91baa1637d24fbd5da3146349233703e5e7"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/test-database-prepare.txt",
+      "size_bytes": 724,
+      "sha256": "322d3fd0674b70acb0ee7d7f0aac9615a50d0f6075fd49bea2b99f0dc4a58b87"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/test-db-restore-before-http.txt",
+      "size_bytes": 724,
+      "sha256": "4934fdc5a46433fc3e638f687dfe2364e50e122cb2a96138f07ed6724865f884"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/test-db-restore-check.txt",
+      "size_bytes": 34,
+      "sha256": "5d73921725059fc9affb6331f50cea40a0211eee5a0c40238cc5ae58abe04025"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/test-db-restored-snapshot.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "actual/local/2026-11-02-0608/D04-22/test-report.md",
+      "size_bytes": 2289,
+      "sha256": "306a6023d948d31efb0d9907f8143b3f87429bbc41c41aa139042c0c3966cc90"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/D04-23-report.md",
+      "size_bytes": 3971,
+      "sha256": "8cb7395ed9f07baf6d6862243d52d3ac800f09104e6885e4968d2003180a2298"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/audit-field-evidence.json",
+      "size_bytes": 2299,
+      "sha256": "976776c7467f52449504ee9f7ebb35697f30182095125a6d06bb123d30b606a5"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/database-before-after.json",
+      "size_bytes": 1014,
+      "sha256": "075a7000f3d51a2fb27ba745fbac659445ad1c38f67b07eea7cfb4f4a5960e54"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/database-scope-final.json",
+      "size_bytes": 2475,
+      "sha256": "ae1c7e98705be7d9ef443e2eb351ab8d3f05ca5c95de7fe1079ea09a1fc6e89f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/download-announcement-file-member-published.pdf",
+      "size_bytes": 173,
+      "sha256": "8f364131e47acdd40a15c9ac228fad522e610f6642862d37719c2b79f1f561fa"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/download-announcement-file-owner-draft.pdf",
+      "size_bytes": 173,
+      "sha256": "8f364131e47acdd40a15c9ac228fad522e610f6642862d37719c2b79f1f561fa"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/evidence-index.md",
+      "size_bytes": 2308,
+      "sha256": "fab491837802b9684807620949cec367ed69c0f9f3efb2924006f0783de0d965"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/fixture-ids.json",
+      "size_bytes": 217,
+      "sha256": "f84068594add01cb1936b0622cb282926b34d7395dca763850ec7e5d3336536e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/http-case-summary.json",
+      "size_bytes": 1105,
+      "sha256": "7cae84b41566f3358326c4cfae3fd4733bc0b88f93a1fd88687952fef0db97dc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/http-preliminary-transcript.jsonl",
+      "size_bytes": 41086,
+      "sha256": "6f316b6715d4e2b32e82455b26e2735e57d09c153da741e85020eb56fc9d01e6"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/http-smoke-continuation.php",
+      "size_bytes": 21898,
+      "sha256": "513ff2655b39d8ee849d0f56d97977e1fe46ac457be338e8a35165836c8e051a"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/http-smoke.php",
+      "size_bytes": 25929,
+      "sha256": "a0a74b27674f88f1b7c44fcc1970cdd2c4232ac2db21b894479ef7ab57f76b94"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/http-summary-final.json",
+      "size_bytes": 1819,
+      "sha256": "675e29eb328b8de7c120a07aa511be60d48cf0c3857df28086f91e69f1babb89"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/http-transcript-continuation.jsonl",
+      "size_bytes": 29752,
+      "sha256": "1a0300d248c8b9494d26e48efee983cf1096df6843c37bdaaa73c732045863fd"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/notification-worker-verification.json",
+      "size_bytes": 1356,
+      "sha256": "9e72bc07abdad8646f06c7f80e75bd82446a549d05773198ace93403b6f243b7"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/preflight-http-initial-failure.txt",
+      "size_bytes": 529,
+      "sha256": "bd9c643494b48009ccb4fccec2c3220164e18b2cb143ebbaff20b3c385dad4b7"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/preflight-http.json",
+      "size_bytes": 446,
+      "sha256": "6d0a85f662ee2d08982d46f73190e8250c85d8cb56bc27de47dcd2c55508515b"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/preflight-http.php",
+      "size_bytes": 2549,
+      "sha256": "8a0715a5398705a226c9c7ebbad2f5686b32cd19df5bd67f751d6dd767be50cd"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/preflight.json",
+      "size_bytes": 348,
+      "sha256": "1a213aa6c7eea762a896250b233abac61e3b47cf2332014822556924f8050e5f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/run-status-final.json",
+      "size_bytes": 109,
+      "sha256": "66ff74bfe736c32eea996647b0b3cddc660dbee159ff7912bb0cf08d6949f1d6"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/run-status-preliminary.json",
+      "size_bytes": 213,
+      "sha256": "156a4dcc16d31c7b37e3df33d6bb367f253f30ec1d7726f404f14b3a9a22e9ce"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/runtime-log-summary.txt",
+      "size_bytes": 360,
+      "sha256": "16ae48f97cd3aa8602fd15de17dc2a8d88b7070d6f62341e304ac3440894d626"
+    },
+    {
+      "path": "actual/local/2026-11-02-0632/D04-23/setup-acceptance.php",
+      "size_bytes": 5397,
+      "sha256": "423527616ae6c1c456419cd18e077cad9e3e16895dc0dc37b98c6c9631a3ff1f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/D04-24-report.md",
+      "size_bytes": 1677,
+      "sha256": "cf63e52f14c2f168304b8aaa8c0b2c51ee81e3f2f0159e63830dbf62fa1a162a"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/checkpoint-3m-snapshot.json",
+      "size_bytes": 2798,
+      "sha256": "62abd8c4a75c473b36da68b2fe5567c321b852eaf9def99a32eeeccc32a65f05"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/checkpoint-5m-snapshot.json",
+      "size_bytes": 2798,
+      "sha256": "307f3cd3e85caf7da026eba8616af6711d207c55816a7ac397db472aa68dce2e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/checkpoint-8m-snapshot.json",
+      "size_bytes": 2798,
+      "sha256": "8e2d044231eda8403222066b62bff6ad9b962914498e4f5a2a5c9dd4ea4890e2"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/end-snapshot.json",
+      "size_bytes": 2796,
+      "sha256": "23b809823b2ae3e2530c290d07324f5141890f85343ff1be3ee840d7aa187606"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/evidence-index.md",
+      "size_bytes": 1633,
+      "sha256": "e4786b50782b5195275a6d54d5e5bcdbe6e8f9bfb792526c732962e0cac7c00e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/log-summary-3m.json",
+      "size_bytes": 1942,
+      "sha256": "07b16a7f03cb6ca38a365ffa54a08be81b375d4a31a9031d95ca4c30babef873"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/log-summary-5m.json",
+      "size_bytes": 1942,
+      "sha256": "61342b486a06f50f5b9343a62396cc503186029669be45607deb74ea84fd2865"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/log-summary-8m.json",
+      "size_bytes": 1942,
+      "sha256": "52f00888889d21b6a3fdee22df6e0dabd7e58fdb3238376a3a81b116b97e8ddc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/log-summary-end.json",
+      "size_bytes": 1942,
+      "sha256": "551a4f00d176aa9298bd9406241bcdcab56da0fedce0b1e14607d8a91bee2454"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/log-summary-start.json",
+      "size_bytes": 1407,
+      "sha256": "4cdae90e8ae41d5b08358b55950de1e06c5807586dc328a712a3ed9da9f8946d"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/migration-status-end.txt",
+      "size_bytes": 2861,
+      "sha256": "b0406ef06ce96fd2c2769af6a086285e9e0d6bd724c2fa107ee4c460d6a9ccbc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/migration-status-start.txt",
+      "size_bytes": 2861,
+      "sha256": "b0406ef06ce96fd2c2769af6a086285e9e0d6bd724c2fa107ee4c460d6a9ccbc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/observation-snapshot.php",
+      "size_bytes": 13224,
+      "sha256": "bceab99df75e19f208311ece309480f89c69261a658def5772fa0a8987d4e8cf"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/recovery-and-retest.md",
+      "size_bytes": 2066,
+      "sha256": "fda65c8b58da1363a6c8a885a9ad08bda4721334fb93846abe85bbc1d9a15aed"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/replay-diagnostic.php",
+      "size_bytes": 4473,
+      "sha256": "12aac4ed7f5017cb98c6ed7c13f7e3361939094d86eee7bcbed3c804ab607e1f"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/runtime-3m.txt",
+      "size_bytes": 957,
+      "sha256": "fd4ae58e7601e61673183c13808e6e5bcbf4b5a5357c6e5515b66bab81c83708"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/runtime-5m.txt",
+      "size_bytes": 957,
+      "sha256": "fd4ae58e7601e61673183c13808e6e5bcbf4b5a5357c6e5515b66bab81c83708"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/runtime-8m.txt",
+      "size_bytes": 957,
+      "sha256": "fd4ae58e7601e61673183c13808e6e5bcbf4b5a5357c6e5515b66bab81c83708"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/runtime-end-captured-at.txt",
+      "size_bytes": 21,
+      "sha256": "5eea9f5bcb13b2de4a1b2fd2fe0fb759e56e99e529e492a82ca5aa28ae0dd0a3"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/runtime-end.txt",
+      "size_bytes": 957,
+      "sha256": "fd4ae58e7601e61673183c13808e6e5bcbf4b5a5357c6e5515b66bab81c83708"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/runtime-start-captured-at.txt",
+      "size_bytes": 21,
+      "sha256": "ad5bf168c448879a3f8fc82e63097849a94908e4f38cf20519da7a30e9c5a978"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/runtime-start.txt",
+      "size_bytes": 957,
+      "sha256": "fd4ae58e7601e61673183c13808e6e5bcbf4b5a5357c6e5515b66bab81c83708"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/start-snapshot.json",
+      "size_bytes": 2798,
+      "sha256": "3eb22c9733aba943b5b93d9d670612e221935f8878968b2d9b46ce4e9d02aaa9"
+    },
+    {
+      "path": "actual/local/2026-11-02-0713/D04-24/window-comparison.json",
+      "size_bytes": 1157,
+      "sha256": "809a7ebb6be07f78c12a751bd8b04f45f7f0f8fb5c4b89b337ae0ac5332aae00"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/D04-25-report.md",
+      "size_bytes": 2186,
+      "sha256": "698bc805f505db86ca08fb9dee2b26dabfe51aacc2a110f546f2c3838b05be65"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/build-context-file-verification.txt",
+      "size_bytes": 19351,
+      "sha256": "24069b6439dd30a840f4f623cade1c6dcb839396ccb0085de9afb57438e60ee2"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/build-context-verification.json",
+      "size_bytes": 231,
+      "sha256": "5752db07110e15e2a5f435bee834f4b6172f842e78b1cac365cdf9e26729f56a"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/captured-at.txt",
+      "size_bytes": 94,
+      "sha256": "2868d6d3df31277a5f00ff7a7e15b4f76ddfa9ab6cca2f0f87ba2a19d0a3da0c"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/contract-openapi-sha256.txt",
+      "size_bytes": 187,
+      "sha256": "f588a196e258535cdfba342bc6e4f2f1a91c4b21de053545ec3b98fb1b38d41e"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/migration-status-current.txt",
+      "size_bytes": 2861,
+      "sha256": "b0406ef06ce96fd2c2769af6a086285e9e0d6bd724c2fa107ee4c460d6a9ccbc"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/plan-evidence-link-validation.json",
+      "size_bytes": 3319,
+      "sha256": "3fdd591b68ad667d7403e971bc90dbf4bd9efaabd5809e7e9c4d372b15485353"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/runtime-config-current.txt",
+      "size_bytes": 228,
+      "sha256": "09a37690bd0fe6afadfd25790b87f09da60999a881c8e509935093e7a2514a86"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/runtime-current.txt",
+      "size_bytes": 957,
+      "sha256": "fd4ae58e7601e61673183c13808e6e5bcbf4b5a5357c6e5515b66bab81c83708"
+    },
+    {
+      "path": "actual/local/2026-11-02-0746/D04-25/source-state.txt",
+      "size_bytes": 5149,
+      "sha256": "188ef7177dbd3e3d7d1f2170ee3cbce165335fd18b092673a9d681aeea4f7611"
+    },
+    {
+      "path": "actual/migration-status-2026-11-01.txt",
+      "size_bytes": 2698,
+      "sha256": "2dbae4c4f90ae74e02b7c37d2fd67f229b14a2bdc186fd1a3ce0ff621e2bc052"
+    },
+    {
+      "path": "actual/routes-2026-11-01.json",
+      "size_bytes": 25040,
+      "sha256": "fb2dee061bcfe381d30a1975dcee70f523d35ddae2d39f7a5e48878d6deef8c4"
+    },
+    {
+      "path": "project/2026-11-02-0033/D04-09-project-report.md",
+      "size_bytes": 822,
+      "sha256": "8ec7096160d5aa4b8dc3df46fcc01bf5a776a37064ad47d6f0cad7f6f3edd8cd"
+    }
+  ]
+}

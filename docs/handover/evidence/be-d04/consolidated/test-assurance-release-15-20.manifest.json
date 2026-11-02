@@ -1,0 +1,719 @@
+{
+  "group": "test-assurance-release-15-20",
+  "archive": "test-assurance-release-15-20.zip",
+  "archive_sha256": "5d8a2b44687c0a73a98f6bb8e1d8d0e1b23031ca7f390be838b8cd34695c01e4",
+  "member_count": 142,
+  "uncompressed_bytes": 3258476,
+  "members": [
+    {
+      "path": "test/2026-11-02-0045/D04-15/D04-15-report.md",
+      "size_bytes": 1991,
+      "sha256": "48d0f2767308bb8b50e4b062009829c329617ac6aa8736a0bc2d711eb1f0d099"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/concurrency-races.txt",
+      "size_bytes": 144548,
+      "sha256": "b2aefd9fb88680a95049d72ff262347883f7c621e2c8dbfd24741b21bf5191a5"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/database-after-first-restore.txt",
+      "size_bytes": 756,
+      "sha256": "a2a6069f98e00515d9a824537d7d03e6b8b6857d9c2bea40375e3ff09f846e52"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/database-after-second-restore.txt",
+      "size_bytes": 756,
+      "sha256": "a2a6069f98e00515d9a824537d7d03e6b8b6857d9c2bea40375e3ff09f846e52"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/database-after.txt",
+      "size_bytes": 756,
+      "sha256": "a2a6069f98e00515d9a824537d7d03e6b8b6857d9c2bea40375e3ff09f846e52"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/database-before.txt",
+      "size_bytes": 756,
+      "sha256": "a2a6069f98e00515d9a824537d7d03e6b8b6857d9c2bea40375e3ff09f846e52"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/database-restore-first-run.txt",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/database-restore-second-run.txt",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/database-restore.txt",
+      "size_bytes": 475,
+      "sha256": "ea7c17b4da632b2485f2d79707291f29a32a9462e67f5e4a0d54ef2ef5d3225f"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/environment.json",
+      "size_bytes": 1549,
+      "sha256": "08933fb68624eebc7aec8ef3dfb7910078fbc33c1391196f08cba43b50161505"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/migration-status.txt",
+      "size_bytes": 3312,
+      "sha256": "d1905c5c314c6b6958b196cb5cd09b2e94bc1524bc9493a92b495793ee733c92"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/pint.txt",
+      "size_bytes": 756,
+      "sha256": "d84642fd2d2a1c9a562d9cbc6f855b955b30c4a4dd1a7f879db2a7c2d856a974"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/postgres-identity.txt",
+      "size_bytes": 104,
+      "sha256": "aefd3776d74a6604345c762a376b062b6c24c27284c4ef2d3fda2320d099251b"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/race-harness.php",
+      "size_bytes": 41889,
+      "sha256": "4b7bd61a4ef94465dfdd2af6adfaf67bc7dd17b6bb58363ce76e391850905169"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/source-harness.sha256",
+      "size_bytes": 258,
+      "sha256": "bc0dbd958e91501c14ad683102fabea67beeb4b144325a2c13eade845d8ba652"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-15/test-database-backup.sha256",
+      "size_bytes": 102,
+      "sha256": "09b04bb5315391afe9bd1cf409bf0090321e01376843f38edf217ad59c730edf"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/D04-16-report.md",
+      "size_bytes": 1533,
+      "sha256": "5e8b638f9c8c2cb3ad50c38a7822d11109256b1a1b264be02b27c617daa6b46d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/database-after.txt",
+      "size_bytes": 756,
+      "sha256": "a2a6069f98e00515d9a824537d7d03e6b8b6857d9c2bea40375e3ff09f846e52"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/database-before.txt",
+      "size_bytes": 756,
+      "sha256": "a2a6069f98e00515d9a824537d7d03e6b8b6857d9c2bea40375e3ff09f846e52"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/database-restore.txt",
+      "size_bytes": 424,
+      "sha256": "ebbbf468bb7831a49d12b38b126bfbebcef9d15714bef3b24bfa887d758f3c2d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/database-snapshot.sql",
+      "size_bytes": 831,
+      "sha256": "97762c99be4fd4da153dffe85af0a48e1401d48f894eed71bac058cdfcbf7258"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/environment.json",
+      "size_bytes": 782,
+      "sha256": "a5629d2ce7874c54f0671ea36fda8c469d6aa6db5278be01decf51b0704a2f99"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/fault-cleanup-query.sql",
+      "size_bytes": 243,
+      "sha256": "b4ba1c22b261a333c37801e736c620286981ff1f7767662d95fa40d8457e1cd0"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/fault-cleanup.txt",
+      "size_bytes": 132,
+      "sha256": "67cfe69e176f477e35259e1a2c524e7e63e57f5f8b7f99e8ddd4738a517cfc13"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/fault-injection-api-tests.txt",
+      "size_bytes": 33458,
+      "sha256": "6a86eeb26132d8eee269698bd1aa6e46f8aaf455921facd270c31ad9b9667ab2"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/migration-status.txt",
+      "size_bytes": 3312,
+      "sha256": "5c43fb26aa0c0aac8b4582a34bfdb32f65603565c208d9ed91beb17efb5510d4"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/pint.txt",
+      "size_bytes": 756,
+      "sha256": "50854db75c161cc523a2894bdede791068a8ef03f836e4fa9ebdb0fdf9f466d1"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/postgres-identity.txt",
+      "size_bytes": 104,
+      "sha256": "aefd3776d74a6604345c762a376b062b6c24c27284c4ef2d3fda2320d099251b"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/source-harness.php",
+      "size_bytes": 20017,
+      "sha256": "af456284cacb326d286e958318f02235693290a07904e25a909ecf8f81ab845a"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/source-harness.sha256",
+      "size_bytes": 124,
+      "sha256": "7da471ac5e9b5fb72bc9ae7ac11bc24f30c3a03d00a459666a7474a1f72f9495"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-16/test-image-digest.txt",
+      "size_bytes": 72,
+      "sha256": "77f3469076d9341993b9a826a073e70842ea070c5318a49f29cbb4dad3f64ac0"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/D04-17-report.md",
+      "size_bytes": 2546,
+      "sha256": "084b5076521760e4b833304d34b22ab7d85b38a746b2b5477435c9e5b2f4521a"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/announcement-controller.php",
+      "size_bytes": 23263,
+      "sha256": "0139e1d17e8c52a90c0dd78284035c9a86d7cd56c18be8bf955270c8181d93f0"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/announcement-publish-regression.txt",
+      "size_bytes": 9276,
+      "sha256": "e3e1aeb41a16db05324806ea1fc4124252ae336c9840ad0c7722da05e9f62b1e"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/committed-worker-test.txt",
+      "size_bytes": 1136,
+      "sha256": "49a9502720e22f9066c9edf48ce4ca3f5ef100ca489436aea981f7d6478d0c66"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/d04-17-tests.txt",
+      "size_bytes": 10698,
+      "sha256": "9e570ffc56d2caec45cdd5856b04c171e57cf0a84f3e3e7787e53d1c69bf8297"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/database-after.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/database-before.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/database-restore.txt",
+      "size_bytes": 586,
+      "sha256": "10d994a6083c95a1fe71ae04a22d8aacf0d69b9eb1107910192221e78ce5d0ed"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/database-snapshot.sql",
+      "size_bytes": 1691,
+      "sha256": "6286b12a9d4795686eed6dd358177bf9ea448b604d1098b047b8c1c6974f3538"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/environment.json",
+      "size_bytes": 1150,
+      "sha256": "431d2a1775b0d262b4cfcf294a8c603b386355b99044a5bda7c2d26b5dbca61d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/migration-status.txt",
+      "size_bytes": 3312,
+      "sha256": "7fb02d919a75f4a98bcd37c05ce4c2797c33ff76945821a05e68eb4e09872e5b"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/pint.txt",
+      "size_bytes": 757,
+      "sha256": "3858990fa1e0fc4ea12e3d7adc4370e8a26004dbbabbef388dcac6fd12ec1695"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/postgres-identity.txt",
+      "size_bytes": 104,
+      "sha256": "aefd3776d74a6604345c762a376b062b6c24c27284c4ef2d3fda2320d099251b"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/source-harness.php",
+      "size_bytes": 16986,
+      "sha256": "3733efbedc72cbe961982bf23f513cbb92be98fbff742e979bdb19d824f9a2fc"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/source-hashes.sha256",
+      "size_bytes": 246,
+      "sha256": "c79a7f309b0df3cae450fac7bb64fe07cdcde92227331647c08f8af2dd79ff2c"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/terminal-replay-regression.txt",
+      "size_bytes": 4506,
+      "sha256": "ab61adc7c7277478c1d7abad5134048701a6e2304421d2403b45593933ae2f51"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/test-db-checkpoint.sha256",
+      "size_bytes": 108,
+      "sha256": "18f45f86bdab6eee7074e763f2e040e00723574f010a8e2aad25fa716dd5b54b"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-17/test-image-digest.txt",
+      "size_bytes": 72,
+      "sha256": "18acf62efefdd705814bbc04ac1e4a7df8a1c306d405091b7ad5c8a7819418d3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/D04-18-report.md",
+      "size_bytes": 3593,
+      "sha256": "48e33c2d20ffa9e071ae86e82cc9d0a02019698ccab0135788781bedbff08a28"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/baseline-route-set.txt",
+      "size_bytes": 2646,
+      "sha256": "57f3de1c00a2661c8fd0610783ca71ae97b32d24feee35496438391f96d4a062"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/d04-concurrency-race.txt",
+      "size_bytes": 144451,
+      "sha256": "e9d31d33199253d612f99bc94a4879f658eb934512bdf5c81052eddfea31e092"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/d04-focused-tests-clean.txt",
+      "size_bytes": 263259,
+      "sha256": "593e4bb4a10683fc017c0b68ab8486aedfe8e49f65906c20eec93aa6fea2e6a7"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/d04-focused-tests.txt",
+      "size_bytes": 351246,
+      "sha256": "6285cd50d75502bf7eaf5132c598da01798cdc5281541ddb501a27790b4a03dd"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-after-focused.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-after-full-final.txt",
+      "size_bytes": 1276,
+      "sha256": "6ac2a72d4aae2c8b5423afedf308cf2ab28f0ba16ccbf1c5e0287d573cb3e794"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-after-full-restored.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-after-race-final.txt",
+      "size_bytes": 1562,
+      "sha256": "d10d0a4c311c4c0c0c5641763700f2f18d8d3fc4db26abd950af85203d47d006"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-after-race-restore.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-before.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-final-before.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-restore-final.txt",
+      "size_bytes": 1001,
+      "sha256": "b5cbf8ef11c4b505348c7f5d58d7bfbbaeadd0affe918bea0541abd8b7f2725f"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-restored-check.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/database-snapshot.sql",
+      "size_bytes": 1691,
+      "sha256": "6286b12a9d4795686eed6dd358177bf9ea448b604d1098b047b8c1c6974f3538"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/full-backend-regression-phase2-clone.txt",
+      "size_bytes": 95197,
+      "sha256": "a38452e37c09b3d7a7b49269c3b9c99b3a8041956e857b0bc3877c46c65dc720"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/full-backend-regression.txt",
+      "size_bytes": 93700,
+      "sha256": "6c8d77b8c1874dd1dcadccd5e803559cd15cc03f3225aa44f4d8493f474f5619"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/full-suite-database-after.txt",
+      "size_bytes": 1276,
+      "sha256": "6ac2a72d4aae2c8b5423afedf308cf2ab28f0ba16ccbf1c5e0287d573cb3e794"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/full-suite-database-before.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/generated-route-set.txt",
+      "size_bytes": 3243,
+      "sha256": "bf3cd9ff503004785c9cc18d666915f0f1bf0fe6bec59d63713e59d2ef171502"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/graph-update.txt",
+      "size_bytes": 1191,
+      "sha256": "a60ac464d2b38e78e063b98db59a1912ffd6af0c89cc67f8260d40b27abff63a"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/legacy-clone-after-preflight.txt",
+      "size_bytes": 356,
+      "sha256": "be5acca97bbcb32cd7cb2f828fd58b11360fa7269a36ec332c137682e40f49e4"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/legacy-clone-before.txt",
+      "size_bytes": 705,
+      "sha256": "916a71e45a2f8f0b7ed26c8d53535e543f834070eaecac99343dd8ccf0e55355"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/legacy-clone-prepare-final.txt",
+      "size_bytes": 163,
+      "sha256": "4583f7c415d9398438a1f87cf480cfe36af257d45b14d3dead54efd50daaf13c"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/legacy-clone-prepare.txt",
+      "size_bytes": 163,
+      "sha256": "4583f7c415d9398438a1f87cf480cfe36af257d45b14d3dead54efd50daaf13c"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/migration-preflight-tests.txt",
+      "size_bytes": 2063,
+      "sha256": "62b67aa86cd9a2ceacdf65bf771bb42df6b9c9212e7d8b7306436ee62afd5340"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/non-d04-test-discovery.txt",
+      "size_bytes": 76318,
+      "sha256": "287f2dc4bc2dde0940d70820b531c13559b93d01c16a1f145274487b21eb7f47"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-baseline.json",
+      "size_bytes": 637662,
+      "sha256": "939485fff023750a3c859a2fa231a410a24856387efa64749fa832801c2aecf5"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-d04-before-annotations.tsv",
+      "size_bytes": 1136,
+      "sha256": "f614595a68905d16e51c71edc6a52180429db4efd8f50be903b656493e6cf66b"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-d04-operation-matrix-final.tsv",
+      "size_bytes": 1874,
+      "sha256": "f10e86d40662b7aa4544e73a6799cabfa599d1929459da99ea58aa42915ba4f5"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-d04-operation-matrix.json",
+      "size_bytes": 3195,
+      "sha256": "495cef530903b3dbbf9c4b6795aff7ddaa4e42919afde491222d0098c6284e3f"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-d04-operation-summary.json",
+      "size_bytes": 1667,
+      "sha256": "2d2f79bc60f77f4fb9d3646de4b92f6694ca487a9f5131aca76c59125e10be5d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-d04-response-headers.tsv",
+      "size_bytes": 2612,
+      "sha256": "224c4e71e29ab00e6523721c9461a97e45d9b3ef12929d23bf2a07aec79c7164"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-export.txt",
+      "size_bytes": 504,
+      "sha256": "ffcadf72e7aa5b3cd9e95756cb287cf62ab8485e13f3ca36ac6e04389c019dae"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-lint-baseline.txt",
+      "size_bytes": 27709,
+      "sha256": "67756b346ca54eac472763051fbd2b50df4d44112834a2e2337fd216114c7401"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-lint-comparison.md",
+      "size_bytes": 829,
+      "sha256": "8804793b4f96c5ff5188bd17bf5a88e257298236315128a6f8a53d21e7c7b2a5"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-lint-exit-codes.txt",
+      "size_bytes": 33,
+      "sha256": "bb837ad7aa296132a0530ebaa76488f32f9e993503db8401ea05238e42b8e826"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-lint-generated.txt",
+      "size_bytes": 24207,
+      "sha256": "d8cd932678c93c2c0b06d380056fd2811acb3bc7a9b3a4a1a312397c8da6ffd7"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-route-parity-final.txt",
+      "size_bytes": 46,
+      "sha256": "cc2c316aa51b6b110e6d29117257863b5aaf546ce4868e9224cfbfd6178ca6bb"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-route-parity.txt",
+      "size_bytes": 497,
+      "sha256": "3cba12e48c045e1b8eccb70ac20d6f8d4209cceb7bbe0b814054590fe84b2005"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi-schema-validation.txt",
+      "size_bytes": 1591,
+      "sha256": "7cef86d73ea04d0fa4406aedc9b60d7bd6ff8ebaf80805cfb60229e9ce529a93"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/openapi.json",
+      "size_bytes": 851164,
+      "sha256": "c8cb008537c474ccd53c2ba234565957e7a93be89d28267b1939136099103cf2"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/prepare-legacy-clone.sql",
+      "size_bytes": 2091,
+      "sha256": "bfac88d34163160387ea7efe390f2efce260d6bc37bde5a2cee6e15c586483bc"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/route-counts.txt",
+      "size_bytes": 93,
+      "sha256": "7b69d334bcfd8314962a460b897d027399e8a08188a5753faed28a6d52a13009"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/routes-added.txt",
+      "size_bytes": 597,
+      "sha256": "83f38610c3fa49f1686b480f46d8b4473ab9c55f5aed0a19b1e079b1ddb23b6f"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/routes-removed.txt",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/scramble-annotations-syntax-and-pint.txt",
+      "size_bytes": 1097,
+      "sha256": "592bc08978b6ea0459be69e6e49d853d7e87cb379842c9ede365f6d19103c70c"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/scramble-attribute-signatures.txt",
+      "size_bytes": 1461,
+      "sha256": "b88f5cf4c7dc804c9911fa83c4f3696f1c8120dbc1f570cb1d01dbcc4b2af2de"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/scramble-export-help.txt",
+      "size_bytes": 1526,
+      "sha256": "d68ec1046373750053090ae7433d836b07b154ec81f4fa65929d7e651953143c"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/temporary-database-cleanup.txt",
+      "size_bytes": 15,
+      "sha256": "1b40c53f640ca0d0e632c6153e9f77505862c38ed97c46015647b54d97ed99df"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-18/test-command-help.txt",
+      "size_bytes": 1950,
+      "sha256": "0038bbe5387d8c817fbbfa3532e124f0c1190467bec64c99abce369326b81a33"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/D04-19-report.md",
+      "size_bytes": 5638,
+      "sha256": "a75b3d16eca45bb1295868d27d97e504c74d15501b7ca8bc39d4bde82cd288e2"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/audit-projections.sql",
+      "size_bytes": 306,
+      "sha256": "bdc0a558efd6d69608cb8fcb0d35dda3255693eff90a8405abb800c56d08b601"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/audit-projections.txt",
+      "size_bytes": 15213,
+      "sha256": "315713655f521ebd44e762c84fea2cd37317a333131aea941c46a7cddbacd448"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/database-after-http.txt",
+      "size_bytes": 1562,
+      "sha256": "f66ae83681b4d32a698d72b22d3dfe2e35efca392f5ed402259085c34b5c99fd"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/database-after-restored.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/database-before.txt",
+      "size_bytes": 1432,
+      "sha256": "1a73118486a2db909597df12d3c6265ca75437ae35d003727cc7d9a3186be9e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/database-restore-record.txt",
+      "size_bytes": 1204,
+      "sha256": "aa781455f7789eeea10fd540c5e90ac8dd5e0b010287b98d4528309efbf1db77"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/database-snapshot.sql",
+      "size_bytes": 1691,
+      "sha256": "6286b12a9d4795686eed6dd358177bf9ea448b604d1098b047b8c1c6974f3538"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/diagnostic-notes.md",
+      "size_bytes": 1646,
+      "sha256": "7c359529cbc647f22f24d95b927fc69c5cc4048d303abd38396e909129a1eceb"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/download-E03-member-published-file-download.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/download-E03-owner-download-detached-file.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/download-E03-owner-download-draft-file.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/download-E03-owner-published-file-download.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/fixture-ids.json",
+      "size_bytes": 363,
+      "sha256": "ba64bd4e7c9e9ea7bbcb7afe421516db0cbbbbd31e351505760926086990e6f7"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/fixture-seed-initial-failure.txt",
+      "size_bytes": 334,
+      "sha256": "5773d84e6d768bc31a7d4f7c2444247043ed8b788228e2f410e25f596c75e4f4"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/fixture-seed.txt",
+      "size_bytes": 295,
+      "sha256": "1a7a22713f45f1a1f829a09708a36d173196f5fd0eb4fc7b951726a89d023740"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/graph-update.txt",
+      "size_bytes": 1378,
+      "sha256": "dbe3bf20ab9ca40643823b49eb66ee409f5b48e6fa5d1441ec05e7d6e20169e1"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-attachment-a.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-attachment-b.pdf",
+      "size_bytes": 142,
+      "sha256": "93e31154c364805a3ef8c904bc257f5ef77600c31b67d392704cd6e1e9cd0657"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-demo.php",
+      "size_bytes": 31035,
+      "sha256": "82a184ab4876e017f46fb2614f3239b2e3748d8f9933e0f394e44cc93735c443"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-route-coverage.md",
+      "size_bytes": 3761,
+      "sha256": "a8111430489ffb1a116db0f3c1003c24e5c46ce238f9ff523c3c3819ff162caf"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-summary.json",
+      "size_bytes": 819,
+      "sha256": "a56e27d24e4b137fcfc783557af41a04e154daafc0cb09fa6a14b628e35bf854"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-transcript-order-diff.jsonl",
+      "size_bytes": 44875,
+      "sha256": "166d5f035d6e04ac2d00166c812c40d48a6812c166f3b6cf07249ad4ca74df08"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-transcript-pending-migrations.jsonl",
+      "size_bytes": 1164,
+      "sha256": "4c77508a14918e1f702c6a89e97502b7743c1166aa9fd46cbec4a241bdc05fc4"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-transcript-runtime-misconfig-2.jsonl",
+      "size_bytes": 11964,
+      "sha256": "a9c7a23f8ab4b5d159a7053790033ca2b99dec5543222813b79e0c23da983a22"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-transcript-runtime-misconfig.jsonl",
+      "size_bytes": 11964,
+      "sha256": "a0e9b4bde1a62ba39d869deb7d0c1130909c14f07b005ac24eb095085336803b"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/http-transcript.jsonl",
+      "size_bytes": 85273,
+      "sha256": "4357ac375ffb79dd51fb2107b8ac7801495f3a0a26d30ba250ff8c729c5bc0aa"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/membership-revocation.json",
+      "size_bytes": 140,
+      "sha256": "48a1014fb8cdbf9539063dfb62bf499d59dd6cc0a9755de4fbc2506ec0129e69"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/migrate-status-after-runtime.txt",
+      "size_bytes": 2861,
+      "sha256": "e06c559bbae69b292250803e778577945339a704ac02dee54ace26f14387a619"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/migrate-status-before.txt",
+      "size_bytes": 2861,
+      "sha256": "50698e913543ea07df4427c97f4787eae241c060504638448b86f946217068ba"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/migration-status-after-restore.txt",
+      "size_bytes": 2861,
+      "sha256": "50698e913543ea07df4427c97f4787eae241c060504638448b86f946217068ba"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/prepare-demo-fee-period.sql",
+      "size_bytes": 161,
+      "sha256": "6c7d0f239bf7933e5eae9865e1aa83e66d4fdfc6dc9d18fbbd54ae5edcd002b3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/prepare-demo-fee-period.txt",
+      "size_bytes": 162,
+      "sha256": "c427123dee01a82bfceb64f227422b162fe5cacb6379591ac345957e8a3f1dfa"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/scoped-db-checks.sql",
+      "size_bytes": 2118,
+      "sha256": "21225b0159ae72cc1c5df4cf28a5b536da1c593df9fedeb784b06591c46eab89"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-19/scoped-db-checks.txt",
+      "size_bytes": 4005,
+      "sha256": "65587e4daadcd98b7a7dc067cd09ee3c9201608c155c330a8591e4b90c8c7b95"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-20/backend-build-context-tree.sha256",
+      "size_bytes": 111,
+      "sha256": "508a9f58874a06b8298ca39a07efa9be3565c793051538dbdec7fe92e59c2e28"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-20/backend-build-context.sha256",
+      "size_bytes": 41609,
+      "sha256": "bf423594ecb0e98c7e561666ab4b758f92f4638d4629520b7bf9603ed5682e24"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-20/evidence-index.md",
+      "size_bytes": 2782,
+      "sha256": "24a80830635f4ef4f0870417a6f730dafdec89e0320603d3633981fbb87904cd"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-20/graph-update.txt",
+      "size_bytes": 751,
+      "sha256": "df5b9bd92bd64cd07b6929df351304438611e9c411957ee16f0fab15df2add5c"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-20/release-manifest.json",
+      "size_bytes": 6443,
+      "sha256": "4293335b1d26a0df95a2c6bc3458094114ef80925fddebb3cb2637c45f31d564"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-20/runbook.md",
+      "size_bytes": 4436,
+      "sha256": "f645f5579b2a5839084c684333c686e41b068ddf6c666c83aec1a893ab379854"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-20/test-summary.md",
+      "size_bytes": 3685,
+      "sha256": "576e35fe1c563f8f670dd9d7f78fc1423411fa0d3fc731300bde6ca9a1750101"
+    }
+  ]
+}

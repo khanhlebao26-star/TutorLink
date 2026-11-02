@@ -4,6 +4,18 @@ namespace App\Support;
 
 final class AdminPermissions
 {
+    public const VIEW_REPORTS = 'admin.reports.view';
+
+    public const ASSIGN_REPORTS = 'admin.reports.assign';
+
+    public const DECIDE_REPORTS = 'admin.reports.decide';
+
+    public const MODERATE_REVIEWS = 'admin.reviews.moderate';
+
+    public const VIEW_AUDIT_LOGS = 'admin.audit_logs.view';
+
+    public const PURGE_REPORTS = 'admin.reports.purge';
+
     public const ASSIGN_TUTOR_PROFILES = 'admin.tutor_profiles.assign';
 
     public const DECIDE_VERIFICATION_DOCUMENTS = 'admin.verification_documents.decide';
@@ -32,6 +44,13 @@ final class AdminPermissions
     public static function all(): array
     {
         return [
+            self::VIEW_REPORTS,
+            self::ASSIGN_REPORTS,
+            self::DECIDE_REPORTS,
+            self::MODERATE_REVIEWS,
+            self::VIEW_AUDIT_LOGS,
+            self::PURGE_REPORTS,
+
             self::ASSIGN_TUTOR_PROFILES,
             self::DECIDE_VERIFICATION_DOCUMENTS,
             self::VIEW_TUTOR_PROFILES,

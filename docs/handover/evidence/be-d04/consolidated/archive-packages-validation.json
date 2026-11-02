@@ -1,0 +1,58 @@
+{
+  "source_root": "docs/handover/evidence/be-d04",
+  "source_file_count": 441,
+  "source_uncompressed_bytes": 6358958,
+  "grouped_member_count": 441,
+  "loose_source_files_removed_from_evidence_tree": 434,
+  "live_indexes_retained": 2,
+  "container_owned_fixture_duplicates_retained": 5,
+  "retained_fixture_path": "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private",
+  "groups": [
+    {
+      "group": "actual-local",
+      "archive": "docs/handover/evidence/be-d04/consolidated/actual-local.zip",
+      "manifest": "docs/handover/evidence/be-d04/consolidated/actual-local.manifest.json",
+      "member_count": 155,
+      "uncompressed_bytes": 1633327,
+      "archive_bytes": 287849,
+      "archive_sha256": "ce67ee675e10594e2302460761807792b675a077ae57af1024fb330dec3276e2",
+      "verified": true
+    },
+    {
+      "group": "test-api-implementation-07-14",
+      "archive": "docs/handover/evidence/be-d04/consolidated/test-api-implementation-07-14.zip",
+      "manifest": "docs/handover/evidence/be-d04/consolidated/test-api-implementation-07-14.manifest.json",
+      "member_count": 76,
+      "uncompressed_bytes": 1166105,
+      "archive_bytes": 190036,
+      "archive_sha256": "1d85e4835bcec16de8a2b9cda0b5d87bcc366fc7ff377e66a4e9982fcac92b54",
+      "verified": true
+    },
+    {
+      "group": "test-assurance-release-15-20",
+      "archive": "docs/handover/evidence/be-d04/consolidated/test-assurance-release-15-20.zip",
+      "manifest": "docs/handover/evidence/be-d04/consolidated/test-assurance-release-15-20.manifest.json",
+      "member_count": 142,
+      "uncompressed_bytes": 3258476,
+      "archive_bytes": 350576,
+      "archive_sha256": "5d8a2b44687c0a73a98f6bb8e1d8d0e1b23031ca7f390be838b8cd34695c01e4",
+      "verified": true
+    },
+    {
+      "group": "test-foundation-01-06",
+      "archive": "docs/handover/evidence/be-d04/consolidated/test-foundation-01-06.zip",
+      "manifest": "docs/handover/evidence/be-d04/consolidated/test-foundation-01-06.manifest.json",
+      "member_count": 68,
+      "uncompressed_bytes": 301050,
+      "archive_bytes": 84180,
+      "archive_sha256": "69536964f7b3ba5d250d08e7dfe456091501eb0b39c029906692541bfe94db15",
+      "verified": true
+    }
+  ],
+  "all_members_hash_verified": true,
+  "markdown_evidence_links_resolved": 126,
+  "task_anchor_links_resolved": 53,
+  "link_validation_passed": true,
+  "all_linked_source_file_paths_replaced": true,
+  "loose_source_cleanup_complete": false
+}

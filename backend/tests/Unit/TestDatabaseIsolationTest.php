@@ -15,6 +15,19 @@ class TestDatabaseIsolationTest extends TestCase
         $this->assertStringNotContainsString('SQLSTATE', $process->getErrorOutput());
     }
 
+    public function test_application_database_host_is_rejected_before_connection(): void
+    {
+        $process = $this->probe([
+            'DB_CONNECTION' => 'pgsql',
+            'DB_DATABASE' => 'tutorlink_test',
+            'DB_HOST' => 'db',
+        ]);
+
+        $this->assertSame(1, $process->getExitCode());
+        $this->assertStringContainsString('Unsafe test database configuration.', $process->getErrorOutput());
+        $this->assertStringNotContainsString('SQLSTATE', $process->getErrorOutput());
+    }
+
     public function test_sqlite_memory_is_safe_even_when_development_environment_is_inherited(): void
     {
         $process = $this->probe(['DB_CONNECTION' => 'sqlite', 'DB_DATABASE' => 'tutorlink', 'DB_URL' => 'postgres://never-connect.invalid/tutorlink']);

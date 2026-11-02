@@ -584,9 +584,9 @@ sequence\_number — integer; NOT NULL.
 
 title — varchar(180); NOT NULL.
 
-planned\_starts\_at — timestamptz; NOT NULL.
+planned\_starts\_at — timestamptz(6); NOT NULL.
 
-planned\_ends\_at — timestamptz; NOT NULL.
+planned\_ends\_at — timestamptz(6); NOT NULL.
 
 timezone — varchar(64); NOT NULL; snapshot `Program.timezone` tại lúc lập Session; mọi instant lưu UTC.
 
@@ -596,13 +596,15 @@ location\_text — text; NULL.
 
 meeting\_url — text; NULL.
 
-status — varchar(20); NOT NULL; mặc định: scheduled; enum: SessionStatus; cần điều chỉnh.
+status — varchar(20); NOT NULL; mặc định: scheduled; enum: SessionStatus (scheduled/completed/cancelled).
 
-version — integer; NOT NULL DEFAULT 1; BR-19, optimistic concurrency cho Session.
+version — integer; NOT NULL DEFAULT 1; CHECK version >= 1 trên PostgreSQL; BR-19, optimistic concurrency cho Session.
 
-created\_at — timestamptz; NULL.
+terminal\_replay — jsonb; NULL; metadata nội bộ gồm actor/action/hash của payload gốc và response snapshot cho replay terminal; không trả trực tiếp qua API.
 
-updated\_at — timestamptz; NULL.
+created\_at — timestamptz(6); NULL.
+
+updated\_at — timestamptz(6); NULL.
 
 ### Bảng lesson\_sessions
 
@@ -630,7 +632,9 @@ Khóa ghép / unique: program\_sessions: UNIQUE(program\_id,program\_version,seq
 
 program\_sessions lưu kế hoạch; lesson\_sessions lưu kết quả thực hiện, quan hệ 1 → 0..1. Hai cột status dùng SessionStatus scheduled/completed/cancelled và được cập nhật nhất quán trong một transaction. Không dùng planned/in\_progress/no\_show làm enum đích. tutor\_joined\_at/customer\_joined\_at là cột legacy được giữ lại, không suy ra chức năng điểm danh. program\_version là số phiên bản lịch sử, không đặt FK ghép tới version hiện tại của programs.
 
-Theo BR-19, mọi mutation Session kiểm `expected_version` dưới cùng transaction với state gate; PATCH lịch chỉ khi Program Active và Session scheduled. Complete/cancel trong Active/Paused tăng version, cùng với tạo lesson\_sessions nguyên tử khi complete. Replay request hợp lệ trả kết quả đã lưu mà không tăng version/audit lần hai. `Program.timezone` authoritative; program\_sessions.timezone snapshot giá trị đó, instant lưu UTC. `meeting_url` chỉ nhận HTTPS, tối đa 2.048 ký tự, không credentials.
+Theo BR-19, edit/complete/cancel Session kiểm `expected_version` dưới cùng transaction với state gate; create khởi tạo version 1. PATCH lịch chỉ khi Program Active và Session scheduled; PATCH không đổi dữ liệu không tăng version/audit. Complete/cancel trong Active/Paused tăng version, cùng với tạo lesson\_sessions nguyên tử khi complete. Replay request hợp lệ trả snapshot đã lưu mà không tăng version/audit lần hai, kể cả khi Program đã terminal, sau khi kiểm identity/scope/quyền hiện tại. `Program.timezone` authoritative; program\_sessions.timezone snapshot giá trị đó, instant lưu UTC. `meeting_url` chỉ nhận HTTPS, tối đa 2.048 ký tự, không credentials.
+
+**Runtime BE-K04, 01/11/2026:** hai migration bổ sung version/terminal replay/default scheduled và giữ microseconds cho bốn timestamp planned. FK + UNIQUE `lesson_sessions.program_session_id` đã có từ schema trước, không được thêm lại. Complete tạo actual `completed` với actual times nullable; cancel không tạo actual. Status default `scheduled` của bảng actual vẫn là cấu trúc legacy, không phải luồng tạo actual của API. Metadata terminal cũ có thể null; không tự suy replay hoặc backfill khi thiếu payload gốc. Xem [bàn giao BE-K04](../handover/BE-K04-handover.md) để biết migration, evidence và giới hạn môi trường.
 
 # 07 · Nhiệm vụ và bài nộp
 
@@ -766,7 +770,7 @@ amount\_minor — bigint; NOT NULL.
 
 currency — char(3); NOT NULL; mặc định: VND.
 
-status — varchar(20); NOT NULL; mặc định: declared; enum: FeeRecordStatus; cần điều chỉnh.
+status — varchar(20); NOT NULL; mặc định: declared; enum: FeeRecordStatus; migration đổi tên `declared_status` thành `status`.
 
 disclaimer — text; NULL.
 
@@ -774,23 +778,37 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-tutor\_payment\_mark — varchar(20); NOT NULL; mặc định: unmarked; enum: TutorPaymentMark; đề xuất thêm.
+tutor\_payment\_mark — varchar(20); NOT NULL DEFAULT unmarked; enum: TutorPaymentMark.
 
 version — integer; NOT NULL DEFAULT 1; BR-19, optimistic concurrency cho edit/mark/void.
 
-voided\_at — timestamptz; NULL; đề xuất thêm.
+voided\_at — timestamptz; NULL.
 
 Fee `version` theo BR-19 tăng mỗi lần sửa/mark/void thành công; các mutation kiểm `expected_version`. Chỉ record declared chưa marked_paid được sửa amount; kỳ tháng và record voided giữ nguyên.
 
-voided\_by — bigint; NULL; FK; tham chiếu users.id; đề xuất thêm.
+voided\_by — bigint; NULL; FK users.id, RESTRICT khi xóa.
 
-void\_reason — text; NULL; đề xuất thêm.
+void\_reason — text; NULL.
 
-payment\_marked\_at — timestamptz; NULL; đề xuất thêm.
+payment\_marked\_at — timestamptz; NULL.
 
-payment\_marked\_by — bigint; NULL; FK; tham chiếu users.id; đề xuất thêm.
+payment\_marked\_by — bigint; NULL; FK users.id, RESTRICT khi xóa.
 
-payment\_mark\_reason — text; NULL; đề xuất thêm.
+payment\_mark\_reason — text; NULL.
+
+last\_change\_reason — text; NULL.
+
+### Schema BE-D04 đã chốt — migrations PostgreSQL 02/11/2026
+
+`2026_11_01_233000_add_be_d04_workspace_schema` chuyển `progress_records.value` từ numeric sang `smallint`, thêm `version integer NOT NULL DEFAULT 1` cho Progress/Announcement/Fee, đổi `fee_records.declared_status` thành `status` và thêm metadata Fee liệt kê ở trên. Các cột nullable giữ NULL khi không có sự kiện tương ứng; FK actor metadata (`voided_by`, `payment_marked_by`) tham chiếu `users.id` với `ON DELETE RESTRICT`. `2026_11_02_000000_enforce_d04_fee_currency` thêm CHECK `fee_records_d04_currency_check`, chỉ nhận `VND`.
+
+CHECK constraints cuối cùng:
+
+- Progress: `progress_records_d04_metric_value_check` buộc metric `progress_percent`, value 0–100; `progress_records_d04_version_check` buộc version ≥1. Index `(program_id, recorded_at DESC, id DESC)` phục vụ list ổn định.
+- Announcement: `announcements_d04_version_check` buộc version ≥1; index `(program_id, published_at DESC, id DESC)` cho Published và partial index `(program_id, created_at DESC NULLS LAST, id DESC) WHERE published_at IS NULL` cho Draft.
+- Fee: `fee_records_d04_amount_check` buộc amount 0..9,007,199,254,740,991; `fee_records_d04_period_check` buộc ngày đầu và cuối trọn tháng; `fee_records_d04_status_check` chỉ `declared|voided`; `fee_records_d04_payment_mark_check` chỉ `unmarked|marked_paid|marked_unpaid`; `fee_records_d04_version_check` buộc version ≥1; `fee_records_d04_zero_amount_check` buộc amount 0 ⇒ mark `unmarked`. `fee_records_d04_void_metadata_check` đồng bộ status với void timestamp/actor/reason; `fee_records_d04_payment_metadata_check` đồng bộ payment mark với timestamp/actor và reason nullable có nội dung nếu có; `fee_records_d04_last_change_reason_check` chỉ nhận NULL hoặc chuỗi trim không trắng tối đa 2.000 ký tự. Currency chỉ `VND` theo CHECK ở migration thứ hai.
+
+Migrations đã được chạy và các CHECK/index/FK đã được xác nhận trên `tutorlink_test`; điều này chưa xác nhận áp dụng vào runtime môi trường thực tế. Thứ tự trên DB các loại bảng/column như SQL được định nghĩa; API resource allow-list được ghi tại [BE-D04 contract](../handover/BE-D04-contract.md) mục 13.
 
 ### Bảng reviews
 
@@ -1116,7 +1134,7 @@ created\_at — timestamptz; NOT NULL.
 
 expires\_at — timestamptz; NULL; command BR-23 có hạn 30 ngày, Fee Record theo BR-22 có thể NULL đến khi đủ điều kiện purge.
 
-UNIQUE(actor\_id,idempotency\_key). Accept Invitation và feedback Task ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa được chứng nhận đã tích hợp bảng này. Feedback Task dùng receipt 30 ngày theo Tutor + UUID key + POST + canonical path + hash của `expected_submission_version` và `feedback` đã chuẩn hóa; replay trả response snapshot sau kiểm quyền hiện tại, không ghi lại side effect. Fee Record cần tính hash/replay theo BR-22 và giữ receipt tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
+UNIQUE(actor\_id,idempotency\_key). Accept Invitation và feedback Task ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa được chứng nhận đã tích hợp bảng này. Feedback Task dùng receipt 30 ngày theo Tutor + UUID key + POST + canonical path + hash của `expected_submission_version` và `feedback` đã chuẩn hóa; replay trả response snapshot sau kiểm quyền hiện tại, không ghi lại side effect. BE-D04 Fee mutation lưu request hash và response snapshot trong receipt cùng transaction; `expires_at=NULL` cho tới khi Fee Record và lịch sử liên quan đủ điều kiện purge theo policy này. D04-17 đã kiểm tra receipt còn tồn tại/replay sau 31 ngày, khi Fee voided, Program terminal và khi cleanup audit chạy. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
 
 ## Tham chiếu đa hình
 
@@ -1154,3 +1172,8 @@ Các cột assignment đã được đưa vào bảng tutor\_profiles và report
 ## Realtime session registry — K03.13 (30/10/2026)
 
 Migration `2026_10_30_180000_create_realtime_sessions_table` bổ sung `realtime_sessions`: `id`, `user_id` FK User cascade delete, `session_hash` char(64) HMAC không phải session ID thô, `channel_token` char(64) ngẫu nhiên, `expires_at`, nullable `revoked_at`, `created_at`/`updated_at` timestamptz(6). Unique `(user_id,session_hash)`, unique token, index `(user_id,revoked_at,expires_at)`. Registry và database sessions dùng cùng connection. Giữ revoked tombstone để chặn request cũ tái cấp quyền; chưa có cleanup tự động. Không thay schema Conversation/Message/File hoặc xóa scan evidence lịch sử. [Contract](../handover/BE-K03-K03.1-contract.md#13-realtime) và [test/evidence](../handover/BE-K03-K03.13-test-report.md) là căn cứ cho bổ sung này; sơ đồ draw.io chưa cập nhật trong task này.
+
+
+## BE-H04 runtime schema — 02/11/2026
+
+Migration `2026_11_02_052431_add_h04_review_report_controls` thêm reviews.visibility (visible/hidden, default visible), version (integer default 1, >=1) và index (tutor_profile_id,visibility,created_at,id). Unique (program_id,customer_id) được tái sử dụng. Report pending/reviewing map sang open, default/check open/resolved/dismissed; partial UNIQUE (reporter_id,resource_type,resource_id) WHERE open và index (reporter_id,created_at). Status lạ/null hoặc duplicate open làm preflight fail trước DDL; cần review dữ liệu, không tự xóa. Assignment columns/version hiện hữu được tái sử dụng. Không thêm bảng evidence/File hoặc kho copy private content; reason moderation/decision nằm trong audit hiện hữu. Down yêu cầu reverse migration được review. [Test report và giới hạn](../handover/BE-H04-test-report.md); chưa áp dụng migration vào database ứng dụng/production.

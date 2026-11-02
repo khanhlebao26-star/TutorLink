@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-02",
+  "base": "8a34aa2",
+  "branch": "codex/2w-be-h04",
+  "files": {
+    ".github/workflows/ci.yml": "59be7e6b7f0ca66cf2021d1b51bbfafcbf1f5b6c3c07c8e5974d76668c7199ed",
+    "backend/app/Console/Commands/PurgeNotificationData.php": "a644d5ae8027a7545e3807a65573b13bd221ff00168d83b96a5136137d388814",
+    "backend/app/Http/Controllers/Api/V1/AuditLogController.php": "7382c31a7d6a168d6d0e3b6f9251100aa74b7dbf244264a83c41ef9d1604ce78",
+    "backend/app/Http/Controllers/Api/V1/PersonalAccessTokenController.php": "f13d487c58186600aca76a6518e7db587d9547dec58c3a4900faace5ce5c68d8",
+    "backend/app/Http/Controllers/Api/V1/PublicTutorReviewController.php": "8ae41c516599e85b4982d76fdde60834ec717d5dbdbeafedbd3a27f502be9223",
+    "backend/app/Http/Controllers/Api/V1/ReportController.php": "d57a9222f059247103ba324d42ef1dd276a878ea37f9e453ef72f41e078af768",
+    "backend/app/Http/Controllers/Api/V1/ReviewController.php": "c60298595a97c1afe8959c549eb07d6291db0f119f2a537032656641cd5b5032",
+    "backend/app/Support/AdminPermissions.php": "3c30875ed44371d73cb11b47d8e0f656ddf2f12f45b05467c890d27a2d8a8d3c",
+    "backend/app/Support/TrustWorkflow.php": "600374e0a2de2feccd8a83a15bbbf6fcb1380bca4a87e7f71a9135d8c8c26f1f",
+    "backend/bootstrap/app.php": "c13d03df8ab43690d0450949c0383e5c0a2a02dc35edc1855e9cbf48fe03a39c",
+    "backend/database/migrations/2026_11_02_052431_add_h04_review_report_controls.php": "a829ee6469b4a133929298832d75305caa37106a2732762983ea9c3b431e5c6d",
+    "backend/routes/api.php": "830623b0c04b2be4e067f123be27979dc8d3db160d56181c7f2ae4a6f9765914",
+    "backend/scripts/test-console.php": "8c354f8b038af917ce9187d23c71fd33b5db87c373f79d9a441f7aaaee2d03fb",
+    "backend/tests/Feature/MarketplaceCloseoutTest.php": "dd59bf1400b7c31e9efa63d5b2c2a9fc9e7b44d7a6a996cf563c7a487ac53354",
+    "backend/tests/Feature/TrustWorkflowApiTest.php": "afedc907a41c30877ffdd51367e72fe149ba70f0a2c806c43a478c944b335f01",
+    "backend/tests/Feature/TrustWorkflowConcurrencyTest.php": "f4d7c276de6019f2a83032016ab1111f758396df23cfdca3d0328398fdbfce59",
+    "docs/api/openapi.json": "c89c6176d3a91a70cff245212c2156224eec1d80f3d59efc9408788f03672e39",
+    "docs/handover/BE-H04-test-report.md": "c39675baf3ee130aa3d41844445675e408029d4809bacd209ffe99b81a3e1703"
+  }
+}

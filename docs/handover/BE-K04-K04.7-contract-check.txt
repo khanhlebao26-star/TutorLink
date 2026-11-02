@@ -1,0 +1,7 @@
+PASS GET /api/v1/programs/{program}/sessions responses=200,404,422,401,403
+PASS POST /api/v1/programs/{program}/sessions responses=422,201,401,403,404,409
+PASS GET /api/v1/sessions/{session} responses=200,404,401,403
+PASS PATCH /api/v1/sessions/{session} responses=200,404,422,401,403,409
+PASS POST /api/v1/sessions/{session}/complete responses=200,422,401,403,404,409
+PASS POST /api/v1/sessions/{session}/cancel responses=200,422,401,403,404,409
+PASS SessionResource excludes terminal_replay and legacy attendance fields.

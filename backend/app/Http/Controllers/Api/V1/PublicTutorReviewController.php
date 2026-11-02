@@ -25,11 +25,11 @@ class PublicTutorReviewController extends Controller
             ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'))
             ->firstOrFail();
 
-        // Completed is intentionally not produced by the current Program lifecycle.
         // Historical membership remains valid after a customer leaves the Program.
         $visible = DB::table('reviews')
             ->join('programs', 'programs.id', '=', 'reviews.program_id')
             ->join('users as authors', 'authors.id', '=', 'reviews.customer_id')
+            ->where('reviews.visibility', 'visible')
             ->where('reviews.tutor_profile_id', $profile->id)
             ->whereColumn('programs.owner_tutor_profile_id', 'reviews.tutor_profile_id')
             ->where('programs.status', 'completed')
@@ -56,17 +56,17 @@ class PublicTutorReviewController extends Controller
 
         $reviews = $visible->select([
             'reviews.id',
-            'authors.full_name as author_name',
+
             'reviews.rating',
             'reviews.comment',
             'reviews.created_at',
         ])->orderByDesc('reviews.created_at')->orderByDesc('reviews.id')
-            ->paginate($filters['per_page'] ?? 5);
+            ->paginate($filters['per_page'] ?? 20);
 
         return response()->json([
             'data' => collect($reviews->items())->map(fn ($review) => [
                 'id' => (int) $review->id,
-                'author_name' => $review->author_name,
+                'author_name' => 'Customer đã xác minh',
                 'rating' => (int) $review->rating,
                 'comment' => $review->comment,
                 'created_at' => $review->created_at === null ? null : Carbon::parse($review->created_at)->toISOString(),

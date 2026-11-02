@@ -76,7 +76,7 @@ class MarketplaceCloseoutTest extends TestCase
             $this->review($profile, $status, 5);
         }
         $this->getJson("/api/v1/tutors/{$profile->public_slug}/reviews")->assertOk()
-            ->assertJsonCount(0, 'data')->assertJsonPath('meta.per_page', 5)
+            ->assertJsonCount(0, 'data')->assertJsonPath('meta.per_page', 20)
             ->assertJsonPath('meta.total', 0)->assertJsonPath('aggregate.average', null)
             ->assertJsonPath('aggregate.count', 0)
             ->assertJsonPath('aggregate.histogram', ['1' => 0, '2' => 0, '3' => 0, '4' => 0, '5' => 0]);

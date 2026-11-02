@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AdminController;
+use App\Http\Controllers\Api\V1\AnnouncementController;
+use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\ConversationController;
 use App\Http\Controllers\Api\V1\ConversationRealtimeController;
+use App\Http\Controllers\Api\V1\FeeRecordController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
@@ -13,8 +16,13 @@ use App\Http\Controllers\Api\V1\ListingController;
 use App\Http\Controllers\Api\V1\NotificationOutboxController;
 use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\ProgramController;
+use App\Http\Controllers\Api\V1\ProgramOverviewController;
+use App\Http\Controllers\Api\V1\ProgressRecordController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
+use App\Http\Controllers\Api\V1\ReportController;
+use App\Http\Controllers\Api\V1\ReviewController;
+use App\Http\Controllers\Api\V1\SessionController;
 use App\Http\Controllers\Api\V1\TaskController;
 use App\Http\Controllers\Api\V1\TutorProfileController;
 use App\Http\Middleware\EnsureActiveAccount;
@@ -23,6 +31,23 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::middleware(EnsureActiveApiActor::class)->group(function () {
+        Route::get('/programs/{program}/review', [ReviewController::class, 'show'])->whereNumber('program');
+        Route::get('/admin/reviews', [ReviewController::class, 'index']);
+        Route::get('/admin/reviews/{review}', [ReviewController::class, 'detail'])->whereNumber('review');
+        Route::get('/me/reports', [ReportController::class, 'mine']);
+        Route::get('/me/reports/{report}', [ReportController::class, 'ownDetail'])->whereNumber('report');
+        Route::get('/admin/reports', [ReportController::class, 'index']);
+        Route::get('/admin/reports/{report}', [ReportController::class, 'show'])->whereNumber('report');
+        Route::get('/admin/reports/{report}/evidence', [ReportController::class, 'evidence'])->whereNumber('report');
+        Route::get('/admin/audit-logs', [AuditLogController::class, 'index']);
+        Route::get('/admin/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->whereNumber('auditLog');
+        Route::post('/programs/{program}/review', [ReviewController::class, 'store'])->whereNumber('program');
+        Route::post('/admin/reviews/{review}/hide', [ReviewController::class, 'hide'])->whereNumber('review');
+        Route::post('/admin/reviews/{review}/restore', [ReviewController::class, 'restore'])->whereNumber('review');
+        Route::post('/reports', [ReportController::class, 'store']);
+        Route::post('/admin/reports/{report}/resolve', [ReportController::class, 'resolve'])->whereNumber('report');
+        Route::post('/admin/reports/{report}/dismiss', [ReportController::class, 'dismiss'])->whereNumber('report');
+        Route::put('/admin/reports/{report}/assignment', [ReportController::class, 'assign'])->whereNumber('report');
         Route::get('/programs', [ProgramController::class, 'index'])
             ->name('programs.index');
         Route::post('/programs', [ProgramController::class, 'store'])
@@ -30,6 +55,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/programs/{program}', [ProgramController::class, 'show'])
             ->whereNumber('program')
             ->name('programs.show');
+        Route::get('/programs/{program}/overview', [ProgramOverviewController::class, 'show'])
+            ->whereNumber('program')
+            ->name('programs.overview');
         Route::patch('/programs/{program}', [ProgramController::class, 'update'])
             ->whereNumber('program')
             ->name('programs.update');
@@ -48,6 +76,51 @@ Route::prefix('v1')->group(function () {
         Route::post('/programs/{program}/invitations', [InvitationController::class, 'store'])
             ->whereNumber('program')
             ->name('programs.invitations.store');
+        Route::get('/programs/{program}/progress-records', [ProgressRecordController::class, 'index'])
+            ->whereNumber('program')
+            ->name('programs.progress-records.index');
+        Route::post('/programs/{program}/progress-records', [ProgressRecordController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.progress-records.store');
+        Route::patch('/progress-records/{progressRecord}', [ProgressRecordController::class, 'update'])
+            ->whereNumber('progressRecord')
+            ->name('progress-records.update');
+        Route::get('/programs/{program}/announcements', [AnnouncementController::class, 'index'])
+            ->whereNumber('program')
+            ->name('programs.announcements.index');
+        Route::post('/programs/{program}/announcements', [AnnouncementController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.announcements.store');
+        Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])
+            ->whereNumber('announcement')
+            ->name('announcements.show');
+        Route::patch('/announcements/{announcement}', [AnnouncementController::class, 'update'])
+            ->whereNumber('announcement')
+            ->name('announcements.update');
+        Route::post('/announcements/{announcement}/publish', [AnnouncementController::class, 'publish'])
+            ->whereNumber('announcement')
+            ->name('announcements.publish');
+        Route::get('/programs/{program}/fee-records', [FeeRecordController::class, 'index'])
+            ->whereNumber('program')
+            ->name('programs.fee-records.index');
+        Route::post('/programs/{program}/fee-records', [FeeRecordController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.fee-records.store');
+        Route::get('/fee-records/{feeRecord}', [FeeRecordController::class, 'show'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.show');
+        Route::patch('/fee-records/{feeRecord}', [FeeRecordController::class, 'update'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.update');
+        Route::post('/fee-records/{feeRecord}/mark-paid', [FeeRecordController::class, 'markPaid'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.mark-paid');
+        Route::post('/fee-records/{feeRecord}/mark-unpaid', [FeeRecordController::class, 'markUnpaid'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.mark-unpaid');
+        Route::post('/fee-records/{feeRecord}/void', [FeeRecordController::class, 'void'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.void');
         Route::get('/invitations', [InvitationController::class, 'index'])
             ->name('invitations.index');
         Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])
@@ -98,6 +171,36 @@ Route::prefix('v1')->group(function () {
         )
             ->whereNumber('conversation')
             ->name('conversations.realtime');
+
+        Route::get(
+            '/programs/{program}/sessions',
+            [SessionController::class, 'index'],
+        )->whereNumber('program')->name('programs.sessions.index');
+
+        Route::post(
+            '/programs/{program}/sessions',
+            [SessionController::class, 'store'],
+        )->whereNumber('program')->name('programs.sessions.store');
+
+        Route::get(
+            '/sessions/{session}',
+            [SessionController::class, 'show'],
+        )->whereNumber('session')->name('sessions.show');
+
+        Route::patch(
+            '/sessions/{session}',
+            [SessionController::class, 'update'],
+        )->whereNumber('session')->name('sessions.update');
+
+        Route::post(
+            '/sessions/{session}/complete',
+            [SessionController::class, 'complete'],
+        )->whereNumber('session')->name('sessions.complete');
+
+        Route::post(
+            '/sessions/{session}/cancel',
+            [SessionController::class, 'cancel'],
+        )->whereNumber('session')->name('sessions.cancel');
     });
 
     Route::prefix('auth')->group(function () {
@@ -196,18 +299,20 @@ Route::prefix('v1')->group(function () {
         Route::put('/me/password', [AuthController::class, 'updatePassword'])
             ->name('auth.update-password');
 
-        Route::post('/files', [FileController::class, 'store'])
-            ->name('files.store');
-        Route::get('/files/{file}', [FileController::class, 'show'])
-            ->name('files.show');
-        Route::post('/files/{file}/complete', [FileController::class, 'complete'])
-            ->name('files.complete');
-        Route::post('/files/{file}/links', [FileController::class, 'link'])
-            ->name('files.link');
-        Route::get('/files/{file}/download', [FileController::class, 'download'])
-            ->name('files.download');
-        Route::delete('/files/{file}', [FileController::class, 'destroy'])
-            ->name('files.destroy');
+        Route::middleware(EnsureActiveApiActor::class)->group(function (): void {
+            Route::post('/files', [FileController::class, 'store'])
+                ->name('files.store');
+            Route::get('/files/{file}', [FileController::class, 'show'])
+                ->name('files.show');
+            Route::post('/files/{file}/complete', [FileController::class, 'complete'])
+                ->name('files.complete');
+            Route::post('/files/{file}/links', [FileController::class, 'link'])
+                ->name('files.link');
+            Route::get('/files/{file}/download', [FileController::class, 'download'])
+                ->name('files.download');
+            Route::delete('/files/{file}', [FileController::class, 'destroy'])
+                ->name('files.destroy');
+        });
 
         Route::get('/tutor/profile', [TutorProfileController::class, 'show'])
             ->name('tutor.profile.show');

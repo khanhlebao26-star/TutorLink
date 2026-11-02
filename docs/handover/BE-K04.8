@@ -1,0 +1,10 @@
+**BE-K04 — K04.8 cập nhật**
+
+**Trạng thái:** Đã hoàn tất K04.1–K04.7 trên branch `be-k04`; K04.8 đang chờ review PR.  
+**PR:** [dán link PR sau khi tạo] — reviewer: Hoàng.  
+**Evidence:** [BE-K04 handover](docs/handover/BE-K04-handover.md), [K04.6 test report](docs/handover/BE-K04-K04.6-test-report.md), [K04.7 OpenAPI parity](docs/handover/BE-K04-K04.7-route-parity.txt), [K04.7 lint](docs/handover/BE-K04-K04.7-openapi-lint.txt).
+
+**Acceptance trọng yếu:** PostgreSQL test ghi nhận hai complete đồng thời chỉ có một actual; complete/cancel không tạo trạng thái mâu thuẫn; mutation mới bị chặn khi Program terminal và replay hợp lệ được trả sau khi kiểm quyền hiện tại. Nhóm K04.6 đạt 109 test/913 assertions, gồm 17 race cases; full backend đạt 625 test/4.516 assertions. OpenAPI có 89 operations, route parity đạt; lint hợp lệ với 59 cảnh báo toàn dự án.
+
+**Việc tiếp theo:** Hoàng review PR; xử lý góp ý nếu có; sau khi review đạt thì merge theo quy trình repo.  
+**Blocker:** Chưa ghi nhận blocker kỹ thuật; còn chờ review. Chưa xác nhận staging/production migration hoặc triển khai.

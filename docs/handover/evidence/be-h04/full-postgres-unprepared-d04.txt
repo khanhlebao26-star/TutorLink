@@ -1,0 +1,1943 @@
+
+   PASS  Tests\Unit\ExampleTest
+  ✓ that true is true                                                    0.02s  
+
+   PASS  Tests\Unit\TaskSubmissionRequestHashTest
+  ✓ it matches the RFC 8785 JCS hash vector for special Unicode submiss… 0.03s  
+
+   PASS  Tests\Unit\TestConsoleGuardTest
+  ✓ unsafe targets are rejected before connection                        1.40s  
+  ✓ database override options are rejected                               0.04s  
+  ✓ known test database name with application host is rejected for chec… 0.26s  
+  ✓ check accepts sqlite memory without migrating                        0.21s  
+
+   PASS  Tests\Unit\TestDatabaseIsolationTest
+  ✓ development database is rejected before providers or refresh databa… 0.10s  
+  ✓ application database host is rejected before connection              0.09s  
+  ✓ sqlite memory is safe even when development environment is inherite… 0.21s  
+  ✓ cached configuration with wrong target is rejected before boot       0.09s  
+
+   PASS  Tests\Feature\AdminApprovalAuditTest
+  ✓ request changes resubmit and approve records every decision          1.16s  
+  ✓ approval decisions require a reason                                  0.06s  
+  ✓ admin without permission and non admin cannot review profiles        0.06s  
+  ✓ invalid tutor profile status filters are rejected                    0.07s  
+  ✓ only reviewer with permission can download verification document     0.11s  
+  ✓ account and profile suspension are separate and audited              0.12s  
+
+   PASS  Tests\Feature\AuthFileProfileTest
+  ✓ customer registration creates a customer                             0.59s  
+  ✓ tutor registration creates a tutor                                   0.08s  
+  ✓ registration sends a frontend email verification link                0.08s  
+  ✓ customer exactly fifteen can register                                0.06s  
+  ✓ customer one day under fifteen cannot register                       0.09s  
+  ✓ tutor exactly eighteen can register                                  0.07s  
+  ✓ tutor one day under eighteen cannot register                         0.05s  
+  ✓ role cannot be changed through me                                    0.05s  
+  ✓ unauthenticated api request returns json 401                         0.04s  
+  ✓ login and current user work                                          0.05s  
+  ✓ email verification marks the user verified                           0.04s  
+  ✓ password reset sends a frontend link                                 0.25s  
+  ✓ password reset updates the password                                  0.06s  
+  ✓ expired password reset token is rejected                             0.25s  
+  ✓ invalid password reset token is rejected                             0.26s  
+  ✓ password reset is throttled for sixty seconds                        0.47s  
+  ✓ local admin seeder is idempotent and grants all permissions          0.07s  
+  ✓ csrf mismatch returns json 419 for api requests                      0.03s  
+  ✓ invalid payload returns json 422 with field errors                   0.04s  
+  ✓ unverified user cannot upload business file                          0.05s  
+  ✓ file can be completed and only owner can download or delete          0.07s  
+  ✓ submitted tutor profile cannot be edited                             0.10s  
+  ✓ tutor profile stores specialization and avatar                       0.21s  
+  ✓ completed verification document can be attached to tutor profile     0.11s  
+  ✓ catalog can be seeded and read                                       0.07s  
+  ✓ login is rate limited                                                0.05s  
+  ✓ register is rate limited                                             0.04s  
+
+   FAIL  Tests\Feature\BeD04AnnouncementDraftApiTest
+  ⨯ draft create list detail and customer scope                          0.09s  
+  ⨯ draft file replace and detach are atomic diff and noop is inert      0.03s  
+  ⨯ validation file eligibility permissions and program state            0.03s  
+
+   FAIL  Tests\Feature\BeD04AnnouncementFileIntegrationTest
+  ⨯ announcement attachment upload and complete use the shared private…  0.04s  
+  ⨯ draft file access is owner only and generic link or delete cannot b… 0.04s  
+  ⨯ published announcement file requires current owner or active member… 0.04s  
+
+   FAIL  Tests\Feature\BeD04AnnouncementPublishApiTest
+  ⨯ publish commits snapshot audit outbox and replay receipt once        0.04s  
+  ⨯ publish validates key and version and uses active member snapshot    0.05s  
+  ⨯ outbox failure rolls back publish state audit and receipt            0.05s  
+
+   FAIL  Tests\Feature\BeD04ConcurrencyRaceTest
+  ⨯ contract races repeat three times and observe real postgres lock waits
+
+   FAIL  Tests\Feature\BeD04ContractBoundaryMatrixTest
+  ⨯ br26 defaults maximums empty pages and filter intersection on all l… 0.04s  
+  ⨯ fee month eligibility changes at midnight in program timezone        0.03s  
+  ⨯ real apis normalize unicode crlf and reject wrong json types and un… 0.03s  
+
+   FAIL  Tests\Feature\BeD04FeeRecordApiTest
+  ⨯ fee full lifecycle keeps metadata and emits audit outbox receipts    0.04s  
+  ⨯ fee period currency amount state access and pagination are enforced  0.04s  
+
+   FAIL  Tests\Feature\BeD04IdempotencyMatrixTest
+  ⨯ fee create replay canonical hash and conflicts are distinct          0.04s  
+  ⨯ fee noop new key only adds receipt and stale same value conflicts    0.03s  
+  ⨯ publish replay returns old snapshot after terminal change but check… 0.03s  
+  ⨯ progress and draft do not create idempotency receipts                0.03s  
+
+   FAIL  Tests\Feature\BeD04MigrationPreflightTest
+  ⨯ ambiguous legacy fee status fails before schema changes with data s… 0.04s  
+  ⨯ ambiguous legacy fee status fails before schema changes with data s… 0.03s  
+  ⨯ fractional legacy progress fails before type change                  0.03s  
+  ⨯ wrong legacy progress metric fails before type change                0.04s  
+  ⨯ wrong legacy progress scope fails before type change                 0.04s  
+  ⨯ invalid legacy announcement content fails before version backfill    0.04s  
+  ⨯ invalid fee period fails before status rename                        0.03s  
+
+   FAIL  Tests\Feature\BeD04OutboxRetentionTest
+  ⨯ announcement and fee events pause resume and deliver once to snapsh… 0.04s  
+  ⨯ fee receipt survives retention after fee void and program completio… 0.03s  
+  ⨯ expired announcement publish receipt cannot publish twice            0.03s  
+
+   FAIL  Tests\Feature\BeD04OverviewApiTest
+  ⨯ active overview uses stable summaries and allowlisted projections    0.04s  
+  ⨯ empty and terminal overview returns nulls zero counts and role capa… 0.03s  
+  ⨯ overview checks scope authentication and rejects query parameters    0.03s  
+  ⨯ overview reads program and summaries from one repeatable snapshot    0.03s  
+
+   PASS  Tests\Feature\BeD04PostgresSchemaContractTest
+  ✓ fee schema has contract metadata with data set "status"              0.04s  
+  ✓ fee schema has contract metadata with data set "tutor payment mark"  0.04s  
+  ✓ fee schema has contract metadata with data set "version"             0.04s  
+  ✓ fee schema has contract metadata with data set "void timestamp"      0.04s  
+  ✓ fee schema has contract metadata with data set "void actor"          0.04s  
+  ✓ fee schema has contract metadata with data set "void reason"         0.04s  
+  ✓ fee schema has contract metadata with data set "payment timestamp"   0.04s  
+  ✓ fee schema has contract metadata with data set "payment actor"       0.04s  
+  ✓ fee schema has contract metadata with data set "payment reason"      0.04s  
+  ✓ fee schema has contract metadata with data set "last change reason"  0.04s  
+  ✓ progress schema uses integer value and version                       0.04s  
+  ✓ announcement schema has version                                      0.04s  
+  ✓ fee check constraints cover contract states and bounds               0.03s  
+
+   FAIL  Tests\Feature\BeD04ProgressApiTest
+  ⨯ owner creates progress and member reads stable paginated list        0.04s  
+  ⨯ patch noop null and stale version have expected side effects         0.03s  
+  ⨯ invalid values permissions and program state are enforced            0.03s  
+
+   FAIL  Tests\Feature\BeD04RollbackFaultInjectionTest
+  ⨯ announcement file link and unlink faults rollback and retry
+  ⨯ fee update audit and outbox faults rollback and retry
+  ⨯ fee create receipt fault rolls back resource audit and outbox then retries
+  ⨯ announcement publish audit outbox and receipt faults rollback then retry
+
+   PASS  Tests\Feature\BeD04RouteContractTest
+  ✓ contract endpoint is registered with data set " o v-01 overview rea… 0.03s  
+  ✓ contract endpoint is registered with data set " p r-01 list progres… 0.03s  
+  ✓ contract endpoint is registered with data set " p r-02 create progr… 0.03s  
+  ✓ contract endpoint is registered with data set " p r-03 update progr… 0.03s  
+  ✓ contract endpoint is registered with data set " a n-01 list announc… 0.03s  
+  ✓ contract endpoint is registered with data set " a n-02 read announc… 0.03s  
+  ✓ contract endpoint is registered with data set " a n-03 create draft… 0.03s  
+  ✓ contract endpoint is registered with data set " a n-04 update draft… 0.03s  
+  ✓ contract endpoint is registered with data set " a n-05 publish anno… 0.03s  
+  ✓ contract endpoint is registered with data set " f e-01 list fee rec… 0.03s  
+  ✓ contract endpoint is registered with data set " f e-02 create fee r… 0.04s  
+  ✓ contract endpoint is registered with data set " f e-03 read fee rec… 0.04s  
+  ✓ contract endpoint is registered with data set " f e-04 update fee r… 0.06s  
+  ✓ contract endpoint is registered with data set " f e-05 mark fee pai… 0.04s  
+  ✓ contract endpoint is registered with data set " f e-06 mark fee unp… 0.03s  
+  ✓ contract endpoint is registered with data set " f e-07 void fee rec… 0.03s  
+
+   FAIL  Tests\Feature\BeD04SharedRequestTest
+  ⨯ workspace scope hides outsiders and forbids member mutation          0.04s  
+  ⨯ authentication inactive account and admin scope use api error envel… 0.03s  
+  ⨯ expected version rejects non json integers with data set "numeric s… 0.03s  
+  ⨯ expected version rejects non json integers with data set "float"     0.03s  
+  ⨯ expected version rejects non json integers with data set "boolean"   0.03s  
+  ⨯ expected version rejects non json integers with data set "zero"      0.04s  
+  ⨯ unknown fields and non object json are rejected                      0.03s  
+  ⨯ normalization preserves omission null and body whitespace            0.03s  
+  ⨯ stale version response has only authorized current version and requ… 0.03s  
+  ⨯ locked workspace uses contract lock order and locks files after res… 0.03s  
+  ✓ file row locks require the workspace writer transaction              0.03s  
+
+   FAIL  Tests\Feature\BeD04SqlConstraintTest
+  ⨯ fee check constraints reject invalid sql rows                        0.04s  
+  ⨯ progress check constraints reject invalid sql rows with data set "v… 0.03s  
+  ⨯ progress check constraints reject invalid sql rows with data set "w… 0.03s  
+  ⨯ progress check constraints reject invalid sql rows with data set "v… 0.03s  
+  ⨯ announcement version check rejects invalid sql row                   0.03s  
+
+   PASS  Tests\Feature\ChatAttachmentDisabledTest
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.07s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.05s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.05s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.05s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.05s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.06s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.06s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.05s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.05s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.09s  
+  ✓ file_ids accepts only omission or an empty JSON array with dataset…  0.06s  
+  ✓ omitted file_ids and empty array replay the same text                0.09s  
+  ✓ client cannot send file or system messages with ('file')             0.06s  
+  ✓ client cannot send file or system messages with ('system')           0.05s  
+  ✓ multipart cannot attach a binary file to a text message              0.06s  
+  ✓ message attachment purpose cannot be uploaded                        0.09s  
+  ✓ an owned complete file cannot be linked to a real message            0.07s  
+  ✓ legacy message files and links remain unchanged when new linking is… 0.08s  
+
+   PASS  Tests\Feature\CompleteFileApiTest
+  ✓ valid file completes without creating antivirus evidence and replay… 0.07s  
+  ✓ metadata violations are persisted as rejected with ('size')          0.06s  
+  ✓ metadata violations are persisted as rejected with ('hash')          0.06s  
+  ✓ metadata violations are persisted as rejected with ('mime')          0.07s  
+  ✓ metadata violations are persisted as rejected with ('extension')     0.06s  
+  ✓ metadata violations are persisted as rejected with ('purpose')       0.06s  
+  ✓ metadata violations are persisted as rejected with ('private')       0.06s  
+  ✓ metadata violations are persisted as rejected with ('content')       0.09s  
+  ✓ missing storage stays pending and returns a storage error            0.06s  
+  ✓ validation unavailable stays pending and can complete on retry       0.08s  
+  ✓ rejected files cannot be completed again                             0.05s  
+  ✓ legacy clean files do not acquire fabricated scan evidence           0.10s  
+  ✓ valid historical scan evidence is preserved without invoking a scan… 0.06s  
+  ✓ object changed during validation cannot become complete              0.06s  
+  ✓ wrong owner and suspended owner cannot complete a file               0.06s  
+  ✓ upload does not trust client supplied completion or scan evidence    0.05s  
+
+   PASS  Tests\Feature\ConversationBroadcastAuthTest
+  ✓ authentication is required                                           0.08s  
+  ✓ members receive a valid session bound signature                      0.14s  
+  ✓ other sessions outsider and admin cannot use the token               0.18s  
+  ✓ cancelled chat and suspended peer remain readable                    0.09s  
+  ✓ membership removal denies an existing token                          0.09s  
+  ✓ expired grant is denied and renewal rotates its token                0.12s  
+  ✓ invalid channel socket and client selected session are rejected      0.10s  
+
+   PASS  Tests\Feature\ConversationLifecycleApiTest
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.08s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.08s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.08s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.07s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.08s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.08s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.08s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.07s  
+  ✓ completion closes only when the pair has no ongoing relationship wi… 0.08s  
+  ✓ only an eligible contact request reopens the same conversation       0.10s  
+  ✓ lazy invitation expiry respects remaining active programs with data… 0.08s  
+  ✓ lazy invitation expiry respects remaining active programs with data… 0.08s  
+  ✓ replacing an expired invitation does not close the conversation      0.08s  
+  ✓ failure after conversation closure rolls back all lifecycle writes   0.08s  
+  ✓ admin suspension preserves conversation state and read cursors with… 0.08s  
+  ✓ admin suspension preserves conversation state and read cursors with… 0.08s  
+  ✓ admin suspension preserves conversation state and read cursors with… 0.09s  
+  ✓ admin suspension preserves conversation state and read cursors with… 0.09s  
+  ✓ cancelling a draft before any completed program keeps the chat acti… 0.07s  
+  ✓ program completion does not create a missing conversation            0.08s  
+
+   PASS  Tests\Feature\DatabaseSchemaTest
+  ✓ suite uses the configured database                                   0.04s  
+  ✓ core business tables are created                                     0.04s  
+  ✓ users match the tutorlink identity contract                          0.04s  
+  ✓ postgres accepts current user statuses                               0.03s  
+  ✓ postgres rejects legacy inactive user status                         0.03s  
+  ✓ postgres rejects legacy pending user status                          0.04s  
+  ✓ postgres accepts current tutor profile statuses                      0.05s  
+  ✓ postgres rejects cancelled tutor profile status                      0.03s  
+  ✓ postgres rejects expired tutor profile status                        0.04s  
+  ✓ laravel and learning sessions use distinct tables                    0.05s  
+  ✓ program and invitation store immutable offer snapshots               0.04s  
+  ✓ programs have a customer id column                                   0.04s  
+  ✓ postgres accepts completed programs and requires a customer          0.05s  
+  ✓ postgres allows only one customer and pending invitation per progra… 0.05s  
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ the application returns a successful response                        0.05s  
+
+   PASS  Tests\Feature\FileLifecycleConcurrencyTest
+  ✓ document attachment committing first prevents file deletion          0.59s  
+  ✓ file deletion committing first prevents document attachment          1.00s  
+  ✓ link and delete preserve an existing verification document           1.50s  
+
+   PASS  Tests\Feature\FileSizePolicyTest
+  ✓ upload and complete enforce the decimal byte boundary with ('avatar… 0.41s  
+  ✓ upload and complete enforce the decimal byte boundary with ('avatar… 0.32s  
+  ✓ upload and complete enforce the decimal byte boundary with ('avatar… 0.06s  
+  ✓ upload and complete enforce the decimal byte boundary with ('verifi… 0.35s  
+  ✓ upload and complete enforce the decimal byte boundary with ('verifi… 0.36s  
+  ✓ upload and complete enforce the decimal byte boundary with ('verifi… 0.07s  
+  ✓ upload and complete enforce the decimal byte boundary with ('task_a… 0.33s  
+  ✓ upload and complete enforce the decimal byte boundary with ('task_a… 0.33s  
+  ✓ upload and complete enforce the decimal byte boundary with ('task_a… 0.07s  
+  ✓ upload and complete enforce the decimal byte boundary with ('profil… 0.35s  
+  ✓ upload and complete enforce the decimal byte boundary with ('profil… 0.33s  
+  ✓ upload and complete enforce the decimal byte boundary with ('profil… 0.06s  
+  ✓ complete rejects an oversized object despite smaller declared metad… 0.13s  
+  ✓ complete rejects an oversized object even when metadata matches      0.12s  
+
+   PASS  Tests\Feature\IdentitySecurityTest
+  ✓ spa login without csrf token is rejected                             0.06s  
+  ✓ spa login with wrong csrf token is rejected                          0.04s  
+  ✓ spa login with valid csrf token succeeds                             0.05s  
+  ✓ tampered verification signature is rejected                          0.04s  
+  ✓ expired verification link is rejected                                0.04s  
+  ✓ signed link with wrong email hash is rejected                        0.04s  
+
+   PASS  Tests\Feature\IdentitySessionTest
+  ✓ login and logout use real session cookies                            0.10s  
+  ✓ password change keeps a and revokes b and old a                      0.15s  
+  ✓ password reset revokes current and other sessions                    0.12s  
+  ✓ resetting b does not log out a                                       0.10s  
+  ✓ suspend and restore do not restore old credentials                   0.15s  
+  ✓ revocation action only removes target sessions                       0.05s  
+  ✓ audit failure rolls back suspend and revocation                      0.12s  
+
+   PASS  Tests\Feature\Infrastructure\PostgresConnectionsTest
+  ✓ it opens two distinct PostgreSQL sessions on the test database       0.05s  
+  ✓ it enforces transaction locks across independent PostgreSQL session… 0.04s  
+
+   PASS  Tests\Feature\Infrastructure\PostgresRuntimeTest
+  ✓ it boots the guarded Laravel test application on PostgreSQL          0.03s  
+
+   PASS  Tests\Feature\Infrastructure\TestActorsTest
+  ✓ it authenticates a basic user fixture                                0.04s  
+  ✓ it provides a customer profile without tutor access                  0.05s  
+  ✓ it provides a tutor draft accessible to its owner                    0.05s  
+  ✓ it requires explicit permissions for an admin fixture                0.04s  
+
+   PASS  Tests\Feature\InvitationAcceptConcurrencyTest
+  ✓ only one concurrent accept creates membership audit and outbox       0.80s  
+  ✓ accept and lazy expiry race leaves no membership or partial writes   0.79s  
+  ✓ accept and draft cancel race commit a consistent serial order        0.84s  
+  ✓ accept and account suspension race respect the user lock             0.77s  
+  ✓ accept and atomic profile suspension preserve a consistent outcome   0.78s  
+  ✓ concurrent assignment changes cannot overwrite the same version      0.83s  
+  ✓ two completions close the chat only after both programs end          0.75s  
+  ✓ completion and invitation send follow serialized order               1.45s  
+  ✓ accept and invitation decisions commit only one outcome              2.84s  
+  ✓ expiry worker competes with accept and another worker without dupli… 2.03s  
+  ✓ expiry and invitation cancellation keep the expired outcome          0.70s  
+  ✓ program completion and task creation serialize on the program lock   2.85s  
+
+   PASS  Tests\Feature\InvitationAcceptTest
+  ✓ it activates the Program once and replays the same response for an…  0.09s  
+  ✓ it returns 404 without mutations when another Customer accepts the…  0.06s  
+  ✓ it returns 409 at the exact expiry time without activating the Prog… 0.06s  
+  ✓ it accepts an offer after its source Listing becomes inactive when…  0.07s  
+  ✓ it returns 409 when the Program version no longer matches the Invit… 0.06s  
+  ✓ it returns 409 when the required identity document expires at the c… 0.06s  
+  ✓ it returns 409 when the stored snapshot names a different Program    0.06s  
+  ✓ it returns 409 while the source Listing has an active moderation ho… 0.07s  
+  ✓ it returns 409 when an Idempotency-Key is reused for a different In… 0.07s  
+  ✓ it returns 422 without mutating state when the request has an unsup… 0.06s  
+  ✓ it returns 422 when Idempotency-Key is not a UUID                    0.05s  
+  ✓ it returns 401 with the API error envelope when no Customer is auth… 0.03s  
+
+   PASS  Tests\Feature\InvitationApiTest
+  ✓ it sends an immutable snapshot and replays the same idempotent resp… 0.08s  
+  ✓ it returns effective expiry in scoped Invitation reads without writ… 0.11s  
+  ✓ it expires an old pending Invitation atomically before sending a re… 0.11s  
+  ✓ it rolls back lazy expiry when the replacement request has a stale…  0.10s  
+  ✓ it rejects a send while an unexpired Invitation locks the Draft      0.08s  
+  ✓ it snapshots the allow-listed source Listing context at send time    0.09s  
+  ✓ it rejects sending when the source Listing has a moderation hold     0.08s  
+
+   PASS  Tests\Feature\InvitationDecisionApiTest
+  ✓ it resolves the pending Invitation once without activating or chang… 0.09s  
+  ✓ it resolves the pending Invitation once without activating or chang… 0.08s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.06s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.06s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.06s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.07s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.09s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.07s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.06s  
+  ✓ it denies unrelated accounts and the opposite party without exposin… 0.06s  
+  ✓ it requires authentication for Invitation decisions with ('reject')  0.04s  
+  ✓ it requires authentication for Invitation decisions with ('cancel')  0.04s  
+  ✓ it validates decision payloads without writing any state with datas… 0.08s  
+  ✓ it validates decision payloads without writing any state with datas… 0.08s  
+  ✓ it validates decision payloads without writing any state with datas… 0.07s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.07s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.07s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it refuses expired and terminal Invitations without side effects wi… 0.06s  
+  ✓ it denies a suspended decision actor with ('reject')                 0.05s  
+  ✓ it denies a suspended decision actor with ('cancel')                 0.05s  
+  ✓ it allows the Tutor to edit and send a new offer after a decision w… 0.08s  
+  ✓ it allows the Tutor to edit and send a new offer after a decision w… 0.08s  
+  ✓ it rolls back Invitation, membership and audit if the outbox write…  0.06s  
+  ✓ it rolls back Invitation, membership and audit if the outbox write…  0.06s  
+  ✓ it rolls back Invitation, membership and audit if the outbox write…  0.06s  
+
+   PASS  Tests\Feature\InvitationExpiryTest
+  ✓ it expires due Invitations once even for suspended parties and leav… 0.12s  
+  ✓ it synchronizes chat at the end of expiry or a decision while prese… 0.07s  
+  ✓ it synchronizes chat at the end of expiry or a decision while prese… 0.07s  
+  ✓ it synchronizes chat at the end of expiry or a decision while prese… 0.07s  
+  ✓ it synchronizes chat at the end of expiry or a decision while prese… 0.06s  
+  ✓ it synchronizes chat at the end of expiry or a decision while prese… 0.06s  
+  ✓ it synchronizes chat at the end of expiry or a decision while prese… 0.06s  
+  ✓ it rolls back failed expiry and retries it while continuing other o… 0.09s  
+  ✓ it expires all batches and ignores a removed or already resolved ca… 0.78s  
+
+   PASS  Tests\Feature\MarketplaceApiTest
+  ✓ pending tutor cannot publish listing                                 0.08s  
+  ✓ other tutor cannot update listing                                    0.07s  
+  ✓ non public listing is not returned                                   0.08s  
+  ✓ price sort requires price unit                                       0.08s  
+  ✓ overlapping availability is rejected                                 0.04s  
+  ✓ delete listing soft cancels it                                       0.07s  
+  ✓ suspended profile cannot publish listing                             0.07s  
+  ✓ suspended account cannot manage listing                              0.07s  
+  ✓ other tutor cannot read or delete listing                            0.08s  
+  ✓ non public listing is hidden from list and detail                    0.10s  
+  ✓ suspend and restore changes public visibility                        0.11s  
+  ✓ inactive catalog is not public                                       0.10s  
+  ✓ listing filters are applied on server                                0.10s  
+  ✓ listing pagination returns total count                               0.08s  
+  ✓ price filter does not mix price units                                0.08s  
+  ✓ owner detail and public tutor slug work                              0.09s  
+  ✓ catalog seeder is idempotent                                         0.08s  
+  ✓ archive preserves program reference and snapshot                     0.08s  
+
+   FAIL  Tests\Feature\MarketplaceCloseoutTest
+  ✓ owner status counts and actions are scoped before pagination         0.17s  
+  ✓ owner actions match catalog and terminal state enforcement           0.11s  
+  ✓ public listing exposes tutor slug without owner actions              0.09s  
+  ⨯ reviews exclude all non completed programs and return empty aggrega… 0.06s  
+  ✓ reviews validate pagination and public tutor visibility              0.07s  
+  ✓ completed review pagination aggregates full set and exposes only pu… 0.07s  
+  ✓ completed reviews require matching owner customer membership and un… 0.08s  
+
+   PASS  Tests\Feature\MarketplaceSearchCompatibilityTest
+  ✓ mixed case search matches title and description with filters and pa… 0.10s  
+
+   PASS  Tests\Feature\MessageBroadcastTest
+  ✓ notification is enqueued only after outer commit                     0.19s  
+  ✓ outer rollback discards message and notification                     0.19s  
+  ✓ replay and conflict do not enqueue another notification              0.19s  
+  ✓ validation quota and outsider failures do not enqueue                0.19s  
+  ✓ queue failure does not lose the committed message                    0.19s  
+  ✓ transport uses only session channels and minimal payload             0.17s  
+  ✓ transport failure leaves the committed message readable              0.18s  
+
+   PASS  Tests\Feature\MessagingSchemaTest
+  ✓ members and messages follow conversation relationships               0.06s  
+  ✓ attachments do not include other resource types with the same id     0.04s  
+  ✓ database defaults hash column and cursor index match the contract    0.05s  
+  ✓ database rejects duplicate direct keys                               0.04s  
+  ✓ message keys are unique per sender across conversations              0.04s  
+  ✓ postgres rejects legacy statuses types and missing direct keys       0.04s  
+  ✓ migration can round trip on empty messaging tables                   0.06s  
+  ✓ migration refuses legacy conversations without modifying them        0.07s  
+  ✓ migration refuses existing messages without modifying them           0.05s  
+
+   PASS  Tests\Feature\NotificationOutboxRuntimeTest
+  ✓ worker command processes committed events without duplicate          0.14s  
+  ✓ failure queues one alert and monitor does not duplicate it           0.15s  
+  ✓ failed handoff rolls back failure marker and job together            0.11s  
+  ✓ monitor backfills legacy failures and throttles reminders            0.13s  
+  ✓ pending alerts are aggregated and limited to once per ten minutes    0.14s  
+  ✓ pending alert handoff rollback does not consume throttle slot        0.13s  
+  ✓ queue on an independent connection is rejected                       0.13s  
+  ✓ retention preview does not delete any data                           0.17s  
+  ✓ executing retention requires both permissions                        0.15s  
+  ✓ retention preserves unresolved failures and audits each batch        0.16s  
+  ✓ failed retention audit rolls back deletion                           0.15s  
+  ✓ scheduler has monitor and controlled retention tasks                 0.09s  
+
+   PASS  Tests\Feature\NotificationOutboxWriterTest
+  ✓ commit records once per recipient without creating notifications     0.05s  
+  ✓ rollback removes the outbox event                                    0.05s  
+  ✓ replay does not create a second outbox event                         0.04s  
+  ✓ reusing an event key with different payload is rejected              0.04s  
+  ✓ payload outside the allow list is rejected                           0.03s  
+  ✓ accepted invitation requires the program deep link to match its id   0.03s  
+
+   PASS  Tests\Feature\OpenConversationApiTest
+  ✓ creates one conversation with two members and minimal peer data      0.06s  
+  ✓ reverse direction reuses the same pair and does not duplicate membe… 0.07s  
+  ✓ tutor can initiate a new conversation                                0.08s  
+  ✓ context is frozen on reuse and reopen and history is preserved       0.11s  
+  ✓ initial null context stays null on later requests                    0.07s  
+  ✓ reuse still validates supplied listing ownership and visibility      0.09s  
+  ✓ hidden catalog or moderation hold blocks listing context             0.08s  
+  ✓ authentication actor role and active state are enforced              0.05s  
+  ✓ self same role admin and missing peers are rejected                  0.06s  
+  ✓ unknown fields and invalid ids are rejected                          0.06s  
+  ✓ unverified unapproved or expired tutors cannot open contact          0.06s  
+  ✓ reopen rechecks eligibility and does not change a cancelled chat on… 0.07s  
+  ✓ existing invalid membership is not silently repaired                 0.06s  
+  ✓ member write failure rolls back the entire conversation              0.06s  
+
+   PASS  Tests\Feature\OpenConversationConcurrencyTest
+  ✓ concurrent opposite direction opens create one conversation and kee… 0.81s  
+
+   PASS  Tests\Feature\PersonalAccessTokenTest
+  ✓ it issues a one-time token and only lists metadata for its owner     0.06s  
+  ✓ it validates token names abilities and expiry bounds                 0.04s  
+  ✓ it enforces PAT abilities and rejects PAT use on session-only token… 0.06s  
+  ✓ it combines listing abilities with tutor eligibility and resource o… 0.08s  
+  ✓ it rejects expired tokens and revokes PATs when account is suspende… 0.06s  
+
+   PASS  Tests\Feature\PhaseTwoAcceptanceTest
+  ✓ avatar rejects documents and files over five million bytes           0.06s  
+  ✓ missing or tampered storage cannot be completed                      0.06s  
+  ✓ attached files cannot be deleted and storage is preserved            0.09s  
+  ✓ unlinked owner file can be deleted                                   0.05s  
+  ✓ generic links do not grant cross resource access or fake future fea… 0.09s  
+  ✓ deactivated account cannot use me or login                           0.05s  
+  ✓ unverified tutor cannot submit and incomplete profile returns field… 0.06s  
+  ✓ ready profile submit is idempotent and locks every edit path         0.12s  
+  ✓ admin queue excludes drafts and view only admin has no actions       0.05s  
+  ✓ reject is terminal and restore requires each separate permission     0.12s  
+  ✓ deactivated accounts cannot be approved or reactivated by suspend r… 0.05s  
+  ✓ audit failure rolls back admin decision                              0.09s  
+  ✓ owner verification link is idempotent and locked after submit        0.15s  
+  ✓ admin seed cannot change a customer role or password                 0.05s  
+  ✓ customer cannot access tutor onboarding                              0.04s  
+  ✓ logout clears web session after sanctum authentication               0.05s  
+
+   PASS  Tests\Feature\ProcessNotificationOutboxTest
+  ✓ committed outbox creates notification and is marked processed        0.15s  
+  ✓ running command again does not duplicate notification                0.13s  
+  ✓ future outbox is not processed                                       0.29s  
+  ✓ business rollback leaves nothing for worker                          0.17s  
+  ✓ existing matching notification is not duplicated                     0.16s  
+  ✓ conflicting notification does not mark outbox processed              0.13s  
+  ✓ uncommitted outbox is invisible to another worker                    0.15s  
+  ✓ worker skips row locked by another connection                        0.15s  
+  ✓ rolled back processing can be retried                                0.15s  
+  ✓ retry window expires without another delivery attempt                0.13s  
+  ✓ failed processing rolls back notification and can retry              0.15s  
+  ✓ tenth failure stops automatic retries                                0.14s  
+  ✓ retry backoff is at most five minutes                                0.14s  
+  ✓ authorized replay preserves event and writes audit                   0.13s  
+  ✓ successful replay resolves failure without duplicate notification    0.15s  
+  ✓ failed replay requires a new replay request                          0.14s  
+  ✓ outbox apis require explicit permissions                             0.13s  
+  ✓ replay requires a nonblank reason                                    0.13s  
+  ✓ a second pending replay is rejected without another audit            0.13s  
+  ✓ processed or resolved outbox cannot be replayed                      0.13s  
+  ✓ audit failure rolls back replay state                                0.13s  
+  ✓ listing classifies outbox states and excludes payload                0.15s  
+  ✓ killed worker before commit can be retried                           0.50s  
+
+   PASS  Tests\Feature\ProgramApiTest
+  ✓ it creates a Draft for an active Customer and records an audit entr… 0.11s  
+  ✓ it denies Program creation to a Customer                             0.07s  
+  ✓ it rejects unsupported offer values and fields without creating a P… 0.06s  
+  ✓ it rejects a source Listing under moderation hold                    0.07s  
+  ✓ it lists and shows only Programs visible to the actor                0.08s  
+  ✓ it lets a Customer read a Program only after becoming an active mem… 0.06s  
+  ✓ it updates a Draft once and increments its version                   0.06s  
+  ✓ it rejects stale versions and unsupported mutation fields without c… 0.07s  
+  ✓ it keeps a Draft locked while an Invitation is pending and unexpire… 0.06s  
+  ✓ it expires an overdue Invitation and edits the Draft in one transac… 0.08s  
+  ✓ it rolls back auto-expiry when the PATCH version is stale            0.07s  
+  ✓ it returns 403 when an active Program member attempts to edit the D… 0.05s  
+  ✓ it rejects editing a Program that is no longer a Draft               0.06s  
+  ✓ it returns an empty list to an active Customer without Program memb… 0.04s  
+  ✓ it denies Program listing to an Admin                                0.04s  
+
+   PASS  Tests\Feature\ProgramLifecycleApiTest
+  ✓ it records distinct lifecycle events without changing the offer ver… 0.09s  
+  ✓ it returns Session and Task blockers without completing the Program  0.07s  
+  ✓ it returns 404 when another Tutor attempts a Program lifecycle acti… 0.06s  
+  ✓ it rejects a transition outside the allowed state without side effe… 0.06s  
+  ✓ it cancels a Draft and its unexpired Invitation in one transaction   0.07s  
+  ✓ it completes a Program when Tasks are terminal and writes the membe… 0.07s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.06s  
+  ✓ it reports every nonterminal Task as a blocker and preserves child…  0.07s  
+  ✓ it grants access only after accept and completes a paused Program o… 0.16s  
+
+   PASS  Tests\Feature\ReadConversationApiTest
+  ✓ all three reads require a session                                    0.06s  
+  ✓ inbox scopes before returning private data and returns only minimal… 0.06s  
+  ✓ outsider gets 404 before cursor validation and cannot distinguish m… 0.06s  
+  ✓ admin has no participant inbox or conversation read access           0.06s  
+  ✓ a suspended actor with an existing session cannot read               0.05s  
+  ✓ cancelled chat and suspended peer remain readable without any read…  0.06s  
+  ✓ unread counts only peer messages after the composite read position   0.06s  
+  ✓ a legacy read marker from another conversation is not used as a val… 0.06s  
+  ✓ file preview is generic and history hides internal metadata          0.06s  
+  ✓ history visits every message with identical timestamps exactly once  0.11s  
+  ✓ polling drains all pages of new messages in ascending order          0.15s  
+  ✓ an empty conversation provides a usable polling origin for the firs… 0.06s  
+  ✓ loading older history never replaces the polling checkpoint          0.08s  
+  ✓ page size defaults to 20 and accepts 50                              0.12s  
+  ✓ invalid query parameters return the agreed error envelope            0.08s  
+  ✓ message cursors reject tampering and a different conversation scope  0.07s  
+  ✓ inbox uses cursor pagination with messages first and deterministic…  0.10s  
+  ✓ inbox cursor cannot be reused by another actor or as a message curs… 0.07s  
+  ✓ pagination preserves fractional timestamps when the database stores… 0.07s  
+
+   PASS  Tests\Feature\ReadCursorApiTest
+  ✓ first read advances only the current member and updates inbox unrea… 0.08s  
+  ✓ equal and older targets return the effective marker without changin… 0.07s  
+  ✓ timestamp including fractions takes priority over a numerically lar… 0.07s  
+  ✓ ID breaks ties between messages with identical timestamps            0.07s  
+  ✓ missing and foreign target messages return the same neutral error w… 0.07s  
+  ✓ null reset missing field non-integer and non-positive targets are r… 0.08s  
+  ✓ client cannot choose another member or set server-owned read fields  0.06s  
+  ✓ outsider and Admin receive 404 before validation including when the… 0.06s  
+  ✓ unauthenticated and suspended actors cannot change read state        0.06s  
+  ✓ cancelled chat with suspended peer remains readable and is not reop… 0.06s  
+  ✓ either participant may mark own or system messages without changing… 0.08s  
+  ✓ legacy cursor pointing to another Conversation is reported without…  0.06s  
+  ✓ a null-timestamp target is invalid and a malformed legacy marker re… 0.06s  
+  ✓ equal legacy marker keeps a null last_read_at rather than inventing… 0.06s  
+  ✓ a failed pivot write rolls back and a retry may advance normally     0.06s  
+
+   PASS  Tests\Feature\ReadCursorConcurrencyTest
+  ✓ racing reads keep the furthest timestamp even when its id is smalle… 0.82s  
+  ✓ racing equal timestamp targets keep the larger message id            0.81s  
+  ✓ two stale reads cannot reduce an existing newer marker or change it… 0.70s  
+  ✓ two members update only their own markers when they race             0.85s  
+  ✓ suspension committing before a waiting read blocks a stale actor     0.53s  
+  ✓ a read committing first is preserved when suspension then completes  0.53s  
+  ✓ a send waiting for read commit stays unread after the target         0.52s  
+
+   PASS  Tests\Feature\RealtimeRevocationConcurrencyTest
+  ✓ revocation committing first prevents publishing                      0.45s  
+  ✓ publishing first holds the lock until revocation can commit          0.44s  
+
+   PASS  Tests\Feature\RealtimeSessionAccessTest
+  ✓ logout revokes only current session and stale requests cannot reiss… 0.14s  
+  ✓ account suspend revokes every session and restore does not restore…  0.20s  
+  ✓ profile suspend revokes every session and restore does not restore…  0.25s  
+  ✓ suspend transaction rollback preserves realtime access               0.13s  
+
+   PASS  Tests\Feature\SendSlackOperationalAlertTest
+  ✓ success uses backend token and safe operational message              0.11s  
+  ✓ pending and worker alerts have only operational fields               0.07s  
+  ✓ connection timeout releases job without inline retry                 0.08s  
+  ✓ rate limit respects retry after                                      0.08s  
+  ✓ retry after is not shortened to normal backoff cap                   0.08s  
+  ✓ invalid retry after uses bounded backoff                             0.08s  
+  ✓ retry after beyond retry window fails without early retry            0.09s  
+  ✓ temporary http error releases job with data set #0                   0.08s  
+  ✓ temporary http error releases job with data set #1                   0.08s  
+  ✓ temporary http error releases job with data set #2                   0.08s  
+  ✓ http 200 with temporary api error is retried                         0.10s  
+  ✓ http 200 with api rate limit respects retry after                    0.09s  
+  ✓ permanent api error fails without retry with data set #0             0.09s  
+  ✓ permanent api error fails without retry with data set #1             0.08s  
+  ✓ permanent api error fails without retry with data set #2             0.08s  
+  ✓ permanent api error fails without retry with data set #3             0.08s  
+  ✓ permanent api error fails without retry with data set #4             0.08s  
+  ✓ permanent api error fails without retry with data set #5             0.08s  
+  ✓ http auth error fails without retry                                  0.09s  
+  ✓ invalid json response is not treated as success                      0.08s  
+  ✓ missing configuration fails without http request                     0.08s  
+  ✓ tenth temporary failure stops retry with safe exception              0.08s  
+  ✓ expired job does not send to slack                                   0.08s  
+  ✓ unknown response content and token are not logged or serialized      0.08s  
+  ✓ private fields are rejected before queue serialization               0.08s  
+  ✓ slack failure does not rollback committed business or notification   0.22s  
+  ✓ permanent failure is stored in failed jobs without token             0.11s  
+  ✓ rolled back enqueue does not send any slack request                  0.10s  
+
+   PASS  Tests\Feature\SendTextMessageApiTest
+  ✓ text send preserves spaces and only normalizes newlines with the se… 0.08s  
+  ✓ input trimming and empty-string normalization remain enabled outsid… 0.05s  
+  ✓ same normalized payload replays including an uppercase UUID and omi… 0.07s  
+  ✓ changing significant spaces or unicode composition conflicts instea… 0.08s  
+  ✓ same sender key in a different member conversation returns 409       0.08s  
+  ✓ the same UUID is independent for a different sender                  0.08s  
+  ✓ replay is allowed after cancellation and peer suspension without re… 0.07s  
+  ✓ a suspended actor cannot replay a previously persisted message       0.07s  
+  ✓ replay checks current membership before looking up the sender key    0.07s  
+  ✓ new messages are blocked for cancelled chat or suspended peer witho… 0.07s  
+  ✓ suspended TutorProfile blocks new messages while expired contact do… 0.07s  
+  ✓ authentication outsider and Admin cannot send a valid payload        0.06s  
+  ✓ validation rejects blank oversized system file and client-controlle… 0.10s  
+  ✓ text length is checked after newline normalization and accepts exac… 0.09s  
+  ✓ a sliding 60 second quota is global to the sender and replay never…  0.45s  
+  ✓ failed and conflicting attempts do not consume the remaining quota…  0.44s  
+  ✓ quota uses the thirtieth newest timestamp even when legacy rows exc… 0.12s  
+  ✓ legacy text with a null hash can replay without modifying the store… 0.06s  
+  ✓ clock regression cannot place a new message behind an issued pollin… 0.09s  
+  ✓ a message insert failure rolls back the message and leaves the same… 0.08s  
+  ✓ message timestamp precision and sender-time index exist without dro… 0.10s  
+
+   PASS  Tests\Feature\SendTextMessageConcurrencyTest
+  ✓ concurrent retries create one message and return 201 and 200         0.97s  
+  ✓ concurrent different payloads with one key return one conflict       0.85s  
+  ✓ same sender key cannot be created in two conversations concurrently  0.79s  
+  ✓ only one request can take the last global quota slot                 0.75s  
+  ✓ send waiting for committed h02 suspension is rejected                0.46s  
+  ✓ send commits before waiting h02 suspension and remains visible to p… 0.48s  
+  ✓ a stale sender object waiting for its own suspension is rejected     0.53s  
+
+   PASS  Tests\Feature\SessionApiTest
+  ✓ it creates only a planned Session with UTC timestamps                0.09s  
+  ✓ it allows member reads and rejects outsider reads                    0.09s  
+  ✓ it increments version once and rejects stale edits                   0.10s  
+  ✓ it does not increase version or audit for a no-op edit               0.12s  
+  ✓ it checks the merged schedule for a partial edit                     0.11s  
+  ✓ it blocks new writes when the Program is not active with ('paused')  0.12s  
+  ✓ it blocks new writes when the Program is not active with ('complete… 0.11s  
+  ✓ it blocks new writes when the Program is not active with ('cancelle… 0.11s  
+  ✓ it blocks new writes when the Program is not active with ('draft')   0.10s  
+  ✓ it replays create and edit before terminal Program state checks      0.10s  
+  ✓ it canonicalizes key order and equivalent timestamp offsets          0.08s  
+  ✓ it checks current authorization before replay                        0.07s  
+  ✓ it rolls back the planned Session when audit writing fails           0.07s  
+K04_RACE:{"program_id":14,"operations":["complete","complete"],"block_chain":[1967,1966,1965],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","complete"],"block_chain":[1970,1969,1968],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","cancel"],"block_chain":[1980,1972,1971],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["cancel","complete"],"block_chain":[1983,1982,1981],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_complete"],"block_chain":[1986,1985,1984],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_complete","create"],"block_chain":[1989,1988,1987],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_cancel"],"block_chain":[1999,1991,1990],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","create"],"block_chain":[2002,2001,2000],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["complete","program_complete"],"block_chain":[2005,2004,2003],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","complete"],"block_chain":[2008,2007,2006],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["complete","program_cancel"],"block_chain":[2018,2010,2009],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","complete"],"block_chain":[2021,2020,2019],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_complete"],"block_chain":[2024,2023,2022],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","cancel"],"block_chain":[2027,2026,2025],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_cancel"],"block_chain":[2037,2029,2028],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","cancel"],"block_chain":[2041,2039,2038],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["edit","edit"],"block_chain":[2044,2043,2042],"statuses":[200,409]}
+
+   PASS  Tests\Feature\SessionConcurrencyTest
+  ✓ concurrent complete has one actual and one audit with data set "sam… 0.86s  
+  ✓ concurrent complete has one actual and one audit with data set "dif… 0.79s  
+  ✓ complete and cancel have one winner with data set "complete first"   0.73s  
+  ✓ complete and cancel have one winner with data set "cancel first"     0.92s  
+  ✓ create and program terminal have a consistent order with data set "… 0.79s  
+  ✓ create and program terminal have a consistent order with data set "… 0.72s  
+  ✓ create and program terminal have a consistent order with data set "… 0.71s  
+  ✓ create and program terminal have a consistent order with data set "… 0.71s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.87s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.73s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.75s  
+  ✓ session and program terminal respect blockers with data set "comple… 0.73s  
+  ✓ session and program terminal respect blockers with data set "cancel… 0.74s  
+  ✓ session and program terminal respect blockers with data set "cancel… 0.73s  
+  ✓ session and program terminal respect blockers with data set "cancel… 1.27s  
+  ✓ session and program terminal respect blockers with data set "cancel… 0.73s  
+  ✓ concurrent edits cannot overwrite the same version                   0.74s  
+
+   PASS  Tests\Feature\SessionPolicyValidationTest
+  ✓ it allows reading only for the owner and current member              0.09s  
+  ✓ it applies the Program state matrix with dataset "active"            0.07s  
+  ✓ it applies the Program state matrix with dataset "paused"            0.05s  
+  ✓ it applies the Program state matrix with dataset "completed"         0.05s  
+  ✓ it applies the Program state matrix with dataset "cancelled"         0.05s  
+  ✓ it applies the Program state matrix with dataset "draft"             0.05s  
+  ✓ it blocks new mutations on terminal Sessions with ('completed')      0.05s  
+  ✓ it blocks new mutations on terminal Sessions with ('cancelled')      0.05s  
+  ✓ it rejects unauthenticated, outsider and member mutations            0.06s  
+  ✓ it rejects inactive actors                                           0.07s  
+  ✓ it accepts a valid schedule and requires an idempotency header       0.07s  
+  ✓ it rejects invalid schedule data with dataset "blank title"          0.05s  
+  ✓ it rejects invalid schedule data with dataset "missing offset"       0.05s  
+  ✓ it rejects invalid schedule data with dataset "invalid date"         0.06s  
+  ✓ it rejects invalid schedule data with dataset "equal times"          0.06s  
+  ✓ it rejects invalid schedule data with dataset "end before start"     0.05s  
+  ✓ it rejects invalid schedule data with dataset "http URL"             0.06s  
+  ✓ it rejects invalid schedule data with dataset "URL credentials"      0.10s  
+  ✓ it rejects invalid schedule data with dataset "long URL"             0.07s  
+  ✓ it rejects invalid schedule data with dataset "server-owned status"  0.06s  
+  ✓ it rejects invalid schedule data with dataset "client timezone"      0.06s  
+  ✓ it requires an integer expected version for edit and actions         0.14s  
+  ✓ it accepts a partial edit and rejects an edit without content field… 0.06s  
+  ✓ it allows only the contracted complete and cancel payloads           0.07s  
+
+   PASS  Tests\Feature\SessionSchemaTest
+  ✓ it defaults a planned Session to scheduled with version one          0.06s  
+  ✓ it connects Program, planned Session and actual in both directions   0.07s  
+  ✓ it rejects a second actual for the same planned Session              0.05s  
+  ✓ it rejects an actual referencing a missing planned Session           0.06s  
+  ✓ it rejects invalid planned Session statuses on PostgreSQL with ('pl… 0.07s  
+  ✓ it rejects invalid planned Session statuses on PostgreSQL with ('in… 0.06s  
+  ✓ it rejects invalid planned Session statuses on PostgreSQL with ('no… 0.06s  
+  ✓ it rejects nonpositive Session versions on PostgreSQL with (0)       0.05s  
+  ✓ it rejects nonpositive Session versions on PostgreSQL with (-1)      0.05s  
+  ✓ it stores terminal replay metadata without serializing it            0.05s  
+  ✓ it does not allow mass assignment of server-managed Session fields   0.03s  
+  ✓ it hides legacy attendance fields on actual serialization            0.03s  
+
+   PASS  Tests\Feature\SessionTransitionApiTest
+  ✓ it completes a Session and creates one actual                        0.09s  
+  ✓ it cancels a Session without creating an actual                      0.08s  
+  ✓ it allows scheduled transitions while the Program is paused with ('… 0.09s  
+  ✓ it allows scheduled transitions while the Program is paused with ('… 0.08s  
+  ✓ it rejects the opposite transition after a terminal result with ('c… 0.11s  
+  ✓ it rejects the opposite transition after a terminal result with ('c… 0.10s  
+  ✓ it replays the same command with the same or a new key with ('compl… 0.11s  
+  ✓ it replays the same command with the same or a new key with ('cance… 0.11s  
+  ✓ it uses durable metadata after the receipt expires with ('complete'… 0.10s  
+  ✓ it uses durable metadata after the receipt expires with ('cancel')   0.10s  
+  ✓ it replays after the Program completes without repeating business e… 0.14s  
+  ✓ it replays after the Program completes without repeating business e… 0.11s  
+  ✓ it blocks new transitions on a terminal Program with ('completed')   0.09s  
+  ✓ it blocks new transitions on a terminal Program with ('cancelled')   0.09s  
+  ✓ it rejects stale versions before creating an actual                  0.08s  
+  ✓ it rejects key reuse with another payload or action                  0.10s  
+  ✓ it rejects a different cancel reason with a new key                  0.09s  
+  ✓ it checks current authorization before returning replay              0.10s  
+  ✓ it does not infer replay from a legacy terminal status alone         0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+  ✓ it rolls back all transition writes when a required write fails wit… 0.08s  
+
+   PASS  Tests\Feature\SubmissionVersioningBackfillPostgresTest
+  ✓ it reruns PostgreSQL backfill for representative legacy rows and ro… 0.17s  
+
+   PASS  Tests\Feature\Task3SchemaDeltaTest
+  ✓ task3 schema columns exist                                           0.04s  
+  ✓ assignment and outbox reject invalid references and duplicates       0.05s  
+  ✓ task submissions keep versions and current pointer matches task and… 0.05s  
+
+   PASS  Tests\Feature\TaskSubmissionConcurrencyTest
+  ✓ submission retry and review races leave consistent versions          1.71s  
+
+   PASS  Tests\Feature\TaskWorkflowApiTest
+  ✓ it completes task assignment, versioned submission, revision, and a… 0.16s  
+  ✓ it preserves meaningful edge whitespace for submission and feedback… 0.09s  
+  ✓ it serializes Task and Submission timestamps as RFC 3339 UTC throug… 0.09s  
+  ✓ it stores the RFC 8785 JCS hash for special Unicode submission cont… 0.06s  
+  ✓ it allows a new submission while review is pending and rejects feed… 0.10s  
+  ✓ it allows task owners to cancel only open tasks and restricts trans… 0.10s  
+  ✓ it enforces task visibility and mutation permissions by owner and a… 0.10s  
+  ✓ it applies Program state gates to task creation and actions          0.14s  
+  ✓ it rejects task edits and submissions in terminal task states while… 0.18s  
+  ✓ it replays feedback from the shared receipt after authorization wit… 0.19s  
+  ✓ it links a completed task file and permits only the task participan… 0.16s  
+  ✓ it rolls back submission and task state when a file link cannot be…  0.08s  
+  ✓ it backfills a legacy submission into version one and the task curr… 0.04s  
+
+   PASS  Tests\Feature\TrustWorkflowApiTest
+  ✓ it creates one Review only after completion and hides it from publi… 0.12s  
+  ✓ it refuses invalid Reviews and outsiders                             0.07s  
+  ✓ it revokes evidence at reassignment and closure and exposes only th… 0.15s  
+  ✓ it restricts audit to current assignments and masks raw JSONB while… 0.07s  
+  ✓ it enforces Report scope validation and quota without charging a ma… 0.15s  
+  ✓ it rolls back Report decisions and evidence reads if the audit writ… 0.07s  
+  ✓ it keeps open and recent Reports while purging closed Reports older… 0.05s  
+
+   PASS  Tests\Feature\TrustWorkflowConcurrencyTest
+  ✓ duplicate reviews commit once and same key replays                   1.57s  
+  ✓ concurrent report assignment rejects the stale writer                0.66s  
+
+   PASS  Tests\Feature\TutorProfileApprovalWorkflowTest
+  ✓ it assigns reassigns and revokes with optimistic locking and a mini… 0.10s  
+  ✓ it rejects invalid assignees and callers without assignment permiss… 0.10s  
+  ✓ it removes the old reviewer scope for detail decisions and private…  0.12s  
+  ✓ it keeps assignment-only queue metadata separate from profile detai… 0.09s  
+  ✓ it requires identity and structured qualification evidence before s… 0.10s  
+  ✓ it submits once retains eligible assignments and requires separate…  0.14s  
+  ✓ it returns a stale conflict even if a profile is reassigned back to… 0.09s  
+  ✓ it clears an ineligible reviewer on resubmission and forbids reject… 0.10s  
+  ✓ it checks document decision permission separately from download and… 0.09s  
+  ✓ it suspends profile and active account atomically then restores onl… 0.11s  
+  ✓ it cannot partially suspend with either required permission missing… 0.15s  
+  ✓ it cannot partially suspend with either required permission missing… 0.09s  
+  ✓ it rolls back account profile audit and token revocation if the out… 0.09s  
+  ✓ it enforces authorization when business actions are called directly… 0.09s  
+  ✓ it keeps approved content unchanged until a versioned revision is a… 0.14s  
+  ✓ it preserves approved content on revision rejection and does not re… 0.13s  
+  ✓ it supports changes requested revisions with versioned edits and re… 0.15s  
+  ✓ it retains document decisions when the owner retries attaching the…  0.09s  
+  ✓ it protects revision avatar files from deletion while keeping the o… 0.09s  
+  ✓ it enforces unique open revisions and positive revision versions in… 0.08s  
+  ✓ it requires private identity files and matching ownership before su… 0.10s  
+  ✓ it does not grant Program eligibility when a claimed qualification…  0.12s  
+  ✓ it backfills the legacy suspension state and preserves profile and…  0.12s  
+  ✓ it hides profiles with deleted tutor accounts without partial decis… 0.11s  
+  ✓ it allows profile suspension and restoration with profile permissio… 0.13s  
+
+   PASS  Tests\Feature\ZipScanGuardTest
+  ✓ ZIP guard accepts ordinary entries and non ZIP                       0.05s  
+  ✓ ZIP guard refuses unsafe or incomplete archives with ('file')        0.03s  
+  ✓ ZIP guard refuses unsafe or incomplete archives with ('total')       0.03s  
+  ✓ ZIP guard refuses unsafe or incomplete archives with ('count')       0.03s  
+  ✓ ZIP guard refuses unsafe or incomplete archives with ('encrypted')   0.03s  
+  ✓ ZIP guard refuses unsafe or incomplete archives with ('nested')      0.03s  
+  ✓ ZIP guard refuses unsafe or incomplete archives with ('malformed')   0.03s  
+  ✓ ZIP guard reports an expired deadline as unavailable                 0.04s  
+  ✓ ZIP guard reports invalid limits as unavailable                      0.03s  
+  ✓ archive policy rejection blocks a previously complete file           0.06s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementDraftApiTe…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementDraftApiTest.php:256
+  3   tests/Feature/BeD04AnnouncementDraftApiTest.php:31
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementDraftApiTe…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementDraftApiTest.php:256
+  3   tests/Feature/BeD04AnnouncementDraftApiTest.php:100
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementDraftApiTe…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementDraftApiTest.php:256
+  3   tests/Feature/BeD04AnnouncementDraftApiTest.php:167
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementFileIntegr…  ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementFileIntegrationTest.php:289
+  3   tests/Feature/BeD04AnnouncementFileIntegrationTest.php:36
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementFileIntegr…  ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementFileIntegrationTest.php:289
+  3   tests/Feature/BeD04AnnouncementFileIntegrationTest.php:98
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementFileIntegr…  ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementFileIntegrationTest.php:289
+  3   tests/Feature/BeD04AnnouncementFileIntegrationTest.php:166
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementPublishApi…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementPublishApiTest.php:249
+  3   tests/Feature/BeD04AnnouncementPublishApiTest.php:32
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementPublishApi…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementPublishApiTest.php:249
+  3   tests/Feature/BeD04AnnouncementPublishApiTest.php:124
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04AnnouncementPublishApi…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04AnnouncementPublishApiTest.php:249
+  3   tests/Feature/BeD04AnnouncementPublishApiTest.php:201
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04ConcurrencyRaceTest >…   ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04ConcurrencyRaceTest.php:26
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04ContractBoundaryMatrix…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04ContractBoundaryMatrixTest.php:315
+  3   tests/Feature/BeD04ContractBoundaryMatrixTest.php:34
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04ContractBoundaryMatrix…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04ContractBoundaryMatrixTest.php:315
+  3   tests/Feature/BeD04ContractBoundaryMatrixTest.php:144
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04ContractBoundaryMatrix…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04ContractBoundaryMatrixTest.php:315
+  3   tests/Feature/BeD04ContractBoundaryMatrixTest.php:182
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04FeeRecordApiTest > fee…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04FeeRecordApiTest.php:263
+  3   tests/Feature/BeD04FeeRecordApiTest.php:32
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04FeeRecordApiTest > fee…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04FeeRecordApiTest.php:263
+  3   tests/Feature/BeD04FeeRecordApiTest.php:184
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04IdempotencyMatrixTest…   ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04IdempotencyMatrixTest.php:288
+  3   tests/Feature/BeD04IdempotencyMatrixTest.php:32
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04IdempotencyMatrixTest…   ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04IdempotencyMatrixTest.php:288
+  3   tests/Feature/BeD04IdempotencyMatrixTest.php:102
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04IdempotencyMatrixTest…   ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04IdempotencyMatrixTest.php:288
+  3   tests/Feature/BeD04IdempotencyMatrixTest.php:160
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04IdempotencyMatrixTest…   ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04IdempotencyMatrixTest.php:288
+  3   tests/Feature/BeD04IdempotencyMatrixTest.php:211
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04MigrationPreflightTest > ambig…  QueryException   
+  SQLSTATE[42703]: Undefined column: 7 ERROR:  column "declared_status" of relation "fee_records" does not exist
+LINE 1: ...start", "period_end", "amount_minor", "currency", "declared_...
+                                                             ^ (Connection: pgsql, Host: test-db, Port: 5432, Database: tutorlink_test, SQL: insert into "fee_records" ("program_id", "period_start", "period_end", "amount_minor", "currency", "declared_status") values (?, 2026-09-01, 2026-09-30, 300000, VND, confirmed))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+    597▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    598▕ 
+    599▕             $this->recordsHaveBeenModified();
+    600▕ 
+  ➜ 601▕             return $statement->execute();
+    602▕         });
+    603▕     }
+    604▕ 
+    605▕     /**
+
+      [2m+6 vendor frames [22m
+  7   tests/Feature/BeD04MigrationPreflightTest.php:35
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04MigrationPreflightTest > ambig…  QueryException   
+  SQLSTATE[42703]: Undefined column: 7 ERROR:  column "declared_status" of relation "fee_records" does not exist
+LINE 1: ...start", "period_end", "amount_minor", "currency", "declared_...
+                                                             ^ (Connection: pgsql, Host: test-db, Port: 5432, Database: tutorlink_test, SQL: insert into "fee_records" ("program_id", "period_start", "period_end", "amount_minor", "currency", "declared_status") values (?, 2026-09-01, 2026-09-30, 300000, VND, cancelled))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+    597▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    598▕ 
+    599▕             $this->recordsHaveBeenModified();
+    600▕ 
+  ➜ 601▕             return $statement->execute();
+    602▕         });
+    603▕     }
+    604▕ 
+    605▕     /**
+
+      [2m+6 vendor frames [22m
+  7   tests/Feature/BeD04MigrationPreflightTest.php:35
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04MigrationPreflightTest > fract…  QueryException   
+  SQLSTATE[22P02]: Invalid text representation: 7 ERROR:  invalid input syntax for type smallint: "35.5"
+CONTEXT:  unnamed portal parameter $1 = '...' (Connection: pgsql, Host: test-db, Port: 5432, Database: tutorlink_test, SQL: update "progress_records" set "value" = 35.5 where "note" = D04_FIXTURE_PROGRESS_001)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:626
+    622▕             $statement = $this->getPdo()->prepare($query);
+    623▕ 
+    624▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    625▕ 
+  ➜ 626▕             $statement->execute();
+    627▕ 
+    628▕             $this->recordsHaveBeenModified(
+    629▕                 ($count = $statement->rowCount()) > 0
+    630▕             );
+
+      [2m+6 vendor frames [22m
+  7   tests/Feature/BeD04MigrationPreflightTest.php:75
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04MigrationPreflightTest > wrong legacy progress…   
+  INFO  Nothing to migrate.  
+
+
+Failed asserting that 0 is not identical to 0.
+
+  at tests/Feature/BeD04MigrationPreflightTest.php:110
+    106▕                 ->update(['metric_name' => 'attendance']);
+    107▕ 
+    108▕             [$exitCode, $output] = $this->runMigration();
+    109▕ 
+  ➜ 110▕             $this->assertNotSame(0, $exitCode, $output);
+    111▕             $this->assertStringContainsString('invalid Progress rows', $output);
+    112▕             $this->assertFalse(
+    113▕                 DB::table('migrations')->where('migration', self::MIGRATION)->exists(),
+    114▕             );
+
+  1   tests/Feature/BeD04MigrationPreflightTest.php:110
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04MigrationPreflightTest > wrong legacy progress…   
+  INFO  Nothing to migrate.  
+
+
+Failed asserting that 0 is not identical to 0.
+
+  at tests/Feature/BeD04MigrationPreflightTest.php:137
+    133▕                 ->update(['customer_id' => $outsiderId]);
+    134▕ 
+    135▕             [$exitCode, $output] = $this->runMigration();
+    136▕ 
+  ➜ 137▕             $this->assertNotSame(0, $exitCode, $output);
+    138▕             $this->assertStringContainsString('invalid Progress rows', $output);
+    139▕             $this->assertFalse(
+    140▕                 DB::table('migrations')->where('migration', self::MIGRATION)->exists(),
+    141▕             );
+
+  1   tests/Feature/BeD04MigrationPreflightTest.php:137
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04MigrationPreflightTest > invalid legacy announ…   
+  INFO  Nothing to migrate.  
+
+
+Failed asserting that 0 is not identical to 0.
+
+  at tests/Feature/BeD04MigrationPreflightTest.php:160
+    156▕                 ->update(['title' => '   ']);
+    157▕ 
+    158▕             [$exitCode, $output] = $this->runMigration();
+    159▕ 
+  ➜ 160▕             $this->assertNotSame(0, $exitCode, $output);
+    161▕             $this->assertStringContainsString('invalid Announcement content rows', $output);
+    162▕             $this->assertFalse(
+    163▕                 DB::table('migrations')->where('migration', self::MIGRATION)->exists(),
+    164▕             );
+
+  1   tests/Feature/BeD04MigrationPreflightTest.php:160
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04MigrationPreflightTest > inval…  QueryException   
+  SQLSTATE[42703]: Undefined column: 7 ERROR:  column "declared_status" of relation "fee_records" does not exist
+LINE 1: ...start", "period_end", "amount_minor", "currency", "declared_...
+                                                             ^ (Connection: pgsql, Host: test-db, Port: 5432, Database: tutorlink_test, SQL: insert into "fee_records" ("program_id", "period_start", "period_end", "amount_minor", "currency", "declared_status") values (?, 2026-09-01, 2026-09-02, 300000, VND, declared))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:601
+    597▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    598▕ 
+    599▕             $this->recordsHaveBeenModified();
+    600▕ 
+  ➜ 601▕             return $statement->execute();
+    602▕         });
+    603▕     }
+    604▕ 
+    605▕     /**
+
+      [2m+6 vendor frames [22m
+  7   tests/Feature/BeD04MigrationPreflightTest.php:181
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04OutboxRetentionTest >…   ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04OutboxRetentionTest.php:308
+  3   tests/Feature/BeD04OutboxRetentionTest.php:40
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04OutboxRetentionTest >…   ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04OutboxRetentionTest.php:308
+  3   tests/Feature/BeD04OutboxRetentionTest.php:128
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04OutboxRetentionTest >…   ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04OutboxRetentionTest.php:308
+  3   tests/Feature/BeD04OutboxRetentionTest.php:198
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04OverviewApiTest > acti…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04OverviewApiTest.php:292
+  3   tests/Feature/BeD04OverviewApiTest.php:18
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04OverviewApiTest > empt…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04OverviewApiTest.php:292
+  3   tests/Feature/BeD04OverviewApiTest.php:144
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04OverviewApiTest > over…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04OverviewApiTest.php:292
+  3   tests/Feature/BeD04OverviewApiTest.php:216
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04OverviewApiTest > over…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04OverviewApiTest.php:292
+  3   tests/Feature/BeD04OverviewApiTest.php:239
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04ProgressApiTest > owne…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04ProgressApiTest.php:191
+  3   tests/Feature/BeD04ProgressApiTest.php:30
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04ProgressApiTest > patc…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04ProgressApiTest.php:191
+  3   tests/Feature/BeD04ProgressApiTest.php:90
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04ProgressApiTest > inva…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04ProgressApiTest.php:191
+  3   tests/Feature/BeD04ProgressApiTest.php:149
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04RollbackFaultInjection…  ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04RollbackFaultInjectionTest.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04RollbackFaultInjection…  ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04RollbackFaultInjectionTest.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04RollbackFaultInjection…  ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04RollbackFaultInjectionTest.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04RollbackFaultInjection…  ModelNotFoundException   
+  No query results for model [App\Models\User].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04RollbackFaultInjectionTest.php:27
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > wo…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:40
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > au…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:71
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > ex…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:95
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > ex…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:95
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > ex…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:95
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > ex…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:95
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > un…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:132
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > no…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:170
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > st…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:222
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SharedRequestTest > lo…  ModelNotFoundException   
+  No query results for model [App\Models\Program].
+
+  at vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php:821
+    817▕         if (! is_null($model = $this->first($columns))) {
+    818▕             return $model;
+    819▕         }
+    820▕ 
+  ➜ 821▕         throw (new ModelNotFoundException)->setModel(get_class($this->model));
+    822▕     }
+    823▕ 
+    824▕     /**
+    825▕      * Execute the query and get the first result or call a callback.
+
+      [2m+1 vendor frames [22m
+  2   tests/Feature/BeD04SharedRequestTest.php:310
+  3   tests/Feature/BeD04SharedRequestTest.php:240
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SqlConstraintTest > fee check constraints reje…   
+  Failed asserting that null is not null.
+
+  at tests/Feature/BeD04SqlConstraintTest.php:29
+     25▕         DB::beginTransaction();
+     26▕ 
+     27▕         try {
+     28▕             $feeId = DB::table('fee_records')->where('amount_minor', '>', 0)->value('id');
+  ➜  29▕             $this->assertNotNull($feeId);
+     30▕ 
+     31▕             $this->assertConstraintRejects(
+     32▕                 fn () => DB::table('fee_records')->where('id', $feeId)->update(['amount_minor' => 9007199254740992]),
+     33▕                 'fee_records_d04_amount_check',
+
+  1   tests/Feature/BeD04SqlConstraintTest.php:29
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SqlConstraintTest > prog…  AssertionFailedError   
+  Expected PostgreSQL to reject invalid row with progress_records_d04_metric_value_check.
+
+  at tests/Feature/BeD04SqlConstraintTest.php:156
+    152▕             return;
+    153▕         }
+    154▕ 
+    155▕         DB::statement("RELEASE SAVEPOINT {$savepoint}");
+  ➜ 156▕         $this->fail("Expected PostgreSQL to reject invalid row with {$constraint}.");
+    157▕     }
+    158▕ }
+    159▕
+
+  1   tests/Feature/BeD04SqlConstraintTest.php:156
+  2   tests/Feature/BeD04SqlConstraintTest.php:100
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SqlConstraintTest > prog…  AssertionFailedError   
+  Expected PostgreSQL to reject invalid row with progress_records_d04_metric_value_check.
+
+  at tests/Feature/BeD04SqlConstraintTest.php:156
+    152▕             return;
+    153▕         }
+    154▕ 
+    155▕         DB::statement("RELEASE SAVEPOINT {$savepoint}");
+  ➜ 156▕         $this->fail("Expected PostgreSQL to reject invalid row with {$constraint}.");
+    157▕     }
+    158▕ }
+    159▕
+
+  1   tests/Feature/BeD04SqlConstraintTest.php:156
+  2   tests/Feature/BeD04SqlConstraintTest.php:100
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SqlConstraintTest > prog…  AssertionFailedError   
+  Expected PostgreSQL to reject invalid row with progress_records_d04_version_check.
+
+  at tests/Feature/BeD04SqlConstraintTest.php:156
+    152▕             return;
+    153▕         }
+    154▕ 
+    155▕         DB::statement("RELEASE SAVEPOINT {$savepoint}");
+  ➜ 156▕         $this->fail("Expected PostgreSQL to reject invalid row with {$constraint}.");
+    157▕     }
+    158▕ }
+    159▕
+
+  1   tests/Feature/BeD04SqlConstraintTest.php:156
+  2   tests/Feature/BeD04SqlConstraintTest.php:100
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\BeD04SqlConstraintTest > anno…  AssertionFailedError   
+  Expected PostgreSQL to reject invalid row with announcements_d04_version_check.
+
+  at tests/Feature/BeD04SqlConstraintTest.php:156
+    152▕             return;
+    153▕         }
+    154▕ 
+    155▕         DB::statement("RELEASE SAVEPOINT {$savepoint}");
+  ➜ 156▕         $this->fail("Expected PostgreSQL to reject invalid row with {$constraint}.");
+    157▕     }
+    158▕ }
+    159▕
+
+  1   tests/Feature/BeD04SqlConstraintTest.php:156
+  2   tests/Feature/BeD04SqlConstraintTest.php:129
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\MarketplaceCloseoutTest > reviews exclude all non c…   
+  Failed asserting that 20 is identical to 5.
+
+  at tests/Feature/MarketplaceCloseoutTest.php:79
+     75▕         foreach (['draft', 'active', 'paused', 'cancelled'] as $status) {
+     76▕             $this->review($profile, $status, 5);
+     77▕         }
+     78▕         $this->getJson("/api/v1/tutors/{$profile->public_slug}/reviews")->assertOk()
+  ➜  79▕             ->assertJsonCount(0, 'data')->assertJsonPath('meta.per_page', 5)
+     80▕             ->assertJsonPath('meta.total', 0)->assertJsonPath('aggregate.average', null)
+     81▕             ->assertJsonPath('aggregate.count', 0)
+     82▕             ->assertJsonPath('aggregate.histogram', ['1' => 0, '2' => 0, '3' => 0, '4' => 0, '5' => 0]);
+     83▕     }
+
+
+  Tests:    56 failed, 665 passed (4684 assertions)
+  Duration: 106.76s
+

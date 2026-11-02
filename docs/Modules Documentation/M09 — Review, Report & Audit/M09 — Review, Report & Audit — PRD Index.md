@@ -21,11 +21,11 @@ Tạo Review đủ điều kiện sau Program Completed, hiển thị Review tin
 * Admin view/decide/review moderation/audit phải có permission cụ thể và scope; evidence allow-list theo resource, không trả PII/document/object key/file không liên quan; chỉ khi Report open + assignment hiện tại. Report/decision và audit giữ 24 tháng.
 * Audit cùng transaction, append-only; mutation rollback nếu audit write thất bại.
 
-# Implementation gaps
+# Runtime BE-H04 — 02/11/2026
 
-* Admin approval audit có; Review/Report APIs và scoped Admin evidence workflow chưa có.
-* Schema legacy Report pending/reviewing cần map về open/resolved/dismissed.
-* message đã là resource có thể report; conversation không phải ReportResourceType. BR-11/BR-24 chốt cửa sổ tối đa 10 tin trước/5 tin sau, allow-list, evidence access window và retention. Schema mapping, migration và runtime vẫn cần triển khai/kiểm chứng.
+Review/Report/Audit APIs có trong code và OpenAPI. H04 bổ sung visibility/version Review, mapping Report pending/reviewing → open có preflight chặn dữ liệu mơ hồ, partial unique cho Report open; giữ các assignment fields/version có sẵn. Public Review lọc visible và bỏ tên Customer. Evidence có kiểm assignment/open/permission và audit mỗi lần đọc; đóng/reassign thu hồi scope. Audit reader không trả raw JSONB và chỉ mở các scope đã có nguồn assignment/moderation rõ ràng. Retention Report/decision và Audit là 24 tháng, purge có quyền/audit.
+
+[Contract, test report và giới hạn](../../handover/BE-H04-test-report.md). Chưa chứng nhận UI, production hoặc migration trên dữ liệu production. Scoped Audit cho resource không có assignment mapping hiện bị từ chối mặc định.
 
 # Nguồn
 

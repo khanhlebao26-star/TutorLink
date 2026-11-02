@@ -47,6 +47,7 @@ abstract class TestCase extends BaseTestCase
             TestDatabaseGuard::assertSafe($app['config']);
         });
         $app->make(Kernel::class)->bootstrap();
+        TestDatabaseGuard::assertConnectedIdentity($app['config']);
 
         if (isset($this->traitsUsedByTest[DatabaseTruncation::class])) {
             $this->beforeApplicationDestroyed(fn () => $this->truncateTablesForAllConnections());

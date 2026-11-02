@@ -39,6 +39,7 @@ class PersonalAccessTokenController extends Controller
     }
 
     #[Endpoint(title: 'List personal access token metadata')]
+    #[\Dedoc\Scramble\Attributes\Response(200, description: 'Token metadata without token secrets.', type: 'array{data:list<array{id:int,name:string,abilities:list<string>,created_at:?string,last_used_at:?string,expires_at:?string}>}')]
     public function index(Request $request): JsonResponse
     {
         $tokens = $request->user()->tokens()

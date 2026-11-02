@@ -203,6 +203,7 @@ class CompleteFile
                 'task_attachment',
                 'profile_document',
                 'message_attachment',
+                'announcement_attachment',
             ],
             (int) config('file-validation.max_bytes', 5_000_000),
         );

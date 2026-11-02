@@ -10,7 +10,7 @@ class TestConsoleGuardTest extends TestCase
     public function test_unsafe_targets_are_rejected_before_connection(): void
     {
         foreach (['tutorlink', 'tutorlink_demo', 'tutorlink_tests'] as $database) {
-            foreach (['migrate', 'migrate:fresh', 'db:seed'] as $command) {
+            foreach (['migrate', 'migrate:fresh', 'db:seed', 'd04:seed', 'd04:migrate'] as $command) {
                 $process = $this->runConsole([$command], [
                     'DB_CONNECTION' => 'pgsql',
                     'DB_DATABASE' => $database,
@@ -52,6 +52,24 @@ class TestConsoleGuardTest extends TestCase
             'Usage:',
             $process->getErrorOutput(),
         );
+    }
+
+    public function test_known_test_database_name_with_application_host_is_rejected_for_check_and_seed(): void
+    {
+        foreach (['check', 'd04:seed', 'd04:migrate'] as $command) {
+            $process = $this->runConsole([$command], [
+                'DB_CONNECTION' => 'pgsql',
+                'DB_DATABASE' => 'tutorlink_test',
+                'DB_HOST' => 'db',
+            ]);
+
+            $this->assertSame(1, $process->getExitCode());
+            $this->assertStringContainsString(
+                'Unsafe test database configuration.',
+                $process->getErrorOutput(),
+            );
+            $this->assertStringNotContainsString('SQLSTATE', $process->getErrorOutput());
+        }
     }
 
     public function test_check_accepts_sqlite_memory_without_migrating(): void

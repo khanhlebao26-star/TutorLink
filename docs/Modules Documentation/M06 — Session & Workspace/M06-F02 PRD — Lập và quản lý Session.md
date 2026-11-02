@@ -32,8 +32,10 @@ Tutor owner lập các buổi Session của Program; Tutor và Customer member x
 
 # 5\. Chênh lệch/câu hỏi mở
 
-* Đã chốt ID/DTO mapping: API Session ID là program\_sessions.id; program\_sessions là lịch dự kiến, lesson\_sessions là kết quả 0..1. Đây không phải Laravel HTTP session và không còn là câu hỏi mở; migration/runtime vẫn cần kiểm chứng.  
+* Đã chốt ID/DTO mapping: API Session ID là program\_sessions.id; program\_sessions là lịch dự kiến, lesson\_sessions là kết quả 0..1. Đây không phải Laravel HTTP session và không còn là câu hỏi mở.
 * Timezone authoritative và validation meeting URL được chốt tại BR-20. Quyền sửa Session khi Paused đã được chốt tại BR-19.
+
+**Runtime BE-K04, 01/11/2026:** list/detail/create/PATCH đã đăng ký trong OpenAPI. Bốn mutation Session yêu cầu UUID `Idempotency-Key`; edit/complete/cancel yêu cầu JSON integer `expected_version`. Create chỉ tạo planned scheduled/version 1; PATCH có thay đổi tăng version một lần, PATCH không đổi dữ liệu không tăng version/audit; cả hai không tạo actual. Timestamps trả UTC với microseconds. Kiểm quyền hiện tại trước replay; request replay hợp lệ trả response snapshot gốc. Xem [bàn giao API/schema](../../handover/BE-K04-handover.md) và [evidence nghiệp vụ/race](../../handover/BE-K04-K04.6-test-report.md); UI và production chưa được chứng nhận.
 
 # 6\. Nguồn
 

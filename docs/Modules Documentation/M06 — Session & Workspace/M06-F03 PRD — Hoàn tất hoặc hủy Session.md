@@ -24,8 +24,10 @@ Tutor owner ghi nhận kết quả của Scheduled Session mà không xóa mất
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Thiết kế transaction đã chốt: đổi trạng thái lịch và tạo lesson\_sessions completed cùng transaction với audit bắt buộc; replay không tạo actual/audit lần hai. Chưa có bằng chứng runtime/kiểm thử thì giữ trạng thái chưa xác minh, không ghi lại đây là câu hỏi chọn mô hình.  
-* Đã được Dũng xác nhận ngày 18/10/2026 và chốt D21–D22 tại BR-19 ngày 20/10/2026: Tutor owner được hoàn tất/hủy Session scheduled khi Program Active hoặc Paused; Paused không tạo mới và không cho sửa lịch. Program terminal cấm transition mới; chỉ replay tương đương được trả kết quả đã lưu, không ghi lần hai. Versioned write và implementation evidence còn cần đồng bộ.
+* Thiết kế transaction đã chốt: đổi trạng thái lịch và tạo lesson\_sessions completed cùng transaction với audit bắt buộc; replay không tạo actual/audit lần hai.
+* Đã được Dũng xác nhận ngày 18/10/2026 và chốt D21–D22 tại BR-19 ngày 20/10/2026: Tutor owner được hoàn tất/hủy Session scheduled khi Program Active hoặc Paused; Paused không tạo mới và không cho sửa lịch. Program terminal cấm transition mới; chỉ replay tương đương được trả kết quả đã lưu, không ghi lần hai.
+
+**Runtime BE-K04, 01/11/2026:** complete/cancel đã đăng ký; yêu cầu UUID `Idempotency-Key` và JSON integer `expected_version`; cancel nhận optional nullable `reason` tối đa 2.000 ký tự. Transaction dùng lock chung với Program lifecycle, ghi planned/actual/audit/receipt/terminal metadata nguyên tử. Replay kiểm identity/scope/quyền hiện tại trước; tương đương phải khớp actor/action/payload gốc, gồm expected_version gốc. Receipt giữ 30 ngày; terminal metadata hỗ trợ replay bằng key mới hoặc sau TTL. Payload/action khác trả 409; legacy terminal thiếu metadata không suy replay từ status. Không tăng actual/audit/event/version khi replay; receipt cho key mới được phép. Không phát Session notification/outbox theo contract K04.1. Xem [bàn giao BE-K04](../../handover/BE-K04-handover.md) và [17 race cases PostgreSQL cùng rollback evidence](../../handover/BE-K04-K04.6-test-report.md). Không tự complete theo giờ; UI và production chưa được chứng nhận.
 
 # 5\. Nguồn
 

@@ -29,8 +29,8 @@ Cho Tutor owner và Customer member một không gian Program thống nhất đ�
 
 # 5\. Chênh lệch/câu hỏi mở
 
-* Workspace API/UI chưa có trong repo; hiện mới có schema migration.  
-* Shape, counts, timezone và capability của Overview được chốt tại BR-20; API/UI chưa có trong repo và cần triển khai theo contract này.
+* BE-D04 branch (02/11/2026) đã đăng ký Overview API và chạy regression trên `tutorlink_test`; API backend chưa được xác nhận ở runtime môi trường thực tế. UI vẫn ngoài phạm vi backend D04.
+* Shape, counts, timezone, stable ordering và capability theo BR-20 được mô tả tại [BE-D04 contract](../../handover/BE-D04-contract.md) mục 13.6; danh sách route có route parity/OpenAPI evidence tại D04-18.
 
 # 6\. Nguồn
 

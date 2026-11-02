@@ -14,7 +14,7 @@ Tutor ghi nhận khoản phí đã thỏa thuận trong Program theo tháng; s�
 * FeeRecordStatus: declared → voided, không mở lại. TutorPaymentMark độc lập: unmarked → marked\_paid/marked\_unpaid; paid ↔ unpaid cần audit và reason khi đổi paid sang unpaid. Amount 0 giữ mark unmarked và không cho mark paid/unpaid; chỉ cho sửa amount về 0 khi mark hiện tại là unmarked, không reset mark đã ghi. Voided là trạng thái cuối: không sửa amount, mark hoặc void lần nữa.
 * Void giữ nguyên payment mark, giữ kỳ tháng và record để lịch sử không bị ghi đè; void bắt buộc lý do và record voided vẫn chiếm kỳ. PATCH đổi amount cũng bắt buộc lý do.
 * Program Paused cấm tạo Fee Record mới nhưng cho sửa/mark/void record có sẵn theo policy; terminal readonly. Chỉ sửa `amount_minor`/reason khi status `declared` và payment mark chưa `marked_paid`; không đổi kỳ tháng và không sửa record `voided`.
-* Fee Record có integer `version` bắt đầu từ 1. PATCH/mark/void yêu cầu `expected_version`; mismatch trả 409 và không ghi một phần. Mỗi mutation thành công tăng version một lần; đổi `marked_paid` sang `marked_unpaid` vẫn cần reason và audit. Mọi mutation nhận Idempotency-Key; sau khi kiểm lại authorization, cùng actor/key/method/path/payload trả kết quả đã commit; cùng key nhưng request khác trả 409. Replay không tăng version/audit/notification. Mỗi mutation thành công phát `fee_record_changed` in-app cho Customer member sau commit.
+* Fee Record có integer `version` bắt đầu từ 1. PATCH/mark/void yêu cầu `expected_version`; mismatch trả 409 và không ghi một phần. Mỗi mutation có thay đổi thực tế tăng version một lần; đổi `marked_paid` sang `marked_unpaid` vẫn cần reason và audit. Mọi mutation nhận Idempotency-Key; sau khi kiểm lại authorization, cùng actor/key/method/path/hash trả receipt đã commit; cùng key nhưng request khác trả 409. Replay không tăng version/audit/notification. No-op đúng version (PATCH cùng amount (chỉ khi Fee chưa marked_paid) với reason hợp lệ, mark lại cùng trạng thái khi Program/resource còn writable) trả 200 hiện tại; key mới lưu receipt nhưng không đổi metadata/version/audit/outbox. Stale version/state guard vẫn trả 409. Mutation có thay đổi thực tế phát `fee_record_changed` in-app cho Customer member sau commit.
 
 # 3\. Tiêu chí chấp nhận
 
@@ -26,10 +26,10 @@ Tutor ghi nhận khoản phí đã thỏa thuận trong Program theo tháng; s�
 
 # 4\. Khoảng trống triển khai
 
-* Schema cũ dùng declared/confirmed/cancelled; target tách FeeRecordStatus và TutorPaymentMark. Trước migration phải kiểm kê dữ liệu và xác minh nghĩa của `confirmed`; không suy nó thành Customer đã thanh toán.
-* BR-19, BR-20 và BR-22 đã chốt policy sửa, version, timezone, kỳ khai báo, số tiền 0, idempotency, thông báo và cách hiển thị Customer. API/schema/runtime còn cần đồng bộ; kiểm kê và xác minh ý nghĩa legacy `confirmed` trước migration, không suy thành bằng chứng thanh toán.
+* Migration `2026_11_01_233000_add_be_d04_workspace_schema` và `2026_11_02_000000_enforce_d04_fee_currency` cùng API Fee đã chạy trên `tutorlink_test`. Migration dừng nếu gặp legacy `confirmed`/`cancelled` chưa được phân loại; không suy `confirmed` thành Customer đã thanh toán. Runtime môi trường thực tế chưa được xác nhận.
+* Request/response, filter/order, receipt, no-op, schema checks, audit projection, lock protocol và retention đã được chốt trong [BE-D04 contract](../../handover/BE-D04-contract.md) mục 13–17. Fee receipt `expires_at=NULL` giữ tới khi Fee và lịch sử liên quan đủ điều kiện purge theo Database Design.
 
 # 5\. Nguồn
 
 Product: Project Overview, Roles & Actors, Business Rules. Domain: Domain Model, State Lifecycles, Enum Catalog. Workflow: WF-05 Workspace tới Completed. Link nguồn: [Project Overview](<../../Product Document/Project Overview.md>) · [Roles & Actors](<../../Product Document/Roles & Actors.md>) · [Business Rules](<../../Domain Documentation/Business Rules.md>) · [Domain Model](<../../Domain Documentation/Domain Model.md>) · [State Lifecycles](<../../Domain Documentation/State Lifecycles.md>) · [Enum Catalog](<../../Domain Documentation/Enum Catalog.md>)
-Đồng bộ 20/10/2026 — BR-19/20/22 chốt version guard, kỳ tháng và quy tắc Fee Record; runtime/schema còn cần đồng bộ.
+Đồng bộ 02/11/2026 — BE-D04 đã bổ sung API/schema và chạy regression trên test DB; trạng thái môi trường thực tế theo D04-21 trở đi. Pagination/filter/order theo BR-26 và request/response/no-op/receipt trong BE-D04 contract mục 13–17.

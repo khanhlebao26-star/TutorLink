@@ -109,27 +109,16 @@ jobs:
 
       - name: Run backend tests with coverage
         run: |
-          php \
-            -d pcov.enabled=1 \
-            -d pcov.directory="$PWD/app" \
-            vendor/bin/pest \
-            --display-warnings \
-            --fail-on-warning \
-            --coverage \
-            --coverage-clover build/reports/clover.xml \
-            --coverage-html build/reports/html \
-            --coverage-text=build/reports/coverage.txt \
-            --log-junit build/reports/junit.xml \
+          php scripts/test-suite.php --coverage \
             2>&1 | tee build/reports/tests.txt
 
           test -s build/reports/clover.xml
-          test -s build/reports/junit.xml
+          for group in d04-preflight regression d04 d04-race; do
+            test -s "build/reports/$group-junit.xml"
+          done
           test -s build/reports/coverage.txt
 
-      - name: Export OpenAPI from guarded SQLite memory schema
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
+      - name: Export OpenAPI from guarded PostgreSQL test schema
         run: php scripts/test-console.php openapi:export
 
       - name: Set up Node for OpenAPI validation
