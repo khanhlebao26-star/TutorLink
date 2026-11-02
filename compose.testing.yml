@@ -62,17 +62,10 @@ services:
       - -c
       - |
           mkdir -p /evidence/coverage
-          exec php \
-            -d pcov.enabled=1 \
-            -d pcov.directory=/var/www/html/app \
-            vendor/bin/pest \
-            --display-warnings \
-            --fail-on-warning \
-            --coverage \
-            --coverage-clover /evidence/coverage/clover.xml \
-            --coverage-html /evidence/coverage/html \
-            --coverage-text=/evidence/coverage/summary.txt \
-            --log-junit /evidence/coverage/junit.xml
+          php scripts/test-suite.php --coverage
+          result=$$?
+          cp -R build/reports/. /evidence/coverage/
+          exit $$result
 
 networks:
   testing:

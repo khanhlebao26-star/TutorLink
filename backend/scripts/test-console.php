@@ -15,6 +15,7 @@ $allowedCommands = [
     'db:seed',
     'd04:seed',
     'd04:migrate',
+    'd04:legacy',
     'openapi:export',
 ];
 
@@ -25,7 +26,7 @@ if (
     fwrite(
         STDERR,
         'Usage: php scripts/test-console.php '
-        ."[check|migrate|migrate:fresh|db:seed|d04:seed|d04:migrate|openapi:export]\n",
+        ."[check|migrate|migrate:fresh|db:seed|d04:seed|d04:migrate|d04:legacy|openapi:export]\n",
     );
 
     exit(2);
@@ -84,9 +85,15 @@ try {
         );
     }
 
-    $commands = $command === 'openapi:export'
+    if ($command === 'd04:legacy' && $identity['driver'] !== 'pgsql') {
+        throw new RuntimeException('BE-D04 legacy preparation requires PostgreSQL.');
+    }
+
+    $commands = $command === 'd04:legacy'
+        ? ['migrate:fresh', 'db:seed']
+        : ($command === 'openapi:export'
         ? ['migrate', 'scramble:export']
-        : [$command];
+        : [$command]);
 
     foreach ($commands as $artisanCommand) {
         $options = ['--no-interaction' => true];
@@ -94,11 +101,17 @@ try {
         if ($artisanCommand !== 'scramble:export') {
             $options['--force'] = true;
         }
-        if ($d04FixtureSeed && $artisanCommand === 'db:seed') {
+        if (($d04FixtureSeed || $command === 'd04:legacy') && $artisanCommand === 'db:seed') {
             $options['--class'] = 'Database\\Seeders\\BeD04FixtureSeeder';
         }
         if ($d04SchemaMigration && $artisanCommand === 'migrate') {
             $options['--path'] = 'database/migrations/2026_11_01_233000_add_be_d04_workspace_schema.php';
+        }
+        if ($command === 'd04:legacy' && $artisanCommand === 'migrate:fresh') {
+            $options['--path'] = array_values(array_filter(
+                glob('database/migrations/*.php'),
+                fn (string $path): bool => basename($path) < '2026_11_01_233000_add_be_d04_workspace_schema.php',
+            ));
         }
 
         $exitCode = $kernel->call($artisanCommand, $options);

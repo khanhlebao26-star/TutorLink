@@ -7,6 +7,7 @@ use App\Support\AdminPermissions;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Tests\Support\TestDatabaseGuard;
@@ -319,7 +320,7 @@ class BeD04FixtureSeeder extends Seeder
                     'period_end' => $month->endOfMonth()->toDateString(),
                     'amount_minor' => $index === 1 ? 0 : 200000 + (($index % 4) * 25000),
                     'currency' => 'VND',
-                    'status' => 'declared',
+                    (Schema::hasColumn('fee_records', 'status') ? 'status' : 'declared_status') => 'declared',
                     'disclaimer' => null,
                     'created_at' => $month->setTime(12, 0)->utc()->toDateTimeString(),
                     'updated_at' => self::FIXTURE_TIME,
