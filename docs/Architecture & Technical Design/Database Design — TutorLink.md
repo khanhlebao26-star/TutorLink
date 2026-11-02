@@ -770,7 +770,7 @@ amount\_minor — bigint; NOT NULL.
 
 currency — char(3); NOT NULL; mặc định: VND.
 
-status — varchar(20); NOT NULL; mặc định: declared; enum: FeeRecordStatus; cần điều chỉnh.
+status — varchar(20); NOT NULL; mặc định: declared; enum: FeeRecordStatus; migration đổi tên `declared_status` thành `status`.
 
 disclaimer — text; NULL.
 
@@ -778,23 +778,37 @@ created\_at — timestamptz; NULL.
 
 updated\_at — timestamptz; NULL.
 
-tutor\_payment\_mark — varchar(20); NOT NULL; mặc định: unmarked; enum: TutorPaymentMark; đề xuất thêm.
+tutor\_payment\_mark — varchar(20); NOT NULL DEFAULT unmarked; enum: TutorPaymentMark.
 
 version — integer; NOT NULL DEFAULT 1; BR-19, optimistic concurrency cho edit/mark/void.
 
-voided\_at — timestamptz; NULL; đề xuất thêm.
+voided\_at — timestamptz; NULL.
 
 Fee `version` theo BR-19 tăng mỗi lần sửa/mark/void thành công; các mutation kiểm `expected_version`. Chỉ record declared chưa marked_paid được sửa amount; kỳ tháng và record voided giữ nguyên.
 
-voided\_by — bigint; NULL; FK; tham chiếu users.id; đề xuất thêm.
+voided\_by — bigint; NULL; FK users.id, RESTRICT khi xóa.
 
-void\_reason — text; NULL; đề xuất thêm.
+void\_reason — text; NULL.
 
-payment\_marked\_at — timestamptz; NULL; đề xuất thêm.
+payment\_marked\_at — timestamptz; NULL.
 
-payment\_marked\_by — bigint; NULL; FK; tham chiếu users.id; đề xuất thêm.
+payment\_marked\_by — bigint; NULL; FK users.id, RESTRICT khi xóa.
 
-payment\_mark\_reason — text; NULL; đề xuất thêm.
+payment\_mark\_reason — text; NULL.
+
+last\_change\_reason — text; NULL.
+
+### Schema BE-D04 đã chốt — migrations PostgreSQL 02/11/2026
+
+`2026_11_01_233000_add_be_d04_workspace_schema` chuyển `progress_records.value` từ numeric sang `smallint`, thêm `version integer NOT NULL DEFAULT 1` cho Progress/Announcement/Fee, đổi `fee_records.declared_status` thành `status` và thêm metadata Fee liệt kê ở trên. Các cột nullable giữ NULL khi không có sự kiện tương ứng; FK actor metadata (`voided_by`, `payment_marked_by`) tham chiếu `users.id` với `ON DELETE RESTRICT`. `2026_11_02_000000_enforce_d04_fee_currency` thêm CHECK `fee_records_d04_currency_check`, chỉ nhận `VND`.
+
+CHECK constraints cuối cùng:
+
+- Progress: `progress_records_d04_metric_value_check` buộc metric `progress_percent`, value 0–100; `progress_records_d04_version_check` buộc version ≥1. Index `(program_id, recorded_at DESC, id DESC)` phục vụ list ổn định.
+- Announcement: `announcements_d04_version_check` buộc version ≥1; index `(program_id, published_at DESC, id DESC)` cho Published và partial index `(program_id, created_at DESC NULLS LAST, id DESC) WHERE published_at IS NULL` cho Draft.
+- Fee: `fee_records_d04_amount_check` buộc amount 0..9,007,199,254,740,991; `fee_records_d04_period_check` buộc ngày đầu và cuối trọn tháng; `fee_records_d04_status_check` chỉ `declared|voided`; `fee_records_d04_payment_mark_check` chỉ `unmarked|marked_paid|marked_unpaid`; `fee_records_d04_version_check` buộc version ≥1; `fee_records_d04_zero_amount_check` buộc amount 0 ⇒ mark `unmarked`. `fee_records_d04_void_metadata_check` đồng bộ status với void timestamp/actor/reason; `fee_records_d04_payment_metadata_check` đồng bộ payment mark với timestamp/actor và reason nullable có nội dung nếu có; `fee_records_d04_last_change_reason_check` chỉ nhận NULL hoặc chuỗi trim không trắng tối đa 2.000 ký tự. Currency chỉ `VND` theo CHECK ở migration thứ hai.
+
+Migrations đã được chạy và các CHECK/index/FK đã được xác nhận trên `tutorlink_test`; điều này chưa xác nhận áp dụng vào runtime môi trường thực tế. Thứ tự trên DB các loại bảng/column như SQL được định nghĩa; API resource allow-list được ghi tại [BE-D04 contract](../handover/BE-D04-contract.md) mục 13.
 
 ### Bảng reviews
 
@@ -1120,7 +1134,7 @@ created\_at — timestamptz; NOT NULL.
 
 expires\_at — timestamptz; NULL; command BR-23 có hạn 30 ngày, Fee Record theo BR-22 có thể NULL đến khi đủ điều kiện purge.
 
-UNIQUE(actor\_id,idempotency\_key). Accept Invitation và feedback Task ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa được chứng nhận đã tích hợp bảng này. Feedback Task dùng receipt 30 ngày theo Tutor + UUID key + POST + canonical path + hash của `expected_submission_version` và `feedback` đã chuẩn hóa; replay trả response snapshot sau kiểm quyền hiện tại, không ghi lại side effect. Fee Record cần tính hash/replay theo BR-22 và giữ receipt tới khi Fee Record cùng lịch sử liên quan được phép purge. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
+UNIQUE(actor\_id,idempotency\_key). Accept Invitation và feedback Task ghi receipt cùng mutation trong transaction; cùng actor/key + method/path/hash trả response snapshot cũ sau khi kiểm quyền hiện tại, payload khác trả 409. Các module khác chưa được chứng nhận đã tích hợp bảng này. Feedback Task dùng receipt 30 ngày theo Tutor + UUID key + POST + canonical path + hash của `expected_submission_version` và `feedback` đã chuẩn hóa; replay trả response snapshot sau kiểm quyền hiện tại, không ghi lại side effect. BE-D04 Fee mutation lưu request hash và response snapshot trong receipt cùng transaction; `expires_at=NULL` cho tới khi Fee Record và lịch sử liên quan đủ điều kiện purge theo policy này. D04-17 đã kiểm tra receipt còn tồn tại/replay sau 31 ngày, khi Fee voided, Program terminal và khi cleanup audit chạy. Submission giữ key/hash trên task_submissions, Messaging giữ key/hash trên messages.
 
 ## Tham chiếu đa hình
 

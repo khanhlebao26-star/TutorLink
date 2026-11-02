@@ -1,0 +1,389 @@
+{
+  "group": "test-api-implementation-07-14",
+  "archive": "test-api-implementation-07-14.zip",
+  "archive_sha256": "1d85e4835bcec16de8a2b9cda0b5d87bcc366fc7ff377e66a4e9982fcac92b54",
+  "member_count": 76,
+  "uncompressed_bytes": 1166105,
+  "members": [
+    {
+      "path": "test/2026-11-02-0018/D04-07/D04-07-report.md",
+      "size_bytes": 1223,
+      "sha256": "0781d7f181bdc582abceddd503f09e7ad69c2492ac26cb5ff5a04b2f9a848f34"
+    },
+    {
+      "path": "test/2026-11-02-0018/D04-07/database-after.txt",
+      "size_bytes": 298,
+      "sha256": "df5415957b5ac07fa600341f9ba25122813234e8a7a912a0feea151af3881f1f"
+    },
+    {
+      "path": "test/2026-11-02-0018/D04-07/environment.json",
+      "size_bytes": 441,
+      "sha256": "27e288673b6762ee02842e4fb9981c096b806deb96c6e2d26f9d8871230676d3"
+    },
+    {
+      "path": "test/2026-11-02-0018/D04-07/progress-api-tests.txt",
+      "size_bytes": 8902,
+      "sha256": "6bac334cc8cb2f9769bff681fef77d12360508653b1e67b63c9994d72cece168"
+    },
+    {
+      "path": "test/2026-11-02-0025/D04-08/D04-08-report.md",
+      "size_bytes": 1443,
+      "sha256": "3ac075a905f3ad77853d9e0c96bdbe79d2987deb8d56ae7d96195d34934b5e27"
+    },
+    {
+      "path": "test/2026-11-02-0025/D04-08/announcement-draft-tests.txt",
+      "size_bytes": 18389,
+      "sha256": "fc326911504d1a2f5eb056226b0a69f60d91ad5df45e0b44daee1ef1a8c58003"
+    },
+    {
+      "path": "test/2026-11-02-0025/D04-08/database-after.txt",
+      "size_bytes": 347,
+      "sha256": "c16d9e6db907e60b00e925a9d42ac83e69608a161cbeee8d6e8eb9f1ea8fdf29"
+    },
+    {
+      "path": "test/2026-11-02-0025/D04-08/environment.json",
+      "size_bytes": 498,
+      "sha256": "bda43679f2c64575faa11220b8a3984478adcba53228dc8abf68ad51054df148"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/D04-07-09-regression.txt",
+      "size_bytes": 37960,
+      "sha256": "605813084f447d58e0e6abd6a1b645dc83ab8764373a2a2e679a8f6588de1a42"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/D04-09-report.md",
+      "size_bytes": 3650,
+      "sha256": "34a9f57067634e9d72e62f332481039b2d3df2eb0d97d1350229dcdccbaa36f1"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/announcement-file-tests-initial-failure.txt",
+      "size_bytes": 37859,
+      "sha256": "42f13e28caa43ec17b6315a9362d961c969374830d17254413bd5d3c7a22c814"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/announcement-file-tests-membership-fixture-failure.txt",
+      "size_bytes": 11554,
+      "sha256": "5bef8987dad7b0cf6335cabc8bfd7f4b3119a8d11929ce720589db3ab2c0f4af"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/announcement-file-tests.txt",
+      "size_bytes": 12035,
+      "sha256": "a686a5052d36ea34dfa74903b341e3863503833ceda978cae15736f07a298bc2"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/database-after.txt",
+      "size_bytes": 303,
+      "sha256": "f6718eeeef6ecc92f67bc9364c18ad5250f0279e375c3bd442b7f49167105d94"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/database-before.txt",
+      "size_bytes": 624,
+      "sha256": "c67658fa01dc96b7c8903f9e5787094c1c9d155e5c9c7bad6c5a6f37af401a68"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/environment.json",
+      "size_bytes": 632,
+      "sha256": "8a42c9cad6cb66d9eb01d704a7592ffbfe17fd110566b824936f4c718d766cd3"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/migration-after.txt",
+      "size_bytes": 2779,
+      "sha256": "023931527b3112f3ecf8bed21b213b6dae58072279d737d7b9440ec3ad73ff67"
+    },
+    {
+      "path": "test/2026-11-02-0033/D04-09/migration-preflight.txt",
+      "size_bytes": 2779,
+      "sha256": "3f5eea1cb616073c0976480427266922882feb07e86ad2dcd6836d38fdd9092d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-10/D04-10-report.md",
+      "size_bytes": 2900,
+      "sha256": "4bc2ce4447f5fba517f567880023a4f5aaf3ccb0a14b654df4149e26fae0850d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-10/announcement-publish-tests.txt",
+      "size_bytes": 8862,
+      "sha256": "5699b36a056ee51007c80cbeccd49b01866258c54ad577278705cf2ce8ad6731"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-10/database-after.txt",
+      "size_bytes": 548,
+      "sha256": "c175463e6f992b66598379ca4b4eaf3d79c23104ff9b1101ba8141e8c0c4a722"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-10/database-before.txt",
+      "size_bytes": 334,
+      "sha256": "57a36f4a47c3b633dbe69bdf39448f3f6e7a7b44a447713140408665adfc13cb"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-10/environment.json",
+      "size_bytes": 811,
+      "sha256": "148a50135ef49252a5c573c2fc456c678eb1b9839fe1d4180b5f596af51f73b8"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-10/migration-status.txt",
+      "size_bytes": 3350,
+      "sha256": "cffd7cc81a233461a9d798a38b61cc15b8de1d60ba6d964708340ede6172c8c8"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-10/regression-d04-07-10.txt",
+      "size_bytes": 46728,
+      "sha256": "271309f977ee0c71825c5bbdc0aeb510ebf4379a31ccbc8e4d233bed5868a0bb"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/D04-11-report.md",
+      "size_bytes": 3036,
+      "sha256": "ed51f322a7fe78b5da845a76cf2d24975a89c1fb83982b24475193823c578955"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/database-after.txt",
+      "size_bytes": 712,
+      "sha256": "d675cfb917f63f429691df502e1e98a41b5fd8f4de4f2dea501f769bc5a92d64"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/database-before.txt",
+      "size_bytes": 374,
+      "sha256": "59c0fa8c0c924afa17a8205c946d0fd91b426cb08c927c0a82dcd7f19739f2ba"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/environment.json",
+      "size_bytes": 876,
+      "sha256": "2a457878448dfb5ddbc60feebc4f68f776e6a339271b1421f45bcc1e23901625"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/fee-api-tests.txt",
+      "size_bytes": 19570,
+      "sha256": "3d092baf2aeb4af7b559606310306a0f68a6a33ecae17553a67cf2a5471ba924"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/migration-apply.txt",
+      "size_bytes": 684,
+      "sha256": "d5d905f918c224b53a1cc9106390cf98421e7b29a3002973139600d09fe80809"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/migration-status.txt",
+      "size_bytes": 3431,
+      "sha256": "29c06c5f421590dbbc05266e60b74d18362fa0c9745686d6207cc0df41b11e57"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/regression-d04-07-11.txt",
+      "size_bytes": 67568,
+      "sha256": "d8701d882b7249bf5a34ae488b6344203bd37626a873780caae234cf5ebf96d5"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-11/schema-contract-tests.txt",
+      "size_bytes": 2565,
+      "sha256": "e73e25a62c14efa86154f80dfbbf8aaafaf0f32ce50f692cfb6534bfdacc4840"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/D04-12-report.md",
+      "size_bytes": 4174,
+      "sha256": "ab23fd2654a1a93992668d21bb30bec74034e149ba3b1fb2a8299e52af769b68"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/all-d04-including-migration-preflight.txt",
+      "size_bytes": 101897,
+      "sha256": "a033e7dc85366e4df5d86e549febc4f307dd4c2e7bff9a9bdcc98d0981bfab80"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/database-after.txt",
+      "size_bytes": 732,
+      "sha256": "bf305edc40a7d7233a9e2e80130cc8ec4a3c112b2eed78f47146a448e8236034"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/database-before.txt",
+      "size_bytes": 336,
+      "sha256": "fb0a67acd1235555e28c8e567db923400eb50151c68f266891efaa4ccdd12408"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/environment.json",
+      "size_bytes": 1524,
+      "sha256": "f08d3179aa3ea38fb41656b8c8b243e912ebf9725d518cbe60cf93c9ee193fa8"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/migration-apply.txt",
+      "size_bytes": 468,
+      "sha256": "2a35781d231dc882022f50dad7908e900a7abdb4353d2f40adc47ff13a91b99e"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/migration-preflight-before.txt",
+      "size_bytes": 514,
+      "sha256": "48d39ad8ace6b739b1f85722c1ae50a1f992c0e2487f75e87421fbe839232a28"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/migration-status.txt",
+      "size_bytes": 3312,
+      "sha256": "a04aa238bcfea748ece73fae5531bae6ca118d8e4c285edf7350dab8f8ca321e"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/overview-api-tests.txt",
+      "size_bytes": 11250,
+      "sha256": "104dba6319b172ea5cb3ccaec00f1ef2c25381ae83174e98935b7c9849427217"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/overview-empty.json",
+      "size_bytes": 484,
+      "sha256": "5d8e9cffa1b977a81eab0affefd0427c3f43540c8ff4061e89cf97ce0204a57d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/overview-populated-member.json",
+      "size_bytes": 1805,
+      "sha256": "e2f4611999481296ef41a0eebe23abaa8f21a6726b4ab2914889fd9eb7b4143c"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/overview-populated-owner.json",
+      "size_bytes": 1800,
+      "sha256": "7a02ae1ec86d71d29e49a546fa2d27dda39a24f38fa46bc3bd18602194cd6684"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/overview-repeatable-snapshot.json",
+      "size_bytes": 1795,
+      "sha256": "c616e4e920bb4ec8245a518072a40e851717febd648cf344fb31ccd17e391911"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/overview-review-eligible.json",
+      "size_bytes": 483,
+      "sha256": "fd73212c5fd790b404cd767472e667fc52352cb0b1b66a1182fa959931d5a0e3"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/regression-d04-07-12.txt",
+      "size_bytes": 91493,
+      "sha256": "cf75739ae798c3324a5351d208cf95c392da891df9f52a79be424765ca82957d"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/source.patch",
+      "size_bytes": 30833,
+      "sha256": "4838ec5f6a1efbf887f08d1c1839a557ac0cc7353b28b2bb5565698e529ec2ef"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/source.patch.sha256",
+      "size_bytes": 137,
+      "sha256": "01c8494430e74e71f16c237f1a961d1452e8673d0ac3d0c8cedf5f55edd8f8d6"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-12/working-tree-status.txt",
+      "size_bytes": 3959,
+      "sha256": "59ecf039f0d611b4ace86a0aa14a4e2eb68614162d7eff0dc982920b6c5e6559"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/D04-13-report.md",
+      "size_bytes": 2362,
+      "sha256": "3956364ad521d3483905dedb87fb04c20bed6e663045d80c29a576be1755d833"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/case-matrix.md",
+      "size_bytes": 4989,
+      "sha256": "83751fd3acb833a17821e02a2b192af0c07f59373c8b37cbebe10e2f127aa9e7"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/contract-boundary-tests.txt",
+      "size_bytes": 106163,
+      "sha256": "49107e7f958ebc9f84c69fadf29ea9b8e3b92c37a1fe0f20ff10868c57fb8dd9"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/database-after.txt",
+      "size_bytes": 732,
+      "sha256": "bf305edc40a7d7233a9e2e80130cc8ec4a3c112b2eed78f47146a448e8236034"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/database-before.txt",
+      "size_bytes": 895,
+      "sha256": "e4a88f383e45511f84c8854929ffabe39ab1eebd2283fe01c9e80888260cc46f"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/environment.json",
+      "size_bytes": 1314,
+      "sha256": "01b24d218a92db932027ab15401c8698437bd15d0ae04ab539e36e45b755e132"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/migration-status.txt",
+      "size_bytes": 3312,
+      "sha256": "1c087a4107083e1b25a066088614c24ee6e696a9e9cfc8a12f0128660a4dec35"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/regression-d04-07-13.txt",
+      "size_bytes": 197092,
+      "sha256": "a8fea362b4915cc12688159c860d971178d04e18fdc8056712a1f9a959262697"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/source.patch",
+      "size_bytes": 19966,
+      "sha256": "546d009a26597bd9ed543a1daf4681d68bda5584ec4666615299132133867bf9"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/source.patch.sha256",
+      "size_bytes": 137,
+      "sha256": "dbf560e056439a924076523d41f94ea334c4af4719be8a85efe26f90c51ea4e6"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-13/working-tree-status.txt",
+      "size_bytes": 4020,
+      "sha256": "04904504a2a676ab32540c1a3b5297c4ac882d9535c9d33b665596543d74d058"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/D04-14-report.md",
+      "size_bytes": 3101,
+      "sha256": "651b530bd39ac5cacda247be575e1292df2dad89a00469fa8cd2896e65360281"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/database-after.txt",
+      "size_bytes": 756,
+      "sha256": "a2a6069f98e00515d9a824537d7d03e6b8b6857d9c2bea40375e3ff09f846e52"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/database-before.txt",
+      "size_bytes": 732,
+      "sha256": "bf305edc40a7d7233a9e2e80130cc8ec4a3c112b2eed78f47146a448e8236034"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/database-snapshot.sql",
+      "size_bytes": 831,
+      "sha256": "97762c99be4fd4da153dffe85af0a48e1401d48f894eed71bac058cdfcbf7258"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/environment.json",
+      "size_bytes": 1316,
+      "sha256": "9d9c285ba67915d205e36668b5667f9c2baa5caf12963c3fd9c6b710227ac850"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/fixture-adjustment.txt",
+      "size_bytes": 628,
+      "sha256": "f5dda5554103492c97aac5bb0e4b562adf259e87eee02164fe04e23d4fd12c2e"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/hash-vectors.md",
+      "size_bytes": 1018,
+      "sha256": "dd89226aaa2b9fbc7f683789d3327ee4932c556768e276673cc91a0a64ef790e"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/idempotency-api-tests.txt",
+      "size_bytes": 16452,
+      "sha256": "4e2ba200f98206fd4c0530d77e7a2537319e5ee5dc85c98207a4d5e81f3ad846"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/migration-status.txt",
+      "size_bytes": 3312,
+      "sha256": "1c087a4107083e1b25a066088614c24ee6e696a9e9cfc8a12f0128660a4dec35"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/regression-d04-07-14.txt",
+      "size_bytes": 212987,
+      "sha256": "eeb7ede58a5dd86311a90731bbce61bc74e3397a525c9598e06a3968bdbcc350"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/source.patch",
+      "size_bytes": 18716,
+      "sha256": "1e9286687be2bc50402a1004d9ab3b7e9b3b2b3e2b81fc6581a1bd5be0e95e61"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/source.patch.sha256",
+      "size_bytes": 137,
+      "sha256": "991e71e15d6fac2367ee06c2e0c0694ae238ce9a0f6570871d6de9cacdb7cb27"
+    },
+    {
+      "path": "test/2026-11-02-0045/D04-14/working-tree-status.txt",
+      "size_bytes": 4076,
+      "sha256": "6a638c259946bb6c38d5c11bac16053036c652a059731025b66e35aa1b7b8d97"
+    }
+  ]
+}

@@ -15,8 +15,8 @@ Tutor owner gửi thông tin nội bộ cho các thành viên của Program thô
 * Announcement có integer `version` bắt đầu từ 1. PATCH Draft và POST publish yêu cầu `expected_version`; mismatch trả 409, không ghi một phần. Mỗi mutation thành công tăng version một lần; replay hợp lệ không phát notification thứ hai.
 * Draft chỉ Tutor owner xem được. Published được các member hiện tại của Program đọc; quyền truy cập nội dung và file luôn kiểm tra membership hiện tại, không dựa vào việc biết URL/deep link.
 * Tại thời điểm publish, hệ thống chốt các member hiện tại khác với Tutor owner làm recipient notification. Member được thêm vào Program sau đó đọc được Announcement đã published nhưng không nhận thông báo hồi tố.
-* File đính kèm phải complete, đã scan clean, đúng owner, purpose announcement\_attachment và resource scope theo M10. Việc liên kết file vào Announcement phải hoàn tất nguyên tử; không cho publish nếu còn file pending/quarantine/failed.
-* Allow-list field của Draft gồm `title`, `body` và tối đa 5 file đính kèm. `title` bắt buộc không trắng, 1–180 ký tự; `body` bắt buộc không trắng, 1–10.000 ký tự. Mỗi file tối đa 5 MiB và phải qua allow-list purpose/MIME của M10. `published_at`, author, Program và version do server quản lý.
+* File đính kèm phải complete qua kiểm tra kỹ thuật, đúng owner, purpose announcement\_attachment và resource scope theo M10/K03.1; không có yêu cầu antivirus tự động. Việc liên kết file vào Announcement phải hoàn tất nguyên tử; không cho publish nếu còn file pending/quarantine/failed.
+* Allow-list field của Draft gồm `title`, `body` và tối đa 5 file đính kèm. `title` bắt buộc không trắng, 1–180 ký tự; `body` bắt buộc không trắng, 1–10.000 ký tự. Mỗi file tối đa 5.000.000 byte và phải qua allow-list purpose/MIME của M10. `published_at`, author, Program và version do server quản lý.
 * Danh sách Announcement sắp mới nhất trước theo `(published_at,id)` giảm dần. MVP không có read state riêng cho Announcement; trạng thái đã đọc chỉ áp dụng cho Notification Inbox.
 * Chỉ publish mới phát notification; trong cùng transaction ghi trạng thái Published, audit và một outbox event cho mỗi recipient đã chốt. Sau commit, event tạo một in-app notification cho từng recipient, nội dung trung tính kèm Announcement ID/deep link; không sao chép body hay tên/metadata file. Lỗi hoặc rollback không để lại notification.
 * Retry cùng yêu cầu publish trả kết quả đã lưu; không tạo thêm version, audit hay notification. Request cạnh tranh dùng `expected_version` cũ trả 409. Đính chính dùng Announcement mới; Tutor nêu rõ đây là đính chính trong tiêu đề hoặc nội dung, không cần quan hệ dữ liệu riêng trong MVP.
@@ -27,15 +27,15 @@ Tutor owner gửi thông tin nội bộ cho các thành viên của Program thô
 * Publish thành công làm Announcement hiển thị cho member Program và phát đúng một event cho mỗi member khác với Tutor owner tại thời điểm publish. Member gia nhập sau đó đọc được bài nhưng không nhận thông báo hồi tố.
 * Member khác Program/outsider không đọc được nội dung hoặc file private.  
 * Active/Paused cho Tutor owner tạo Draft và publish; Completed/Cancelled chặn create/publish theo capability. Lỗi không thay đổi Announcement hoặc tạo notification giả.
-* Field lạ, title/body trắng hoặc vượt giới hạn, hơn 5 file, file quá 5 MiB hoặc sai purpose/MIME bị từ chối.
-* Chỉ file complete và scan clean được liên kết/publish. Nếu file chưa sẵn sàng hoặc transaction publish thất bại, Announcement không chuyển Published và không có notification.
+* Field lạ, title/body trắng hoặc vượt giới hạn, hơn 5 file, file quá 5.000.000 byte hoặc sai purpose/MIME bị từ chối.
+* Chỉ file complete qua kiểm tra kỹ thuật mới được liên kết/publish; “clean” không phải chứng nhận antivirus. Nếu file chưa sẵn sàng hoặc transaction publish thất bại, Announcement không chuyển Published và không có notification.
 * PATCH chỉ sửa Draft khi Program Active/Paused; đã published thì conflict. Stale PATCH/publish trả 409 và không tạo notification. Retry publish không nhân đôi version, audit hoặc notification.
 * Danh sách trả Published mới nhất trước theo `(published_at,id)` giảm dần; không có trạng thái đã đọc riêng cho Announcement.
 
 # 4\. Chênh lệch/câu hỏi mở
 
-* Allow-list và giới hạn field được chốt tại BR-20; published content immutability/version policy đã được chốt tại BR-19.
-* Migration có announcements; API/UI và notification event writer chưa có trong baseline. Contract cần triển khai recipient snapshot lúc publish, authorization membership hiện tại khi đọc/tải file, stable ordering và outbox nguyên tử.
+* BE-D04 branch (02/11/2026) đã chạy create/edit/publish, receipt, authorization, outbox, file link/unlink và private download trên `tutorlink_test`; xem [D04-09 integration report](../../handover/evidence/be-d04/consolidated/test-api-implementation-07-14.md#d04-09). Runtime Docker local được áp dụng và smoke-tested ở D04-22/23; không xác nhận staging/production hoặc UI.
+* Request/response, query state/order, no-op/replay, audit/outbox, transaction/lock order và file integration chi tiết tại [BE-D04 contract](../../handover/BE-D04-contract.md) mục 13–17. File upload/complete dùng pipeline M10/K03.1; gắn/tháo FileLink với Draft là nguyên tử; Published giữ bất biến.
 
 # 5\. Nguồn
 

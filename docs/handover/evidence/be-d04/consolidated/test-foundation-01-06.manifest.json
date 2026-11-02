@@ -1,0 +1,349 @@
+{
+  "group": "test-foundation-01-06",
+  "archive": "test-foundation-01-06.zip",
+  "archive_sha256": "69536964f7b3ba5d250d08e7dfe456091501eb0b39c029906692541bfe94db15",
+  "member_count": 68,
+  "uncompressed_bytes": 301050,
+  "members": [
+    {
+      "path": "D04-01-summary.md",
+      "size_bytes": 1480,
+      "sha256": "6c479d92f28b6b227c364662d5fd521d07d2356eabad13a0854ab25ba70a6f41"
+    },
+    {
+      "path": "contract-baseline-2026-11-01.md",
+      "size_bytes": 7122,
+      "sha256": "1931562737967878ef0189169f68269def09180ca688b51633eb592d8e3ae009"
+    },
+    {
+      "path": "routes-baseline-2026-11-01.json",
+      "size_bytes": 25040,
+      "sha256": "fb2dee061bcfe381d30a1975dcee70f523d35ddae2d39f7a5e48878d6deef8c4"
+    },
+    {
+      "path": "test/2026-11-01-2234/D04-02/D04-02-report.md",
+      "size_bytes": 2342,
+      "sha256": "e180ab0f5f1ae2cec308f18e0f6f2d35186bf30ecfda4250ccad6ffe64877574"
+    },
+    {
+      "path": "test/2026-11-01-2234/D04-02/database-preservation.txt",
+      "size_bytes": 304,
+      "sha256": "7c7f01183b86cb84596010c9d4894b9cfd160c715b85acd78fcfe796ba0e01f1"
+    },
+    {
+      "path": "test/2026-11-01-2234/D04-02/environment-check.txt",
+      "size_bytes": 189,
+      "sha256": "1a9b16c922954759a47fa25ced5c0d22baeee2e9ffd1113d12a016c0927a3513"
+    },
+    {
+      "path": "test/2026-11-01-2234/D04-02/environment.json",
+      "size_bytes": 2581,
+      "sha256": "6d306caf287ce2f5010f9a020ce601ec03bb4394c6533f1e3f6e194c1c386e67"
+    },
+    {
+      "path": "test/2026-11-01-2234/D04-02/guard-tests.txt",
+      "size_bytes": 1383,
+      "sha256": "4ba07c34c61b1a2734b7a237894f42075cb04eb0c3e0e1a3f544022308a5e02b"
+    },
+    {
+      "path": "test/2026-11-01-2234/D04-02/source.patch",
+      "size_bytes": 7142,
+      "sha256": "7b90aa57eae92e271db8d8952eb55378a7d79b360be86a6f320d37d816435f08"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/D04-03-report.md",
+      "size_bytes": 1967,
+      "sha256": "9a4c57f89a3bd004231acbd73f1cf6d4e94b45cae21cb555e4f81c183f6cfffd"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/database-guard-after-fixtures.txt",
+      "size_bytes": 189,
+      "sha256": "1a9b16c922954759a47fa25ced5c0d22baeee2e9ffd1113d12a016c0927a3513"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/database-preservation.txt",
+      "size_bytes": 627,
+      "sha256": "59d56985fd8a47f87aca100c190286a3cefcfa7e4cd163fdb6c8e6047df76137"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/environment.json",
+      "size_bytes": 2661,
+      "sha256": "b2744e4628ed1ca341a1fd99d7695174ba13c67399411cd4b810c70152ec00fb"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/fixtures.json",
+      "size_bytes": 10240,
+      "sha256": "5657a86580c3bf91f18cb22dee2dd05d39aef57cb943f783c72fe6f47e53d20b"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/fixtures.md",
+      "size_bytes": 6092,
+      "sha256": "ff2d79d429545c521147ade9b78cf2ca9e5505d04d1c4555a7f93ba3ff52bd81"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/guard-tests.txt",
+      "size_bytes": 1385,
+      "sha256": "d517dc7ae5705c7ec3fdb4869297d0535cea761df7c28802d4b9ec8ae886b92c"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/seed-idempotency.txt",
+      "size_bytes": 590,
+      "sha256": "5ba93da34d44e92bc25ef54a82ac690c3c7a538d8874139361f4310abb22509d"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/seed-run-1.txt",
+      "size_bytes": 307,
+      "sha256": "dc9633ea51ad06816c188442826bf632f0801e6e2844b6bed9fcbed7942751ce"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/seed-run-2.txt",
+      "size_bytes": 307,
+      "sha256": "a584ca9d3299814471ad0a3509d0cc072aaca4f32a0bfdbbe6a7ea09d1522b8a"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/source.patch",
+      "size_bytes": 29068,
+      "sha256": "0e4d95917d98a547e4b64f79057c25865fd72272626dd5a838af959c4bfa33b0"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/pending.pdf",
+      "size_bytes": 74,
+      "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/rejected.pdf",
+      "size_bytes": 74,
+      "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/valid.pdf",
+      "size_bytes": 74,
+      "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_owner.pdf",
+      "size_bytes": 74,
+      "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+    },
+    {
+      "path": "test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_purpose.pdf",
+      "size_bytes": 74,
+      "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/D04-04-report.md",
+      "size_bytes": 2050,
+      "sha256": "2e421cebd84714ce8ff7323501dfeccee2659783ddcd701ccbe28f988ca273bf"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/case-matrix.md",
+      "size_bytes": 12510,
+      "sha256": "89cba4391d9cf9035a68788eb543fc43cb7389ec38f46ff6f82f034781983f2f"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/database-preservation.txt",
+      "size_bytes": 644,
+      "sha256": "5a1de379b77fca456bf7b4110a769f8ba433e2dc584a0e9901eb93eb2ccf66fd"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/environment.json",
+      "size_bytes": 2050,
+      "sha256": "03ceba89acb29f6e01d994b7171fd2462283234ada93a45a4466b826d7d15356"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/graphify-update.txt",
+      "size_bytes": 1200,
+      "sha256": "8ce35143f848adbe867cc37c30e8671a100cd6f1524f7e3787dcf82886c034df"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/local-memory-route-probe.json",
+      "size_bytes": 5132,
+      "sha256": "b4e22d29aee14af40bcc9393de6caa29d8f68939b72361ca6a2f3e0c2162ae34"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/local-memory-route-probe.txt",
+      "size_bytes": 5143,
+      "sha256": "90698cbd57ec01bc7184692970e9498d92897a021135a1adc415678ca63ee0c4"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/postgres-after-check.txt",
+      "size_bytes": 539,
+      "sha256": "01c78934d4e515dbacb1b39385883ea51b689745031ade1ab6b86fa9b733478b"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/postgres-first-run.txt",
+      "size_bytes": 35113,
+      "sha256": "19e1f098b4b0366810b8095c1902437bcf26587a644af04132bbcecb5c0da694"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/postgres-schema-before.txt",
+      "size_bytes": 2314,
+      "sha256": "ccc3f554d23002e27f1298bd143224ed6b89acc7d40dd29ae6a6e8e395224ca3"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/source.patch",
+      "size_bytes": 6396,
+      "sha256": "1120631d8f4df69f7df7270b3881787ece5e437e039e4e9f57f3e4c4e7baad60"
+    },
+    {
+      "path": "test/2026-11-01-2316/D04-04/source.patch.sha256",
+      "size_bytes": 79,
+      "sha256": "41d2c4b2b120743af70845a489eff82d4c76c2ce7ef8601e38fb12acb8a4bc5a"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/D04-05-report.md",
+      "size_bytes": 2295,
+      "sha256": "ab1e18822971a335f3c4d90ab3df3d8cac9dfded7be0a716a8b7e77db20e804f"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/after-row-fingerprints.txt",
+      "size_bytes": 222,
+      "sha256": "735603c7e2ac9d99fac20017d8222a3841c18496b04079b8907351d150259ea5"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/backup-restore-manifest.md",
+      "size_bytes": 812,
+      "sha256": "cfce92004397c3fbad7b3b9ad6541d70ff5e12593d3102bb8663067d189325ae"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/before-row-fingerprints.txt",
+      "size_bytes": 222,
+      "sha256": "735603c7e2ac9d99fac20017d8222a3841c18496b04079b8907351d150259ea5"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/constraint-tests.txt",
+      "size_bytes": 3232,
+      "sha256": "37727f76aea7163aee9464646b0bee15725575a31f86e03c1229a4e7ab38679d"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/environment.json",
+      "size_bytes": 737,
+      "sha256": "e588867aa08c1d2e46fe48a4e0d40529abff9b7d954916428a33d3c58b06ab21"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/final-test-db-state.txt",
+      "size_bytes": 666,
+      "sha256": "f87a9d67ee6a4208b68984f375dcaa9d39133ce18400de68bbe555ab85e87934"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/migration-empty-run.txt",
+      "size_bytes": 3550,
+      "sha256": "0c2ba9e208bd72a6583c4483dff6bbeafc352f125bb46a57067c869fec9958a6"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/migration-legacy-preflight-tests.txt",
+      "size_bytes": 1511,
+      "sha256": "052748c83f4bd88e5a3b4c9563b92156127a1dd9f1f318f66c1b4c749b15f4d1"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/migration-legacy-run.txt",
+      "size_bytes": 577,
+      "sha256": "a39272a62d8c0bbd3f7e3b796e21eefd46a1658e82462a8c67ec75beb2c7ab0b"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/migration-second-run.txt",
+      "size_bytes": 497,
+      "sha256": "c054774346c47fbb120df5df787b7704d569531af8bd02aac4900f1d8eaee7a2"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/migration-status-after.txt",
+      "size_bytes": 3407,
+      "sha256": "5ed820f3a55842d53893c5e1b09af711795d280a31522d91bff5555fc2cfdf7a"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/pending-migrations-preflight.txt",
+      "size_bytes": 4103,
+      "sha256": "698bc62ce0c4ae6d7e9e963bd57b06465a0563767ff2fa571a2658ad9d519db7"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/preflight-data.txt",
+      "size_bytes": 1524,
+      "sha256": "ff7a149733abe6b0abbfa49615f6cf1c40a0a4074898cbdcf6e98cf569bb21f9"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/preflight-file-audit.txt",
+      "size_bytes": 564,
+      "sha256": "6ed5243bac20b6fda413a17e0d22d4ad7af6e53a4007f36501a2f25cc8b6c919"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/preflight-relations.txt",
+      "size_bytes": 1944,
+      "sha256": "d94dc477ffe8be85379612114079dffa73a98f5c97c7109063a37ca5fe1432d9"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/schema-after.txt",
+      "size_bytes": 11266,
+      "sha256": "f31d8b841a979a73899094239fb2299d15fbe161dcf44f11fefc8442e3c5ecef"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/schema-empty-db-tests.txt",
+      "size_bytes": 2168,
+      "sha256": "fcfd32d164a6f27f516c0922453e36a25afcdbd4e5370beca8c1eb3887942dbb"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/side-effects-after.txt",
+      "size_bytes": 88,
+      "sha256": "f997675c2a9f75850fdff9b0d3c7c5871569fee6c15136985dab51b4c65f8ef4"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/side-effects-before.txt",
+      "size_bytes": 88,
+      "sha256": "c76ebffa8943aa982ba68a2b414b32ac1611234b459b2fa8221a5157117d40e0"
+    },
+    {
+      "path": "test/2026-11-01-2330/D04-05/source.patch",
+      "size_bytes": 33748,
+      "sha256": "b0207aac1f1d1053ac3f80642d4fbb3b47e2331326199384c7b6cf277abe073e"
+    },
+    {
+      "path": "test/2026-11-02-000000/D04-06/D04-06-report.md",
+      "size_bytes": 2427,
+      "sha256": "a63178e089e28b4d3da94627819bc7d87e2bf065679315bd786175c1fe98993a"
+    },
+    {
+      "path": "test/2026-11-02-000000/D04-06/database-preservation.txt",
+      "size_bytes": 958,
+      "sha256": "b0d02d9c1cd12190d62c8492827590e7ea4366cdd24f97d82ea490d4e6a6ca50"
+    },
+    {
+      "path": "test/2026-11-02-000000/D04-06/environment.json",
+      "size_bytes": 820,
+      "sha256": "ddae87fdc1cb50a4c6eead8bcfd2dd157cb923b89d038d014f5c03ecfc6dd648"
+    },
+    {
+      "path": "test/2026-11-02-000000/D04-06/shared-request-tests.txt",
+      "size_bytes": 10950,
+      "sha256": "5a76396db70ecfc8a8a05f4d1a79d185ef84b2032108ef51bed26ec4c2174229"
+    },
+    {
+      "path": "test/2026-11-02-000000/D04-06/source.patch",
+      "size_bytes": 29704,
+      "sha256": "79fcd71928802197d8a38d53ca35e8f17da5b9fd30adf08c3c2945f6be3a5748"
+    },
+    {
+      "path": "test/D04-01-report.md",
+      "size_bytes": 3521,
+      "sha256": "efaa6fff2b9716f0b2d10e69eadd88ea681f0a94751f14efa3b82b25c4dac59f"
+    },
+    {
+      "path": "test/evidence-index.md",
+      "size_bytes": 2592,
+      "sha256": "c9413a05fb686ab0e27a591b8d835fe77102272470fcaa4133e33cc768331afb"
+    },
+    {
+      "path": "test/runtime-2026-11-01/database-copy.json",
+      "size_bytes": 916,
+      "sha256": "b7cd1d1d17cf684d06b4a3515ab4f54ba555bd83d2488ee440b5b4d40b7c77f5"
+    },
+    {
+      "path": "test/runtime-2026-11-01/environment.json",
+      "size_bytes": 811,
+      "sha256": "b0aa6a655c92acbcfb8501de13b8fb78cc24baa560c11a29b834641741ffdef6"
+    },
+    {
+      "path": "test/runtime-2026-11-01/migration-status.txt",
+      "size_bytes": 574,
+      "sha256": "6fe6cdce88afcfb65b9bb788cd9e2958bd44063fef9e2702aff71f84841253bc"
+    }
+  ]
+}
