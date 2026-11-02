@@ -6,6 +6,17 @@ use Illuminate\Http\JsonResponse;
 
 final class ApiErrorResponse
 {
+    public static function staleVersion(int $currentVersion, string $requestId): JsonResponse
+    {
+        return self::make(
+            409,
+            'stale_version',
+            'The resource changed. Reload before updating.',
+            $requestId,
+            ['current_version' => $currentVersion],
+        );
+    }
+
     /** @param array<string, mixed> $errors */
     public static function make(
         int $status,

@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AdminController;
+use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\ConversationController;
 use App\Http\Controllers\Api\V1\ConversationRealtimeController;
+use App\Http\Controllers\Api\V1\FeeRecordController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
@@ -13,6 +15,8 @@ use App\Http\Controllers\Api\V1\ListingController;
 use App\Http\Controllers\Api\V1\NotificationOutboxController;
 use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\ProgramController;
+use App\Http\Controllers\Api\V1\ProgramOverviewController;
+use App\Http\Controllers\Api\V1\ProgressRecordController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
 use App\Http\Controllers\Api\V1\SessionController;
@@ -31,6 +35,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/programs/{program}', [ProgramController::class, 'show'])
             ->whereNumber('program')
             ->name('programs.show');
+        Route::get('/programs/{program}/overview', [ProgramOverviewController::class, 'show'])
+            ->whereNumber('program')
+            ->name('programs.overview');
         Route::patch('/programs/{program}', [ProgramController::class, 'update'])
             ->whereNumber('program')
             ->name('programs.update');
@@ -49,6 +56,51 @@ Route::prefix('v1')->group(function () {
         Route::post('/programs/{program}/invitations', [InvitationController::class, 'store'])
             ->whereNumber('program')
             ->name('programs.invitations.store');
+        Route::get('/programs/{program}/progress-records', [ProgressRecordController::class, 'index'])
+            ->whereNumber('program')
+            ->name('programs.progress-records.index');
+        Route::post('/programs/{program}/progress-records', [ProgressRecordController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.progress-records.store');
+        Route::patch('/progress-records/{progressRecord}', [ProgressRecordController::class, 'update'])
+            ->whereNumber('progressRecord')
+            ->name('progress-records.update');
+        Route::get('/programs/{program}/announcements', [AnnouncementController::class, 'index'])
+            ->whereNumber('program')
+            ->name('programs.announcements.index');
+        Route::post('/programs/{program}/announcements', [AnnouncementController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.announcements.store');
+        Route::get('/announcements/{announcement}', [AnnouncementController::class, 'show'])
+            ->whereNumber('announcement')
+            ->name('announcements.show');
+        Route::patch('/announcements/{announcement}', [AnnouncementController::class, 'update'])
+            ->whereNumber('announcement')
+            ->name('announcements.update');
+        Route::post('/announcements/{announcement}/publish', [AnnouncementController::class, 'publish'])
+            ->whereNumber('announcement')
+            ->name('announcements.publish');
+        Route::get('/programs/{program}/fee-records', [FeeRecordController::class, 'index'])
+            ->whereNumber('program')
+            ->name('programs.fee-records.index');
+        Route::post('/programs/{program}/fee-records', [FeeRecordController::class, 'store'])
+            ->whereNumber('program')
+            ->name('programs.fee-records.store');
+        Route::get('/fee-records/{feeRecord}', [FeeRecordController::class, 'show'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.show');
+        Route::patch('/fee-records/{feeRecord}', [FeeRecordController::class, 'update'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.update');
+        Route::post('/fee-records/{feeRecord}/mark-paid', [FeeRecordController::class, 'markPaid'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.mark-paid');
+        Route::post('/fee-records/{feeRecord}/mark-unpaid', [FeeRecordController::class, 'markUnpaid'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.mark-unpaid');
+        Route::post('/fee-records/{feeRecord}/void', [FeeRecordController::class, 'void'])
+            ->whereNumber('feeRecord')
+            ->name('fee-records.void');
         Route::get('/invitations', [InvitationController::class, 'index'])
             ->name('invitations.index');
         Route::get('/invitations/{invitation}', [InvitationController::class, 'show'])
@@ -227,18 +279,20 @@ Route::prefix('v1')->group(function () {
         Route::put('/me/password', [AuthController::class, 'updatePassword'])
             ->name('auth.update-password');
 
-        Route::post('/files', [FileController::class, 'store'])
-            ->name('files.store');
-        Route::get('/files/{file}', [FileController::class, 'show'])
-            ->name('files.show');
-        Route::post('/files/{file}/complete', [FileController::class, 'complete'])
-            ->name('files.complete');
-        Route::post('/files/{file}/links', [FileController::class, 'link'])
-            ->name('files.link');
-        Route::get('/files/{file}/download', [FileController::class, 'download'])
-            ->name('files.download');
-        Route::delete('/files/{file}', [FileController::class, 'destroy'])
-            ->name('files.destroy');
+        Route::middleware(EnsureActiveApiActor::class)->group(function (): void {
+            Route::post('/files', [FileController::class, 'store'])
+                ->name('files.store');
+            Route::get('/files/{file}', [FileController::class, 'show'])
+                ->name('files.show');
+            Route::post('/files/{file}/complete', [FileController::class, 'complete'])
+                ->name('files.complete');
+            Route::post('/files/{file}/links', [FileController::class, 'link'])
+                ->name('files.link');
+            Route::get('/files/{file}/download', [FileController::class, 'download'])
+                ->name('files.download');
+            Route::delete('/files/{file}', [FileController::class, 'destroy'])
+                ->name('files.destroy');
+        });
 
         Route::get('/tutor/profile', [TutorProfileController::class, 'show'])
             ->name('tutor.profile.show');

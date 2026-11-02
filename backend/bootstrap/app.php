@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\NormalizeBeD04Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,8 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/v1/programs/*/tasks',
             'api/v1/tasks/*',
         );
-        $middleware->trimStrings(except: [$isMessageSend, $isTaskRequest]);
-        $middleware->convertEmptyStringsToNull(except: [$isMessageSend]);
+        $isBeD04Request = NormalizeBeD04Request::isBeD04Request(...);
+        $middleware->trimStrings(except: [$isMessageSend, $isTaskRequest, $isBeD04Request]);
+        $middleware->convertEmptyStringsToNull(except: [$isMessageSend, $isBeD04Request]);
+        $middleware->appendToGroup('api', NormalizeBeD04Request::class);
         $middleware->redirectGuestsTo(
             fn (Request $request) => $request->is('api/*') ? null : route('login'),
         );

@@ -1,0 +1,12 @@
+services:
+  backend-test:
+    environment:
+      FILESYSTEM_DISK: local
+      LOCAL_ADMIN_EMAIL: ""
+      LOCAL_ADMIN_PASSWORD: ""
+      SLACK_BOT_USER_OAUTH_TOKEN: ""
+      SLACK_BOT_USER_DEFAULT_CHANNEL: ""
+    volumes:
+      - ./docs/handover/evidence/be-d04/test/2026-11-01-2234/D04-02:/evidence
+      - type: tmpfs
+        target: /var/www/html/storage/app
