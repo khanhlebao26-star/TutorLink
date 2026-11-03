@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\HealthController;
+use App\Http\Middleware\MarketplaceCacheControl;
 use App\Http\Middleware\NormalizeBeD04Request;
 use App\Support\ApiErrorResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\Http\Middleware\CheckAbilities;
 use Laravel\Sanctum\Http\Middleware\CheckForAnyAbility;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -37,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trimStrings(except: [$isMessageSend, $isTaskRequest, $isBeD04Request]);
         $middleware->convertEmptyStringsToNull(except: [$isMessageSend, $isBeD04Request]);
         $middleware->appendToGroup('api', NormalizeBeD04Request::class);
+        $middleware->appendToGroup('api', MarketplaceCacheControl::class);
         $middleware->redirectGuestsTo(
             fn (Request $request) => $request->is('api/*') ? null : route('login'),
         );
@@ -51,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/v1/reports',
             'api/v1/me/reports',
             'api/v1/me/reports/*',
+            'api/v1/admin/dashboard',
             'api/v1/admin/reports',
             'api/v1/admin/reports/*',
             'api/v1/admin/reviews',
@@ -63,6 +68,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return ApiErrorResponse::make($status, $code, $message, $requestId, $errors);
         };
+        $exceptions->render(function (AuthenticationException $exception, Request $request) use ($isTrustRequest, $error): ?JsonResponse {
+            return $isTrustRequest($request) ? $error($request, 401, 'unauthenticated', 'Authentication is required.') : null;
+        });
         $exceptions->render(function (ValidationException $exception, Request $request) use ($isTrustRequest, $error): ?JsonResponse {
             return $isTrustRequest($request)
                 ? $error($request, 422, 'validation_failed', 'The given data was invalid.', $exception->errors())
@@ -85,6 +93,13 @@ return Application::configure(basePath: dirname(__DIR__))
         });
         $exceptions->render(function (Throwable $exception, Request $request) use ($isTrustRequest, $error): ?JsonResponse {
             return $isTrustRequest($request) ? $error($request, 500, 'internal_error', 'The request could not be completed.') : null;
+        });
+        $exceptions->respond(function (Response $response) {
+            if (request()->is('api/*') && $response->getStatusCode() >= 400) {
+                $response->headers->set('Cache-Control', 'private, no-store');
+            }
+
+            return $response;
         });
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),

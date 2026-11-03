@@ -25,6 +25,34 @@
                 ],
                 "parameters": [
                     {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 50
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "submitted_desc",
+                                "id_desc"
+                            ]
+                        }
+                    },
+                    {
                         "name": "status",
                         "in": "query",
                         "schema": {
@@ -84,23 +112,7 @@
                         }
                     },
                     "422": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "const": "Invalid tutor profile status."
-                                        }
-                                    },
-                                    "required": [
-                                        "message"
-                                    ]
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/ValidationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -1632,14 +1644,14 @@
                             }
                         }
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -1691,14 +1703,119 @@
                             }
                         }
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/admin/dashboard": {
+            "get": {
+                "operationId": "admin.dashboard",
+                "summary": "Read assigned queues and permitted resource totals without personal data or evidence",
+                "tags": [
+                    "AdminDashboard"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resources without permission are omitted. Queues are restricted to current assignment or unassigned coordination scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "resources": {
+                                                    "type": "object",
+                                                    "additionalProperties": {}
+                                                },
+                                                "permissions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "resources",
+                                                "permissions"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Browser authentication required.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Active verified Admin with admin.dashboard.view required.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -13092,6 +13209,7 @@
         "/tutors/{slug}": {
             "get": {
                 "operationId": "publicTutor.show",
+                "summary": "Public Tutor with a bounded page of Listing cards",
                 "tags": [
                     "PublicTutor"
                 ],
@@ -13102,6 +13220,14 @@
                         "required": true,
                         "schema": {
                             "type": "string"
+                        }
+                    },
+                    {
+                        "name": "listings_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
                         }
                     }
                 ],
@@ -13114,7 +13240,188 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/PublicTutorResource"
+                                            "type": "object",
+                                            "properties": {
+                                                "slug": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "headline": {
+                                                    "type": "string"
+                                                },
+                                                "bio": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "experience_years": {
+                                                    "type": "integer"
+                                                },
+                                                "specializations": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "subcategory": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "category": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "name",
+                                                            "slug",
+                                                            "subcategory",
+                                                            "category"
+                                                        ]
+                                                    }
+                                                },
+                                                "availability_rules": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "weekday": {
+                                                                "type": "integer"
+                                                            },
+                                                            "start_time": {
+                                                                "type": "string"
+                                                            },
+                                                            "end_time": {
+                                                                "type": "string"
+                                                            },
+                                                            "timezone": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "weekday",
+                                                            "start_time",
+                                                            "end_time",
+                                                            "timezone"
+                                                        ]
+                                                    }
+                                                },
+                                                "avatar": {
+                                                    "type": "null"
+                                                },
+                                                "listings": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "title": {
+                                                                "type": "string"
+                                                            },
+                                                            "delivery_mode": {
+                                                                "type": "string"
+                                                            },
+                                                            "city": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "district": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            },
+                                                            "price_from_minor": {
+                                                                "type": "integer"
+                                                            },
+                                                            "currency": {
+                                                                "type": "string"
+                                                            },
+                                                            "price_unit": {
+                                                                "type": "string"
+                                                            },
+                                                            "specialization_name": {
+                                                                "type": [
+                                                                    "string",
+                                                                    "null"
+                                                                ]
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "slug",
+                                                            "title",
+                                                            "delivery_mode",
+                                                            "city",
+                                                            "district",
+                                                            "price_from_minor",
+                                                            "currency",
+                                                            "price_unit",
+                                                            "specialization_name"
+                                                        ]
+                                                    }
+                                                },
+                                                "listings_meta": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer"
+                                                        },
+                                                        "has_more": {
+                                                            "type": "boolean"
+                                                        },
+                                                        "next_page": {
+                                                            "type": [
+                                                                "integer",
+                                                                "null"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "page",
+                                                        "per_page",
+                                                        "has_more",
+                                                        "next_page"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "slug",
+                                                "name",
+                                                "headline",
+                                                "bio",
+                                                "experience_years",
+                                                "specializations",
+                                                "availability_rules",
+                                                "avatar",
+                                                "listings",
+                                                "listings_meta"
+                                            ]
                                         }
                                     },
                                     "required": [
@@ -13123,6 +13430,9 @@
                                 }
                             }
                         }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
                     }
                 },
                 "security": []
@@ -15505,39 +15815,6 @@
                         }
                     }
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "assigned_admin_id": {
-                                        "type": [
-                                            "integer",
-                                            "null"
-                                        ],
-                                        "minimum": 1
-                                    },
-                                    "assignment_version": {
-                                        "type": "integer",
-                                        "minimum": 0
-                                    },
-                                    "reason": {
-                                        "type": "string",
-                                        "pattern": "\\S",
-                                        "maxLength": 2000
-                                    }
-                                },
-                                "required": [
-                                    "assigned_admin_id",
-                                    "assignment_version",
-                                    "reason"
-                                ]
-                            }
-                        }
-                    }
-                },
                 "responses": {
                     "200": {
                         "description": "Authorized result.",
@@ -15571,36 +15848,6 @@
                                     },
                                     "required": [
                                         "data"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Authorization, scope, state or validation failure.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "request_id": {
-                                            "type": "string"
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "required": [
-                                        "code",
-                                        "message",
-                                        "request_id",
-                                        "errors"
                                     ]
                                 }
                             }
@@ -15697,6 +15944,36 @@
                         }
                     },
                     "409": {
+                        "description": "Authorization, scope, state or validation failure.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
                         "description": "Authorization, scope, state or validation failure.",
                         "content": {
                             "application/json": {
@@ -22290,11 +22567,17 @@
                             "type": "string"
                         }
                     },
+                    "avatar": {
+                        "type": "null"
+                    },
                     "listings": {
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/ListingResource"
+                            "type": "string"
                         }
+                    },
+                    "listings_meta": {
+                        "type": "string"
                     }
                 },
                 "required": [
@@ -22305,7 +22588,9 @@
                     "experience_years",
                     "specializations",
                     "availability_rules",
-                    "listings"
+                    "avatar",
+                    "listings",
+                    "listings_meta"
                 ],
                 "title": "PublicTutorResource"
             },

@@ -29,6 +29,11 @@ return [
     ],
 
     'recorders' => [
+        // The vendor cache card still needs display settings when recording is disabled.
+        Recorders\SlowJobs::class => ['enabled' => false, 'sample_rate' => 1, 'threshold' => 1000, 'groups' => []],
+        Recorders\SlowOutgoingRequests::class => ['enabled' => false, 'sample_rate' => 1, 'threshold' => 1000, 'groups' => []],
+        Recorders\Queues::class => ['enabled' => false, 'sample_rate' => 1],
+        Recorders\CacheInteractions::class => ['enabled' => false, 'sample_rate' => 1, 'groups' => []],
         Recorders\SlowQueries::class => [
             'enabled' => true,
             'sample_rate' => 1,

@@ -12,6 +12,7 @@ use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Tests\Support\ProgramApiFixtures;
 use Tests\TestCase;
 
 class MarketplaceApiTest extends TestCase
@@ -209,6 +210,8 @@ class MarketplaceApiTest extends TestCase
             'experience_years' => 3,
             'status' => $profileStatus,
         ]);
+
+        ProgramApiFixtures::approveIdentity($tutor);
 
         return [$tutor, $profile];
     }

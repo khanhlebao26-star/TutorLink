@@ -4,13 +4,14 @@ namespace App\Policies;
 
 use App\Models\TutorProfile;
 use App\Models\User;
+use App\Support\AdminAuthorization;
 use App\Support\AdminPermissions;
 
 class TutorProfilePolicy
 {
     public function permission(User $actor, string $permission): bool
     {
-        return $actor->status === 'active' && $actor->hasPermission($permission);
+        return app(AdminAuthorization::class)->allows($actor, $permission);
     }
 
     public function view(User $actor, TutorProfile $profile): bool

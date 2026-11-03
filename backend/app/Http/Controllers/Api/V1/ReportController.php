@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Reports\AssignReport;
+use App\Actions\Reports\DecideReport;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Models\ServiceListing;
 use App\Models\User;
-use App\Support\NotificationOutboxWriter;
 use App\Support\TrustWorkflow;
 use App\Support\TutorEligibility;
 use Carbon\CarbonImmutable;
@@ -201,31 +202,10 @@ class ReportController extends Controller
     #[Response(422, description: 'Authorization, scope, state or validation failure.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
     public function assign(Request $request, int $report, TrustWorkflow $flow): JsonResponse
     {
-        $flow->permission($request, 'admin.reports.assign');
         $flow->fields($request, ['assigned_admin_id', 'assignment_version', 'reason']);
-        $data = $request->validate(['assigned_admin_id' => 'present|nullable|integer:strict|min:1', 'assignment_version' => 'required|integer:strict|min:0', 'reason' => ['required', 'string', 'max:2000', 'regex:/\S/u']]);
+        $result = app(AssignReport::class)->execute($request->user(), $report, $request->all());
 
-        return DB::transaction(function () use ($request, $report, $flow, $data): JsonResponse {
-            $ids = array_filter([$request->user()->id, $data['assigned_admin_id']]);
-            $actors = User::whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
-            $flow->permission($request, 'admin.reports.assign');
-            $target = $data['assigned_admin_id'] === null ? null : $actors->get($data['assigned_admin_id']);
-            if ($data['assigned_admin_id'] !== null && (! $target || $target->status !== 'active' || ! $target->hasPermission('admin.reports.view') || ! $target->hasPermission('admin.reports.decide'))) {
-                $flow->fail($request, 422, 'invalid_assigned_admin', 'Assigned Admin must be active with Report view and decide permissions.');
-            }
-            $row = DB::table('reports')->where('id', $report)->lockForUpdate()->first();
-            abort_unless($row, 404);
-            if ((int) $row->assignment_version !== $data['assignment_version']) {
-                $flow->fail($request, 409, 'stale_assignment_version', 'Report assignment has changed.');
-            }
-            DB::table('reports')->where('id', $report)->update(['assigned_admin_id' => $data['assigned_admin_id'],
-                'assigned_by' => $request->user()->id, 'assigned_at' => now('UTC'), 'assignment_version' => $row->assignment_version + 1, 'updated_at' => now('UTC')]);
-            $flow->audit($request, 'assignment.change', 'report', $report,
-                ['assigned_admin_id' => $row->assigned_admin_id, 'assignment_version' => (int) $row->assignment_version],
-                ['assigned_admin_id' => $data['assigned_admin_id'], 'assignment_version' => $row->assignment_version + 1], $data['reason']);
-
-            return response()->json(['data' => ['id' => $report, 'assigned_admin_id' => $data['assigned_admin_id'], 'assignment_version' => $row->assignment_version + 1]]);
-        }, 3);
+        return response()->json(['data' => $result]);
     }
 
     /** Resolve scoped Report data. */
@@ -259,20 +239,9 @@ class ReportController extends Controller
     private function decide(Request $request, int $report, TrustWorkflow $flow, string $status): JsonResponse
     {
         $flow->fields($request, ['assignment_version', 'resolution_note']);
-        $data = $request->validate(['assignment_version' => 'required|integer:strict|min:0', 'resolution_note' => ['required', 'string', 'max:2000', 'regex:/\S/u']]);
+        $row = app(DecideReport::class)->execute($request->user(), $report, $status, $request->all());
 
-        return DB::transaction(function () use ($request, $report, $flow, $status, $data): JsonResponse {
-            $flow->lockActor($request);
-            $row = $flow->report($request, $report, 'admin.reports.decide', true);
-            if ($row->status !== 'open' || (int) $row->assignment_version !== $data['assignment_version']) {
-                $flow->fail($request, 409, 'stale_report_decision', 'Report state or assignment has changed.');
-            }
-            DB::table('reports')->where('id', $report)->update(['status' => $status, 'handled_by' => $request->user()->id, 'handled_at' => now('UTC'), 'resolution_note' => $data['resolution_note'], 'updated_at' => now('UTC')]);
-            $flow->audit($request, $status === 'resolved' ? 'report.resolve' : 'report.dismiss', 'report', $report, ['status' => 'open'], ['status' => $status], $data['resolution_note']);
-            app(NotificationOutboxWriter::class)->record('report_'.$status, 'report', $report, "report:{$report}:{$status}", [(int) $row->reporter_id], ['deep_link' => '/reports/'.$report]);
-
-            return response()->json(['data' => $flow->reportData(DB::table('reports')->find($report))]);
-        }, 3);
+        return response()->json(['data' => $flow->reportData($row)]);
     }
 
     /** Evidence scoped Report data. */

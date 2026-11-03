@@ -11,8 +11,15 @@ final class ProgramApiFixtures
     public static function eligibleTutor(): User
     {
         $tutor = TestActors::tutor();
-        $now = now('UTC');
         DB::table('tutor_profiles')->where('id', $tutor->tutorProfile->id)->update(['status' => 'approved']);
+        self::approveIdentity($tutor);
+
+        return $tutor->fresh('tutorProfile');
+    }
+
+    public static function approveIdentity(User $tutor): void
+    {
+        $now = now('UTC');
         $fileId = DB::table('files')->insertGetId([
             'owner_id' => $tutor->id,
             'disk' => 'local',
@@ -38,8 +45,7 @@ final class ProgramApiFixtures
             'created_at' => $now,
             'updated_at' => $now,
         ]);
-
-        return $tutor->fresh('tutorProfile');
+        $tutor->unsetRelation('tutorProfile');
     }
 
     /** @param array<string, mixed> $overrides */

@@ -583,11 +583,13 @@ class BeD04ConcurrencyRaceTest extends TestCase
         do {
             if (preg_match('/READY:(\d+)/', $process->getOutput(), $match)) {
                 $workerPid = (int) $match[1];
+                DB::select('SELECT pg_stat_clear_snapshot()');
                 $blocked = DB::selectOne(
                     'SELECT wait_event_type, CASE WHEN CAST(? AS integer) = ANY(pg_blocking_pids(CAST(? AS integer))) THEN 1 ELSE 0 END AS blocked FROM pg_stat_activity WHERE pid = CAST(? AS integer)',
                     [$parentPid, $workerPid, $workerPid],
                 );
-                if ((int) $blocked->blocked === 1) {
+                // Refresh the transaction statistics snapshot and wait for both lock observations.
+                if ($blocked !== null && (int) $blocked->blocked === 1 && $blocked->wait_event_type === 'Lock') {
                     $this->assertSame('Lock', $blocked->wait_event_type);
 
                     return ['parent_pid' => $parentPid, 'worker_pid' => $workerPid, 'wait_event_type' => (string) $blocked->wait_event_type];
