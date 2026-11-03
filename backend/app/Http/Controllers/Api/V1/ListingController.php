@@ -48,8 +48,11 @@ class ListingController extends Controller
 
         $query = ServiceListing::query()
             ->with([
-                'tutorProfile.user',
-                'specialization.subcategory.category',
+                'tutorProfile:id,user_id,public_slug',
+                'tutorProfile.user:id,full_name',
+                'specialization:id,subcategory_id,name',
+                'specialization.subcategory:id,category_id,name',
+                'specialization.subcategory.category:id,name',
             ])
             ->visiblePublic();
 
@@ -136,8 +139,8 @@ class ListingController extends Controller
         }
 
         match ($sort) {
-            'price_asc' => $query->orderBy('price_from_minor'),
-            'price_desc' => $query->orderByDesc('price_from_minor'),
+            'price_asc' => $query->orderBy('price_from_minor')->orderBy('id'),
+            'price_desc' => $query->orderByDesc('price_from_minor')->orderByDesc('id'),
             default => $query->latest('id'),
         };
 
@@ -157,7 +160,7 @@ class ListingController extends Controller
     public function show(string $slug): ListingResource
     {
         $listing = ServiceListing::query()
-            ->with(['tutorProfile.user', 'specialization.subcategory.category'])
+            ->with(['tutorProfile:id,user_id,public_slug', 'tutorProfile.user:id,full_name', 'specialization:id,subcategory_id,name', 'specialization.subcategory:id,category_id,name', 'specialization.subcategory.category:id,name'])
             ->visiblePublic()
             ->where('slug', $slug)
             ->firstOrFail();

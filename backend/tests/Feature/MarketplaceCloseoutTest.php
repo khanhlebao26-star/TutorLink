@@ -10,6 +10,7 @@ use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Tests\Support\ProgramApiFixtures;
 use Tests\TestCase;
 
 class MarketplaceCloseoutTest extends TestCase
@@ -66,7 +67,8 @@ class MarketplaceCloseoutTest extends TestCase
             ->assertJsonPath('data.tutor_slug', $profile->public_slug)
             ->assertJsonMissingPath('data.allowed_actions');
         $this->getJson("/api/v1/tutors/{$profile->public_slug}")->assertOk()
-            ->assertJsonPath('data.listings.0.tutor_slug', $profile->public_slug);
+            ->assertJsonPath('data.listings.0.slug', $listing->slug)
+            ->assertJsonMissingPath('data.listings.0.tutor_slug');
     }
 
     public function test_reviews_exclude_all_non_completed_programs_and_return_empty_aggregate(): void
@@ -147,9 +149,9 @@ class MarketplaceCloseoutTest extends TestCase
 
     private function tutor(): array
     {
-        $user = User::factory()->create(['role' => 'tutor', 'status' => 'active']);
+        $user = ProgramApiFixtures::eligibleTutor();
 
-        return [$user, $user->tutorProfile()->create(['headline' => 'Test tutor', 'status' => 'approved'])];
+        return [$user, $user->tutorProfile];
     }
 
     private function listing(TutorProfile $profile, string $status): ServiceListing

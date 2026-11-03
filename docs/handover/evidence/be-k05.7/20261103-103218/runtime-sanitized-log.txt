@@ -1,0 +1,100 @@
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  |    INFO  Configuration cached successfully.  
+outbox-worker-1  |    INFO  Routes cached successfully.  
+outbox-worker-1  |    INFO  Blade templates cached successfully.  
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+outbox-worker-1  | Handled 0 outbox event(s).
+broadcast-worker-1  |    INFO  Configuration cached successfully.  
+broadcast-worker-1  |    INFO  Routes cached successfully.  
+broadcast-worker-1  |    INFO  Blade templates cached successfully.  
+app-1               | 172.23.0.9 -  03/Nov/2026:03:35:56 +0000 "GET /index.php" 200
+app-1               | 172.23.0.9 -  03/Nov/2026:03:35:58 +0000 "GET /index.php" 200
+app-1               | 172.23.0.9 -  03/Nov/2026:03:37:25 +0000 "GET /index.php" 200
+app-1               | 172.23.0.9 -  03/Nov/2026:03:40:51 +0000 "GET /index.php" 503
+app-1               | 172.23.0.9 -  03/Nov/2026:03:41:01 +0000 "GET /index.php" 200
+app-1               | 172.23.0.9 -  03/Nov/2026:03:43:02 +0000 "GET /index.php" 200
+app-1               | 172.23.0.9 -  03/Nov/2026:03:42:59 +0000 "GET /index.php" 200
+app-1               | 172.23.0.9 -  03/Nov/2026:03:45:57 +0000 "GET /index.php" 200
+app-1               | 172.23.0.9 -  03/Nov/2026:03:46:13 +0000 "GET /index.php" 503
+app-1               | 172.23.0.9 -  03/Nov/2026:03:48:09 +0000 "GET /index.php" 200
+broadcast-worker-1  |    INFO  Configuration cached successfully.  
+broadcast-worker-1  |    INFO  Routes cached successfully.  
+broadcast-worker-1  |    INFO  Blade templates cached successfully.  
+broadcast-worker-1  |    INFO  Configuration cached successfully.  
+broadcast-worker-1  |    INFO  Routes cached successfully.  
+broadcast-worker-1  |    INFO  Blade templates cached successfully.  
+slack-worker-1      |    INFO  Configuration cached successfully.  
+slack-worker-1      |    INFO  Routes cached successfully.  
+slack-worker-1      |    INFO  Blade templates cached successfully.  
+slack-worker-1      |    INFO  Configuration cached successfully.  
+slack-worker-1      |    INFO  Routes cached successfully.  
+slack-worker-1      |    INFO  Blade templates cached successfully.  
+slack-worker-1      |    INFO  Configuration cached successfully.  
+slack-worker-1      |    INFO  Routes cached successfully.  
+slack-worker-1      |    INFO  Blade templates cached successfully.  

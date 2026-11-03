@@ -1,0 +1,9 @@
+         source         | leaks 
+------------------------+-------
+ telescope_entries      |     0
+ telescope_entries_tags |     0
+ pulse_entries          |     0
+ pulse_aggregates       |     0
+ pulse_values           |     0
+(5 rows)
+

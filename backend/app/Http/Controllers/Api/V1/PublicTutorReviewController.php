@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\TutorProfile;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -19,10 +18,9 @@ class PublicTutorReviewController extends Controller
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
         ]);
 
-        $profile = TutorProfile::query()
+        $profile = TutorProfile::query()->select('id')
             ->where('public_slug', $slug)
-            ->where('status', 'approved')
-            ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'))
+            ->visiblePublic()
             ->firstOrFail();
 
         // Historical membership remains valid after a customer leaves the Program.

@@ -26,6 +26,8 @@ Architecture also contains `Other source files.md` with links to its five non-Go
 
 ## Issue handover
 
+- [BE-D05 + BE-H05 — Phase 5](handover/BE-D05-BE-H05-handover.md): marketplace gate/cache/query và backend quản trị dùng chung; thêm dashboard aggregate, chưa mở UI Filament; xem evidence và giới hạn local trong bàn giao.
+
 - [BE-H04 — Review, Report và Audit](handover/BE-H04-test-report.md): 17 API mới, OpenAPI 122 operations, migration/permission và bằng chứng kiểm thử theo nhóm. Chờ review; không chứng nhận production.
 
 - [BE-K04 — Sessions planned/actual và replay](handover/BE-K04-handover.md): sáu API Session, hai migration, policy/version/replay, 109 test liên quan và 625 test toàn backend với 17 race cases PostgreSQL. K04.7 đồng bộ OpenAPI/Catalog/schema và chuẩn bị bàn giao; chờ Hoàng review, chưa chứng nhận staging/production.

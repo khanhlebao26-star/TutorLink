@@ -6,6 +6,10 @@ use Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Illuminate\Support\Str;
 
+if (! class_exists(OpenApiVersion::class)) {
+    return [];
+}
+
 return [
     'api_path' => 'api/v1',
     'export_path' => '../docs/api/openapi.json',

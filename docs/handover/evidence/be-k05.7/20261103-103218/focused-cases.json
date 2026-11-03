@@ -1,0 +1,698 @@
+[
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it detects severe logs and reported exceptions through registered listeners with data set \"('critical', false)\"",
+    "seconds": 1.495887,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it detects severe logs and reported exceptions through registered listeners with data set \"('alert', false)\"",
+    "seconds": 0.104912,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it detects severe logs and reported exceptions through registered listeners with data set \"('emergency', false)\"",
+    "seconds": 0.109075,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it detects severe logs and reported exceptions through registered listeners with data set \"('error', true)\"",
+    "seconds": 0.115679,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it ignores ordinary logs and its own diagnostic logs with data set \"('info', [])\"",
+    "seconds": 0.104776,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it ignores ordinary logs and its own diagnostic logs with data set \"('warning', [])\"",
+    "seconds": 0.096625,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it ignores ordinary logs and its own diagnostic logs with data set \"('error', [])\"",
+    "seconds": 0.103152,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it ignores ordinary logs and its own diagnostic logs with data set \"('critical', [true])\"",
+    "seconds": 0.093809,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it deduplicates a critical fingerprint until the ten minute cooldown expires",
+    "seconds": 0.131062,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it separates cooldown markers by environment",
+    "seconds": 0.123482,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it enqueues only one alert when separate processes report the same critical event",
+    "seconds": 0.312807,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it alerts at the fifth slow query and suppresses repeats during cooldown",
+    "seconds": 0.127684,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it uses an inclusive 500ms query threshold",
+    "seconds": 0.175819,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it counts only matching queries in a rolling five minute window",
+    "seconds": 0.189497,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it does not combine different query fingerprints or monitor its own storage",
+    "seconds": 0.165411,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it disables both collectors when alerts are disabled or suppressed with data set \"('monitoring.alerts.enabled')\"",
+    "seconds": 0.209538,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it disables both collectors when alerts are disabled or suppressed with data set \"('monitoring.alerts.suppressed')\"",
+    "seconds": 0.185611,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it rolls back the cooldown marker if enqueue fails so the next event can retry",
+    "seconds": 0.161369,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it retains only validated request identifiers in queued critical alerts with data set \"(true)\"",
+    "seconds": 0.156282,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it retains only validated request identifiers in queued critical alerts with data set \"(false)\"",
+    "seconds": 0.136609,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it sends a safe summary for each new monitoring alert kind with data set \"('critical')\"",
+    "seconds": 0.128922,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it sends a safe summary for each new monitoring alert kind with data set \"('slow_query')\"",
+    "seconds": 0.114747,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it rejects private or malformed fields before a monitoring job can be serialized with data set \"(['private@example.test'])\"",
+    "seconds": 0.101172,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it rejects private or malformed fields before a monitoring job can be serialized with data set \"(['PRIVATE_SQL'])\"",
+    "seconds": 0.100019,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it rejects private or malformed fields before a monitoring job can be serialized with data set \"([0])\"",
+    "seconds": 0.145298,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it rejects private or malformed fields before a monitoring job can be serialized with data set \"([-1])\"",
+    "seconds": 0.135246,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it rejects private or malformed fields before a monitoring job can be serialized with data set \"(['PRIVATE_TOKEN'])\"",
+    "seconds": 0.100107,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it releases temporary failures but stops at attempt ten with data set \"(false)\"",
+    "seconds": 0.101968,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it releases temporary failures but stops at attempt ten with data set \"(true)\"",
+    "seconds": 0.111751,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it prevents recursive critical and slow-query alerts during an actual worker retry",
+    "seconds": 0.158617,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it prevents recursive alerts when the actual Slack worker permanently fails",
+    "seconds": 0.125281,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it resets the Slack guard before the worker starts its next loop",
+    "seconds": 0.131563,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringAlertsTest",
+    "name": "it respects Slack rate limiting for monitoring alerts",
+    "seconds": 0.131872,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it reports absent workers and recovers after heartbeats arrive",
+    "seconds": 0.215923,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it marks a worker stale only after ninety seconds and recovers on progress",
+    "seconds": 0.267284,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it writes idle queue heartbeats without requiring a job with data set \"('slack', 'slack-worker')\"",
+    "seconds": 0.139448,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it writes idle queue heartbeats without requiring a job with data set \"('broadcasts', 'broadcast-worker')\"",
+    "seconds": 0.150634,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it writes an outbox heartbeat when the worker has no work",
+    "seconds": 0.121351,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it writes scheduler heartbeats through its own scheduled callback",
+    "seconds": 0.156063,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it limits heartbeat writes to thirty seconds and detects a future clock",
+    "seconds": 0.165124,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it does not accept an unrecognized heartbeat identity",
+    "seconds": 0.128998,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it detects pending outbox lag and distinguishes failed and replayable records",
+    "seconds": 0.281456,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it reports queue counts without exposing payloads or generating Slack alerts",
+    "seconds": 0.16664,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringRuntimeTest",
+    "name": "it reports unavailable metrics safely and lets workers survive heartbeat storage failure",
+    "seconds": 0.128498,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it returns 401 to guests even in local environment with data set \"('/telescope')\"",
+    "seconds": 0.079051,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it returns 401 to guests even in local environment with data set \"('/telescope/telescope-api/requests')\"",
+    "seconds": 0.049632,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it returns 401 to guests even in local environment with data set \"('/pulse')\"",
+    "seconds": 0.043972,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it enforces the complete monitoring permission matrix with data set \"dataset \"active admin with permission\"\"",
+    "seconds": 0.047157,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it enforces the complete monitoring permission matrix with data set \"dataset \"admin without permission\"\"",
+    "seconds": 0.039902,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it enforces the complete monitoring permission matrix with data set \"dataset \"suspended admin\"\"",
+    "seconds": 0.034939,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it enforces the complete monitoring permission matrix with data set \"dataset \"deleted admin\"\"",
+    "seconds": 0.038981,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it enforces the complete monitoring permission matrix with data set \"dataset \"customer with forged permission\"\"",
+    "seconds": 0.036128,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it enforces the complete monitoring permission matrix with data set \"dataset \"tutor with forged permission\"\"",
+    "seconds": 0.035351,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it returns 403 to authenticated customers at both dashboards with data set \"('/telescope')\"",
+    "seconds": 0.130912,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it returns 403 to authenticated customers at both dashboards with data set \"('/telescope/telescope-api/requests')\"",
+    "seconds": 0.096141,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it returns 403 to authenticated customers at both dashboards with data set \"('/pulse')\"",
+    "seconds": 0.124845,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it renders both dashboards for an active permitted admin with data set \"('/telescope')\"",
+    "seconds": 0.134106,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it renders both dashboards for an active permitted admin with data set \"('/telescope/telescope-api/requests')\"",
+    "seconds": 0.101696,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it renders both dashboards for an active permitted admin with data set \"('/pulse')\"",
+    "seconds": 0.126693,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it rejects a revoked browser session at both dashboards with data set \"('/telescope')\"",
+    "seconds": 0.090353,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it rejects a revoked browser session at both dashboards with data set \"('/telescope/telescope-api/requests')\"",
+    "seconds": 0.09024,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it rejects a revoked browser session at both dashboards with data set \"('/pulse')\"",
+    "seconds": 0.083516,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it rechecks authorization on an existing Pulse Livewire snapshot with data set \"dataset \"permission removed\"\"",
+    "seconds": 0.204103,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it rechecks authorization on an existing Pulse Livewire snapshot with data set \"dataset \"account suspended\"\"",
+    "seconds": 0.168588,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it rechecks authorization on an existing Pulse Livewire snapshot with data set \"dataset \"session revoked\"\"",
+    "seconds": 0.169534,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it persists sanitized request query and exception metrics without canary data",
+    "seconds": 0.092587,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it samples ordinary HTTP requests at the configured zero and one boundaries with data set \"dataset \"disabled ordinary recording\"\"",
+    "seconds": 0.042277,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it samples ordinary HTTP requests at the configured zero and one boundaries with data set \"dataset \"all ordinary requests\"\"",
+    "seconds": 0.042049,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it retains failed requests exceptions and slow queries when ordinary sampling is zero",
+    "seconds": 0.055756,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it renders all Pulse cards repeatedly through the database cache",
+    "seconds": 0.130626,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.MonitoringTest",
+    "name": "it prunes expired monitoring data and keeps recent records with an hourly schedule",
+    "seconds": 0.090136,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Worker command processes committed events without duplicate",
+    "seconds": 0.183417,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Failure queues one alert and monitor does not duplicate it",
+    "seconds": 0.216317,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Failed handoff rolls back failure marker and job together",
+    "seconds": 0.208422,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Monitor backfills legacy failures and throttles reminders",
+    "seconds": 0.198706,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Pending alerts are aggregated and limited to once per ten minutes",
+    "seconds": 0.205066,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Pending alert handoff rollback does not consume throttle slot",
+    "seconds": 0.181921,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Queue on an independent connection is rejected",
+    "seconds": 0.188763,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Retention preview does not delete any data",
+    "seconds": 0.201271,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Executing retention requires both permissions",
+    "seconds": 0.204142,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Retention preserves unresolved failures and audits each batch",
+    "seconds": 0.232011,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Failed retention audit rolls back deletion",
+    "seconds": 0.227334,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.NotificationOutboxRuntimeTest",
+    "name": "Scheduler has monitor and controlled retention tasks",
+    "seconds": 0.11245,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.ProductionHealthTest",
+    "name": "it reports the application alive without using database sessions",
+    "seconds": 0.117564,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.ProductionHealthTest",
+    "name": "it is ready only when the database and every required worker are healthy",
+    "seconds": 0.122257,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.ProductionHealthTest",
+    "name": "it reports only the stale worker while the other components remain healthy",
+    "seconds": 0.110317,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.ProductionHealthTest",
+    "name": "it reports database failure without exposing connection details or failing liveness",
+    "seconds": 0.099373,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.ProductionHealthTest",
+    "name": "it reports worker storage failure separately from a healthy database",
+    "seconds": 0.117044,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Success uses backend token and safe operational message",
+    "seconds": 0.109388,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Pending and worker alerts have only operational fields",
+    "seconds": 0.110285,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Connection timeout releases job without inline retry",
+    "seconds": 0.118975,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Rate limit respects retry after",
+    "seconds": 0.106448,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Retry after is not shortened to normal backoff cap",
+    "seconds": 0.106196,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Invalid retry after uses bounded backoff",
+    "seconds": 0.096348,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Retry after beyond retry window fails without early retry",
+    "seconds": 0.09377,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Temporary http error releases job with data set #0",
+    "seconds": 0.095332,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Temporary http error releases job with data set #1",
+    "seconds": 0.096383,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Temporary http error releases job with data set #2",
+    "seconds": 0.095216,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Http 200 with temporary api error is retried",
+    "seconds": 0.093483,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Http 200 with api rate limit respects retry after",
+    "seconds": 0.106669,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Permanent api error fails without retry with data set #0",
+    "seconds": 0.096838,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Permanent api error fails without retry with data set #1",
+    "seconds": 0.096529,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Permanent api error fails without retry with data set #2",
+    "seconds": 0.117702,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Permanent api error fails without retry with data set #3",
+    "seconds": 0.108093,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Permanent api error fails without retry with data set #4",
+    "seconds": 0.103853,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Permanent api error fails without retry with data set #5",
+    "seconds": 0.106353,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Http auth error fails without retry",
+    "seconds": 0.102331,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Invalid json response is not treated as success",
+    "seconds": 0.10121,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Missing configuration fails without http request",
+    "seconds": 0.12253,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Tenth temporary failure stops retry with safe exception",
+    "seconds": 0.112066,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Expired job does not send to slack",
+    "seconds": 0.109614,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Unknown response content and token are not logged or serialized",
+    "seconds": 0.097462,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Private fields are rejected before queue serialization",
+    "seconds": 0.096538,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Slack failure does not rollback committed business or notification",
+    "seconds": 0.231096,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Permanent failure is stored in failed jobs without token",
+    "seconds": 0.124191,
+    "passed": true
+  },
+  {
+    "class": "Tests.Feature.SendSlackOperationalAlertTest",
+    "name": "Rolled back enqueue does not send any slack request",
+    "seconds": 0.105608,
+    "passed": true
+  }
+]

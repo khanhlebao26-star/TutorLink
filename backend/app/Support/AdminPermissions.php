@@ -4,7 +4,11 @@ namespace App\Support;
 
 final class AdminPermissions
 {
+    public const VIEW_DASHBOARD = 'admin.dashboard.view';
+
     public const VIEW_REPORTS = 'admin.reports.view';
+
+    public const VIEW_MONITORING = 'admin.monitoring.view';
 
     public const ASSIGN_REPORTS = 'admin.reports.assign';
 
@@ -44,7 +48,9 @@ final class AdminPermissions
     public static function all(): array
     {
         return [
+            self::VIEW_DASHBOARD,
             self::VIEW_REPORTS,
+            self::VIEW_MONITORING,
             self::ASSIGN_REPORTS,
             self::DECIDE_REPORTS,
             self::MODERATE_REVIEWS,

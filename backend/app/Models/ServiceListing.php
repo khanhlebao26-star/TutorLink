@@ -58,11 +58,8 @@ class ServiceListing extends Model
         return $query
             ->where('status', 'active')
             ->where('currency', 'VND')
-            ->whereHas('tutorProfile', function (Builder $profile): void {
-                $profile
-                    ->where('status', 'approved')
-                    ->whereHas('user', fn (Builder $user) => $user->where('status', 'active'));
-            })
+            ->whereNotExists(fn ($holds) => $holds->selectRaw('1')->from('listing_moderation_holds')->whereColumn('listing_moderation_holds.listing_id', 'service_listings.id')->whereNull('restored_at'))
+            ->whereHas('tutorProfile', fn (Builder $profile) => $profile->visiblePublic())
             ->whereHas('specialization', function (Builder $specialization): void {
                 $specialization
                     ->where('status', 'active')

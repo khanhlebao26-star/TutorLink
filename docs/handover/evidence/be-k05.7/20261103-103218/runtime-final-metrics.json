@@ -1,0 +1,36 @@
+{
+    "checked_at": "2026-11-03T03:50:14.573531Z",
+    "status": "ok",
+    "workers": {
+        "outbox-worker": {
+            "last_seen_at": "2026-11-03T03:49:45Z",
+            "age_seconds": 29,
+            "status": "ok"
+        },
+        "slack-worker": {
+            "last_seen_at": "2026-11-03T03:49:47Z",
+            "age_seconds": 27,
+            "status": "ok"
+        },
+        "broadcast-worker": {
+            "last_seen_at": "2026-11-03T03:49:47Z",
+            "age_seconds": 27,
+            "status": "ok"
+        },
+        "scheduler": {
+            "last_seen_at": "2026-11-03T03:50:00Z",
+            "age_seconds": 14,
+            "status": "ok"
+        }
+    },
+    "outbox": {
+        "pending": 0,
+        "oldest_pending_seconds": 0,
+        "failed_unresolved": 0
+    },
+    "queue": {
+        "waiting_or_reserved": [],
+        "failed_total": 0,
+        "failed_slack": 0
+    }
+}

@@ -184,7 +184,7 @@ Khi đếm tổng số bản ghi và trả danh sách dữ liệu, API phải á
 - **Notification:** sử dụng cursor ổn định để tránh bỏ sót hoặc lặp dữ liệu khi tải tiếp.
 - **Submission:** sử dụng version để xác định đúng phiên bản dữ liệu.
 
-API không được trả về danh sách không giới hạn số lượng bản ghi. D06/BR-14 đã chốt Listing nhúng trong PublicTutor tối đa 10/trang, tải trang sau bằng `listings_page` trên cùng GET Tutor và `listings_meta.has_more`/`next_page`; không thêm endpoint. Runtime hiện còn dùng `get()` cho toàn bộ Listing nên chưa đạt PC-05. Truy vấn không được phát sinh thêm một truy vấn riêng cho từng bản ghi theo cách gây N+1.
+API không được trả về danh sách không giới hạn số lượng bản ghi. D06/BR-14 đã chốt Listing nhúng trong PublicTutor tối đa 10/trang, tải trang sau bằng `listings_page` trên cùng GET Tutor và `listings_meta.has_more`/`next_page`; không thêm endpoint. BE-D05 đã giới hạn truy vấn Listing nhúng bằng offset/limit 11 để trả tối đa 10 card và tính has_more; xem bàn giao D05/H05. Số đo marketplace local không tự chứng nhận đầy đủ PC-01 hoặc SLO production. Truy vấn không được phát sinh thêm một truy vấn riêng cho từng bản ghi theo cách gây N+1.
 
 ### **Cách nghiệm thu**
 

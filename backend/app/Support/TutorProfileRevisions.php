@@ -50,7 +50,8 @@ class TutorProfileRevisions
     /** @return array<string, mixed>|null */
     public function latest(TutorProfile $profile): ?array
     {
-        $revision = DB::table('tutor_profile_revisions')->where('tutor_profile_id', $profile->id)->orderByDesc('revision_no')->first();
+        $revision = $profile->relationLoaded('latestRevisionData') ? $profile->getRelation('latestRevisionData')
+            : DB::table('tutor_profile_revisions')->where('tutor_profile_id', $profile->id)->orderByDesc('revision_no')->first();
         if ($revision === null) {
             return null;
         }

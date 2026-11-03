@@ -1,0 +1,7 @@
+app | running | healthy | Up 53 minutes (healthy)
+broadcast-worker | running |  | Up 53 minutes
+db | running | healthy | Up 56 minutes (healthy)
+proxy | running |  | Up 47 minutes
+reverb | running |  | Up 53 minutes
+scheduler | running |  | Up 53 minutes
+slack-worker | running |  | Up 53 minutes

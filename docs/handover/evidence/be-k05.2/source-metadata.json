@@ -1,0 +1,103 @@
+{
+  "task": "BE-K05.2",
+  "branch": "be-k05",
+  "base_commit": "e335457486dd858e9fee06fb28732eb1f29fccc1",
+  "dependencies": [
+    {
+      "name": "laravel/framework",
+      "version": "v13.35.0"
+    },
+    {
+      "name": "laravel/pulse",
+      "version": "v1.8.1"
+    },
+    {
+      "name": "laravel/telescope",
+      "version": "v5.27.0"
+    },
+    {
+      "name": "livewire/livewire",
+      "version": "v4.4.8"
+    },
+    {
+      "name": "pestphp/pest",
+      "version": "v4.7.8"
+    },
+    {
+      "name": "phpunit/phpunit",
+      "version": "12.5.33"
+    }
+  ],
+  "database": "PostgreSQL tutorlink_test on isolated Docker test-db",
+  "changes_committed": false,
+  "source_files": [
+    {
+      "path": "backend/app/Http/Middleware/EnsureMonitoringActor.php",
+      "sha256": "d74bd2b6518c8608986eac166e07060682b41638e810d721cafffa88bfdca197"
+    },
+    {
+      "path": "backend/app/Providers/MonitoringServiceProvider.php",
+      "sha256": "806b56c41dce11e369946fbfe01a449698907f061dd21ca278d954ddf7390ff7"
+    },
+    {
+      "path": "backend/app/Support/MonitoringPrivacy.php",
+      "sha256": "98a875fedfeb6e0364987c6bfd5889eca97b774c1cc7ccb1079fe1c7101b79c6"
+    },
+    {
+      "path": "backend/app/Support/AdminPermissions.php",
+      "sha256": "b9382921e6f1b96304dd6ba40dffac97c1106e3136c97f748c7bf065a7cf5915"
+    },
+    {
+      "path": "backend/bootstrap/providers.php",
+      "sha256": "bd051812c0aefcd5f30a0176e07e8ded3a1b6c01f581465ba3c57d379ac25f35"
+    },
+    {
+      "path": "backend/composer.json",
+      "sha256": "5cf982275dc6e421b6de174c5464fe8f3bc7901b2c44c4c0853e17d3cbe9d08b"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "3370a81670095a1ab206553835856aff2232dc5cbf1886adcfa92f855fbdbd31"
+    },
+    {
+      "path": "backend/config/cache.php",
+      "sha256": "77726c350a0578e40423dbf870f5dbce81e137739eff3ed121c3d99fef4bd746"
+    },
+    {
+      "path": "backend/config/monitoring.php",
+      "sha256": "2be6ec9ae821fd988a9a242c74a092709ecef78724395aaf593b05a301eccd9b"
+    },
+    {
+      "path": "backend/config/pulse.php",
+      "sha256": "6c86e372c11f29fbf49f727d2855ff82951b88cbd8e00d54dd9c65c5c21f29c7"
+    },
+    {
+      "path": "backend/config/telescope.php",
+      "sha256": "45e50f9c7d4671034168dfbd3c2b68d9db456a38a57ee6a6b2a4a12d8c65daab"
+    },
+    {
+      "path": "backend/routes/console.php",
+      "sha256": "403658a3d596bcda897f6acc8ebb4126d9c42698a03cdcb40981a2f5db0ac48a"
+    },
+    {
+      "path": "backend/routes/web.php",
+      "sha256": "cbf264b146c590b2967c2e4222ed5b8183e28f08e059118b5fd053da97d0595c"
+    },
+    {
+      "path": "backend/tests/Feature/MonitoringTest.php",
+      "sha256": "76635e9c1a247fa61b2b85e50fdee678dd59f183eb71d31a06985a5e370f0491"
+    },
+    {
+      "path": "backend/tests/Support/MonitoringTestCase.php",
+      "sha256": "642845b496d98e1707935291763eb4388aa56dbadeb7c7e81998c61093af4748"
+    },
+    {
+      "path": "backend/database/migrations/2026_11_02_150959_create_telescope_entries_table.php",
+      "sha256": "afc2a0cd0aa4394578ef188cef6d5eab2ddebd18ccf07c28095ed4d1a49da475"
+    },
+    {
+      "path": "backend/database/migrations/2026_11_02_151000_create_pulse_tables.php",
+      "sha256": "f91af5403ef1715b962fe75677f0510573b3b74ec9bf632102c9123c3001960e"
+    }
+  ]
+}

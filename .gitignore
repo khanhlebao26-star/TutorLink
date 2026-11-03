@@ -3,6 +3,7 @@
 **/.env.*
 !**/.env.example
 !**/.env.docker.example
+!**/.env.production.example
 
 # Dependencies
 **/node_modules/

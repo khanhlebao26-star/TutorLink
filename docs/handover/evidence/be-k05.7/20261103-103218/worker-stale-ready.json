@@ -1,0 +1,1 @@
+{"status":"not_ready","app":"ok","db":"ok","workers":{"outbox-worker":"stale","slack-worker":"ok","broadcast-worker":"ok","scheduler":"ok"}}

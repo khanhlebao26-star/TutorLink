@@ -8,6 +8,7 @@ use App\Models\User;
 use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\Support\ProgramApiFixtures;
 use Tests\TestCase;
 
 class MarketplaceSearchCompatibilityTest extends TestCase
@@ -25,6 +26,8 @@ class MarketplaceSearchCompatibilityTest extends TestCase
             'experience_years' => 3,
             'status' => 'approved',
         ]);
+
+        ProgramApiFixtures::approveIdentity($tutor);
 
         $createListing = fn (array $overrides): ServiceListing => ServiceListing::create(array_merge([
             'tutor_profile_id' => $profile->id,

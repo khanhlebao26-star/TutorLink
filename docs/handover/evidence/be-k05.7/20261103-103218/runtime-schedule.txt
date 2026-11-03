@@ -1,0 +1,7 @@
+
+  * * * * * 30s  monitoring:heartbeat:scheduler  Next Due: 25 seconds from now
+  * * * * *      php artisan invitations:expire  Next Due: 55 seconds from now
+  * * * * *      php artisan outbox:monitor .... Next Due: 55 seconds from now
+  0 2 * * *      php artisan outbox:purge --execute='1'  Next Due: 22 hours from now
+  0 * * * *      php artisan monitoring:prune .. Next Due: 23 minutes from now
+

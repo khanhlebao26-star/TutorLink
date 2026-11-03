@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AdminController;
+use App\Http\Controllers\Api\V1\AdminDashboardController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
@@ -257,6 +258,7 @@ Route::prefix('v1')->group(function () {
         ]);
 
         Route::prefix('admin')->middleware(EnsureActiveApiActor::class)->group(function () {
+            Route::get('/dashboard', [AdminDashboardController::class, 'show'])->name('admin.dashboard');
             Route::get('/tutor-profiles', [AdminController::class, 'index'])
                 ->name('admin.tutor-profiles.index');
             Route::get('/tutor-profiles/{tutorProfile}', [AdminController::class, 'show'])

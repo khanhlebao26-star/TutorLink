@@ -1,0 +1,187 @@
+{
+  "run_id": "20261103-103218",
+  "timezone": "Asia/Saigon",
+  "base_commit": "71ef638b23122ce73233a8d70d192830d0ce6b3b",
+  "branch": "be-k05",
+  "source": "working tree after format; no commit or push performed",
+  "source_files": [
+    {
+      "path": ".env.production.example",
+      "sha256": "e7f86a992370142e7c64ec03383b09d18b22fa63432453ae5f8cd7a51513ef2f"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "8453b894a36bd7dbe9527ee323ec3adbee5001da2d09c980c159092e5eb5bcfd"
+    },
+    {
+      "path": "backend/app/Console/Commands/MonitoringRuntime.php",
+      "sha256": "1cfef6282c5d68bd58acc632a6ae6882d338eb7168018b0015db9e4e2e2aa24f"
+    },
+    {
+      "path": "backend/app/Console/Commands/WorkNotificationOutbox.php",
+      "sha256": "1ab776af5bcd4af9a04d5779678c069bcb4797f1fd0eceee0d1e09225e9cc7b1"
+    },
+    {
+      "path": "backend/app/Http/Controllers/HealthController.php",
+      "sha256": "5fab5f52d99e97d162c0abdaf14047b69f2a9da75a4163546238ef444becfecc"
+    },
+    {
+      "path": "backend/app/Http/Middleware/EnsureMonitoringActor.php",
+      "sha256": "d74bd2b6518c8608986eac166e07060682b41638e810d721cafffa88bfdca197"
+    },
+    {
+      "path": "backend/app/Jobs/SendSlackOperationalAlert.php",
+      "sha256": "04df0f8c7e6ca00f1f4ac9f1cf21b2d72c8c652e24779b0b1fdbd6ae275a1d5e"
+    },
+    {
+      "path": "backend/app/Providers/MonitoringServiceProvider.php",
+      "sha256": "baf468d7d8606d803b435b0f1003f5b4df9eabe6f3d457a12b69ca2fd032f0b1"
+    },
+    {
+      "path": "backend/app/Support/AdminPermissions.php",
+      "sha256": "b9382921e6f1b96304dd6ba40dffac97c1106e3136c97f748c7bf065a7cf5915"
+    },
+    {
+      "path": "backend/app/Support/MonitoringAlerts.php",
+      "sha256": "0641b3409652afbd1e4fc103622f434dd03ec226d37ade69a6404c1fe2e1d46f"
+    },
+    {
+      "path": "backend/app/Support/MonitoringPrivacy.php",
+      "sha256": "0685bb9af5313cb7c4aa975ed9ed0c928a0ab9b595b008d7789789afda76a318"
+    },
+    {
+      "path": "backend/app/Support/WorkerHeartbeat.php",
+      "sha256": "d80054ae681cf6bb835f6ea39a6104fb9d1c670ebd4a9b337a567a6993953a00"
+    },
+    {
+      "path": "backend/bootstrap/app.php",
+      "sha256": "06bbad79dfb4c6fc57ab01e028e5dbee76392f60b31bb691baf8d35dbd5b76fe"
+    },
+    {
+      "path": "backend/bootstrap/providers.php",
+      "sha256": "bd051812c0aefcd5f30a0176e07e8ded3a1b6c01f581465ba3c57d379ac25f35"
+    },
+    {
+      "path": "backend/composer.json",
+      "sha256": "5cf982275dc6e421b6de174c5464fe8f3bc7901b2c44c4c0853e17d3cbe9d08b"
+    },
+    {
+      "path": "backend/composer.lock",
+      "sha256": "3370a81670095a1ab206553835856aff2232dc5cbf1886adcfa92f855fbdbd31"
+    },
+    {
+      "path": "backend/config/cache.php",
+      "sha256": "77726c350a0578e40423dbf870f5dbce81e137739eff3ed121c3d99fef4bd746"
+    },
+    {
+      "path": "backend/config/monitoring.php",
+      "sha256": "8a167ac4bb608e06a0b8b3a83ff0e1fa6082ceaa5a4c79bf9e699f73371589e9"
+    },
+    {
+      "path": "backend/config/pulse.php",
+      "sha256": "6c86e372c11f29fbf49f727d2855ff82951b88cbd8e00d54dd9c65c5c21f29c7"
+    },
+    {
+      "path": "backend/config/reverb.php",
+      "sha256": "02d124f514941960b6749c62cbd7ddde2e703021b442336a946418cf99c7e2a7"
+    },
+    {
+      "path": "backend/config/scramble.php",
+      "sha256": "ad07c4b38fae616eae7ff931f64ca916623a024d0088f83b4622a2528c01a370"
+    },
+    {
+      "path": "backend/config/telescope.php",
+      "sha256": "45e50f9c7d4671034168dfbd3c2b68d9db456a38a57ee6a6b2a4a12d8c65daab"
+    },
+    {
+      "path": "backend/database/migrations/2026_11_02_150959_create_telescope_entries_table.php",
+      "sha256": "afc2a0cd0aa4394578ef188cef6d5eab2ddebd18ccf07c28095ed4d1a49da475"
+    },
+    {
+      "path": "backend/database/migrations/2026_11_02_151000_create_pulse_tables.php",
+      "sha256": "f91af5403ef1715b962fe75677f0510573b3b74ec9bf632102c9123c3001960e"
+    },
+    {
+      "path": "backend/docker/production/Caddyfile",
+      "sha256": "69c74d53ebe4463c3282e4c9408ee3f73f1ab9e20b45a9af789d1ba86da88fb5"
+    },
+    {
+      "path": "backend/docker/production/entrypoint.sh",
+      "sha256": "99b63d4649b338879dace3074f1d567b6ebd0d2d56fc0be9bf1bdfefdbd69a6a"
+    },
+    {
+      "path": "backend/docker/production/php.ini",
+      "sha256": "acd450a25de1cdb0ad79cbf46bf7c154d95903b65a08bf87fa25b1a6110680b8"
+    },
+    {
+      "path": "backend/Dockerfile.production",
+      "sha256": "80862b43f85a76a3e59cc84cbd510eb1e19c82607afa5a51008f16a479afb9e3"
+    },
+    {
+      "path": "backend/Dockerfile.production.dockerignore",
+      "sha256": "66b79899f2b0e4902434ad168d01eedd1f8942d128122f45c757bd16987d5c94"
+    },
+    {
+      "path": "backend/routes/console.php",
+      "sha256": "9154dedc3a38bad75176455907d417355ef55f9f4d0f6391634cf0b52e567587"
+    },
+    {
+      "path": "backend/tests/Feature/MonitoringAlertsTest.php",
+      "sha256": "b42fabb51f1d8da4a352c91ba9157f2e845e8aa7efb0a2f5ba64305ddc93ec06"
+    },
+    {
+      "path": "backend/tests/Feature/MonitoringRuntimeTest.php",
+      "sha256": "dac7d64e7220aadd0ebcddcecd09f135f0302f1f455f97a0529b20e2e8ca71ab"
+    },
+    {
+      "path": "backend/tests/Feature/MonitoringTest.php",
+      "sha256": "76635e9c1a247fa61b2b85e50fdee678dd59f183eb71d31a06985a5e370f0491"
+    },
+    {
+      "path": "backend/tests/Feature/ProductionHealthTest.php",
+      "sha256": "7728f7a713d97b50a88d0c1e381bd085745cc1ba1676a81c8eb345d7598b7355"
+    },
+    {
+      "path": "backend/tests/Support/MonitoringTestCase.php",
+      "sha256": "642845b496d98e1707935291763eb4388aa56dbadeb7c7e81998c61093af4748"
+    },
+    {
+      "path": "compose.production.yml",
+      "sha256": "6b1619977a96fa2c2899c918202171a56d2508a6823ab2b52e981d26de1e4bb1"
+    },
+    {
+      "path": "compose.workers.yml",
+      "sha256": "43dd6c83d35a3c76bf0433a8e23de0a706954263298cda492cbde021ad192c94"
+    }
+  ],
+  "locked_versions": [
+    {
+      "name": "laravel/framework",
+      "version": "v13.35.0"
+    },
+    {
+      "name": "laravel/pulse",
+      "version": "v1.8.1"
+    },
+    {
+      "name": "laravel/telescope",
+      "version": "v5.27.0"
+    },
+    {
+      "name": "livewire/livewire",
+      "version": "v4.4.8"
+    },
+    {
+      "name": "laravel/pint",
+      "version": "v1.32.1"
+    },
+    {
+      "name": "pestphp/pest",
+      "version": "v4.7.8"
+    },
+    {
+      "name": "phpunit/phpunit",
+      "version": "12.5.33"
+    }
+  ]
+}

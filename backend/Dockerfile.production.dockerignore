@@ -1,0 +1,17 @@
+.env
+.env.*
+vendor/
+node_modules/
+storage/
+bootstrap/cache/*.php
+public/hot
+public/storage
+build/
+tests/
+scripts/
+.git/
+.codex/
+.claude/
+.ai/
+.mcp.json
+AGENTS.md

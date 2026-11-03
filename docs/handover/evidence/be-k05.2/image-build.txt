@@ -1,0 +1,70 @@
+ Image tutorlink-h01-backend-test:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 647B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 997B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/composer:2
+#3 DONE 1.4s
+
+#4 [internal] load metadata for docker.io/library/php:8.3-cli
+#4 DONE 1.4s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a
+#6 resolve docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a 0.0s done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a
+#7 resolve docker.io/library/composer:2@sha256:4ed71c38c6d788eb4e4e3747b5332f5b40d5b5a6fcadd5062a1a70986a118e0a 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 41.75kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#9 CACHED
+
+#10 [stage-0 5/9] WORKDIR /var/www/html
+#10 CACHED
+
+#11 [stage-0 6/9] COPY composer.json composer.lock ./
+#11 CACHED
+
+#12 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev     && docker-php-ext-install pdo_pgsql zip     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#13 CACHED
+
+#14 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#14 CACHED
+
+#15 [stage-0 8/9] COPY . .
+#15 DONE 0.1s
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 DONE 0.3s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 0.2s done
+#17 exporting manifest sha256:4f7adf2c6845a84a75ef250f82b4b35e06518d7c4cd8f3e2521f8307942c3d92 0.0s done
+#17 exporting config sha256:094a3b989bca3559b454152bd58353d1184419523df632d42a89654d6a4960c0 0.0s done
+#17 exporting attestation manifest sha256:c6c2855ba52a6cb322e8c851a94d75514baca1a36a74e6c8abb8ce150e5edc4b 0.0s done
+#17 exporting manifest list sha256:65c4a3e461011394d3fd786e96684a42df7a1129de82d341cc2c0be891a1d558 0.0s done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local 0.1s done
+#17 DONE 0.5s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built 

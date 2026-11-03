@@ -1,0 +1,21 @@
+http://{$APP_DOMAIN} {
+    redir {$APP_URL}{uri} 308
+}
+
+https://{$APP_DOMAIN} {
+    {$TLS_CONFIG}
+
+    root * /var/www/html/public
+    encode zstd gzip
+    header -Server
+
+    @reverb path /app/* /apps/*
+    handle @reverb {
+        reverse_proxy reverb:8080
+    }
+
+    handle {
+        php_fastcgi app:9000
+        file_server
+    }
+}

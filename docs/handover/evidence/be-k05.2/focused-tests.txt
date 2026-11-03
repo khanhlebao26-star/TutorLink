@@ -1,0 +1,12 @@
+time="2026-11-02T22:46:51+07:00" level=warning msg="Found orphan containers (tutorlink-src-scheduler-1, tutorlink-src-outbox-worker-1, tutorlink-src-slack-worker-1, tutorlink-src-backend-1, tutorlink-src-reverb-1, tutorlink-src-broadcast-worker-1, tutorlink-src-pgadmin-1, tutorlink-src-frontend-1, tutorlink-src-mailpit-1, tutorlink-src-db-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-src-test-db-1 Running 
+ Container tutorlink-src-test-db-1 Waiting 
+ Container tutorlink-src-test-db-1 Healthy 
+ Container tutorlink-src-backend-test-run-1da1705fce12 Creating 
+ Container tutorlink-src-backend-test-run-1da1705fce12 Created 
+
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+
+  [90mTests:[39m    [32;1m27 passed[39;22m[90m (118 assertions)[39m
+  [90mDuration:[39m [39m3.88s[39m
+

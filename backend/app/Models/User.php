@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use App\Support\AdminAuthorization;
+use App\Support\AdminPermissions;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -17,7 +21,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['full_name', 'email', 'password_hash', 'role', 'status', 'permissions', 'date_of_birth', 'terms_version'])]
 #[Hidden(['password_hash', 'remember_token', 'permissions'])]
-class User extends Authenticatable implements MustVerifyEmailContract
+class User extends Authenticatable implements FilamentUser, MustVerifyEmailContract
 {
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, MustVerifyEmailTrait, Notifiable, SoftDeletes;
@@ -49,6 +53,15 @@ class User extends Authenticatable implements MustVerifyEmailContract
     public function hasPermission(string $permission): bool
     {
         return $this->role === 'admin' && in_array($permission, $this->permissions ?? [], true);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        $actor = self::find($this->id);
+
+        return config('admin.panel_enabled', false) && $panel->getId() === 'admin'
+            && $actor !== null
+            && app(AdminAuthorization::class)->allows($actor, AdminPermissions::VIEW_DASHBOARD);
     }
 
     public function customerProfile(): HasOne

@@ -19,7 +19,7 @@ class TrustWorkflow
     public function permission(Request $request, string $permission): void
     {
         $actor = User::find($request->user()->id);
-        if (! $actor || $actor->status !== 'active' || ! $actor->hasPermission($permission)) {
+        if (! $actor || ! app(AdminAuthorization::class)->allows($actor, $permission)) {
             $this->fail($request, 403, 'permission_denied', 'Permission denied.');
         }
     }

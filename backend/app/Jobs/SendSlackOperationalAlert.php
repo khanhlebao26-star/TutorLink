@@ -195,6 +195,7 @@ class SendSlackOperationalAlert implements ShouldQueue
     private function record(string $status, string $code): void
     {
         Log::log($status === 'sent' ? 'info' : 'warning', 'Slack operational alert', [
+            'monitoring_internal' => true,
             'alert_id' => Str::isUuid($this->alertId) ? $this->alertId : 'invalid',
             'status' => $status,
             'error_code' => $code,
@@ -205,6 +206,10 @@ class SendSlackOperationalAlert implements ShouldQueue
 
     private function message(): string
     {
+        if (in_array($this->kind, ['critical', 'slow_query'], true)) {
+            return $this->monitoringMessage();
+        }
+
         $required = match ($this->kind) {
             'outbox_failed' => ['failed_count', 'outbox_id', 'event_type', 'error_code', 'failed_at'],
             'outbox_pending' => ['pending_count', 'oldest_pending_seconds', 'checked_at'],
@@ -285,5 +290,76 @@ class SendSlackOperationalAlert implements ShouldQueue
         return $prefix."\nprocess={$this->context['process']}"
             ."\ndetected_at=".gmdate('Y-m-d\TH:i:s\Z', $this->context['detected_at'])
             ."\nlast_heartbeat_at={$heartbeat}";
+    }
+
+    private function monitoringMessage(): string
+    {
+        $required = [
+            'fingerprint',
+            'count',
+            'max_ms',
+            'observed_at',
+            'request_id',
+        ];
+
+        if (
+            ! Str::isUuid($this->alertId)
+            || array_diff(array_keys($this->context), $required) !== []
+            || array_diff($required, array_keys($this->context)) !== []
+        ) {
+            throw new InvalidArgumentException('Invalid monitoring alert fields.');
+        }
+
+        $fingerprint = $this->context['fingerprint'];
+
+        if (
+            ! is_string($fingerprint)
+            || preg_match('/^[a-f0-9]{64}$/D', $fingerprint) !== 1
+        ) {
+            throw new InvalidArgumentException('Invalid monitoring fingerprint.');
+        }
+
+        foreach (['count', 'max_ms', 'observed_at'] as $field) {
+            if (
+                ! is_int($this->context[$field])
+                || $this->context[$field] < 0
+            ) {
+                throw new InvalidArgumentException('Invalid monitoring number.');
+            }
+        }
+
+        if ($this->context['count'] < 1) {
+            throw new InvalidArgumentException('Invalid monitoring count.');
+        }
+
+        $requestId = $this->context['request_id'];
+
+        if (
+            $requestId !== null
+            && (! is_string($requestId) || ! Str::isUuid($requestId))
+        ) {
+            throw new InvalidArgumentException('Invalid monitoring request ID.');
+        }
+
+        $environment = (string) config('app.env');
+
+        if (preg_match('/^[a-zA-Z0-9_-]{1,32}$/D', $environment) !== 1) {
+            $environment = 'unknown';
+        }
+
+        $text = "[{$environment}] {$this->kind} | alert={$this->alertId}"
+            ."\nfingerprint={$fingerprint}"
+            ."\ncount={$this->context['count']}"
+            ."\nobserved_at=".gmdate(
+                'Y-m-d\TH:i:s\Z',
+                $this->context['observed_at'],
+            )
+            ."\nrequest_id=".($requestId ?? 'unknown');
+
+        if ($this->kind === 'slow_query') {
+            $text .= "\nmax_ms={$this->context['max_ms']}";
+        }
+
+        return $text;
     }
 }

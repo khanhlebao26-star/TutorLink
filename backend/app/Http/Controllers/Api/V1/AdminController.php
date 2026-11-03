@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Actions\Auth\RevokeUserSessions;
+use App\Actions\Accounts\ChangeAccountStatus;
 use App\Actions\TutorProfiles\AssignTutorProfile;
 use App\Actions\TutorProfiles\DecideTutorProfile;
 use App\Actions\TutorProfiles\DecideVerificationDocument;
@@ -25,6 +25,7 @@ use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -43,6 +44,7 @@ class AdminController extends Controller
     #[OpenApiResponse(status: 403, description: 'The actor lacks the required permission.', type: self::ERROR_TYPE)]
     public function index(Request $request): JsonResponse
     {
+        $filters = $request->validate(['page' => ['sometimes', 'integer', 'min:1'], 'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'], 'sort' => ['sometimes', Rule::in(['submitted_desc', 'id_desc'])]]);
         $actor = $request->user();
         $policy = app(TutorProfilePolicy::class);
         $flow = app(TutorProfileWorkflow::class);
@@ -57,13 +59,25 @@ class AdminController extends Controller
         $scope = $request->query('scope', $canView ? 'mine' : 'unassigned');
         $flow->ensure(in_array($scope, ['mine', 'unassigned', 'all'], true), 422, 'invalid_assignment_scope', 'Invalid assignment scope.');
         $flow->ensure($scope === 'mine' ? $canView : $canAssign, 403, 'permission_denied', 'Permission denied.');
-        $query = TutorProfile::query()->whereHas('user')->where('status', $status)->orderByDesc('submitted_at')->orderByDesc('id');
+        $query = TutorProfile::query()->select('tutor_profiles.*')->selectSub(DB::table('tutor_profile_revisions')->selectRaw('1')->whereColumn('tutor_profile_id', 'tutor_profiles.id')->where('status', 'submitted')->limit(1), 'has_submitted_revision')->whereHas('user')->where('status', $status);
+        if (($filters['sort'] ?? 'submitted_desc') === 'submitted_desc') {
+            $query->orderByDesc('submitted_at');
+        }
+        $query->orderByDesc('id');
+        if ($scope !== 'mine') {
+            $query->select(['id', 'status', 'submitted_at', 'assigned_admin_id', 'assigned_by', 'assigned_at', 'assignment_version']);
+        }
         if ($scope === 'mine') {
-            $query->where('assigned_admin_id', $actor->id)->with(['user', 'specializations', 'verificationDocuments']);
+            $query->where('assigned_admin_id', $actor->id)->with(['user:id,full_name,email,role,status,date_of_birth,email_verified_at', 'specializations:id,name', 'verificationDocuments']);
         } elseif ($scope === 'unassigned') {
             $query->whereNull('assigned_admin_id');
         }
-        $page = $query->paginate(min(100, max(1, (int) $request->query('per_page', 20))));
+        $page = $query->paginate($filters['per_page'] ?? 20);
+        if ($scope === 'mine') {
+            $revisions = DB::table('tutor_profile_revisions')->whereIn('tutor_profile_id', $page->getCollection()->pluck('id'))
+                ->selectRaw('DISTINCT ON (tutor_profile_id) *')->orderBy('tutor_profile_id')->orderByDesc('revision_no')->get()->keyBy('tutor_profile_id');
+            $page->getCollection()->each(fn (TutorProfile $profile) => $profile->setRelation('latestRevisionData', $revisions->get($profile->id)));
+        }
         $items = $page->getCollection()->map(fn (TutorProfile $profile): array => $scope === 'mine'
             ? $this->profilePayload($profile)
             : ['id' => $profile->id, 'status' => $profile->status, 'submitted_at' => $profile->submitted_at?->toISOString(),
@@ -210,66 +224,11 @@ class AdminController extends Controller
         string $status,
         string $action,
     ): JsonResponse {
-        $actor = $this->requirePermission($request, AdminPermissions::SUSPEND_ACCOUNTS);
-        $data = $request->validated();
-
-        if ($actor->id === $target->id) {
-            return response()->json(['message' => 'Administrators cannot suspend or restore themselves.'], 422);
-        }
-
-        $target = DB::transaction(function () use ($actor, $data, $status, $action, $target): User {
-            $target = User::query()->lockForUpdate()->findOrFail($target->id);
-            $canTransition = match ($status) {
-                'suspended' => $target->status === 'active',
-                'active' => $target->status === 'suspended',
-                default => false,
-            };
-
-            if (! $canTransition) {
-                abort(409, 'The requested account status transition is not allowed.');
-            }
-
-            $before = [
-                'status' => $target->status,
-                'suspended_at' => $target->suspended_at?->toISOString(),
-            ];
-
-            $updateData = [
-                'status' => $status,
-                'suspended_at' => $status === 'suspended' ? now() : null,
-            ];
-
-            if ($status === 'suspended') {
-                $updateData['remember_token'] = str()->random(60);
-            }
-
-            $target->forceFill($updateData)->save();
-
-            if ($status === 'suspended') {
-                $target->tokens()->delete();
-                app(RevokeUserSessions::class)->handle($target);
-            }
-
-            $after = [
-                'status' => $target->status,
-                'suspended_at' => $target->suspended_at?->toISOString(),
-            ];
-
-            $this->writeAudit($actor, $action, 'user', $target->id, $before, $after, $data['reason']);
-
-            return $target->refresh();
-        });
+        $target = app(ChangeAccountStatus::class)->execute(
+            $request->user(), $target->id, $status === 'suspended', $request->validated()['reason'],
+        );
 
         return response()->json(['data' => (new UserResource($target))->resolve()]);
-    }
-
-    private function requirePermission(Request $request, string $permission): User
-    {
-        $user = $request->user();
-
-        abort_unless($user instanceof User && $user->status === 'active' && $user->hasPermission($permission), 403, 'Permission denied.');
-
-        return $user;
     }
 
     /**
@@ -338,7 +297,7 @@ class AdminController extends Controller
         if (
             app(TutorProfilePolicy::class)->decide($actor, $profile)
             && ($profile->status === 'submitted' || ($profile->status === 'approved'
-                && DB::table('tutor_profile_revisions')->where('tutor_profile_id', $profile->id)->where('status', 'submitted')->exists()))
+                && ($profile->relationLoaded('latestRevisionData') ? (bool) $profile->getAttribute('has_submitted_revision') : DB::table('tutor_profile_revisions')->where('tutor_profile_id', $profile->id)->where('status', 'submitted')->exists())))
             && $profile->user->status === 'active'
         ) {
             $actions = ['approve', 'request-changes', 'reject'];
@@ -364,29 +323,5 @@ class AdminController extends Controller
         }
 
         return $actions;
-    }
-
-    /**
-     * @param  array<string, mixed>  $before
-     * @param  array<string, mixed>  $after
-     */
-    private function writeAudit(
-        User $actor,
-        string $action,
-        string $resourceType,
-        int $resourceId,
-        array $before,
-        array $after,
-        string $reason,
-    ): int {
-        return DB::table('audit_logs')->insertGetId([
-            'actor_id' => $actor->id,
-            'action' => $action,
-            'resource_type' => $resourceType,
-            'resource_id' => $resourceId,
-            'before' => json_encode($before, JSON_THROW_ON_ERROR),
-            'after' => json_encode($after, JSON_THROW_ON_ERROR),
-            'reason' => $reason,
-        ]);
     }
 }

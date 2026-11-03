@@ -1,0 +1,52 @@
+{
+  "base_commit": "01c073b",
+  "branch": "codex/2w-be-h05",
+  "groups": {
+    "d04-preflight": {
+      "tests": 7,
+      "assertions": 27,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "regression": {
+      "tests": 737,
+      "assertions": 5190,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "d04": {
+      "tests": 77,
+      "assertions": 1077,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "d04-race": {
+      "tests": 1,
+      "assertions": 893,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "totals": {
+    "tests": 822,
+    "assertions": 7187,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "line_coverage": {
+    "percent": 93.41,
+    "covered": 8302,
+    "total": 8888
+  },
+  "openapi_operations": 123,
+  "openapi_lint_warnings": 58,
+  "production_image_built": true,
+  "production_deployed": false,
+  "remote_ci_verified": false,
+  "note": "Final grouped coverage includes a clean-schema rerun of d04-race after refreshing PostgreSQL statistics snapshots in the lock barrier. The earlier failing coverage invocation is retained as evidence."
+}

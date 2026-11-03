@@ -37,12 +37,11 @@ Public route hiện có: GET /api/v1/tutors/{slug}. `listings_page` là query s�
 * Trang Listing nhúng không quá 10 phần tử, `has_more`/`next_page` dẫn đến đúng trang tiếp theo trong cùng hồ sơ; thay page không đưa Listing đã mất public gate vào response.
 * Đổi tên Tutor giữ nguyên slug; khôi phục User/Profile làm Listing `active` đủ gate tự hiện lại mà không đổi status, Listing `inactive` và `archived` vẫn ẩn.
 
-# 6\. Khoảng cách triển khai
+# 6. Runtime BE-D05 và giới hạn
 
-* Runtime hiện chưa kiểm email verified ở PublicTutorController/visiblePublic; phải thêm cùng public gate cho hồ sơ, search, detail, avatar và Listing nhúng.
-* Runtime tải toàn bộ Listing visible bằng `get()`, chưa có `listings_page`/`listings_meta`; PublicTutorResource đang dùng ListingResource đầy đủ, cần DTO card allow-list và giới hạn 10.
-* PublicTutorResource chưa trả avatar; FileController chưa cấp quyền tải avatar công khai theo M10. Đường tải phải kiểm lại public gate, không dùng URL công khai vĩnh viễn. Cache public phải invalidation khi User/Profile/Listing/catalog/hold đổi trạng thái; nếu chưa bảo đảm, không cache response riêng tư hoặc đã mất eligibility.
-* Slug tạo một lần kèm ID đã phù hợp quy tắc đích; cần kiểm thử đổi tên không đổi slug và URL cũ còn hoạt động.
+BE-D05 đã bổ sung scope public chung kiểm account/verified email, Profile, identity/qualification documents còn hiệu lực; Listing cùng catalog/hold gate. Hồ sơ public có listings_page/listings_meta và card allow-list tối đa 10/trang, query count không tăng theo số dòng. Slug ổn định khi đổi tên. Cache server chỉ anonymous DTO 200, TTL 60 giây, key theo generation của transaction và mốc giấy tờ hết hạn; client phải revalidate, private response no-store.
+
+Avatar hiện trả null vì chưa có public File download theo policy M10. Không trả object key hoặc URL có thể bỏ qua public gate. Đây vẫn là khoảng trống so với mục tiêu đầy đủ D06. [Bàn giao D05/H05](../../handover/BE-D05-BE-H05-handover.md) ghi bằng chứng local, schema/API delta và giới hạn benchmark; không chứng nhận production hoặc UI.
 
 # 7\. Nguồn
 

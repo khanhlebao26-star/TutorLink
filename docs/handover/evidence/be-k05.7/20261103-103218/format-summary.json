@@ -1,0 +1,9 @@
+{
+  "host_dirty_result": "passed",
+  "docker_explicit_paths_result": "passed",
+  "exit_codes": [
+    0,
+    0
+  ],
+  "performed_before_tests": true
+}

@@ -2,8 +2,8 @@ FROM php:8.3-cli
 
 RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update \
-    && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev \
-    && docker-php-ext-install pdo_pgsql pcntl zip \
+    && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev libicu-dev \
+    && docker-php-ext-install pdo_pgsql pcntl zip intl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
