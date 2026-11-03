@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\WorkerHeartbeat;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -10,6 +11,10 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::useCache('database');
+
+Schedule::call(fn () => app(WorkerHeartbeat::class)->beat('scheduler'))
+    ->name('monitoring:heartbeat:scheduler')
+    ->everyThirtySeconds();
 
 Schedule::command('invitations:expire')
     ->everyMinute()

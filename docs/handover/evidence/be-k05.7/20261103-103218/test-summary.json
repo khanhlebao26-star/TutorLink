@@ -1,0 +1,57 @@
+{
+  "focused": {
+    "tests": 116,
+    "assertions": 473,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "full": {
+    "exit_code": 0,
+    "tests": 806,
+    "assertions": 6970,
+    "groups": [
+      {
+        "group": "d04-junit",
+        "tests": 77,
+        "assertions": 1077,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 9.03149
+      },
+      {
+        "group": "d04-preflight-junit",
+        "tests": 7,
+        "assertions": 27,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 1.004206
+      },
+      {
+        "group": "d04-race-junit",
+        "tests": 1,
+        "assertions": 893,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 35.061292
+      },
+      {
+        "group": "regression-junit",
+        "tests": 721,
+        "assertions": 4973,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "seconds": 139.415342
+      }
+    ]
+  },
+  "coverage": {
+    "covered_lines": 8200,
+    "total_lines": 8808,
+    "line_percent": 93.1
+  }
+}

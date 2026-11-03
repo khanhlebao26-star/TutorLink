@@ -7,10 +7,12 @@ use App\Models\User;
 use App\Support\AdminPermissions;
 use App\Support\MonitoringAlerts;
 use App\Support\MonitoringPrivacy;
+use App\Support\WorkerHeartbeat;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Events\Looping;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
@@ -23,6 +25,7 @@ class MonitoringServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(MonitoringAlerts::class);
+        $this->app->singleton(WorkerHeartbeat::class);
 
         Telescope::filter(MonitoringPrivacy::telescope(...));
         Pulse::filter(MonitoringPrivacy::pulse(...));
@@ -49,7 +52,15 @@ class MonitoringServiceProvider extends ServiceProvider
             app(MonitoringAlerts::class)->setSlackJob($isSlack);
         });
 
-        Queue::looping(function (): void {
+        Queue::looping(function (Looping $event): void {
+            $process = match ($event->queue) {
+                'slack' => 'slack-worker',
+                'broadcasts' => 'broadcast-worker',
+                default => null,
+            };
+            if ($process !== null) {
+                app(WorkerHeartbeat::class)->beat($process);
+            }
             app(MonitoringAlerts::class)->setSlackJob(false);
         });
 

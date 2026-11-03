@@ -1,0 +1,20 @@
+ M .gitignore
+ M backend/app/Console/Commands/WorkNotificationOutbox.php
+ M backend/app/Providers/MonitoringServiceProvider.php
+ M backend/app/Support/MonitoringPrivacy.php
+ M backend/bootstrap/app.php
+ M backend/config/reverb.php
+ M backend/config/scramble.php
+ M backend/routes/console.php
+?? .env.production.example
+?? backend/Dockerfile.production
+?? backend/Dockerfile.production.dockerignore
+?? backend/app/Console/Commands/MonitoringRuntime.php
+?? backend/app/Http/Controllers/HealthController.php
+?? backend/app/Support/WorkerHeartbeat.php
+?? backend/docker/production/
+?? backend/tests/Feature/MonitoringRuntimeTest.php
+?? backend/tests/Feature/ProductionHealthTest.php
+?? compose.production.yml
+?? docs/handover/BE-K05.6-backup-restore-rollback-runbook.md
+?? docs/handover/evidence/be-k05.7/

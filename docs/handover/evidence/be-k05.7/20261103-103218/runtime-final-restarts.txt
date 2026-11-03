@@ -1,0 +1,5 @@
+/tutorlink-k05-prod-app-1 | image=tutorlink-backend:k05-20261103-local | image_id=sha256:51eb59443b1a2fffc155b650ffb42308c2a6f89a703d8c19a713a5e46de0f2df | restarts=0 | restart_policy=unless-stopped
+/tutorlink-k05-prod-outbox-worker-1 | image=tutorlink-backend:k05-20261103-local | image_id=sha256:51eb59443b1a2fffc155b650ffb42308c2a6f89a703d8c19a713a5e46de0f2df | restarts=2 | restart_policy=unless-stopped
+/tutorlink-k05-prod-slack-worker-1 | image=tutorlink-backend:k05-20261103-local | image_id=sha256:51eb59443b1a2fffc155b650ffb42308c2a6f89a703d8c19a713a5e46de0f2df | restarts=3 | restart_policy=unless-stopped
+/tutorlink-k05-prod-broadcast-worker-1 | image=tutorlink-backend:k05-20261103-local | image_id=sha256:51eb59443b1a2fffc155b650ffb42308c2a6f89a703d8c19a713a5e46de0f2df | restarts=3 | restart_policy=unless-stopped
+/tutorlink-k05-prod-scheduler-1 | image=tutorlink-backend:k05-20261103-local | image_id=sha256:51eb59443b1a2fffc155b650ffb42308c2a6f89a703d8c19a713a5e46de0f2df | restarts=0 | restart_policy=unless-stopped

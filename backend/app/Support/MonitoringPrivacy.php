@@ -12,6 +12,10 @@ final class MonitoringPrivacy
 {
     public static function telescope(IncomingEntry $entry): bool
     {
+        if (request()->is('up', 'health/*')) {
+            return false;
+        }
+
         $content = $entry->content;
 
         $entry->user = null;
@@ -87,6 +91,10 @@ final class MonitoringPrivacy
 
     public static function pulse(Entry|Value $entry): bool
     {
+        if (request()->is('up', 'health/*')) {
+            return false;
+        }
+
         if (! $entry instanceof Entry) {
             return false;
         }

@@ -1,0 +1,11 @@
+SERVICE       #   UID       PID    PPID   C   STIME  TTY  TIME      CMD
+app           1   www-data  22275  22252  0   02:42  ?    00:00:00  /sbin/docker-init -- /usr/local/bin/tutorlink-entrypoint php-fpm -F
+app           1   www-data  22300  22275  0   02:42  ?    00:00:00  php-fpm: master process (/usr/local/etc/php-fpm.conf)
+app           1   www-data  22611  22300  0   02:42  ?    00:00:00  php-fpm: pool www
+app           1   www-data  22613  22300  0   02:42  ?    00:00:00  php-fpm: pool www
+scheduler     1   www-data  22481  22440  0   02:42  ?    00:00:00  /sbin/docker-init -- /usr/local/bin/tutorlink-entrypoint php artisan schedule:work
+scheduler     1   www-data  22512  22481  0   02:42  ?    00:00:05  php artisan schedule:work
+scheduler     1   www-data  81699  22512  0   03:36  ?    00:00:00  sh -c '/usr/local/bin/php' 'artisan' schedule:run
+scheduler     1   www-data  81700  81699  6   03:36  ?    00:00:00  /usr/local/bin/php artisan schedule:run
+slack-worker  1   www-data  22400  22373  0   02:42  ?    00:00:00  /sbin/docker-init -- /usr/local/bin/tutorlink-entrypoint php artisan queue:work database --queue=slack --sleep=1 --tries=10 --timeout=20 --max-time=3600
+slack-worker  1   www-data  22427  22400  0   02:42  ?    00:00:06  php artisan queue:work database --queue=slack --sleep=1 --tries=10 --timeout=20 --max-time=3600

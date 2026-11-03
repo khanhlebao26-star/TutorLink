@@ -1,0 +1,33 @@
+FROM php:8.3-fpm-bookworm AS php-base
+
+RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update \
+    && apt-get install -y --no-install-recommends libpq-dev libzip-dev unzip git \
+    && docker-php-ext-install pdo_pgsql pcntl zip opcache \
+    && rm -rf /var/lib/apt/lists/*
+COPY docker/production/php.ini /usr/local/etc/php/conf.d/production.ini
+WORKDIR /var/www/html
+
+FROM php-base AS build
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-scripts
+COPY . .
+RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && composer dump-autoload --no-dev --classmap-authoritative --no-scripts \
+    && APP_ENV=production APP_DEBUG=false TELESCOPE_ENABLED=false PULSE_ENABLED=false php artisan package:discover --no-interaction \
+    && composer check-platform-reqs --no-dev
+
+FROM php-base AS app
+COPY --from=build /var/www/html /var/www/html
+COPY --chmod=755 docker/production/entrypoint.sh /usr/local/bin/tutorlink-entrypoint
+RUN mkdir -p storage/app/private storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+    && sed -i 's/\r$//' /usr/local/bin/tutorlink-entrypoint \
+    && chown -R www-data:www-data storage bootstrap/cache
+USER www-data
+ENTRYPOINT ["/usr/local/bin/tutorlink-entrypoint"]
+CMD ["php-fpm", "-F"]
+
+FROM caddy:2-alpine AS proxy
+COPY --from=build /var/www/html/public /var/www/html/public
+COPY docker/production/Caddyfile /etc/caddy/Caddyfile

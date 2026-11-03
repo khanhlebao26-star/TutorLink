@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\WorkerHeartbeat;
 use Illuminate\Console\Command;
 
 class WorkNotificationOutbox extends Command
@@ -10,7 +11,7 @@ class WorkNotificationOutbox extends Command
 
     protected $description = 'Continuously poll the notification outbox';
 
-    public function handle(): int
+    public function handle(WorkerHeartbeat $heartbeat): int
     {
         $sleep = filter_var($this->option('sleep'), FILTER_VALIDATE_INT, [
             'options' => ['min_range' => 1, 'max_range' => 30],
@@ -31,6 +32,7 @@ class WorkNotificationOutbox extends Command
         });
 
         do {
+            $heartbeat->beat('outbox-worker');
             $result = $this->call('outbox:process', ['--limit' => $limit]);
 
             if ($result !== self::SUCCESS) {

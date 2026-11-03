@@ -1,0 +1,45 @@
+{
+  "development": {
+    "telescope_enabled": true,
+    "pulse_enabled": true,
+    "rows": {
+      "telescope_entries": 86,
+      "telescope_entries_tags": 17,
+      "telescope_monitoring": 0,
+      "pulse_entries": 8,
+      "pulse_aggregates": 28,
+      "pulse_values": 0
+    },
+    "canary_matches": {
+      "telescope_entries.content": 0,
+      "telescope_entries_tags.tag": 0,
+      "telescope_monitoring.tag": 0,
+      "pulse_entries.key": 0,
+      "pulse_aggregates.key": 0,
+      "pulse_values.key": 0,
+      "pulse_values.value": 0
+    }
+  },
+  "production_profile": {
+    "telescope_enabled": true,
+    "pulse_enabled": true,
+    "rows": {
+      "telescope_entries": 4,
+      "telescope_entries_tags": 3,
+      "telescope_monitoring": 0,
+      "pulse_entries": 10,
+      "pulse_aggregates": 34,
+      "pulse_values": 0
+    },
+    "canary_matches": {
+      "telescope_entries.content": 0,
+      "telescope_entries_tags.tag": 0,
+      "telescope_monitoring.tag": 0,
+      "pulse_entries.key": 0,
+      "pulse_aggregates.key": 0,
+      "pulse_values.key": 0,
+      "pulse_values.value": 0
+    }
+  },
+  "scope": "Counts only for the two synthetic canary strings; no private row contents exported. Empty tables are visible in row counts; full fixture redaction assertions are in focused tests."
+}

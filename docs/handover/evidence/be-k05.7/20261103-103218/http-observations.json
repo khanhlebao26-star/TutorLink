@@ -1,0 +1,77 @@
+[
+  {
+    "case": "baseline-up",
+    "url": "https://localhost:8443/up",
+    "http_status": "200",
+    "exit_code": 0
+  },
+  {
+    "case": "baseline-ready",
+    "url": "https://localhost:8443/health/ready",
+    "http_status": "200",
+    "exit_code": 0
+  },
+  {
+    "case": "guest-telescope-production",
+    "url": "https://localhost:8443/telescope",
+    "http_status": "401",
+    "exit_code": 0
+  },
+  {
+    "case": "guest-pulse-production",
+    "url": "https://localhost:8443/pulse",
+    "http_status": "401",
+    "exit_code": 0
+  },
+  {
+    "case": "worker-within-timeout-ready",
+    "http_status": "200",
+    "exit_code": 0
+  },
+  {
+    "case": "worker-stale-ready",
+    "http_status": "503",
+    "exit_code": 0
+  },
+  {
+    "case": "worker-recovered-ready",
+    "http_status": "200",
+    "exit_code": 0
+  },
+  {
+    "case": "db-transition-up",
+    "http_status": "200",
+    "exit_code": 0,
+    "note": "Request completed after database restart; not counted as outage proof"
+  },
+  {
+    "case": "db-transition-ready",
+    "http_status": "200",
+    "exit_code": 0,
+    "note": "Request completed after database restart; not counted as outage proof"
+  },
+  {
+    "case": "db-recovered-ready",
+    "http_status": "200",
+    "exit_code": 0
+  },
+  {
+    "case": "db-down-up",
+    "http_status": "200",
+    "exit_code": 0,
+    "seconds": 15.77,
+    "db_held_stopped_until_response": true
+  },
+  {
+    "case": "db-down-ready",
+    "http_status": "503",
+    "exit_code": 0,
+    "seconds": 30.82,
+    "db_held_stopped_until_response": true
+  },
+  {
+    "case": "final-ready",
+    "http_status": "200",
+    "exit_code": 0
+  }
+]
