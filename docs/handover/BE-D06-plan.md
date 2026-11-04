@@ -201,9 +201,9 @@ Mỗi run lưu commit, diff/hash nếu dirty, thời gian có offset, image/PHP/
 
   **Đầu ra:** Commit/PR, CI URL, issue update và reviewer result.
 
-  **Hoàn thành khi:** PR review và CI trên revision cuối đạt; Khanh xác nhận các tiêu chí; issue có tình trạng thực. Chưa đăng hoặc chưa review phải ghi đúng trạng thái, không tự tick toàn issue. Lượt tạo contract/plan hiện tại chưa thực hiện publish/review.
+  **Hoàn thành khi:** PR review và CI trên revision cuối đạt; Khanh xác nhận các tiêu chí; issue có tình trạng thực. Chưa đăng hoặc chưa review phải ghi đúng trạng thái, không tự tick toàn issue.
 
-  **Actual result:** PR, CI, issue update and reviewer request are recorded after publication. The task remains open until remote CI passes and Khanh completes the review; no approval is inferred from the earlier D06-07 review.
+  **Actual result (05/11/2026):** Local publication and issue-comment attempts were made under the connected `DungGiaIT` account. The GitHub connector reports repository push permission, but `github_create_blob` and the issue-comment API both returned HTTP 403 `Resource not accessible by integration`; shell `git push` has no username credential and `gh` is unavailable. No branch or PR was published, and the issue update did not post, so remote CI and Khanh's PR review have not started. Evidence: [publication blocker](evidence/be-d06/2026-11-05-0455/publication-blocker.md). D06-15 remains blocked pending GitHub Git Data/Issues write access or authenticated CLI credentials. No action was taken as Khanh.
 
 ## 4. Ánh xạ bốn TODO và acceptance
 
@@ -234,4 +234,4 @@ Trước khi commit artifact: xem diff metadata/JSON và API delta. Sau khi comm
 
 ## 6. Handoff và trạng thái hiện tại
 
-D06-01–11 và D06-13 đã PASS theo evidence. D06-12 có local export/lint/parity/freshness pass nhưng chờ CI remote. D06-14 là release candidate gắn với commit `cb881f02bfde6ddab340eb2c0316781677d73117`, với owner/design blockers còn mở. D06-15 chờ PR publication, issue update, CI và review Khanh; không coi CI/review là pass trước khi có kết quả trên revision cuối. D06-07 review đã xác nhận OK; D06-08 đã PASS.
+D06-01–11 và D06-13 đã PASS theo evidence. D06-12 có local export/lint/parity/freshness pass nhưng chờ CI remote. D06-14 là release candidate gắn với source commit `cb881f02bfde6ddab340eb2c0316781677d73117`, với owner/design blockers còn mở. D06-15 bị chặn ở bước publish và issue update do quyền GitHub connector/shell credential như ghi trong evidence; chưa có PR, remote CI, issue comment hoặc review Khanh. Không coi CI/review là pass trước khi có kết quả trên revision cuối. D06-07 review đã xác nhận OK; D06-08 đã PASS.

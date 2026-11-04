@@ -23,6 +23,7 @@ See [test report](test-report.md), [runtime identity](runtime-identity.md), and 
 
 ## Known follow-up gates
 
+- GitHub publication and issue handoff are blocked: the connected `DungGiaIT` account can read the repository and reports `push: true`, but both Git Data blob creation and issue-comment creation returned HTTP 403 `Resource not accessible by integration`; shell Git has no username credential and `gh` is not installed. No remote branch, PR, issue comment, CI run, or Khanh review request exists yet. See [publication blocker evidence](publication-blocker.md).
 - Remote CI must pass on the final PR revision.
 - Khanh's review must be requested and completed. Local review confirmation for D06-07 was already recorded; this does not replace the PR review gate.
 - The operation inventory has 67 routes whose owner is still unconfirmed. The issue's owner-wide acceptance cannot be marked complete until the endpoint owners are identified and confirm their lane metadata; Dũng coordinates this follow-up.

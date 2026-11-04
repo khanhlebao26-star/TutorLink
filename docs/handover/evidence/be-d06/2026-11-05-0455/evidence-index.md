@@ -10,5 +10,6 @@
 | Regression and coverage | [Test report](test-report.md), [main-based final run log](full-suite-main-base.log), [JUnit/Clover/coverage](coverage/), [Dũng lane source map](source-coverage-lane-dung.csv), [operation-to-test/smoke map](operation-test-smoke-map-dung.csv), [superseded pre-rebase artifacts](coverage-pre-main-rebase/) |
 | OpenAPI | [Generated artifact](../../../../api/openapi.json), [operation/schema delta](openapi-operation-delta.md), [export log](openapi-export-final.log), [route parity](openapi-route-parity-final.log), [Redocly lint](redocly-lint-smoke-final.log), [warning triage](redocly-warning-triage.md) |
 | Runtime identity and release summary | [Runtime identity](runtime-identity.md), [release notes](release-notes.md), [requirement/case matrix](requirement-case-matrix.md) |
+| Publication blocker | [GitHub publication attempt and required access](publication-blocker.md) |
 
-Remote CI and PR review links are added after the PR is created. The [release manifest](release-manifest.json) records the exact tested source commit and artifact hashes.
+No PR or issue comment was created because GitHub Git Data and issue-comment writes are unavailable through the connected integration and shell credentials are absent. Remote CI and PR review links can be added after publication. The [release manifest](release-manifest.json) records the exact tested source commit and artifact hashes.

@@ -111,16 +111,22 @@
   },
   "open_gates": [
     {
+      "id": "github-publication",
+      "status": "blocker",
+      "owner": "DungGiaIT / repository integration",
+      "next": "Enable Git Data/Contents write access on the connected GitHub integration or provide authenticated Git CLI credentials, then publish branch be-d06."
+    },
+    {
       "id": "remote-ci",
       "status": "pending",
       "owner": "Dũng",
-      "next": "Push the final PR revision and wait for all required GitHub Actions checks."
+      "next": "After publication, create the PR and wait for all required GitHub Actions checks."
     },
     {
       "id": "review-khanh",
       "status": "pending",
       "owner": "Khanh",
-      "next": "Request review on the PR and resolve findings."
+      "next": "After PR publication, request review and resolve findings; no review request has been sent."
     },
     {
       "id": "owner-confirmation",
