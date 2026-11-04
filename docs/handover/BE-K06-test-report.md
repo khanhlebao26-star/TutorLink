@@ -1,5 +1,7 @@
 # BE-K06 — Task 1–4: môi trường, PostgreSQL tests và live smoke
 
+Commit chứa test và công cụ smoke: 2ba90470e47629f218da85b99ef59b7361ee8a55
+
 Ngày: 04/11/2026 (Asia/Ho_Chi_Minh). Branch: `be-k06`.
 Issue: https://github.com/khanhlebao26-star/TutorLink/issues/85
 
@@ -27,17 +29,17 @@ Evidence: [runtime cuối](evidence/be-k06/20261104-151838/runtime-final.txt), [
 
 Test dùng project riêng `tutorlink-k06-test`, `compose.testing.yml`, PostgreSQL `tutorlink_test`, user `tutorlink_test_runner`. Script `backend/scripts/test-suite.php --coverage` kiểm tra identity, chuẩn bị legacy preflight, regression, fixtures D04 và race. Không chạy suite phá dữ liệu trên runtime backend hoặc database local `tutorlink`.
 
-| Đợt chạy | Tests | Assertions | Failure / error / skip |
-| --- | ---: | ---: | --- |
-| Baseline | 822 | 7.187 | 0 / 0 / 0 |
-| Cuối, gồm 5 test bổ sung | 827 | 7.227 | 0 / 0 / 0 |
+| Đợt chạy                 | Tests | Assertions | Failure / error / skip |
+| ------------------------ | ----: | ---------: | ---------------------- |
+| Baseline                 |   822 |      7.187 | 0 / 0 / 0              |
+| Cuối, gồm 5 test bổ sung |   827 |      7.227 | 0 / 0 / 0              |
 
-| Nhóm cuối | Tests | Assertions |
-| --- | ---: | ---: |
-| Regression, gồm auth/file/chat/session/outbox/Slack fake | 742 | 5.230 |
-| D04 migration preflight | 7 | 27 |
-| D04 integration | 77 | 1.077 |
-| D04 race harness | 1 | 893 |
+| Nhóm cuối                                                | Tests | Assertions |
+| -------------------------------------------------------- | ----: | ---------: |
+| Regression, gồm auth/file/chat/session/outbox/Slack fake |   742 |      5.230 |
+| D04 migration preflight                                  |     7 |         27 |
+| D04 integration                                          |    77 |      1.077 |
+| D04 race harness                                         |     1 |        893 |
 
 Không lấy số test harness D04 làm số trường hợp race riêng. Các race K03/K04/outbox có testcases trong nhóm regression và inventory.
 
@@ -45,14 +47,14 @@ Coverage toàn source `backend/app`: **93,41% (8.302/8.888)** → **93,58% (8.31
 
 Coverage theo nhóm file: mapping regex và danh sách từng file được ghi minh bạch trong [summary JSON](evidence/be-k06/20261104-151838/test-coverage-summary.json). Đây là thống kê các nhóm file trong báo cáo từ Clover toàn backend, không phải thay filter source để nâng điểm; các file khác vẫn có trong coverage toàn source.
 
-| Nhóm | Baseline | Cuối | Dòng cuối |
-| --- | ---: | ---: | ---: |
-| Auth | 97,28% | 97,28% | 322/331 |
-| Files | 92,12% | 92,12% | 526/571 |
-| Chat | 94,52% | 94,52% | 741/784 |
-| Sessions | 88,94% | 90,50% | 867/958 |
-| Outbox | 91,62% | 91,62% | 547/597 |
-| Slack | 92,27% | 92,27% | 167/181 |
+| Nhóm     | Baseline |   Cuối | Dòng cuối |
+| -------- | -------: | -----: | --------: |
+| Auth     |   97,28% | 97,28% |   322/331 |
+| Files    |   92,12% | 92,12% |   526/571 |
+| Chat     |   94,52% | 94,52% |   741/784 |
+| Sessions |   88,94% | 90,50% |   867/958 |
+| Outbox   |   91,62% | 91,62% |   547/597 |
+| Slack    |   92,27% | 92,27% |   167/181 |
 
 Evidence: [log cuối](evidence/be-k06/20261104-151838/final/full-suite.log), [exit 0](evidence/be-k06/20261104-151838/final/exit-code.txt), [coverage text](evidence/be-k06/20261104-151838/final/coverage/coverage.txt), [Clover](evidence/be-k06/20261104-151838/final/coverage/clover.xml), [case inventory](evidence/be-k06/20261104-151838/final/case-inventory.csv), [danh sách test lỗi, hiện rỗng](evidence/be-k06/20261104-151838/final/failed-tests.csv).
 
@@ -71,13 +73,13 @@ HTML coverage và serialized coverage trung gian được giữ ở `outputs/be-
 File: `backend/tests/Feature/SessionApiTest.php`, `backend/tests/Feature/SessionTransitionApiTest.php`.
 Focused check: **44 tests / 317 assertions**, exit 0. Sau đó chạy lại toàn suite với hai file test được bind read-only vào image test baseline. Source ứng dụng không thay đổi. Pint trên dirty files và danh sách PHP thay đổi đều passed.
 
-| Tình huống acceptance | Evidence test hiện có được chạy lại |
-| --- | --- |
-| Race tạo chat/gửi tin/read cursor | `OpenConversationConcurrencyTest`, `SendTextMessageConcurrencyTest`, `ReadCursorConcurrencyTest` |
-| Race complete/cancel/edit Session và Program | `SessionConcurrencyTest` |
-| Auth/session revocation, role và cross-user | `IdentitySecurityTest`, `IdentitySessionTest`, `PersonalAccessTokenTest`, Session/chat API tests |
-| Outbox rollback, SKIP LOCKED, worker chết, retry/replay | `NotificationOutboxWriterTest`, `ProcessNotificationOutboxTest`, `NotificationOutboxRuntimeTest` |
-| Slack timeout, 429/Retry-After, permanent error, retry exhaustion | `SendSlackOperationalAlertTest` — HTTP fake, không phải Slack thật |
+| Tình huống acceptance                                             | Evidence test hiện có được chạy lại                                                              |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Race tạo chat/gửi tin/read cursor                                 | `OpenConversationConcurrencyTest`, `SendTextMessageConcurrencyTest`, `ReadCursorConcurrencyTest` |
+| Race complete/cancel/edit Session và Program                      | `SessionConcurrencyTest`                                                                         |
+| Auth/session revocation, role và cross-user                       | `IdentitySecurityTest`, `IdentitySessionTest`, `PersonalAccessTokenTest`, Session/chat API tests |
+| Outbox rollback, SKIP LOCKED, worker chết, retry/replay           | `NotificationOutboxWriterTest`, `ProcessNotificationOutboxTest`, `NotificationOutboxRuntimeTest` |
+| Slack timeout, 429/Retry-After, permanent error, retry exhaustion | `SendSlackOperationalAlertTest` — HTTP fake, không phải Slack thật                               |
 
 Không phát hiện lỗi source ứng dụng chặn lane trong các đợt test đã chạy. Lỗi runtime cũ đã xử lý như Task 1. Một lần smoke dừng vì công cụ so sánh mảng PHP theo thứ tự key; đã sửa phép so sánh JSON object, vì PostgreSQL JSONB có thể đổi thứ tự key. Đây là sửa observer, không phải lỗi replay nghiệp vụ; giữ lại evidence lần dừng để phân biệt.
 
