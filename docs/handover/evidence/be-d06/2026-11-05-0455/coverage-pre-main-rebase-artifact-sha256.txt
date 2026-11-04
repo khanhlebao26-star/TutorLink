@@ -1,0 +1,6 @@
+49e1edef997c8d0f96231cacb0a59c4ce2e0bbf2b2089fb2cbc12cacf6ee5752  docs/handover/evidence/be-d06/2026-11-05-0455/coverage-pre-main-rebase/clover.xml
+342b20f1df8a15145844c28e98d4b0faafc232220c6af4f3f398073b08581d97  docs/handover/evidence/be-d06/2026-11-05-0455/coverage-pre-main-rebase/coverage.txt
+db6cb3ac24a4d70fcb5195a12199db43497284e7635a4b3e555659d62b75652c  docs/handover/evidence/be-d06/2026-11-05-0455/coverage-pre-main-rebase/d04-junit.xml
+f3d76b42d4774dce63a0d8e2eafd6684915a86e84f3297f5d397810e4ae8c83f  docs/handover/evidence/be-d06/2026-11-05-0455/coverage-pre-main-rebase/d04-preflight-junit.xml
+ca1cd6d024fec5113c92f09a4f335148213f50f06280e9b40c3b22a35397f88f  docs/handover/evidence/be-d06/2026-11-05-0455/coverage-pre-main-rebase/d04-race-junit.xml
+179f19c5f33f5ca04734fc32a0e00d709a80103e298eae96ec065b0cfc8001db  docs/handover/evidence/be-d06/2026-11-05-0455/coverage-pre-main-rebase/regression-junit.xml

@@ -1,0 +1,388 @@
+
+
+Code Coverage Report:
+  2026-11-04 23:21:33
+
+ Summary:
+  Classes: 61.78% (118/191)
+  Methods: 79.97% (479/599)
+  Lines:   93.42% (8321/8907)
+
+App\Actions\Accounts\ChangeAccountStatus
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 18/ 18)
+App\Actions\Admin\ReadAdminDashboard
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 24/ 24)
+App\Actions\Auth\RevokeUserSessions
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 31/ 31)
+App\Actions\Files\CompleteFile
+  Methods:  25.00% ( 1/ 4)   Lines:  85.42% (164/192)
+App\Actions\Fortify\CreateNewUser
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 15/ 15)
+App\Actions\Fortify\PasswordValidationRules
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Actions\Fortify\ResetUserPassword
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 11/ 11)
+App\Actions\Fortify\UpdateUserPassword
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 42/ 42)
+App\Actions\Fortify\UpdateUserProfileInformation
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  5/  5)
+App\Actions\Invitations\AcceptInvitation
+  Methods:  80.00% ( 4/ 5)   Lines:  96.77% (240/248)
+App\Actions\Invitations\ResolveInvitation
+  Methods:  33.33% ( 1/ 3)   Lines:  89.06% ( 57/ 64)
+App\Actions\Invitations\SendInvitation
+  Methods:  50.00% ( 1/ 2)   Lines:  90.48% (190/210)
+App\Actions\Messaging\AdvanceReadCursor
+  Methods:  50.00% ( 1/ 2)   Lines:  93.33% ( 42/ 45)
+App\Actions\Messaging\IssueConversationRealtime
+  Methods:   0.00% ( 0/ 1)   Lines:  72.34% ( 34/ 47)
+App\Actions\Messaging\OpenConversation
+  Methods:  50.00% ( 1/ 2)   Lines:  91.49% (129/141)
+App\Actions\Messaging\ReadConversations
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 61/ 61)
+App\Actions\Messaging\SendTextMessage
+  Methods:  75.00% ( 3/ 4)   Lines:  93.26% ( 83/ 89)
+App\Actions\Messaging\SyncConversationLifecycle
+  Methods:   0.00% ( 0/ 1)   Lines:  93.33% ( 56/ 60)
+App\Actions\Programs\CreateProgramDraft
+  Methods:   0.00% ( 0/ 1)   Lines:  82.86% ( 87/105)
+App\Actions\Programs\TransitionProgram
+  Methods:  66.67% ( 2/ 3)   Lines:  91.39% (138/151)
+App\Actions\Programs\UpdateProgramDraft
+  Methods:   0.00% ( 0/ 1)   Lines:  93.58% (102/109)
+App\Actions\Reports\AssignReport
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 19/ 19)
+App\Actions\Reports\DecideReport
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 13/ 13)
+App\Actions\Sessions\SaveSession
+  Methods:  50.00% ( 1/ 2)   Lines:  86.36% (247/286)
+App\Actions\Sessions\TransitionSession
+  Methods:  50.00% ( 1/ 2)   Lines:  85.44% (270/316)
+App\Actions\TutorProfiles\AssignTutorProfile
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 24/ 24)
+App\Actions\TutorProfiles\DecideTutorProfile
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 44/ 44)
+App\Actions\TutorProfiles\DecideVerificationDocument
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 24/ 24)
+App\Actions\TutorProfiles\SubmitTutorProfile
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 35/ 35)
+App\Actions\TutorProfiles\SuspendTutorProfile
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 42/ 42)
+App\Console\Commands\ExpireProgramInvitations
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 15/ 15)
+App\Console\Commands\MonitorNotificationOutbox
+  Methods:   0.00% ( 0/ 1)   Lines:  80.00% ( 20/ 25)
+App\Console\Commands\MonitoringRuntime
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 30/ 30)
+App\Console\Commands\ProcessNotificationOutbox
+  Methods:  50.00% ( 3/ 6)   Lines:  91.25% (146/160)
+App\Console\Commands\PurgeNotificationData
+  Methods:  50.00% ( 1/ 2)   Lines:  97.14% ( 68/ 70)
+App\Console\Commands\WorkNotificationOutbox
+  Methods:   0.00% ( 0/ 1)   Lines:  72.73% ( 16/ 22)
+App\Events\ConversationMessagesChanged
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Exceptions\InvitationAcceptException
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Exceptions\ProgramActionException
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Exceptions\SessionActionException
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Http\Controllers\Api\V1\AdminController
+  Methods:  83.33% (15/18)   Lines:  95.45% (126/132)
+App\Http\Controllers\Api\V1\AdminDashboardController
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  3/  3)
+App\Http\Controllers\Api\V1\AnnouncementController
+  Methods:  69.23% ( 9/13)   Lines:  98.49% (326/331)
+App\Http\Controllers\Api\V1\AuditLogController
+  Methods: 100.00% ( 5/ 5)   Lines: 100.00% ( 47/ 47)
+App\Http\Controllers\Api\V1\AuthController
+  Methods:  80.00% ( 8/10)   Lines:  94.51% ( 86/ 91)
+App\Http\Controllers\Api\V1\AvailabilityRuleController
+  Methods:  25.00% ( 1/ 4)   Lines:  50.82% ( 31/ 61)
+App\Http\Controllers\Api\V1\CatalogController
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 31/ 31)
+App\Http\Controllers\Api\V1\ConversationController
+  Methods: 100.00% ( 7/ 7)   Lines: 100.00% (119/119)
+App\Http\Controllers\Api\V1\ConversationRealtimeController
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  5/  5)
+App\Http\Controllers\Api\V1\FeeRecordController
+  Methods:  77.27% (17/22)   Lines:  97.89% (324/331)
+App\Http\Controllers\Api\V1\FileController
+  Methods:  83.33% ( 5/ 6)   Lines:  98.30% (173/176)
+App\Http\Controllers\Api\V1\InvitationAcceptController
+  Methods:  50.00% ( 1/ 2)   Lines:  88.24% ( 45/ 51)
+App\Http\Controllers\Api\V1\InvitationController
+  Methods:  42.86% ( 3/ 7)   Lines:  80.77% ( 63/ 78)
+App\Http\Controllers\Api\V1\ListingController
+  Methods:  62.50% ( 5/ 8)   Lines:  85.31% (209/245)
+App\Http\Controllers\Api\V1\NotificationOutboxController
+  Methods:  66.67% ( 2/ 3)   Lines:  99.17% (119/120)
+App\Http\Controllers\Api\V1\PersonalAccessTokenController
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% ( 36/ 36)
+App\Http\Controllers\Api\V1\ProgramController
+  Methods:  61.54% ( 8/13)   Lines:  94.06% ( 95/101)
+App\Http\Controllers\Api\V1\ProgramOverviewController
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 73/ 73)
+App\Http\Controllers\Api\V1\ProgressRecordController
+  Methods:  83.33% ( 5/ 6)   Lines:  99.02% (101/102)
+App\Http\Controllers\Api\V1\PublicTutorController
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 26/ 26)
+App\Http\Controllers\Api\V1\PublicTutorReviewController
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 59/ 59)
+App\Http\Controllers\Api\V1\ReportController
+  Methods:  84.62% (11/13)   Lines:  96.09% (123/128)
+App\Http\Controllers\Api\V1\ReviewController
+  Methods:  85.71% ( 6/ 7)   Lines:  98.28% ( 57/ 58)
+App\Http\Controllers\Api\V1\SessionController
+  Methods:  88.89% ( 8/ 9)   Lines:  94.44% (102/108)
+App\Http\Controllers\Api\V1\TaskController
+  Methods:  84.62% (22/26)   Lines:  97.67% (294/301)
+App\Http\Controllers\Api\V1\TutorProfileController
+  Methods:  50.00% ( 3/ 6)   Lines:  93.33% ( 84/ 90)
+App\Http\Controllers\BroadcastAuthController
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Http\Controllers\HealthController
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 15/ 15)
+App\Http\Middleware\EnsureActiveAccount
+  Methods:   0.00% ( 0/ 1)   Lines:  75.00% ( 12/ 16)
+App\Http\Middleware\EnsureActiveApiActor
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 36/ 36)
+App\Http\Middleware\EnsureMonitoringActor
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  4/  4)
+App\Http\Middleware\MarketplaceCacheControl
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 23/ 23)
+App\Http\Middleware\NormalizeBeD04Request
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% ( 27/ 27)
+App\Http\Requests\AdminDecisionRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  4/  4)
+App\Http\Requests\AnnouncementIndexRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 18/ 18)
+App\Http\Requests\AnnouncementShowRequest
+  Methods:  75.00% ( 3/ 4)   Lines:  94.74% ( 18/ 19)
+App\Http\Requests\AssignTutorProfileRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  7/  7)
+App\Http\Requests\AttachTutorAvatarRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  5/  5)
+App\Http\Requests\AvailabilityRuleRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 22/ 22)
+App\Http\Requests\BeD04ApiRequest
+  Methods:  75.00% ( 3/ 4)   Lines:  92.59% ( 25/ 27)
+App\Http\Requests\CancelSessionRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  9/  9)
+App\Http\Requests\CompleteSessionRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  3/  3)
+App\Http\Requests\ConversationBroadcastAuthRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 15/ 15)
+App\Http\Requests\CreatePersonalAccessTokenRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 12/ 12)
+App\Http\Requests\CreateProgramRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 39/ 39)
+App\Http\Requests\CreateSessionRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Http\Requests\FeeRecordIndexRequest
+  Methods:  50.00% ( 2/ 4)   Lines:  89.47% ( 17/ 19)
+App\Http\Requests\FeeRecordShowRequest
+  Methods:  66.67% ( 2/ 3)   Lines:  87.50% (  7/  8)
+App\Http\Requests\FeeRecordWriteRequest
+  Methods:  33.33% ( 1/ 3)   Lines:  88.46% ( 23/ 26)
+App\Http\Requests\FileLinkRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 10/ 10)
+App\Http\Requests\FileUploadRequest
+  Methods:  50.00% ( 1/ 2)   Lines:  93.33% ( 28/ 30)
+App\Http\Requests\ForgotPasswordRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  4/  4)
+App\Http\Requests\InvitationDecisionRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  2/  2)
+App\Http\Requests\InvitationIndexRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  5/  5)
+App\Http\Requests\IssueConversationRealtimeRequest
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 16/ 16)
+App\Http\Requests\LoginRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  6/  6)
+App\Http\Requests\MarkFeeRecordPaidRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  4/  4)
+App\Http\Requests\MarkFeeRecordUnpaidRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  4/  4)
+App\Http\Requests\OpenConversationRequest
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 16/ 16)
+App\Http\Requests\OverviewRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Http\Requests\ProgramActionRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  2/  2)
+App\Http\Requests\ProgramApiRequest
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 17/ 17)
+App\Http\Requests\ProgramIndexRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  5/  5)
+App\Http\Requests\ProgressRecordIndexRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 11/ 11)
+App\Http\Requests\PublishAnnouncementRequest
+  Methods:  60.00% ( 3/ 5)   Lines:  78.95% ( 15/ 19)
+App\Http\Requests\RegisterRequest
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% ( 20/ 20)
+App\Http\Requests\ResetPasswordRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  7/  7)
+App\Http\Requests\SendInvitationRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  2/  2)
+App\Http\Requests\SendTextMessageRequest
+  Methods: 100.00% ( 5/ 5)   Lines: 100.00% ( 42/ 42)
+App\Http\Requests\SessionApiRequest
+  Methods:  85.71% ( 6/ 7)   Lines:  88.97% (121/136)
+App\Http\Requests\StoreAnnouncementRequest
+  Methods:  66.67% ( 2/ 3)   Lines:  94.44% ( 17/ 18)
+App\Http\Requests\StoreFeeRecordRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  8/  8)
+App\Http\Requests\StoreProgressRecordRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 12/ 12)
+App\Http\Requests\TutorProfileDecisionRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  5/  5)
+App\Http\Requests\TutorProfileRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 18/ 18)
+App\Http\Requests\UpdateAnnouncementRequest
+  Methods:  33.33% ( 1/ 3)   Lines:  67.86% ( 19/ 28)
+App\Http\Requests\UpdateFeeRecordRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  5/  5)
+App\Http\Requests\UpdateListingRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 22/ 22)
+App\Http\Requests\UpdateMeRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  4/  4)
+App\Http\Requests\UpdatePasswordRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  6/  6)
+App\Http\Requests\UpdateProgramRequest
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% ( 32/ 32)
+App\Http\Requests\UpdateProgressRecordRequest
+  Methods:  33.33% ( 1/ 3)   Lines:  65.00% ( 13/ 20)
+App\Http\Requests\UpdateReadCursorRequest
+  Methods:  75.00% ( 3/ 4)   Lines:  95.83% ( 23/ 24)
+App\Http\Requests\UpdateSessionRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 16/ 16)
+App\Http\Requests\VerificationDocumentDecisionRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  2/  2)
+App\Http\Requests\VerificationDocumentRequest
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  6/  6)
+App\Http\Requests\VoidFeeRecordRequest
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  4/  4)
+App\Http\Resources\AnnouncementResource
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 23/ 23)
+App\Http\Resources\ConversationReadResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 16/ 16)
+App\Http\Resources\ConversationResource
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 11/ 11)
+App\Http\Resources\FeeRecordResource
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 24/ 24)
+App\Http\Resources\FileResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 14/ 14)
+App\Http\Resources\InvitationResource
+  Methods:  75.00% ( 3/ 4)   Lines:  92.86% ( 65/ 70)
+App\Http\Resources\ListingResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 45/ 45)
+App\Http\Resources\MessageResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  9/  9)
+App\Http\Resources\ProgramResource
+  Methods:  50.00% ( 1/ 2)   Lines:  97.22% ( 35/ 36)
+App\Http\Resources\ProgressRecordResource
+  Methods:  50.00% ( 1/ 2)   Lines:  94.12% ( 16/ 17)
+App\Http\Resources\PublicTutorResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 37/ 37)
+App\Http\Resources\ReadCursorResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  6/  6)
+App\Http\Resources\SessionResource
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 34/ 34)
+App\Http\Resources\TutorProfileResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 21/ 21)
+App\Http\Resources\UserResource
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 15/ 15)
+App\Jobs\BroadcastConversationChanged
+  Methods:  66.67% ( 2/ 3)   Lines:  97.67% ( 42/ 43)
+App\Jobs\SendSlackOperationalAlert
+  Methods:  62.50% ( 5/ 8)   Lines:  92.27% (167/181)
+App\Models\Announcement
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 10/ 10)
+App\Models\AvailabilityRule
+  Methods:  50.00% ( 1/ 2)   Lines:  75.00% (  3/  4)
+App\Models\Category
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Models\Conversation
+  Methods:  75.00% ( 3/ 4)   Lines:  78.95% ( 15/ 19)
+App\Models\FeeRecord
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  8/  8)
+App\Models\File
+  Methods:  60.00% ( 3/ 5)   Lines:  84.21% ( 16/ 19)
+App\Models\LessonSession
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  9/  9)
+App\Models\Message
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 17/ 17)
+App\Models\Program
+  Methods: 100.00% ( 5/ 5)   Lines: 100.00% ( 41/ 41)
+App\Models\ProgramSession
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% ( 14/ 14)
+App\Models\ProgressRecord
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  7/  7)
+App\Models\ServiceListing
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 33/ 33)
+App\Models\Specialization
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  1/  1)
+App\Models\Subcategory
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  2/  2)
+App\Models\TutorProfile
+  Methods:  88.89% ( 8/ 9)   Lines:  96.97% ( 32/ 33)
+App\Models\User
+  Methods: 100.00% ( 7/ 7)   Lines: 100.00% ( 25/ 25)
+App\Models\VerificationDocument
+  Methods:  66.67% ( 2/ 3)   Lines:  66.67% (  2/  3)
+App\Policies\ProgramPolicy
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% (  6/  6)
+App\Policies\ProgramSessionPolicy
+  Methods: 100.00% ( 8/ 8)   Lines: 100.00% ( 26/ 26)
+App\Policies\ReportPolicy
+  Methods: 100.00% ( 3/ 3)   Lines: 100.00% (  5/  5)
+App\Policies\TutorProfilePolicy
+  Methods:  80.00% ( 4/ 5)   Lines:  77.78% (  7/  9)
+App\Providers\AppServiceProvider
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 49/ 49)
+App\Providers\FortifyServiceProvider
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% (  5/  5)
+App\Providers\MonitoringServiceProvider
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 41/ 41)
+App\Support\AdminAuthorization
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  3/  3)
+App\Support\AdminPermissions
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 21/ 21)
+App\Support\AnnouncementFileAccess
+  Methods:  50.00% ( 1/ 2)   Lines:  88.89% ( 96/108)
+App\Support\ApiErrorResponse
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 13/ 13)
+App\Support\BeD04Workspace
+  Methods:  77.78% ( 7/ 9)   Lines:  90.57% ( 96/106)
+App\Support\InvitationTransitionWriter
+  Methods: 100.00% ( 4/ 4)   Lines: 100.00% ( 69/ 69)
+App\Support\MessagingCursor
+  Methods:  66.67% ( 2/ 3)   Lines:  84.85% ( 28/ 33)
+App\Support\MonitoringAlerts
+  Methods:  66.67% ( 4/ 6)   Lines:  96.97% (128/132)
+App\Support\MonitoringPrivacy
+  Methods:  50.00% ( 2/ 4)   Lines:  95.70% ( 89/ 93)
+App\Support\NotificationOutboxAlerts
+  Methods:  66.67% ( 2/ 3)   Lines:  97.14% (102/105)
+App\Support\NotificationOutboxWriter
+  Methods:   0.00% ( 0/ 1)   Lines:  80.00% ( 76/ 95)
+App\Support\PublicCatalogCache
+  Methods:   0.00% ( 0/ 1)   Lines:  88.89% (  8/  9)
+App\Support\RealtimeSessionChannels
+  Methods:  70.00% ( 7/10)   Lines:  96.18% (126/131)
+App\Support\TaskSubmissionRequestHash
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% (  7/  7)
+App\Support\TrustWorkflow
+  Methods:  83.33% (10/12)   Lines:  89.80% ( 44/ 49)
+App\Support\TutorEligibility
+  Methods: 100.00% ( 1/ 1)   Lines: 100.00% ( 28/ 28)
+App\Support\TutorProfileChecklist
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 24/ 24)
+App\Support\TutorProfileRevisions
+  Methods: 100.00% ( 2/ 2)   Lines: 100.00% ( 36/ 36)
+App\Support\TutorProfileWorkflow
+  Methods: 100.00% ( 5/ 5)   Lines: 100.00% ( 26/ 26)
+App\Support\WorkerHeartbeat
+  Methods:  66.67% ( 2/ 3)   Lines:  96.55% ( 28/ 29)
+App\Support\ZipScanGuard
+  Methods:  66.67% ( 2/ 3)   Lines:  93.08% (121/130)

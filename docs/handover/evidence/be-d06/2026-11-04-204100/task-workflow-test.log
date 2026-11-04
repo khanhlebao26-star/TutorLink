@@ -1,0 +1,23 @@
+ Container tutorlink-d06-test-backend-test-run-30a6c06809b5 Creating
+ Container tutorlink-d06-test-backend-test-run-30a6c06809b5 Created
+
+  [31;1m⨯[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\TaskWorkflowApiTest[22m [90m>[39m it paginates Task lists and S…
+[39;1m  Failed to assert that the response count matched the expected 1
+Failed asserting that actual size 0 matches expected size 1.[39;22m
+
+  at [32mtests/Feature/TaskWorkflowApiTest.php[39m:[32m38[39m
+     34▕         ->assertJsonPath('meta.total', 21)
+     35▕         ->assertJsonPath('meta.last_page', 2)
+     36▕         ->assertJsonPath('data.0.id', $taskIds[0]);
+     37▕     $this->getJson("/api/v1/programs/{$program}/tasks?page=2&per_page=50")
+  ➜  38▕         ->assertOk()->assertJsonCount(1, 'data')
+     39▕         ->assertJsonPath('meta.current_page', 2)
+     40▕         ->assertJsonPath('meta.per_page', 50)
+     41▕         ->assertJsonPath('data.0.id', $taskIds[20]);
+     42▕     $this->getJson("/api/v1/programs/{$program}/tasks?per_page=51")->assertUnprocessable();
+
+
+  [90mTests:[39m    [31;1m1 failed[39;22m[90m,[39m[39m [39m[32;1m13 passed[39;22m[90m (261 assertions)[39m
+  [90mDuration:[39m [39m1.65s[39m

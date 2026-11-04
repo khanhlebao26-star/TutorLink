@@ -1,0 +1,2 @@
+NAME                           IMAGE                COMMAND                  SERVICE   CREATED         STATUS                   PORTS
+tutorlink-d06-test-test-db-1   postgres:16-alpine   "docker-entrypoint.s…"   test-db   4 minutes ago   Up 4 minutes (healthy)   5432/tcp

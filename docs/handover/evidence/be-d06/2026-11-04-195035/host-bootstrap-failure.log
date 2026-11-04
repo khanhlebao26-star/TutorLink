@@ -1,0 +1,20 @@
+
+   Error
+
+  Class "Laravel\Telescope\Telescope" not found
+
+  at app/Providers/MonitoringServiceProvider.php:30
+     26▕     {
+     27▕         $this->app->singleton(MonitoringAlerts::class);
+     28▕         $this->app->singleton(WorkerHeartbeat::class);
+     29▕
+  ➜  30▕         Telescope::filter(MonitoringPrivacy::telescope(...));
+     31▕         Pulse::filter(MonitoringPrivacy::pulse(...));
+     32▕     }
+     33▕
+     34▕     public function boot(): void
+
+      [2m+8 vendor frames [22m
+
+  9   artisan:16
+      Illuminate\Foundation\Application::handleCommand()

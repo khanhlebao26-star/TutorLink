@@ -1,0 +1,81 @@
+time="2026-11-05T05:04:32+07:00" level=warning msg="Found orphan containers (tutorlink-scheduler-1, tutorlink-broadcast-worker-1, tutorlink-slack-worker-1, tutorlink-outbox-worker-1, tutorlink-backend-1, tutorlink-pgadmin-1, tutorlink-db-1, tutorlink-frontend-1, tutorlink-mailpit-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-test-db-1 Running
+ Image tutorlink-h01-backend-test:local Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 612B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 1.13kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 DONE 0.7s
+
+#4 [internal] load metadata for docker.io/library/composer:2
+#4 DONE 0.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 FROM docker.io/library/composer:2@sha256:5190d9b445add2fa26090108273cb1ef1e1af98175201c737b85b3c4f90fbf7c
+#6 resolve docker.io/library/composer:2@sha256:5190d9b445add2fa26090108273cb1ef1e1af98175201c737b85b3c4f90fbf7c 0.0s done
+#6 DONE 0.0s
+
+#7 [stage-0  1/10] FROM docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a
+#7 resolve docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 81.66kB 0.0s done
+#8 DONE 0.0s
+
+#9 [stage-0  5/10] WORKDIR /var/www/html
+#9 CACHED
+
+#10 [stage-0  6/10] COPY composer.json composer.lock ./
+#10 CACHED
+
+#11 [stage-0  8/10] COPY . .
+#11 CACHED
+
+#12 [stage-0  3/10] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#12 CACHED
+
+#13 [stage-0  9/10] RUN APP_ENV=testing APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= php artisan package:discover --ansi
+#13 CACHED
+
+#14 [stage-0  2/10] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev libicu-dev     && docker-php-ext-install pdo_pgsql zip intl     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#14 CACHED
+
+#15 [stage-0  4/10] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#15 CACHED
+
+#16 [stage-0  7/10] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#16 CACHED
+
+#17 [stage-0 10/10] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#17 CACHED
+
+#18 exporting to image
+#18 exporting layers done
+#18 exporting manifest sha256:9bbb33b530bfe385aeab76722b12b628d9de965a2d16835a30edb1687f1f4e4c done
+#18 exporting config sha256:1d499ca10ab324f9e2df62ed0445372b57c34117814e7f902767e9b464115441 done
+#18 exporting attestation manifest sha256:9b9150cc45b36c82212a07eecb6cb6d43c9b847eaf3eb525bf81c3725f9a6529 done
+#18 exporting manifest list sha256:31f2fe9b03f8a023c95135044eaa1dc03e39cdf24a2d75275539d16c51f9d70a done
+#18 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#18 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#18 DONE 0.0s
+
+#19 resolving provenance for metadata file
+#19 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built
+ Container tutorlink-test-db-1 Waiting
+ Container tutorlink-test-db-1 Healthy
+ Container tutorlink-backend-test-run-d96d65dfad8a Creating
+ Container tutorlink-backend-test-run-d96d65dfad8a Created
+
+   INFO  Nothing to migrate.
+
+OpenAPI document exported to ../docs/api/openapi.json.

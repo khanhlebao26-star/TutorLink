@@ -1,0 +1,8 @@
+time="2026-11-05T04:50:07+07:00" level=warning msg="Found orphan containers (tutorlink-scheduler-1, tutorlink-broadcast-worker-1, tutorlink-slack-worker-1, tutorlink-outbox-worker-1, tutorlink-backend-1, tutorlink-pgadmin-1, tutorlink-db-1, tutorlink-frontend-1, tutorlink-mailpit-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-test-db-1 Running
+ Image tutorlink-h01-backend-test:local Building
+ Image tutorlink-h01-backend-test:local Built
+ Container tutorlink-test-db-1 Waiting
+ Container tutorlink-test-db-1 Healthy
+ Container tutorlink-backend-test-run-c9cd2d0e9d12 Creating
+ Container tutorlink-backend-test-run-c9cd2d0e9d12 Created

@@ -15,7 +15,7 @@ Operation/schema detail: [OpenAPI operation and schema delta](openapi-operation-
 ## Runtime and test result
 
 - Synthetic fixtures are reproducible in a disposable PostgreSQL test project and expose aliases rather than stable numeric IDs to FE examples.
-- Final grouped regression: 831 tests / 7,366 assertions; zero failures, errors, or skips.
+- Final grouped regression on the main-based D06 commit: 826 tests / 7,324 assertions; zero failures, errors, or skips.
 - Live loopback cookie/CSRF HTTP smoke: 26/26 passed, with a database snapshot for Task/Submission/replay/feedback state.
 - OpenAPI: 123/123 route parity, deterministic export hash, Redocly zero errors and 52 classified warnings.
 

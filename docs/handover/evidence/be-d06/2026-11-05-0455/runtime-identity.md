@@ -1,6 +1,6 @@
 # BE-D06 — Runtime identity
 
-Captured on 05/11/2026 (Asia/Ho_Chi_Minh) from the isolated `tutorlink-d06-smoke` Compose project.
+Captured on 05/11/2026 (Asia/Ho_Chi_Minh) from the isolated `tutorlink-d06-smoke` Compose project. The tested D06 source revision is `cb881f02bfde6ddab340eb2c0316781677d73117`, based on main `fb54886617524e43727705f7f6ee86bed4135ef9`.
 
 | Component | Identity and state |
 | --- | --- |

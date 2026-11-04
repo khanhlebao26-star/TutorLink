@@ -1,0 +1,653 @@
+time="2026-11-05T04:51:01+07:00" level=warning msg="Found orphan containers (tutorlink-scheduler-1, tutorlink-broadcast-worker-1, tutorlink-slack-worker-1, tutorlink-outbox-worker-1, tutorlink-backend-1, tutorlink-pgadmin-1, tutorlink-db-1, tutorlink-frontend-1, tutorlink-mailpit-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-test-db-1 Running
+ Image tutorlink-h01-backend-test:local Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 612B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 1.01kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 DONE 0.8s
+
+#4 [internal] load metadata for docker.io/library/composer:2
+#4 DONE 0.9s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a
+#6 resolve docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a 0.0s done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:2@sha256:5190d9b445add2fa26090108273cb1ef1e1af98175201c737b85b3c4f90fbf7c
+#7 resolve docker.io/library/composer:2@sha256:5190d9b445add2fa26090108273cb1ef1e1af98175201c737b85b3c4f90fbf7c 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 27.86kB done
+#8 DONE 0.0s
+
+#9 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#9 CACHED
+
+#10 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#10 CACHED
+
+#11 [stage-0 6/9] COPY composer.json composer.lock ./
+#11 CACHED
+
+#12 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev libicu-dev     && docker-php-ext-install pdo_pgsql zip intl     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [stage-0 5/9] WORKDIR /var/www/html
+#13 CACHED
+
+#14 [stage-0 8/9] COPY . .
+#14 CACHED
+
+#15 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#15 CACHED
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:13ac997e2598a232b83598803c7542bc57817fb8c567a9f2d56a2159360f3e6d done
+#17 exporting config sha256:cfce3e7d592ed31bd1a71454a4841d99b2b2814cf3a2c5689b2880aed1e22b29 done
+#17 exporting attestation manifest sha256:627bea6d05353a4467f948321aab074c6828f451b47426dacc6a6db50e3b1e71 done
+#17 exporting manifest list sha256:a1bdd13bce63555ab9714a7da58ce3b16d58fe2b348ffe62743ad04639cc414d done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#17 DONE 0.0s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built
+ Container tutorlink-test-db-1 Waiting
+ Container tutorlink-test-db-1 Healthy
+ Container tutorlink-backend-test-run-f05b9a7e30b9 Creating
+ Container tutorlink-backend-test-run-f05b9a7e30b9 Created
+SAFE: test database identity verified. driver=pgsql config_cache=absent configured_host=test-db database=tutorlink_test username=tutorlink_test_runner server_address=172.22.0.3
+
+  Dropping all tables .......................................... 122.42ms DONE
+
+   INFO  Preparing database.
+
+  Creating migration table ....................................... 5.06ms DONE
+
+   INFO  Running migrations.
+
+  0001_01_01_000000_create_users_table ........................... 7.89ms DONE
+  0001_01_01_000001_create_cache_table ........................... 3.42ms DONE
+  0001_01_01_000002_create_jobs_table ............................ 6.64ms DONE
+  2026_10_06_155651_create_personal_access_tokens_table .......... 2.94ms DONE
+  2026_10_07_000050_create_sessions_table ........................ 0.53ms DONE
+  2026_10_07_000100_extend_users_and_create_files_table .......... 8.06ms DONE
+  2026_10_07_000200_create_identity_and_catalog_tables .......... 38.17ms DONE
+  2026_10_07_000300_create_messaging_tables ..................... 13.57ms DONE
+  2026_10_07_000400_create_program_and_learning_tables .......... 40.87ms DONE
+  2026_10_07_000500_create_operations_and_trust_tables .......... 31.20ms DONE
+  2026_10_07_000600_add_purpose_to_files_table ................... 0.94ms DONE
+  2026_10_07_000700_add_admin_approval_fields .................... 1.91ms DONE
+  2026_10_07_000700_add_tutor_onboarding_file_links .............. 1.23ms DONE
+  2026_10_12_000800_align_identity_status_constraints ............ 4.07ms DONE
+  2026_10_13_162057_add_public_slug_to_tutor_profiles_table ...... 2.38ms DONE
+  2026_10_20_075315_align_user_and_tutor_profile_statuses ........ 6.19ms DONE
+  2026_10_20_101959_add_two_factor_columns_to_users_table ........ 0.84ms DONE
+  2026_10_20_102000_create_passkeys_table ........................ 8.30ms DONE
+  2026_10_22_000000_align_program_schema_with_domain_design ..... 12.64ms DONE
+  2026_10_22_073014_add_admin_assignment_columns_to_tutor_profiles_and_reports  6.64ms DONE
+  2026_10_22_073015_create_notification_outbox_and_add_event_key_to_notifications  5.30ms DONE
+  2026_10_22_073016_add_submission_versioning_and_idempotency .... 9.08ms DONE
+  2026_10_22_080000_enforce_utc_timestamps_and_vnd_currency ..... 27.63ms DONE
+  2026_10_25_000000_preserve_outbox_timestamp_precision .......... 6.26ms DONE
+  2026_10_26_212524_add_invitation_acceptance_support_tables ..... 9.84ms DONE
+  2026_10_27_074546_add_h02_approval_support ..................... 7.36ms DONE
+  2026_10_28_034616_align_messaging_contract ..................... 4.42ms DONE
+  2026_10_28_140000_prepare_message_sending ...................... 1.59ms DONE
+  2026_10_28_200000_add_file_scan_evidence ....................... 1.20ms DONE
+  2026_10_30_180000_create_realtime_sessions_table ............... 3.79ms DONE
+  2026_11_01_014629_add_version_and_terminal_replay_to_program_sessions  2.49ms DONE
+  2026_11_01_023131_preserve_program_session_timestamp_precision . 2.80ms DONE
+
+
+   INFO  Seeding database.
+
+  Database\Seeders\BeD04FixtureSeeder ................................ RUNNING
+BE-D04 fixtures ready: 8 actors, 4 Programs, 59 Fees, 55 Progress records, 4 Announcements, 5 files.
+  Database\Seeders\BeD04FixtureSeeder ............................ 373 ms DONE
+
+
+=== d04-preflight ===
+
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+
+  [90mTests:[39m    [32;1m7 passed[39;22m[90m (27 assertions)[39m
+  [90mDuration:[39m [39m1.22s[39m
+
+
+  Dropping all tables ........................................... 98.07ms DONE
+
+   INFO  Preparing database.
+
+  Creating migration table ....................................... 4.98ms DONE
+
+   INFO  Running migrations.
+
+  0001_01_01_000000_create_users_table ........................... 9.58ms DONE
+  0001_01_01_000001_create_cache_table ........................... 3.01ms DONE
+  0001_01_01_000002_create_jobs_table ............................ 7.56ms DONE
+  2026_10_06_155651_create_personal_access_tokens_table .......... 4.75ms DONE
+  2026_10_07_000050_create_sessions_table ........................ 0.55ms DONE
+  2026_10_07_000100_extend_users_and_create_files_table .......... 7.28ms DONE
+  2026_10_07_000200_create_identity_and_catalog_tables .......... 34.34ms DONE
+  2026_10_07_000300_create_messaging_tables ..................... 13.52ms DONE
+  2026_10_07_000400_create_program_and_learning_tables .......... 55.19ms DONE
+  2026_10_07_000500_create_operations_and_trust_tables .......... 31.10ms DONE
+  2026_10_07_000600_add_purpose_to_files_table ................... 0.91ms DONE
+  2026_10_07_000700_add_admin_approval_fields .................... 1.99ms DONE
+  2026_10_07_000700_add_tutor_onboarding_file_links .............. 1.44ms DONE
+  2026_10_12_000800_align_identity_status_constraints ............ 2.18ms DONE
+  2026_10_13_162057_add_public_slug_to_tutor_profiles_table ...... 1.22ms DONE
+  2026_10_20_075315_align_user_and_tutor_profile_statuses ........ 3.48ms DONE
+  2026_10_20_101959_add_two_factor_columns_to_users_table ........ 0.91ms DONE
+  2026_10_20_102000_create_passkeys_table ........................ 4.49ms DONE
+  2026_10_22_000000_align_program_schema_with_domain_design ..... 10.81ms DONE
+  2026_10_22_073014_add_admin_assignment_columns_to_tutor_profiles_and_reports  6.55ms DONE
+  2026_10_22_073015_create_notification_outbox_and_add_event_key_to_notifications  5.62ms DONE
+  2026_10_22_073016_add_submission_versioning_and_idempotency .... 8.73ms DONE
+  2026_10_22_080000_enforce_utc_timestamps_and_vnd_currency ..... 25.79ms DONE
+  2026_10_25_000000_preserve_outbox_timestamp_precision .......... 6.00ms DONE
+  2026_10_26_212524_add_invitation_acceptance_support_tables ..... 9.10ms DONE
+  2026_10_27_074546_add_h02_approval_support ..................... 7.74ms DONE
+  2026_10_28_034616_align_messaging_contract ..................... 4.13ms DONE
+  2026_10_28_140000_prepare_message_sending ...................... 1.48ms DONE
+  2026_10_28_200000_add_file_scan_evidence ....................... 0.92ms DONE
+  2026_10_30_180000_create_realtime_sessions_table ............... 3.43ms DONE
+  2026_11_01_014629_add_version_and_terminal_replay_to_program_sessions  2.06ms DONE
+  2026_11_01_023131_preserve_program_session_timestamp_precision . 2.54ms DONE
+  2026_11_01_233000_add_be_d04_workspace_schema ................. 19.98ms DONE
+  2026_11_02_000000_enforce_d04_fee_currency ..................... 0.81ms DONE
+  2026_11_02_052431_add_h04_review_report_controls ............... 5.52ms DONE
+  2026_11_02_150959_create_telescope_entries_table ............... 6.09ms DONE
+  2026_11_02_151000_create_pulse_tables .......................... 8.90ms DONE
+  2026_11_03_135735_create_marketplace_cache_versions ............ 3.67ms DONE
+
+
+=== regression ===
+
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[31;1m⨯[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22mK04_RACE:{"program_id":16,"operations":["complete","complete"],"block_chain":[2941,2939,2932],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","complete"],"block_chain":[2944,2943,2942],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["complete","cancel"],"block_chain":[2947,2946,2945],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["cancel","complete"],"block_chain":[2950,2949,2948],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_complete"],"block_chain":[2953,2952,2951],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_complete","create"],"block_chain":[2956,2955,2954],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["create","program_cancel"],"block_chain":[2959,2958,2957],"statuses":[201,409]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","create"],"block_chain":[2969,2968,2967],"statuses":[200,409]}
+K04_RACE:{"program_id":1,"operations":["complete","program_complete"],"block_chain":[2972,2971,2970],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","complete"],"block_chain":[2975,2974,2973],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["complete","program_cancel"],"block_chain":[2978,2977,2976],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","complete"],"block_chain":[2981,2980,2979],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_complete"],"block_chain":[2984,2983,2982],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_complete","cancel"],"block_chain":[2994,2993,2985],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["cancel","program_cancel"],"block_chain":[2998,2997,2996],"statuses":[200,200]}
+K04_RACE:{"program_id":1,"operations":["program_cancel","cancel"],"block_chain":[3001,3000,2999],"statuses":[409,200]}
+K04_RACE:{"program_id":1,"operations":["edit","edit"],"block_chain":[3004,3003,3002],"statuses":[200,409]}
+[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m[90;1m.[39;22m
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it returns 401 to guests even in l…
+[39;1m  Expected response status code [401] but received 404.
+Failed asserting that 404 is identical to 401.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m34[39m
+     30▕
+     31▕ it('returns 401 to guests even in local environment', function (string $path) {
+     32▕     config(['app.env' => 'local']);
+     33▕
+  ➜  34▕     $this->getJson($path)->assertUnauthorized()->assertJsonPath('code', 'unauthenticated');
+     35▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     36▕
+     37▕ it('enforces the complete monitoring permission matrix', function (string $role, string $status, bool $permission, bool $deleted, bool $allowed) {
+     38▕     $actor = TestActors::user([
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it returns 401 to guests even in l…
+[39;1m  Expected response status code [401] but received 404.
+Failed asserting that 404 is identical to 401.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m34[39m
+     30▕
+     31▕ it('returns 401 to guests even in local environment', function (string $path) {
+     32▕     config(['app.env' => 'local']);
+     33▕
+  ➜  34▕     $this->getJson($path)->assertUnauthorized()->assertJsonPath('code', 'unauthenticated');
+     35▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     36▕
+     37▕ it('enforces the complete monitoring permission matrix', function (string $role, string $status, bool $permission, bool $deleted, bool $allowed) {
+     38▕     $actor = TestActors::user([
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it returns 401 to guests even in l…
+[39;1m  Expected response status code [401] but received 404.
+Failed asserting that 404 is identical to 401.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m34[39m
+     30▕
+     31▕ it('returns 401 to guests even in local environment', function (string $path) {
+     32▕     config(['app.env' => 'local']);
+     33▕
+  ➜  34▕     $this->getJson($path)->assertUnauthorized()->assertJsonPath('code', 'unauthenticated');
+     35▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     36▕
+     37▕ it('enforces the complete monitoring permission matrix', function (string $role, string $status, bool $permission, bool $deleted, bool $allowed) {
+     38▕     $actor = TestActors::user([
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it returns 403 to authenticated cu…
+[39;1m  Expected response status code [403] but received 404.
+Failed asserting that 404 is identical to 403.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m66[39m
+     62▕ it('returns 403 to authenticated customers at both dashboards', function (string $path) {
+     63▕     $this->configureRealtimeTests();
+     64▕     $cookies = $this->loginBrowser(TestActors::customer());
+     65▕
+  ➜  66▕     $this->browserRequest($cookies, 'GET', $path)->assertForbidden();
+     67▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     68▕
+     69▕ it('renders both dashboards for an active permitted admin', function (string $path) {
+     70▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it returns 403 to authenticated cu…
+[39;1m  Expected response status code [403] but received 404.
+Failed asserting that 404 is identical to 403.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m66[39m
+     62▕ it('returns 403 to authenticated customers at both dashboards', function (string $path) {
+     63▕     $this->configureRealtimeTests();
+     64▕     $cookies = $this->loginBrowser(TestActors::customer());
+     65▕
+  ➜  66▕     $this->browserRequest($cookies, 'GET', $path)->assertForbidden();
+     67▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     68▕
+     69▕ it('renders both dashboards for an active permitted admin', function (string $path) {
+     70▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it returns 403 to authenticated cu…
+[39;1m  Expected response status code [403] but received 404.
+Failed asserting that 404 is identical to 403.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m66[39m
+     62▕ it('returns 403 to authenticated customers at both dashboards', function (string $path) {
+     63▕     $this->configureRealtimeTests();
+     64▕     $cookies = $this->loginBrowser(TestActors::customer());
+     65▕
+  ➜  66▕     $this->browserRequest($cookies, 'GET', $path)->assertForbidden();
+     67▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     68▕
+     69▕ it('renders both dashboards for an active permitted admin', function (string $path) {
+     70▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it renders both dashboards for an…
+[39;1m  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m73[39m
+     69▕ it('renders both dashboards for an active permitted admin', function (string $path) {
+     70▕     $this->configureRealtimeTests();
+     71▕     $cookies = $this->loginBrowser(TestActors::admin([AdminPermissions::VIEW_MONITORING]));
+     72▕
+  ➜  73▕     $this->browserRequest($cookies, 'GET', $path)->assertOk();
+     74▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     75▕
+     76▕ it('rejects a revoked browser session at both dashboards', function (string $path) {
+     77▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it renders both dashboards for an…
+[39;1m  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m73[39m
+     69▕ it('renders both dashboards for an active permitted admin', function (string $path) {
+     70▕     $this->configureRealtimeTests();
+     71▕     $cookies = $this->loginBrowser(TestActors::admin([AdminPermissions::VIEW_MONITORING]));
+     72▕
+  ➜  73▕     $this->browserRequest($cookies, 'GET', $path)->assertOk();
+     74▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     75▕
+     76▕ it('rejects a revoked browser session at both dashboards', function (string $path) {
+     77▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it renders both dashboards for an…
+[39;1m  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m73[39m
+     69▕ it('renders both dashboards for an active permitted admin', function (string $path) {
+     70▕     $this->configureRealtimeTests();
+     71▕     $cookies = $this->loginBrowser(TestActors::admin([AdminPermissions::VIEW_MONITORING]));
+     72▕
+  ➜  73▕     $this->browserRequest($cookies, 'GET', $path)->assertOk();
+     74▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     75▕
+     76▕ it('rejects a revoked browser session at both dashboards', function (string $path) {
+     77▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it rejects a revoked browser sessi…
+[39;1m  Expected response status code [401] but received 404.
+Failed asserting that 404 is identical to 401.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m82[39m
+     78▕     $admin = TestActors::admin([AdminPermissions::VIEW_MONITORING]);
+     79▕     $cookies = $this->loginBrowser($admin);
+     80▕     app(RevokeUserSessions::class)->handle($admin);
+     81▕
+  ➜  82▕     $this->browserRequest($cookies, 'GET', $path)->assertUnauthorized();
+     83▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     84▕
+     85▕ it('rechecks authorization on an existing Pulse Livewire snapshot', function (Closure $change, int $status) {
+     86▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it rejects a revoked browser sessi…
+[39;1m  Expected response status code [401] but received 404.
+Failed asserting that 404 is identical to 401.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m82[39m
+     78▕     $admin = TestActors::admin([AdminPermissions::VIEW_MONITORING]);
+     79▕     $cookies = $this->loginBrowser($admin);
+     80▕     app(RevokeUserSessions::class)->handle($admin);
+     81▕
+  ➜  82▕     $this->browserRequest($cookies, 'GET', $path)->assertUnauthorized();
+     83▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     84▕
+     85▕ it('rechecks authorization on an existing Pulse Livewire snapshot', function (Closure $change, int $status) {
+     86▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it rejects a revoked browser sessi…
+[39;1m  Expected response status code [401] but received 404.
+Failed asserting that 404 is identical to 401.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m82[39m
+     78▕     $admin = TestActors::admin([AdminPermissions::VIEW_MONITORING]);
+     79▕     $cookies = $this->loginBrowser($admin);
+     80▕     app(RevokeUserSessions::class)->handle($admin);
+     81▕
+  ➜  82▕     $this->browserRequest($cookies, 'GET', $path)->assertUnauthorized();
+     83▕ })->with(['/telescope', '/telescope/telescope-api/requests', '/pulse']);
+     84▕
+     85▕ it('rechecks authorization on an existing Pulse Livewire snapshot', function (Closure $change, int $status) {
+     86▕     $this->configureRealtimeTests();
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it rechecks authorization on an ex…
+[39;1m  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m90[39m
+     86▕     $this->configureRealtimeTests();
+     87▕     Livewire::withoutLazyLoading();
+     88▕     $admin = TestActors::admin([AdminPermissions::VIEW_MONITORING]);
+     89▕     $cookies = $this->loginBrowser($admin);
+  ➜  90▕     $page = $this->browserRequest($cookies, 'GET', '/pulse')->assertOk();
+     91▕     preg_match_all('/wire:snapshot="([^"]+)"/', $page->getContent(), $matches);
+     92▕     $snapshot = collect($matches[1])->map(
+     93▕         fn (string $value): string => html_entity_decode($value, ENT_QUOTES | ENT_HTML5),
+     94▕     )->first(fn (string $value): bool => json_decode($value, true)['memo']['name'] === 'pulse.slow-queries');
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it rechecks authorization on an ex…
+[39;1m  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m90[39m
+     86▕     $this->configureRealtimeTests();
+     87▕     Livewire::withoutLazyLoading();
+     88▕     $admin = TestActors::admin([AdminPermissions::VIEW_MONITORING]);
+     89▕     $cookies = $this->loginBrowser($admin);
+  ➜  90▕     $page = $this->browserRequest($cookies, 'GET', '/pulse')->assertOk();
+     91▕     preg_match_all('/wire:snapshot="([^"]+)"/', $page->getContent(), $matches);
+     92▕     $snapshot = collect($matches[1])->map(
+     93▕         fn (string $value): string => html_entity_decode($value, ENT_QUOTES | ENT_HTML5),
+     94▕     )->first(fn (string $value): bool => json_decode($value, true)['memo']['name'] === 'pulse.slow-queries');
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it rechecks authorization on an ex…
+[39;1m  Expected response status code [200] but received 404.
+Failed asserting that 404 is identical to 200.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m90[39m
+     86▕     $this->configureRealtimeTests();
+     87▕     Livewire::withoutLazyLoading();
+     88▕     $admin = TestActors::admin([AdminPermissions::VIEW_MONITORING]);
+     89▕     $cookies = $this->loginBrowser($admin);
+  ➜  90▕     $page = $this->browserRequest($cookies, 'GET', '/pulse')->assertOk();
+     91▕     preg_match_all('/wire:snapshot="([^"]+)"/', $page->getContent(), $matches);
+     92▕     $snapshot = collect($matches[1])->map(
+     93▕         fn (string $value): string => html_entity_decode($value, ENT_QUOTES | ENT_HTML5),
+     94▕     )->first(fn (string $value): bool => json_decode($value, true)['memo']['name'] === 'pulse.slow-queries');
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it persists sanitized request quer…
+[39;1m  Expected response status code [200] but received 500.
+Failed asserting that 500 is identical to 200.
+
+The following exception occurred during the last request:
+
+Illuminate\Contracts\Container\BindingResolutionException: Target [Laravel\Pulse\Contracts\ResolvesUsers] is not instantiable. in /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Container.php:1440
+Stack trace:
+#0 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Container.php(1156): Illuminate\Container\Container->notInstantiable('Laravel\\Pulse\\C...')
+#1 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Container.php(939): Illuminate\Container\Container->build('Laravel\\Pulse\\C...')
+#2 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1086): Illuminate\Container\Container->resolve('Laravel\\Pulse\\C...', Array, true)
+#3 /var/www/html/vendor/laravel/framework/src/Illuminate/Container/Container.php(867): Illuminate\Foundation\Application->resolve('Laravel\\Pulse\\C...', Array)
+#4 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1066): Illuminate\Container\Container->make('Laravel\\Pulse\\C...', Array)
+#5 /var/www/html/vendor/laravel/pulse/src/Pulse.php(454): Illuminate\Foundation\Application->make('Laravel\\Pulse\\C...')
+#6 /var/www/html/vendor/laravel/pulse/src/Pulse.php(478): Laravel\Pulse\Pulse->authenticatedUserIdResolver()
+#7 /var/www/html/vendor/laravel/pulse/src/Recorders/SlowRequests.php(71): Laravel\Pulse\Pulse->resolveAuthenticatedUserId()
+#8 /var/www/html/tests/Feature/MonitoringTest.php(125): Laravel\Pulse\Recorders\SlowRequests->record(Object(Illuminate\Support\Carbon), Object(Illuminate\Http\Request), Object(Illuminate\Http\JsonResponse))
+#9 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/CallableDispatcher.php(39): P\Tests\Feature\MonitoringTest->{closure}('private-id')
+#10 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(254): Illuminate\Routing\CallableDispatcher->dispatch(Object(Illuminate\Routing\Route), Object(Closure))
+#11 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Route.php(219): Illuminate\Routing\Route->runCallable()
+#12 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(834): Illuminate\Routing\Route->run()
+#13 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->Illuminate\Routing\{closure}(Object(Illuminate\Http\Request))
+#14 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(52): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#15 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#16 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestForgery.php(104): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#17 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestForgery->handle(Object(Illuminate\Http\Request), Object(Closure))
+#18 /var/www/html/vendor/laravel/framework/src/Illuminate/View/Middleware/ShareErrorsFromSession.php(48): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#19 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\View\Middleware\ShareErrorsFromSession->handle(Object(Illuminate\Http\Request), Object(Closure))
+#20 /var/www/html/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(120): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#21 /var/www/html/vendor/laravel/framework/src/Illuminate/Session/Middleware/StartSession.php(63): Illuminate\Session\Middleware\StartSession->handleStatefulRequest(Object(Illuminate\Http\Request), Object(Illuminate\Session\Store), Object(Closure))
+#22 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Session\Middleware\StartSession->handle(Object(Illuminate\Http\Request), Object(Closure))
+#23 /var/www/html/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/AddQueuedCookiesToResponse.php(36): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#24 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse->handle(Object(Illuminate\Http\Request), Object(Closure))
+#25 /var/www/html/vendor/laravel/framework/src/Illuminate/Cookie/Middleware/EncryptCookies.php(74): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#26 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Cookie\Middleware\EncryptCookies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#27 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#28 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(833): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#29 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(812): Illuminate\Routing\Router->runRouteWithinStack(Object(Illuminate\Routing\Route), Object(Illuminate\Http\Request))
+#30 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(776): Illuminate\Routing\Router->runRoute(Object(Illuminate\Http\Request), Object(Illuminate\Routing\Route))
+#31 /var/www/html/vendor/laravel/framework/src/Illuminate/Routing/Router.php(765): Illuminate\Routing\Router->dispatchToRoute(Object(Illuminate\Http\Request))
+#32 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch(Object(Illuminate\Http\Request))
+#33 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->Illuminate\Foundation\Http\{closure}(Object(Illuminate\Http\Request))
+#34 /var/www/html/vendor/laravel/mcp/src/Server/Middleware/AddWwwAuthenticateHeader.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#35 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Laravel\Mcp\Server\Middleware\AddWwwAuthenticateHeader->handle(Object(Illuminate\Http\Request), Object(Closure))
+#36 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#37 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#38 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle(Object(Illuminate\Http\Request), Object(Closure))
+#39 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#40 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle(Object(Illuminate\Http\Request), Object(Closure))
+#41 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle(Object(Illuminate\Http\Request), Object(Closure))
+#42 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#43 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle(Object(Illuminate\Http\Request), Object(Closure))
+#44 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(110): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#45 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle(Object(Illuminate\Http\Request), Object(Closure))
+#46 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#47 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle(Object(Illuminate\Http\Request), Object(Closure))
+#48 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#49 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle(Object(Illuminate\Http\Request), Object(Closure))
+#50 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#51 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle(Object(Illuminate\Http\Request), Object(Closure))
+#52 /var/www/html/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(28): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#53 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle(Object(Illuminate\Http\Request), Object(Closure))
+#54 /var/www/html/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->Illuminate\Pipeline\{closure}(Object(Illuminate\Http\Request))
+#55 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then(Object(Closure))
+#56 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter(Object(Illuminate\Http\Request))
+#57 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(638): Illuminate\Foundation\Http\Kernel->handle(Object(Illuminate\Http\Request))
+#58 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(604): Illuminate\Foundation\Testing\TestCase->call('POST', '/_test/monitori...', Array, Array, Array, Array, '{"profile":{"em...')
+#59 /var/www/html/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json('POST', '/_test/monitori...', Array, Array, 0)
+#60 /var/www/html/tests/Feature/MonitoringTest.php(130): Illuminate\Foundation\Testing\TestCase->postJson('/_test/monitori...', Array, Array)
+#61 /var/www/html/vendor/pestphp/pest/src/Factories/TestCaseMethodFactory.php(177): P\Tests\Feature\MonitoringTest->{closure}()
+#62 [internal function]: P\Tests\Feature\MonitoringTest->Pest\Factories\{closure}()
+#63 /var/www/html/vendor/pestphp/pest/src/Concerns/Testable.php(514): call_user_func_array(Object(Closure), Array)
+#64 /var/www/html/vendor/pestphp/pest/src/Support/ExceptionTrace.php(26): P\Tests\Feature\MonitoringTest->Pest\Concerns\{closure}()
+#65 /var/www/html/vendor/pestphp/pest/src/Concerns/Testable.php(514): Pest\Support\ExceptionTrace::ensure(Object(Closure))
+#66 /var/www/html/vendor/pestphp/pest/src/Concerns/Testable.php(336): P\Tests\Feature\MonitoringTest->__callClosure(Object(Closure), Array)
+#67 /var/www/html/vendor/pestphp/pest/src/Factories/TestCaseFactory.php(179) : eval()'d code(160): P\Tests\Feature\MonitoringTest->__runTest(Object(Closure))
+#68 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1318): P\Tests\Feature\MonitoringTest->__pest_evaluable_it_persists_sanitized_request_query_and_exception_metrics_without_canary_data()
+#69 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(1355): PHPUnit\Framework\TestCase->invokeTestMethod('__pest_evaluabl...', Array)
+#70 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(521): PHPUnit\Framework\TestCase->runTest()
+#71 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(99): PHPUnit\Framework\TestCase->runBare()
+#72 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestCase.php(361): PHPUnit\Framework\TestRunner->run(Object(P\Tests\Feature\MonitoringTest))
+#73 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestCase->run()
+#74 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#75 /var/www/html/vendor/phpunit/phpunit/src/Framework/TestSuite.php(374): PHPUnit\Framework\TestSuite->run()
+#76 /var/www/html/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#77 /var/www/html/vendor/phpunit/phpunit/src/TextUI/Application.php(229): PHPUnit\TextUI\TestRunner->run(Object(PHPUnit\TextUI\Configuration\Configuration), Object(PHPUnit\Runner\ResultCache\DefaultResultCache), Object(PHPUnit\Framework\TestSuite))
+#78 /var/www/html/vendor/pestphp/pest/src/Kernel.php(103): PHPUnit\TextUI\Application->run(Array)
+#79 /var/www/html/vendor/pestphp/pest/bin/pest(196): Pest\Kernel->handle(Array, Array)
+#80 /var/www/html/vendor/pestphp/pest/bin/pest(204): {closure}()
+#81 /var/www/html/vendor/bin/pest(119): include('/var/www/html/v...')
+#82 {main}
+
+----------------------------------------------------------------------------------
+
+Target [Laravel\Pulse\Contracts\ResolvesUsers] is not instantiable.[39;22m
+
+  at [32mtests/Feature/MonitoringTest.php[39m:[32m134[39m
+    130▕     $this->withCookie('private_cookie', $canary)->postJson(
+    131▕         '/_test/monitoring/private-id?email='.$canary,
+    132▕         ['profile' => ['email' => $canary, 'password' => $canary]],
+    133▕         ['Authorization' => 'Bearer '.$canary, 'X-Private-Header' => $canary],
+  ➜ 134▕     )->assertOk();
+    135▕     Telescope::store(app(EntriesRepository::class));
+    136▕     Pulse::ingest();
+    137▕
+    138▕     foreach (['request', 'query', 'exception'] as $type) {
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it sam… [41;1m BindingResolutionException [49;22m
+[39;1m  Target [Laravel\Telescope\Contracts\EntriesRepository] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+7 vendor frames [22m
+  [33m8   [39m[39;1mtests/Feature/MonitoringTest.php[39;22m:[39;1m178[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it sam… [41;1m BindingResolutionException [49;22m
+[39;1m  Target [Laravel\Telescope\Contracts\EntriesRepository] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+7 vendor frames [22m
+  [33m8   [39m[39;1mtests/Feature/MonitoringTest.php[39;22m:[39;1m178[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it ret… [41;1m BindingResolutionException [49;22m
+[39;1m  Target [Laravel\Telescope\Contracts\EntriesRepository] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+7 vendor frames [22m
+  [33m8   [39m[39;1mtests/Feature/MonitoringTest.php[39;22m:[39;1m196[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it ren… [41;1m BindingResolutionException [49;22m
+[39;1m  Target [Laravel\Pulse\Contracts\Ingest] is not instantiable.[39;22m
+
+  at [32mvendor/laravel/framework/src/Illuminate/Container/Container.php[39m:[32m1440[39m
+    1436▕         } else {
+    1437▕             $message = "Target [$concrete] is not instantiable.";
+    1438▕         }
+    1439▕
+  ➜ 1440▕         throw new BindingResolutionException($message);
+    1441▕     }
+    1442▕
+    1443▕     /**
+    1444▕      * Throw an exception for an unresolvable primitive.
+
+      [2m+10 vendor frames [22m
+  [33m11  [39m[39;1mtests/Feature/MonitoringTest.php[39;22m:[39;1m214[39;22m
+
+  [31m────────────────────────────────────────────────────────────────────────────[39m
+  [41;1m FAILED [49;22m [1mTests\Feature\MonitoringTest[22m [90m>[39m it pru… [41;1m NamespaceNotFoundException [49;22m
+[39;1m  There are no commands defined in the "telescope" namespace.[39;22m
+
+  at [32mvendor/symfony/console/Application.php[39m:[32m694[39m
+    690▕
+    691▕                 $message .= implode("\n    ", $alternatives);
+    692▕             }
+    693▕
+  ➜ 694▕             throw new NamespaceNotFoundException($message, $alternatives);
+    695▕         }
+    696▕
+    697▕         $exact = \in_array($namespace, $namespaces, true);
+    698▕         if (\count($namespaces) > 1 && !$exact) {
+
+      [2m+5 vendor frames [22m
+  [33m6   [39m[39;1mroutes/console.php[39;22m:[39;1m34[39;22m
+      [2m+13 vendor frames [22m
+  [33m20  [39m[39;1mtests/Feature/MonitoringTest.php[39;22m:[39;1m243[39;22m
+
+
+  [90mTests:[39m    [31;1m21 failed[39;22m[90m,[39m[39m [39m[32;1m725 passed[39;22m[90m (5298 assertions)[39m
+  [90mDuration:[39m [39m74.36s[39m
