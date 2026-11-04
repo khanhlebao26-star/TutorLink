@@ -121,7 +121,8 @@ class AuthFileProfileTest extends TestCase
     {
         $this->getJson('/api/v1/me')
             ->assertUnauthorized()
-            ->assertJsonPath('message', 'Unauthenticated.');
+            ->assertJsonPath('code', 'unauthenticated')
+            ->assertJsonStructure(['code', 'message', 'request_id', 'errors']);
     }
 
     public function test_login_and_current_user_work(): void
@@ -269,14 +270,16 @@ class AuthFileProfileTest extends TestCase
 
         $this->assertSame(419, $response->getStatusCode());
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
-        $this->assertSame('CSRF token mismatch.', $response->getData(true)['message']);
+        $this->assertSame('csrf_token_mismatch', $response->getData(true)['code']);
+        $this->assertSame($response->getData(true)['request_id'], $response->headers->get('X-Request-ID'));
     }
 
     public function test_invalid_payload_returns_json_422_with_field_errors(): void
     {
         $this->postJson('/api/v1/auth/forgot-password', ['email' => 'not-an-email'])
             ->assertUnprocessable()
-            ->assertJsonStructure(['message', 'errors' => ['email']]);
+            ->assertJsonPath('code', 'validation_failed')
+            ->assertJsonStructure(['code', 'message', 'request_id', 'errors' => ['email']]);
     }
 
     public function test_unverified_user_cannot_upload_business_file(): void

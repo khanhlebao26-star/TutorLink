@@ -1,0 +1,10 @@
+# D06-01 — Gap register
+
+| ID | Finding | Evidence / source | Status and next action |
+| --- | --- | --- | --- |
+| G01 | `docs/README.md` links to current-worktree D01 handover path that is absent. | `docs/README.md`; historical snapshot reachable from Git at `8a34aa2`. | **Resolved (05/11/2026):** D06-09 changed the reference to a stable commit-pinned source; affected-doc link check passed. |
+| G02 | D03 handover links in current integration docs resolve to absent relative files. | API guide and M07/M10 integration docs; historical source is reachable at `8a34aa2`. | **Resolved (05/11/2026):** D06-09 replaced affected links with commit-pinned historical references; 15 affected docs had zero broken local links. |
+| G03 | A K03.1 test-report link points to a path absent from the current worktree. | `docs/Modules Documentation/M10 — Files/M10-F01 PRD — Upload File.md:28`; `docs/handover/BE-K03-K03.1-test-report.md` absent. | **Blocked — owner: Dũng.** Next: locate the authoritative historical source/ref; if unavailable, mark the reference unresolved. Do not invent a destination. |
+| G04 | System Design references to §12 / Task 4 have no matching source in the current architecture document (which ends at §9). | `docs/handover/BE-D06-contract.md:45`; repo architecture documentation and dependency table. | **Blocked — owner: Dũng.** Next: locate the authoritative System Design source or retain the citation as unresolved; do not infer missing requirements. |
+| G05 | OpenAPI count/hash is artifact-only; freshness, route parity, schema lint, and live behavior are not proven by this task. | Checked-in `docs/api/openapi.json`, SHA-256/count in `baseline.md`. | **Local checks resolved (05/11/2026):** D06-12 export/lint/parity/freshness passed; remote CI is still pending. |
+| G06 | K06 test/coverage and smoke evidence are historical; current checkout/runtime identity is separate. | BE-K06 evidence under `docs/handover/evidence/be-k06/20261104-151838/`; source commit in dependency refs. | **Resolved for local D06 evidence (05/11/2026):** current source passed the final grouped suite and isolated HTTP smoke; see D06-11/13 records. |

@@ -31,6 +31,8 @@ class AnnouncementController extends Controller
 {
     private const ERROR_RESPONSE_TYPE = 'array{code: string, message: string, request_id: string, errors: array<string, mixed>}';
 
+    private const ANNOUNCEMENT_TYPE = "array{id:int,program_id:int,author_id:int,state:'draft'|'published',title:string,body:string,files:list<array{id:int,original_name:string,mime_type:string,size_bytes:int,complete:bool}>,published_at:string|null,version:int,created_at:string|null,updated_at:string|null}";
+
     private const ALLOWED_MIMES = [
         'application/pdf',
         'image/jpeg',
@@ -39,7 +41,7 @@ class AnnouncementController extends Controller
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ];
 
-    #[OpenApiResponse(status: 200, description: 'Paginated Announcements.', type: 'array{data: list<AnnouncementResource>, meta: array{current_page: int, per_page: int, total: int, last_page: int}}')]
+    #[OpenApiResponse(status: 200, description: 'Paginated Announcements with allow-listed file metadata.', type: 'array{data: list<'.self::ANNOUNCEMENT_TYPE.'>, meta: array{current_page: int, per_page: int, total: int, last_page: int}}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'The account or requested Announcement state is forbidden.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Program is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -89,7 +91,7 @@ class AnnouncementController extends Controller
         ]);
     }
 
-    #[OpenApiResponse(status: 200, description: 'Announcement resource.', type: 'array{data: AnnouncementResource}')]
+    #[OpenApiResponse(status: 200, description: 'Announcement resource with allow-listed file metadata.', type: 'array{data:'.self::ANNOUNCEMENT_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'The account is forbidden.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Announcement is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -107,7 +109,7 @@ class AnnouncementController extends Controller
         return response()->json(['data' => (new AnnouncementResource($resource))->resolve($request)]);
     }
 
-    #[OpenApiResponse(status: 201, description: 'Announcement draft created.', type: 'array{data: AnnouncementResource}')]
+    #[OpenApiResponse(status: 201, description: 'Announcement draft created.', type: 'array{data:'.self::ANNOUNCEMENT_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may create a draft.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Program is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -160,7 +162,7 @@ class AnnouncementController extends Controller
         return response()->json(['data' => (new AnnouncementResource($announcement))->resolve($request)], 201);
     }
 
-    #[OpenApiResponse(status: 200, description: 'Announcement draft updated.', type: 'array{data: AnnouncementResource}')]
+    #[OpenApiResponse(status: 200, description: 'Announcement draft updated.', type: 'array{data:'.self::ANNOUNCEMENT_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may update a draft.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Announcement is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -262,7 +264,7 @@ class AnnouncementController extends Controller
         return response()->json(['data' => (new AnnouncementResource($resource))->resolve($request)]);
     }
 
-    #[OpenApiResponse(status: 200, description: 'Announcement published.', type: 'array{data: AnnouncementResource}')]
+    #[OpenApiResponse(status: 200, description: 'Announcement published.', type: 'array{data:'.self::ANNOUNCEMENT_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may publish.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Announcement is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]

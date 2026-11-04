@@ -22,7 +22,9 @@ class ProgressRecordController extends Controller
 {
     private const ERROR_RESPONSE_TYPE = 'array{code: string, message: string, request_id: string, errors: array<string, mixed>}';
 
-    #[OpenApiResponse(status: 200, description: 'Paginated Progress records.', type: 'array{data: list<ProgressRecordResource>, meta: array{current_page: int, per_page: int, total: int, last_page: int}}')]
+    private const PROGRESS_RECORD_TYPE = "array{id:int,program_id:int,customer_id:int,metric_name:'progress_percent',value:int,note:string|null,recorded_by:int,recorded_at:string|null,version:int,created_at:string|null,updated_at:string|null}";
+
+    #[OpenApiResponse(status: 200, description: 'Paginated Progress records.', type: 'array{data: list<'.self::PROGRESS_RECORD_TYPE.'>, meta: array{current_page: int, per_page: int, total: int, last_page: int}}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'The account or operation is forbidden.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Program is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -56,7 +58,7 @@ class ProgressRecordController extends Controller
         ]);
     }
 
-    #[OpenApiResponse(status: 201, description: 'Progress record created.', type: 'array{data: ProgressRecordResource}')]
+    #[OpenApiResponse(status: 201, description: 'Progress record created.', type: 'array{data:'.self::PROGRESS_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may create Progress.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Program is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -103,7 +105,7 @@ class ProgressRecordController extends Controller
         return response()->json(['data' => (new ProgressRecordResource($record))->resolve($request)], 201);
     }
 
-    #[OpenApiResponse(status: 200, description: 'Progress record updated.', type: 'array{data: ProgressRecordResource}')]
+    #[OpenApiResponse(status: 200, description: 'Progress record updated.', type: 'array{data:'.self::PROGRESS_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may update Progress.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Progress record is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]

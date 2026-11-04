@@ -23,11 +23,15 @@ class ProgramOverviewController extends Controller
 {
     private const ERROR_RESPONSE_TYPE = 'array{code: string, message: string, request_id: string, errors: array<string, mixed>}';
 
+    private const PROGRESS_RECORD_TYPE = "array{id:int,program_id:int,customer_id:int,metric_name:'progress_percent',value:int,note:string|null,recorded_by:int,recorded_at:string|null,version:int,created_at:string|null,updated_at:string|null}";
+
+    private const ANNOUNCEMENT_TYPE = "array{id:int,program_id:int,author_id:int,state:'draft'|'published',title:string,body:string,files:list<array{id:int,original_name:string,mime_type:string,size_bytes:int,complete:bool}>,published_at:string|null,version:int,created_at:string|null,updated_at:string|null}";
+
     /** Build the Workspace summary from one repeatable, read-only database snapshot. */
     #[OpenApiResponse(
         status: 200,
         description: 'Program Workspace overview.',
-        type: 'array{data: array{next_session: SessionResource|null, task_counts: array{todo: int, in_progress: int, submitted: int, completed: int, cancelled: int}, latest_progress: ProgressRecordResource|null, latest_announcement: AnnouncementResource|null, capabilities: array{can_create_session: bool, can_create_task: bool, can_record_progress: bool, can_create_fee_record: bool, can_create_announcement: bool, can_create_review: bool}}}',
+        type: 'array{data: array{next_session: SessionResource|null, task_counts: array{todo: int, in_progress: int, submitted: int, completed: int, cancelled: int}, latest_progress: '.self::PROGRESS_RECORD_TYPE.'|null, latest_announcement: '.self::ANNOUNCEMENT_TYPE.'|null, capabilities: array{can_create_session: bool, can_create_task: bool, can_record_progress: bool, can_create_fee_record: bool, can_create_announcement: bool, can_create_review: bool}}}',
     )]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]

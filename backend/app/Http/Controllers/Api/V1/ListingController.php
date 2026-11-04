@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateListingRequest;
 use App\Http\Resources\ListingResource;
 use App\Models\ServiceListing;
 use App\Models\Specialization;
+use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -157,6 +158,7 @@ class ListingController extends Controller
         ]);
     }
 
+    #[OpenApiResponse(status: 404, description: 'The Listing is not found or no longer publicly visible.', type: 'array{code:string,message:string,request_id:string,errors:array<string,mixed>}')]
     public function show(string $slug): ListingResource
     {
         $listing = ServiceListing::query()

@@ -1,0 +1,158 @@
+{
+  "task": "D06-01",
+  "captured_at": "2026-11-04T19:37:18+07:00",
+  "baseline_commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688",
+  "branch": "be-d06",
+  "working_tree_before_evidence": {
+    "status_porcelain": [
+      "M docs/README.md",
+      "?? docs/handover/BE-D06-contract.md",
+      "?? docs/handover/BE-D06-plan.md",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/pending.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/rejected.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/valid.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_owner.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_purpose.pdf"
+    ],
+    "tracked_diff_sha256": "898bc56db9712dcbddfe21ba20c3919d03b300c68d7af4e368f8366892868735",
+    "tracked_diff_bytes": 1038,
+    "files": {
+      "docs/handover/BE-D06-contract.md": {
+        "status": "??",
+        "sha256": "91340a6fe64e770a4d0a88ed71bdadfb254b1c3188d2f2d144f0713dcd18e325"
+      },
+      "docs/handover/BE-D06-plan.md": {
+        "status": "??",
+        "sha256": "b219fdc8a74a0dced0b482387f63b5dad8d9873d7935bb3305d83d325117c866"
+      },
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/pending.pdf": {
+        "status": "??",
+        "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+      },
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/rejected.pdf": {
+        "status": "??",
+        "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+      },
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/valid.pdf": {
+        "status": "??",
+        "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+      },
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_owner.pdf": {
+        "status": "??",
+        "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+      },
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_purpose.pdf": {
+        "status": "??",
+        "sha256": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c"
+      }
+    }
+  },
+  "openapi": {
+    "path": "docs/api/openapi.json",
+    "sha256": "83717e94538ac04fa6e4b7ec1865001f1dc5c810b67c5562e446ddce9b1c7940",
+    "bytes": 1086888,
+    "spec_version": "3.1.2",
+    "api_info_version": "1.0.0",
+    "operations": 123,
+    "schemas": 60
+  },
+  "locks": {
+    "backend/composer.lock": {
+      "sha256": "56b6094f45759aa5667f6c16378c59862eca00a6d7fdd5b1d28931395d09bb0b",
+      "bytes": 545449,
+      "versions": {
+        "dedoc/scramble": "v0.13.49",
+        "laravel/framework": "v13.35.0",
+        "pestphp/pest": "v4.7.8"
+      }
+    },
+    "frontend/package-lock.json": {
+      "sha256": "3a30ab82cd559848f375c70741c215b170d6070cc52e827ff0e5d479c3043f2a",
+      "bytes": 239456,
+      "lockfile_version": 3
+    }
+  },
+  "dependency_refs": [
+    {
+      "name": "BE-D01",
+      "issue_or_ref": "#36",
+      "implementation_commit": "3512fd74f27cb1c7f7992d6d319f2706c5308d90",
+      "source_commit": "8a34aa2",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "historical handover in Git; no longer in worktree"
+    },
+    {
+      "name": "BE-D02",
+      "issue_or_ref": "#69",
+      "implementation_commit": "b272d2cc5dd5e77374e149620e508dc34aab7970",
+      "source_commit": "8a34aa2",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "historical contract and implementation in Git; no longer in worktree"
+    },
+    {
+      "name": "BE-D03",
+      "issue_or_ref": "#74",
+      "implementation_commit": "9c9d7468853aadbc2c32928fa55598e945d04d4c",
+      "source_commit": "8a34aa2",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "historical report/source in Git; no longer in worktree"
+    },
+    {
+      "name": "BE-D04",
+      "issue_or_ref": "D04 handover",
+      "implementation_commit": "8a34aa29a981f8d16cf9852a82cc1d0064590bd0",
+      "source_commit": "8a34aa29a981f8d16cf9852a82cc1d0064590bd0",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "tracked handover/evidence present"
+    },
+    {
+      "name": "BE-D05 / BE-H05",
+      "issue_or_ref": "D05-H05",
+      "implementation_commit": "a24ba746500724f1445e6ae48475d9f2c6ea7e4b",
+      "source_commit": "a24ba746500724f1445e6ae48475d9f2c6ea7e4b",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "tracked handover/evidence present"
+    },
+    {
+      "name": "BE-K04",
+      "issue_or_ref": "K04.7",
+      "implementation_commit": "ad2df0f852f3e0b4944f0a1abf502921592291fc",
+      "source_commit": "17cc0df25c7d61313981d38bc9751b80b395a325",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "tracked handover/evidence present"
+    },
+    {
+      "name": "BE-H03",
+      "issue_or_ref": "#75",
+      "implementation_commit": "2026c996400137da31d21b1e7064cb4d4823b51e",
+      "source_commit": "2026c996400137da31d21b1e7064cb4d4823b51e",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "tracked handover/evidence present"
+    },
+    {
+      "name": "BE-H04",
+      "issue_or_ref": "H04 report",
+      "implementation_commit": "11a03d58569237819a708b2c89221da7ea6aadd9",
+      "source_commit": "11a03d58569237819a708b2c89221da7ea6aadd9",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "tracked handover/evidence present"
+    },
+    {
+      "name": "BE-K06",
+      "issue_or_ref": "K06 report / baseline",
+      "implementation_commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688",
+      "source_commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688",
+      "implementation_is_ancestor": true,
+      "source_is_ancestor": true,
+      "note": "current source baseline; evidence remains historical"
+    }
+  ]
+}

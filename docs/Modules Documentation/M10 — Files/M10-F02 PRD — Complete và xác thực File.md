@@ -10,7 +10,7 @@ Chỉ cho phép attach/download File khi upload hoàn tất, object tồn tại 
 
 * Chỉ owner gọi POST /files/{id}/complete.  
 * Máy chủ xác minh object tồn tại, kích thước, MIME và checksum khớp metadata; trạng thái rejected không complete được.  
-* Điều chỉnh 29/10/2026 theo [K03.1](../../handover/BE-K03-K03.1-contract.md): không antivirus tự động. FileScanStatus `pending/clean/rejected`; clean chỉ sau object/size/extension/MIME/chữ ký/checksum và archive policy hợp lệ. Pending chưa attach/download; metadata/archive vi phạm → rejected. Storage hoặc validation tạm lỗi → pending, cho retry. clean/complete không có nghĩa đã antivirus-scan; không tự ghi scan evidence giả.
+* Điều chỉnh 29/10/2026 theo [K03.1](https://github.com/khanhlebao26-star/TutorLink/blob/17cc0df25c7d61313981d38bc9751b80b395a325/docs/handover/BE-K03-K03.1-contract.md): không antivirus tự động. FileScanStatus `pending/clean/rejected`; clean chỉ sau object/size/extension/MIME/chữ ký/checksum và archive policy hợp lệ. Pending chưa attach/download; metadata/archive vi phạm → rejected. Storage hoặc validation tạm lỗi → pending, cho retry. clean/complete không có nghĩa đã antivirus-scan; không tự ghi scan evidence giả.
 * File chưa complete không được attach hoặc tải như tệp hợp lệ.  
 * Validation complete phải idempotent và chịu được request lặp.
 
@@ -23,8 +23,8 @@ Chỉ cho phép attach/download File khi upload hoàn tất, object tồn tại 
 
 # 4\. Implementation hiện tại và câu hỏi mở
 
-* [K03.7a](../../handover/BE-K03-K03.7a-test-report.md) đã gỡ ClamAV, giữ ZIP guard có giới hạn; guard không phân tích đệ quy container nhúng và không phải antivirus. Evidence quét thật cũ và schema được giữ; file legacy thiếu evidence không bị gán bằng chứng giả.
-* [K03.7b](../../handover/BE-K03-K03.7b-test-report.md) đã kiểm tra kỹ thuật upload/complete với giới hạn chung 5.000.000 byte, gồm byte boundary, metadata khai nhỏ hơn object thật và object quá lớn dù checksum khớp. Cleanup/storage compensation theo M10-F05 và CV approval theo phiên bản là công việc riêng, không được chứng nhận bởi complete.
+* [K03.7a](https://github.com/khanhlebao26-star/TutorLink/blob/0bebbb574ec962dde3c02a54703c96b9a05553a4/docs/handover/BE-K03-K03.7a-test-report.md) đã gỡ ClamAV, giữ ZIP guard có giới hạn; guard không phân tích đệ quy container nhúng và không phải antivirus. Evidence quét thật cũ và schema được giữ; file legacy thiếu evidence không bị gán bằng chứng giả.
+* [K03.7b](https://github.com/khanhlebao26-star/TutorLink/blob/3d9621d42dadb2f267d0df79aaa49c13290bd1e1/docs/handover/BE-K03-K03.7b-test-report.md) đã kiểm tra kỹ thuật upload/complete với giới hạn chung 5.000.000 byte, gồm byte boundary, metadata khai nhỏ hơn object thật và object quá lớn dù checksum khớp. Cleanup/storage compensation theo M10-F05 và CV approval theo phiên bản là công việc riêng, không được chứng nhận bởi complete.
 
 # 5\. Nguồn
 
