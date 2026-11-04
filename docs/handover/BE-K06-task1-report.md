@@ -5,7 +5,7 @@ Issue: https://github.com/khanhlebao26-star/TutorLink/issues/85
 
 **Cập nhật sau Task 1–4:** user đã xác nhận channel thử; Slack thật gửi thành công qua native worker/queue riêng. Đã sửa runtime cũ thiếu Filament/intl, health cuối ready. Xem [báo cáo hiện hành](BE-K06-test-report.md). Nội dung bên dưới giữ snapshot ban đầu; việc đăng GitHub do user tự thực hiện theo yêu cầu.
 
-## Kết quả
+## Kết quả snapshot ban đầu lúc 15:06
 
 Môi trường local sẵn sàng cho regression/integration. Preflight Slack xác thực token thành công; chưa xác minh channel thử và chưa gửi thông báo thật. Task 1 còn điều kiện xác nhận channel, không đánh dấu toàn bộ BE-K06 hoàn thành.
 
@@ -45,8 +45,8 @@ Các file evidence cũ trực tiếp trong `evidence/be-k06/` được giữ ngu
 
 ## Tiếp theo
 
-Chạy regression auth/file và integration chat/session/outbox trên PostgreSQL; ghi riêng fake tests với Slack thật. Chưa thay đổi source ứng dụng, chưa commit/push hoặc tạo PR trong Task 1.
+Đây là kế hoạch tại snapshot 15:06. Đợt sau đã hoàn tất regression/integration và smoke local/Slack thật, code/test cùng evidence đã được Khanh commit/push. Kết quả và việc tiếp theo hiện hành ở [báo cáo BE-K06](BE-K06-test-report.md).
 
 ## Cập nhật issue
 
-Đã đọc đúng issue #85 và thử đăng kết quả. GitHub connector từ chối POST comment với HTTP 403 `Resource not accessible by integration`. Trình duyệt dự phòng đang ở trạng thái chưa đăng nhập, nên chưa đăng được cập nhật lên issue. Nội dung sẵn để đăng tại [BE-K06-issue-update.md](BE-K06-issue-update.md). Đây là blocker của việc cập nhật issue, không phải lỗi runtime/backend.
+Lịch sử Task 1: connector từng từ chối POST comment với HTTP 403, trình duyệt dự phòng chưa đăng nhập. Sau đó Khanh đã tự đăng kết quả Task 1–4 lên issue; bình luận cũ cần cập nhật commit/evidence hiện tại. Theo yêu cầu của Khanh, agent chỉ chuẩn bị [nội dung cập nhật](BE-K06-issue-update.md), không tự đăng; lỗi quyền ghi cũ không còn là blocker cần agent xử lý.

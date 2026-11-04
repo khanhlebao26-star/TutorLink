@@ -1,6 +1,6 @@
 # BE-K06 evidence: 20261104-151838
 
-Baseline `fb54886617524e43727705f7f6ee86bed4135ef9`; working tree chưa commit được nhận diện bởi `source-manifest.json` và `test-changes.patch`.
+Baseline `fb54886617524e43727705f7f6ee86bed4135ef9`; code/test đã commit/push tại `2ba90470e47629f218da85b99ef59b7361ee8a55`, nhận diện bởi `source-manifest.json` và `test-changes.patch`. Log/JUnit/Clover cuối bổ sung tại `55d08b0897eafd49c158f802dd4635417aab9499`; coverage text bổ sung tại `b9e73e323762fa44d44610651b1037917d0ab4af`.
 
 ## Các lệnh đã dùng
 
@@ -38,11 +38,11 @@ Test runner mặc định chạy `php scripts/test-suite.php --coverage` trên P
 - `slack-permalink.json`: permalink message thật.
 - `smoke-initial-attempt.json`, `smoke-missing-filament.json`: dừng trước khi tạo fixture do runtime thiếu class.
 - `smoke-json-object-order-attempt.json`: observer dừng do thứ tự object keys, không phải lỗi replay nghiệp vụ.
-- `runtime-*`: lỗi dependency/intl ban đầu và kết quả rebuild/composer install cuối.
+- `runtime-*`: snapshot/exit-code được commit; log build/composer chi tiết giữ local.
 - `health-final.txt`, `migrations-final.txt`, `runtime-final.txt`: trạng thái cuối.
 - `pint-*-final.*`: format pass. Các log formatter thử ban đầu được giữ để truy vết; dùng kết quả cuối làm kết luận.
 - `evidence-scan.json`: quét mẫu credential thông dụng; `secret-literal-scan.json`: đối chiếu literal secret môi trường mà không lưu giá trị.
 
-HTML/serialized coverage được chuyển sang `outputs/be-k06/20261104-151838/{baseline,final}/coverage/` (Git ignored); JUnit/Clover/text giữ ở đây.
+HTML/serialized coverage được chuyển sang `outputs/be-k06/20261104-151838/{baseline,final}/coverage/` (Git ignored). `final/coverage/` gồm 4 JUnit XML, Clover và coverage text đã commit dù nằm dưới ignore rule. Raw coverage/log baseline vẫn giữ local; số liệu baseline có trong summary JSON.
 
-Không commit/push/PR/bình luận GitHub trong đợt này. Báo cáo chính `docs/handover/BE-K06-test-report.md`; nội dung tự đăng `docs/handover/BE-K06-issue-update.md`.
+Khanh đã commit/push code và evidence. Chỉnh sửa tài liệu hiện tại để Khanh tự commit/push; nội dung bình luận GitHub được chuẩn bị để Khanh tự đăng. Báo cáo chính `docs/handover/BE-K06-test-report.md`; nội dung tự đăng `docs/handover/BE-K06-issue-update.md`.

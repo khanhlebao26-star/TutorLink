@@ -2,6 +2,8 @@
 
 Commit chứa test và công cụ smoke: 2ba90470e47629f218da85b99ef59b7361ee8a55
 
+PR: chưa tạo. [Mô tả PR đã chuẩn bị](BE-K06-pr-description.md); tạo từ `be-k06` vào `main`, đề nghị reviewer `Hoang271205`. Chưa có xác nhận review hoặc bàn giao BE-H06.
+
 Ngày: 04/11/2026 (Asia/Ho_Chi_Minh). Branch: `be-k06`.
 Issue: https://github.com/khanhlebao26-star/TutorLink/issues/85
 
@@ -9,9 +11,9 @@ Issue: https://github.com/khanhlebao26-star/TutorLink/issues/85
 
 Task 1–4 đã thực hiện trên Docker local. Bộ backend cuối đạt **827 tests / 7.227 assertions, 0 failure/error/skip**, exit 0. Smoke API thật đạt 25 request checks và 14 assertions; notification được outbox-worker đang chạy xử lý. Một tin thử Slack thật được gửi qua database queue riêng và native Laravel worker, Slack trả HTTP 200 / `ok=true` cùng timestamp; permalink đã lấy thành công.
 
-Chưa commit, push, tạo PR hoặc đăng bình luận GitHub theo yêu cầu của Khanh. Chưa hoàn tất review/Gate BE hoặc toàn bộ bàn giao BE-H06 chỉ bằng báo cáo Task 1–4 này.
+Code/test đã được Khanh commit và push tại `2ba90470e47629f218da85b99ef59b7361ee8a55`. Evidence cuối bổ sung ở `55d08b0897eafd49c158f802dd4635417aab9499` (log/JUnit/Clover) và `b9e73e323762fa44d44610651b1037917d0ab4af` (coverage text). Cập nhật tài liệu hiện tại chưa commit; Khanh tự commit/push. Chưa có xác nhận Hoàng review hoặc BE-H06 tiếp nhận; không coi báo cáo Task 1–4 là nghiệm thu toàn issue.
 
-Baseline: `fb54886617524e43727705f7f6ee86bed4135ef9`. Test bổ sung và công cụ smoke hiện là working tree chưa commit. [Manifest SHA-256](evidence/be-k06/20261104-151838/source-manifest.json) và [patch test](evidence/be-k06/20261104-151838/test-changes.patch) nhận diện đúng nội dung đã chạy. Sau khi Khanh commit, cần bổ sung SHA đó vào issue/PR; không mô tả working tree hiện tại là một commit mới đã có.
+Baseline: `fb54886617524e43727705f7f6ee86bed4135ef9`. [Manifest SHA-256](evidence/be-k06/20261104-151838/source-manifest.json) và [patch test](evidence/be-k06/20261104-151838/test-changes.patch) nhận diện nội dung đã kiểm tra, khớp với code/test trong commit `2ba90470e47629f218da85b99ef59b7361ee8a55`. Các commit bổ sung evidence/tài liệu không sửa source ứng dụng hoặc test đã chạy.
 
 ## Task 1 — Môi trường
 
@@ -23,7 +25,7 @@ Baseline: `fb54886617524e43727705f7f6ee86bed4135ef9`. Test bổ sung và công c
 - Cấu hình production không được khởi động hoặc thay đổi trong đợt này.
 - Snapshot cuối: jobs pending=0, failed_jobs=0, outbox pending=0; đúng một message, một actual Session và một outbox đã xử lý trong bộ demo đạt. PostgreSQL test tạm đã dừng sau khi thu đủ evidence; runtime local tiếp tục chạy.
 
-Evidence: [runtime cuối](evidence/be-k06/20261104-151838/runtime-final.txt), [migration](evidence/be-k06/20261104-151838/migrations-final.txt), [health](evidence/be-k06/20261104-151838/health-final.txt), [composer install cuối](evidence/be-k06/20261104-151838/runtime-composer-install-final.log), [extensions](evidence/be-k06/20261104-151838/php-extensions.txt).
+Evidence: [runtime cuối](evidence/be-k06/20261104-151838/runtime-final.txt), [migration](evidence/be-k06/20261104-151838/migrations-final.txt), [health](evidence/be-k06/20261104-151838/health-final.txt), [composer install exit](evidence/be-k06/20261104-151838/runtime-composer-install-final-exit.txt), [extensions](evidence/be-k06/20261104-151838/php-extensions.txt). Chi tiết log build/composer được giữ local, không phải bằng chứng bắt buộc mở được từ GitHub.
 
 ## Task 2 — Regression/integration trên PostgreSQL
 
@@ -113,7 +115,32 @@ Evidence: [smoke JSON](evidence/be-k06/20261104-151838/smoke.json), [exit 0](evi
 
 Không đổi endpoint, schema hoặc event contract. Auth dùng session cookie và CSRF; Chat gửi `peer_user_id`, rồi `client_message_id` UUID/text/body. Session create có `Idempotency-Key` UUID; complete có `expected_version` và key riêng. `program_paused` ghi outbox trong transaction, notification chống trùng theo recipient/type/event_key. Slack operational alert là đường riêng, không suy diễn mọi notification đều được gửi Slack.
 
-Payload, method/path và assertions tái hiện nằm trong công cụ smoke; contract nghiệp vụ tiếp tục dùng tài liệu K02/K03/K04 và OpenAPI hiện hành.
+### Bàn giao endpoint và errors cho BE-H06
+
+Các ID dưới đây là biến fixture, không hardcode ID từ database của máy khác. Tất cả API `/api/v1` nhận `Accept: application/json`; request ghi dùng session cookie và `X-XSRF-TOKEN` sau bootstrap. Bảng tóm tắt luồng đã smoke, không thay thế [OpenAPI hiện hành](../api/openapi.json).
+
+| Endpoint | Payload/headers chính | Kết quả và nhánh lỗi đã kiểm |
+| --- | --- | --- |
+| `GET /sanctum/csrf-cookie` | Cookie jar riêng từng actor | 204, bootstrap CSRF |
+| `POST /api/v1/auth/login` | `email`, `password` demo | 200; sau đó `GET /api/v1/me` xác nhận đúng actor |
+| `POST /api/v1/conversations` | `peer_user_id` | 201, lấy `data.id` |
+| `POST /api/v1/conversations/{id}/messages` | UUID `client_message_id`, `message_type=text`, `body`, `file_ids=[]` | 201; replay cùng payload 200/cùng ID; đổi payload cùng key 409 `client_message_id_conflict` |
+| `GET /api/v1/conversations/{id}/messages` | Cookie thành viên | 200; outsider 404 `conversation_not_found`; sau logout 401 `unauthenticated` |
+| `POST /api/v1/programs/{id}/sessions` | `title`, `planned_starts_at`, `planned_ends_at`, `delivery_mode`; `Idempotency-Key` UUID | 201, version 1 |
+| `GET /api/v1/sessions/{id}` | Cookie thành viên | 200; outsider 404 `session_not_found` |
+| `POST /api/v1/sessions/{id}/complete` | `expected_version`; `Idempotency-Key` UUID | 200/replay không tạo actual trùng; Customer 403 `session_mutation_forbidden`; stale 409 `stale_session_version` |
+| `POST /api/v1/programs/{id}/pause` | Tutor owner; không cần payload | 200, tạo `program_paused` |
+| `POST /api/v1/auth/logout` | Session cookie và CSRF | 204, request chat kế tiếp 401 |
+
+Error boundaries bổ sung bằng test: hết version trả 409 `session_version_exhausted`; scheduled Session có actual trả 409 `session_actual_conflict`; assertions xác nhận không ghi một phần.
+
+### Event contract và nguồn hiện hành
+
+- `program_paused`: ghi trong transaction chuyển Program; `resource_type=program`, `resource_id` là Program ID; payload allow-list `deep_link`; event_key được lưu bền, ví dụ đợt smoke `program:2:pause:35`. Notification uniqueness theo `(user_id,type,event_key)`. Session complete không tự tạo loại notification mới.
+- Outbox retry tối đa 10 lần/60 phút; replay thủ công giữ event_key, có quyền/reason/audit. Nguồn nghiệp vụ: [Business Rules BR-25](<../Domain Documentation/Business Rules.md>) và [PRD phát sinh/chuyển Notification](<../Modules Documentation/M08 — Fee, Announcement & Notification/M08-F03 PRD — Phát sinh và chuyển Notification.md>). Runtime writer: [NotificationOutboxWriter](../../backend/app/Support/NotificationOutboxWriter.php).
+- Chat contract: [PRD mở Conversation](<../Modules Documentation/M04 — Messaging/M04-F01 PRD — Tạo hoặc dùng lại Conversation.md>), [PRD gửi text/retry](<../Modules Documentation/M04 — Messaging/M04-F04 PRD — Gửi tin nhắn văn bản và retry.md>); Session: [contract K04 hiện có](BE-K04-K04.1-contract.md). Không dẫn các tài liệu K02/K03 cũ đã bị gỡ khỏi checkout.
+- Slack operational alert là job riêng, không mặc định gửi mọi notification sang Slack. Smoke dùng job `SendSlackOperationalAlert` qua queue riêng như phần Task 4; fake và live evidence được ghi tách biệt.
+- [Công cụ smoke](../../backend/scripts/be-k06-smoke.php) tự chuẩn bị fixtures local có prefix riêng; xem [lệnh tái chạy](evidence/be-k06/20261104-151838/README.md). Mỗi lần chạy tạo một bộ mới; chỉ thêm `--slack` khi vẫn dùng channel thử được cấp.
 
 ## Giới hạn và việc tiếp theo
 
@@ -122,5 +149,5 @@ Payload, method/path và assertions tái hiện nằm trong công cụ smoke; co
 - Dữ liệu demo của lần thành công và lần observer dừng được giữ có prefix `be-k06-*` để đối chiếu; không xóa dữ liệu ứng dụng. Mỗi lần chạy smoke tạo một bộ mới.
 - Script cần dev dependencies để tái sử dụng fixture helpers. Không dùng trong production hoặc thay cho flow đăng ký/duyệt tài khoản.
 - Chưa xác minh regular Slack queue end-to-end ở Task 4; có test fake của worker, real native worker với queue riêng và runtime heartbeat riêng biệt như đã ghi.
-- Khanh tự commit/push, bổ sung SHA cuối và đăng nội dung cập nhật issue; Hoàng review. Không đóng toàn issue trước khi bàn giao BE-H06 và review.
+- Code/test và evidence cuối đã push. Khanh tự commit/push các sửa tài liệu hiện tại và đăng [nội dung cập nhật issue](BE-K06-issue-update.md). Chờ Hoàng (`Hoang271205`) review và xác nhận BE-H06 tiếp nhận; không đóng toàn issue trước khi chốt hai mục này.
 - Không còn blocker được quan sát trong phạm vi các kiểm tra đã chạy.
