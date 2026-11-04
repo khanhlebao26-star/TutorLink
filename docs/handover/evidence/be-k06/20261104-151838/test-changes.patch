@@ -1,0 +1,112 @@
+diff --git a/backend/tests/Feature/SessionApiTest.php b/backend/tests/Feature/SessionApiTest.php
+index b33ac08..e148c5f 100644
+--- a/backend/tests/Feature/SessionApiTest.php
++++ b/backend/tests/Feature/SessionApiTest.php
+@@ -145,6 +145,48 @@
+     $this->assertDatabaseCount('lesson_sessions', 0);
+ });
+ 
++it('returns 409 without editing a Session whose version is exhausted', function () {
++    $id = $this->postJson($this->url, $this->payload, [
++        'Idempotency-Key' => (string) Str::uuid(),
++    ])->assertCreated()->json('data.id');
++    DB::table('program_sessions')->where('id', $id)->update(['version' => 2147483647]);
++
++    $this->patchJson("/api/v1/sessions/{$id}", [
++        'expected_version' => 2147483647,
++        'title' => 'Must not overwrite the lesson',
++    ], ['Idempotency-Key' => (string) Str::uuid()])
++        ->assertConflict()->assertJsonPath('code', 'session_version_exhausted');
++
++    $this->assertDatabaseHas('program_sessions', [
++        'id' => $id, 'title' => $this->payload['title'], 'version' => 2147483647,
++    ]);
++    $this->assertDatabaseCount('audit_logs', 1);
++    $this->assertDatabaseCount('idempotency_receipts', 1);
++    $this->assertDatabaseCount('lesson_sessions', 0);
++    $this->assertDatabaseCount('notification_outbox', 0);
++});
++
++it('accepts a no-op edit at the maximum Session version without new business writes', function () {
++    $id = $this->postJson($this->url, $this->payload, [
++        'Idempotency-Key' => (string) Str::uuid(),
++    ])->assertCreated()->json('data.id');
++    DB::table('program_sessions')->where('id', $id)->update(['version' => 2147483647]);
++
++    $this->patchJson("/api/v1/sessions/{$id}", [
++        'expected_version' => 2147483647,
++        'title' => $this->payload['title'],
++    ], ['Idempotency-Key' => (string) Str::uuid()])
++        ->assertOk()->assertJsonPath('data.version', 2147483647);
++
++    $this->assertDatabaseHas('program_sessions', [
++        'id' => $id, 'title' => $this->payload['title'], 'version' => 2147483647,
++    ]);
++    $this->assertDatabaseCount('audit_logs', 1);
++    $this->assertDatabaseCount('idempotency_receipts', 2);
++    $this->assertDatabaseCount('lesson_sessions', 0);
++    $this->assertDatabaseCount('notification_outbox', 0);
++});
++
+ it('does not increase version or audit for a no-op edit', function () {
+     $id = $this->postJson(
+         $this->url,
+diff --git a/backend/tests/Feature/SessionTransitionApiTest.php b/backend/tests/Feature/SessionTransitionApiTest.php
+index b7ec21d..c53202a 100644
+--- a/backend/tests/Feature/SessionTransitionApiTest.php
++++ b/backend/tests/Feature/SessionTransitionApiTest.php
+@@ -289,6 +289,54 @@
+     $this->assertDatabaseCount('idempotency_receipts', 1);
+ });
+ 
++it('returns 409 without side effects when the Session version is exhausted', function (string $action) {
++    DB::table('program_sessions')->where('id', $this->sessionId)->update(['version' => 2147483647]);
++    $payload = ['expected_version' => 2147483647];
++    if ($action === 'cancel') {
++        $payload['reason'] = 'Cancel boundary fixture';
++    }
++
++    $this->postJson(
++        "{$this->url}/{$action}",
++        $payload,
++        ['Idempotency-Key' => (string) Str::uuid()],
++    )->assertConflict()->assertJsonPath('code', 'session_version_exhausted');
++
++    $this->assertDatabaseHas('program_sessions', [
++        'id' => $this->sessionId, 'status' => 'scheduled',
++        'version' => 2147483647, 'terminal_replay' => null,
++    ]);
++    $this->assertDatabaseCount('lesson_sessions', 0);
++    $this->assertDatabaseCount('audit_logs', 1);
++    $this->assertDatabaseCount('idempotency_receipts', 1);
++    $this->assertDatabaseCount('notification_outbox', 0);
++})->with(['complete', 'cancel']);
++
++it('returns 409 without overwriting an actual attached to a scheduled Session', function () {
++    $actualId = DB::table('lesson_sessions')->insertGetId([
++        'program_session_id' => $this->sessionId, 'status' => 'completed',
++        'completion_note' => 'Existing actual must be preserved',
++    ]);
++
++    $this->postJson(
++        "{$this->url}/complete",
++        ['expected_version' => 1],
++        ['Idempotency-Key' => (string) Str::uuid()],
++    )->assertConflict()->assertJsonPath('code', 'session_actual_conflict');
++
++    $this->assertDatabaseHas('program_sessions', [
++        'id' => $this->sessionId, 'status' => 'scheduled',
++        'version' => 1, 'terminal_replay' => null,
++    ]);
++    $this->assertDatabaseHas('lesson_sessions', [
++        'id' => $actualId, 'completion_note' => 'Existing actual must be preserved',
++    ]);
++    $this->assertDatabaseCount('lesson_sessions', 1);
++    $this->assertDatabaseCount('audit_logs', 1);
++    $this->assertDatabaseCount('idempotency_receipts', 1);
++    $this->assertDatabaseCount('notification_outbox', 0);
++});
++
+ it('rejects key reuse with another payload or action', function () {
+     $key = (string) Str::uuid();
+ 

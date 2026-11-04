@@ -145,6 +145,48 @@ it('increments version once and rejects stale edits', function () {
     $this->assertDatabaseCount('lesson_sessions', 0);
 });
 
+it('returns 409 without editing a Session whose version is exhausted', function () {
+    $id = $this->postJson($this->url, $this->payload, [
+        'Idempotency-Key' => (string) Str::uuid(),
+    ])->assertCreated()->json('data.id');
+    DB::table('program_sessions')->where('id', $id)->update(['version' => 2147483647]);
+
+    $this->patchJson("/api/v1/sessions/{$id}", [
+        'expected_version' => 2147483647,
+        'title' => 'Must not overwrite the lesson',
+    ], ['Idempotency-Key' => (string) Str::uuid()])
+        ->assertConflict()->assertJsonPath('code', 'session_version_exhausted');
+
+    $this->assertDatabaseHas('program_sessions', [
+        'id' => $id, 'title' => $this->payload['title'], 'version' => 2147483647,
+    ]);
+    $this->assertDatabaseCount('audit_logs', 1);
+    $this->assertDatabaseCount('idempotency_receipts', 1);
+    $this->assertDatabaseCount('lesson_sessions', 0);
+    $this->assertDatabaseCount('notification_outbox', 0);
+});
+
+it('accepts a no-op edit at the maximum Session version without new business writes', function () {
+    $id = $this->postJson($this->url, $this->payload, [
+        'Idempotency-Key' => (string) Str::uuid(),
+    ])->assertCreated()->json('data.id');
+    DB::table('program_sessions')->where('id', $id)->update(['version' => 2147483647]);
+
+    $this->patchJson("/api/v1/sessions/{$id}", [
+        'expected_version' => 2147483647,
+        'title' => $this->payload['title'],
+    ], ['Idempotency-Key' => (string) Str::uuid()])
+        ->assertOk()->assertJsonPath('data.version', 2147483647);
+
+    $this->assertDatabaseHas('program_sessions', [
+        'id' => $id, 'title' => $this->payload['title'], 'version' => 2147483647,
+    ]);
+    $this->assertDatabaseCount('audit_logs', 1);
+    $this->assertDatabaseCount('idempotency_receipts', 2);
+    $this->assertDatabaseCount('lesson_sessions', 0);
+    $this->assertDatabaseCount('notification_outbox', 0);
+});
+
 it('does not increase version or audit for a no-op edit', function () {
     $id = $this->postJson(
         $this->url,

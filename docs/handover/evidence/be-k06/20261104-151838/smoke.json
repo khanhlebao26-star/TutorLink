@@ -1,0 +1,281 @@
+{
+    "run_id": "be-k06-20261104-082755-qxs2",
+    "checked_at": "2026-11-04T08:27:55+00:00",
+    "steps": [
+        {
+            "name": "tutor csrf",
+            "method": "GET",
+            "path": "/sanctum/csrf-cookie",
+            "expected_status": 204,
+            "actual_status": 204,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "tutor login",
+            "method": "POST",
+            "path": "/api/v1/auth/login",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "tutor me",
+            "method": "GET",
+            "path": "/api/v1/me",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "customer csrf",
+            "method": "GET",
+            "path": "/sanctum/csrf-cookie",
+            "expected_status": 204,
+            "actual_status": 204,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "customer login",
+            "method": "POST",
+            "path": "/api/v1/auth/login",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "customer me",
+            "method": "GET",
+            "path": "/api/v1/me",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "outsider csrf",
+            "method": "GET",
+            "path": "/sanctum/csrf-cookie",
+            "expected_status": 204,
+            "actual_status": 204,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "outsider login",
+            "method": "POST",
+            "path": "/api/v1/auth/login",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "outsider me",
+            "method": "GET",
+            "path": "/api/v1/me",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "open chat",
+            "method": "POST",
+            "path": "/api/v1/conversations",
+            "expected_status": 201,
+            "actual_status": 201,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "send text",
+            "method": "POST",
+            "path": "/api/v1/conversations/7/messages",
+            "expected_status": 201,
+            "actual_status": 201,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "retry same text",
+            "method": "POST",
+            "path": "/api/v1/conversations/7/messages",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "reject changed text with same key",
+            "method": "POST",
+            "path": "/api/v1/conversations/7/messages",
+            "expected_status": 409,
+            "actual_status": 409,
+            "code": "client_message_id_conflict",
+            "passed": true
+        },
+        {
+            "name": "peer reads chat",
+            "method": "GET",
+            "path": "/api/v1/conversations/7/messages",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "outsider cannot read chat",
+            "method": "GET",
+            "path": "/api/v1/conversations/7/messages",
+            "expected_status": 404,
+            "actual_status": 404,
+            "code": "conversation_not_found",
+            "passed": true
+        },
+        {
+            "name": "create Session",
+            "method": "POST",
+            "path": "/api/v1/programs/2/sessions",
+            "expected_status": 201,
+            "actual_status": 201,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "member reads Session",
+            "method": "GET",
+            "path": "/api/v1/sessions/2",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "outsider cannot read Session",
+            "method": "GET",
+            "path": "/api/v1/sessions/2",
+            "expected_status": 404,
+            "actual_status": 404,
+            "code": "session_not_found",
+            "passed": true
+        },
+        {
+            "name": "customer cannot complete Session",
+            "method": "POST",
+            "path": "/api/v1/sessions/2/complete",
+            "expected_status": 403,
+            "actual_status": 403,
+            "code": "session_mutation_forbidden",
+            "passed": true
+        },
+        {
+            "name": "stale Session version",
+            "method": "POST",
+            "path": "/api/v1/sessions/2/complete",
+            "expected_status": 409,
+            "actual_status": 409,
+            "code": "stale_session_version",
+            "passed": true
+        },
+        {
+            "name": "complete Session",
+            "method": "POST",
+            "path": "/api/v1/sessions/2/complete",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "retry complete Session",
+            "method": "POST",
+            "path": "/api/v1/sessions/2/complete",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "pause Program creates notification event",
+            "method": "POST",
+            "path": "/api/v1/programs/2/pause",
+            "expected_status": 200,
+            "actual_status": 200,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "logout",
+            "method": "POST",
+            "path": "/api/v1/auth/logout",
+            "expected_status": 204,
+            "actual_status": 204,
+            "code": null,
+            "passed": true
+        },
+        {
+            "name": "logged-out chat denied",
+            "method": "GET",
+            "path": "/api/v1/conversations/7/messages",
+            "expected_status": 401,
+            "actual_status": 401,
+            "code": "unauthenticated",
+            "passed": true
+        }
+    ],
+    "passed": true,
+    "fixtures": {
+        "tutor_id": 89,
+        "customer_id": 90,
+        "outsider_id": 91,
+        "program_id": 2,
+        "preconditions": "Synthetic verified actors, approved identity metadata and active Program; not a registration/approval/file-upload smoke.",
+        "conversation_id": 7,
+        "session_id": 2
+    },
+    "checks": {
+        "tutor authenticated identity": true,
+        "customer authenticated identity": true,
+        "outsider authenticated identity": true,
+        "chat replay returns same message": true,
+        "Session replay keeps result": true,
+        "one actual Session": true,
+        "one chat message": true,
+        "Session emits no unsupported notification": true,
+        "Program pause wrote outbox": true,
+        "running outbox-worker processed demo events": true,
+        "one notification for 793530eb-08aa-423b-9670-6b5beadd62fe": true,
+        "real Slack accepts TEST_BE-K06 message": true,
+        "smoke Slack queue drained": true,
+        "smoke Slack job not failed": true
+    },
+    "outbox": [
+        {
+            "id": "793530eb-08aa-423b-9670-6b5beadd62fe",
+            "type": "program_paused",
+            "event_key": "program:2:pause:35",
+            "notification_count": 1
+        }
+    ],
+    "slack": {
+        "alert_id": "a8515d9d-90a9-4837-a9f1-b25309354459",
+        "queue": "k06-smoke-ac3p3evz",
+        "receipts": [
+            {
+                "http_status": 200,
+                "ok": true,
+                "error": null,
+                "channel": "C0C8BM660TB",
+                "ts": "1793780886.888319",
+                "test_marker_present": true
+            }
+        ],
+        "kind": "synthetic outbox_pending drill",
+        "transport": "real database queue + native Laravel worker + real Slack API; dedicated smoke queue, not regular slack-worker"
+    }
+}

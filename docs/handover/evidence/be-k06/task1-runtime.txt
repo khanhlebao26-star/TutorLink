@@ -1,0 +1,12 @@
+NAME                               IMAGE                            COMMAND                  SERVICE            CREATED              STATUS                    PORTS
+tutorlink-src-backend-1            tutorlink-src-backend            "docker-php-entrypoi…"   backend            40 hours ago         Up 21 minutes (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+tutorlink-src-broadcast-worker-1   tutorlink-src-broadcast-worker   "docker-php-entrypoi…"   broadcast-worker   About a minute ago   Up 40 seconds             8000/tcp
+tutorlink-src-db-1                 postgres:16-alpine               "docker-entrypoint.s…"   db                 4 weeks ago          Up 21 minutes (healthy)   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+tutorlink-src-frontend-1           node:22-bookworm-slim            "docker-entrypoint.s…"   frontend           3 weeks ago          Up 21 minutes             0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+tutorlink-src-mailpit-1            axllent/mailpit:latest           "/mailpit"               mailpit            3 weeks ago          Up 21 minutes (healthy)   0.0.0.0:1025->1025/tcp, [::]:1025->1025/tcp, 0.0.0.0:8025->8025/tcp, [::]:8025->8025/tcp
+tutorlink-src-outbox-worker-1      tutorlink-k02-worker:local       "docker-php-entrypoi…"   outbox-worker      About a minute ago   Up 39 seconds             8000/tcp
+tutorlink-src-pgadmin-1            dpage/pgadmin4:9.17              "/entrypoint.sh"         pgadmin            2 weeks ago          Up 21 minutes             127.0.0.1:5050->80/tcp
+tutorlink-src-reverb-1             tutorlink-src-reverb             "docker-php-entrypoi…"   reverb             About a minute ago   Up 40 seconds             127.0.0.1:8080->8080/tcp
+tutorlink-src-scheduler-1          tutorlink-k02-worker:local       "docker-php-entrypoi…"   scheduler          About a minute ago   Up 40 seconds             8000/tcp
+tutorlink-src-slack-worker-1       tutorlink-k02-worker:local       "docker-php-entrypoi…"   slack-worker       About a minute ago   Up 39 seconds             8000/tcp
+tutorlink-src-test-db-1            postgres:16-alpine               "docker-entrypoint.s…"   test-db            10 days ago          Up 21 minutes (healthy)   5432/tcp

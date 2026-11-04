@@ -1,0 +1,11 @@
+{
+  "checked_on": "2026-11-04",
+  "environment": "tutorlink-src / backend",
+  "token_configured": true,
+  "channel_configured": true,
+  "auth": {"http_status": 200, "ok": true, "error": null},
+  "channel_check": {"http_status": 200, "ok": false, "error": "missing_scope", "is_member": null, "is_archived": null},
+  "message_sent": false,
+  "live_delivery_verified": false,
+  "note": "Real read-only Slack API preflight, not a fake test or message delivery test. Token and channel identifiers omitted. Channel access and approval as a group-provided test channel still require confirmation. missing_scope on conversations.info does not prove chat.postMessage will fail."
+}

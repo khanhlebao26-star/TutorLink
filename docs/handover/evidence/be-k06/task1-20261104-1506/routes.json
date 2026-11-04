@@ -1,0 +1,466 @@
+[
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/admin/notification-outbox",
+    "name": "admin.notification-outbox.index",
+    "action": "App\\Http\\Controllers\\Api\\V1\\NotificationOutboxController@index",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/admin/notification-outbox/{outbox}/replay",
+    "name": "admin.notification-outbox.replay",
+    "action": "App\\Http\\Controllers\\Api\\V1\\NotificationOutboxController@replay",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/admin/tutor-profiles",
+    "name": "admin.tutor-profiles.index",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@index",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/admin/tutor-profiles/{tutorProfile}",
+    "name": "admin.tutor-profiles.show",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@show",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/admin/tutor-profiles/{tutorProfile}/approve",
+    "name": "admin.tutor-profiles.approve",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@approve",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "PUT",
+    "uri": "api/v1/admin/tutor-profiles/{tutorProfile}/assignment",
+    "name": "admin.tutor-profiles.assignment",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@assign",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/admin/tutor-profiles/{tutorProfile}/reject",
+    "name": "admin.tutor-profiles.reject",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@reject",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/admin/tutor-profiles/{tutorProfile}/request-changes",
+    "name": "admin.tutor-profiles.request-changes",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@requestChanges",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/admin/tutor-profiles/{tutorProfile}/restore",
+    "name": "admin.tutor-profiles.restore",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@restoreProfile",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/admin/tutor-profiles/{tutorProfile}/suspend",
+    "name": "admin.tutor-profiles.suspend",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AdminController@suspendProfile",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/auth/email/verification-notification",
+    "name": "verification.send",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AuthController@resendVerification",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "Illuminate\\Routing\\Middleware\\ThrottleRequests:6,1"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/auth/email/verify/{id}/{hash}",
+    "name": "verification.verify",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AuthController@verifyEmail",
+    "middleware": [
+      "api",
+      "Illuminate\\Routing\\Middleware\\ValidateSignature",
+      "Illuminate\\Routing\\Middleware\\ThrottleRequests:6,1"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/auth/forgot-password",
+    "name": "auth.forgot-password",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AuthController@forgotPassword",
+    "middleware": [
+      "api"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/auth/login",
+    "name": "auth.login",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AuthController@login",
+    "middleware": [
+      "api",
+      "Illuminate\\Routing\\Middleware\\ThrottleRequests:login"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/auth/logout",
+    "name": "auth.logout",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AuthController@logout",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/auth/register",
+    "name": "auth.register",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AuthController@register",
+    "middleware": [
+      "api",
+      "Illuminate\\Routing\\Middleware\\ThrottleRequests:register"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/auth/reset-password",
+    "name": "auth.reset-password",
+    "action": "App\\Http\\Controllers\\Api\\V1\\AuthController@resetPassword",
+    "middleware": [
+      "api"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/conversations",
+    "name": "conversations.store",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ConversationController@store",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/conversations",
+    "name": "conversations.index",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ConversationController@index",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/conversations/{conversation}",
+    "name": "conversations.show",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ConversationController@show",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/conversations/{conversation}/messages",
+    "name": "conversations.messages.index",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ConversationController@messages",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/conversations/{conversation}/messages",
+    "name": "conversations.messages.store",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ConversationController@sendMessage",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "PATCH",
+    "uri": "api/v1/conversations/{conversation}/read",
+    "name": "conversations.read",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ConversationController@markRead",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/conversations/{conversation}/realtime",
+    "name": "conversations.realtime",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ConversationRealtimeController",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/files",
+    "name": "files.store",
+    "action": "App\\Http\\Controllers\\Api\\V1\\FileController@store",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/files/{file}",
+    "name": "files.show",
+    "action": "App\\Http\\Controllers\\Api\\V1\\FileController@show",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "DELETE",
+    "uri": "api/v1/files/{file}",
+    "name": "files.destroy",
+    "action": "App\\Http\\Controllers\\Api\\V1\\FileController@destroy",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/files/{file}/complete",
+    "name": "files.complete",
+    "action": "App\\Http\\Controllers\\Api\\V1\\FileController@complete",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/files/{file}/download",
+    "name": "files.download",
+    "action": "App\\Http\\Controllers\\Api\\V1\\FileController@download",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/files/{file}/links",
+    "name": "files.link",
+    "action": "App\\Http\\Controllers\\Api\\V1\\FileController@link",
+    "middleware": [
+      "api",
+      "Illuminate\\Auth\\Middleware\\Authenticate:web",
+      "App\\Http\\Middleware\\EnsureActiveAccount",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/programs/{program}/sessions",
+    "name": "programs.sessions.index",
+    "action": "App\\Http\\Controllers\\Api\\V1\\SessionController@index",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/programs/{program}/sessions",
+    "name": "programs.sessions.store",
+    "action": "App\\Http\\Controllers\\Api\\V1\\SessionController@store",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "GET|HEAD",
+    "uri": "api/v1/sessions/{session}",
+    "name": "sessions.show",
+    "action": "App\\Http\\Controllers\\Api\\V1\\SessionController@show",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "PATCH",
+    "uri": "api/v1/sessions/{session}",
+    "name": "sessions.update",
+    "action": "App\\Http\\Controllers\\Api\\V1\\SessionController@update",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/sessions/{session}/cancel",
+    "name": "sessions.cancel",
+    "action": "App\\Http\\Controllers\\Api\\V1\\SessionController@cancel",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  },
+  {
+    "domain": null,
+    "method": "POST",
+    "uri": "api/v1/sessions/{session}/complete",
+    "name": "sessions.complete",
+    "action": "App\\Http\\Controllers\\Api\\V1\\SessionController@complete",
+    "middleware": [
+      "api",
+      "App\\Http\\Middleware\\EnsureActiveApiActor"
+    ],
+    "path": null
+  }
+]
