@@ -8,7 +8,9 @@ type ApiErrorBody = {
   error?: { code?: string; message?: string };
 };
 
-const configuredUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/$/, "");
+const configuredUrl = (
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
+).replace(/\/$/, "");
 const versionedSuffix = "/api/v1";
 
 const apiOrigin = configuredUrl.endsWith(versionedSuffix)
@@ -18,7 +20,9 @@ const apiBaseUrl = configuredUrl.endsWith(versionedSuffix)
   ? configuredUrl
   : `${configuredUrl}${versionedSuffix}`;
 
-const configuredMode = (process.env.NEXT_PUBLIC_DATA_MODE ?? "api").toLowerCase();
+const configuredMode = (
+  process.env.NEXT_PUBLIC_DATA_MODE ?? "api"
+).toLowerCase();
 if (configuredMode !== "mock" && configuredMode !== "api") {
   throw new Error("NEXT_PUBLIC_DATA_MODE must be either mock or api");
 }
@@ -29,7 +33,11 @@ const authHintCookie = "tutorlink-auth";
 export function setAuthHint(authenticated: boolean) {
   if (typeof document === "undefined") return;
   document.cookie = `${authHintCookie}=${authenticated ? "1" : "0"}; Path=/; SameSite=Lax`;
-  window.dispatchEvent(new CustomEvent<boolean>("tutorlink-session-hint", { detail: authenticated }));
+  window.dispatchEvent(
+    new CustomEvent<boolean>("tutorlink-session-hint", {
+      detail: authenticated,
+    }),
+  );
 }
 
 export class ApiClientError extends Error {
@@ -38,7 +46,7 @@ export class ApiClientError extends Error {
   fieldErrors?: Record<string, string[]>;
   requestId?: string;
   retryAfter?: number;
-  blockers?: {sessions:number[];tasks:number[]};
+  blockers?: { sessions: number[]; tasks: number[] };
 
   constructor(
     message: string,
@@ -60,13 +68,22 @@ export class ApiClientError extends Error {
   }
 }
 
-export function describeApiError(error: unknown, fallback = "Không thể thực hiện thao tác.") {
-  if (!(error instanceof ApiClientError)) return error instanceof Error ? error.message : fallback;
-  if (error.status === 401) return "Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Hãy đăng nhập lại.";
-  if (error.status === 419) return "Phiên CSRF đã hết hạn. Hãy thử lại để tạo phiên bảo mật mới.";
-  if (error.status === 422) return error.message || "Dữ liệu chưa hợp lệ. Hãy kiểm tra lại biểu mẫu.";
-  if (error.status === 403) return `Bạn không có quyền thực hiện thao tác này. ${error.message}`;
-  if (error.status === 429) return "Bạn đã thao tác quá nhanh. Vui lòng đợi một lúc rồi thử lại.";
+export function describeApiError(
+  error: unknown,
+  fallback = "Không thể thực hiện thao tác.",
+) {
+  if (!(error instanceof ApiClientError))
+    return error instanceof Error ? error.message : fallback;
+  if (error.status === 401)
+    return "Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Hãy đăng nhập lại.";
+  if (error.status === 419)
+    return "Phiên CSRF đã hết hạn. Hãy thử lại để tạo phiên bảo mật mới.";
+  if (error.status === 422)
+    return error.message || "Dữ liệu chưa hợp lệ. Hãy kiểm tra lại biểu mẫu.";
+  if (error.status === 403)
+    return `Bạn không có quyền thực hiện thao tác này. ${error.message}`;
+  if (error.status === 429)
+    return "Bạn đã thao tác quá nhanh. Vui lòng đợi một lúc rồi thử lại.";
   return error.message || fallback;
 }
 
@@ -82,33 +99,75 @@ export function toApiClientError(error: unknown): ApiClientError {
   const axiosError = error as AxiosError<ApiErrorBody>;
   const response = axiosError.response;
   const body = response?.data;
-  const normalized = new ApiClientError(body?.message ?? body?.error?.message ?? (axiosError.message || "Không thể kết nối tới máy chủ."), {
-    status: response?.status,
-    code: body?.code ?? body?.error?.code,
-    fieldErrors: body?.errors,
-    requestId: body?.request_id ?? response?.headers?.["x-request-id"],
-    retryAfter: response?.headers?.["retry-after"] ? Number(response.headers["retry-after"]) : undefined,
-  });
-  const blockers=(body?.errors as unknown as {blockers?:{sessions?:unknown;tasks?:unknown}})?.blockers;
-  if(blockers&&Array.isArray(blockers.sessions)&&Array.isArray(blockers.tasks))normalized.blockers={sessions:blockers.sessions.filter((id):id is number=>Number.isSafeInteger(id)),tasks:blockers.tasks.filter((id):id is number=>Number.isSafeInteger(id))};
+  const normalized = new ApiClientError(
+    body?.message ??
+      body?.error?.message ??
+      (axiosError.message || "Không thể kết nối tới máy chủ."),
+    {
+      status: response?.status,
+      code: body?.code ?? body?.error?.code,
+      fieldErrors: body?.errors,
+      requestId: body?.request_id ?? response?.headers?.["x-request-id"],
+      retryAfter: response?.headers?.["retry-after"]
+        ? Number(response.headers["retry-after"])
+        : undefined,
+    },
+  );
+  const blockers = (
+    body?.errors as unknown as {
+      blockers?: { sessions?: unknown; tasks?: unknown };
+    }
+  )?.blockers;
+  if (
+    blockers &&
+    Array.isArray(blockers.sessions) &&
+    Array.isArray(blockers.tasks)
+  ) {
+    const ids = (items: unknown[]) =>
+      items.flatMap((item) => {
+        if (typeof item === "number" && Number.isSafeInteger(item))
+          return [item];
+        if (
+          item &&
+          typeof item === "object" &&
+          "id" in item &&
+          typeof item.id === "number" &&
+          Number.isSafeInteger(item.id)
+        )
+          return [item.id];
+        return [];
+      });
+    normalized.blockers = {
+      sessions: ids(blockers.sessions),
+      tasks: ids(blockers.tasks),
+    };
+  }
   return normalized;
 }
 
-api.interceptors.response.use((response) => response, (error) => {
-  const normalized = toApiClientError(error);
-  if (normalized.status === 401) setAuthHint(false);
-  return Promise.reject(normalized);
-});
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const normalized = toApiClientError(error);
+    if (normalized.status === 401) setAuthHint(false);
+    return Promise.reject(normalized);
+  },
+);
 
 export async function initializeCsrf() {
   try {
-    await axios.get(`${apiOrigin}/sanctum/csrf-cookie`, { withCredentials: true });
+    await axios.get(`${apiOrigin}/sanctum/csrf-cookie`, {
+      withCredentials: true,
+    });
   } catch (error) {
     throw toApiClientError(error);
   }
 }
 
-export async function request<T>(config: AxiosRequestConfig, requiresCsrf = false) {
+export async function request<T>(
+  config: AxiosRequestConfig,
+  requiresCsrf = false,
+) {
   if (requiresCsrf) await initializeCsrf();
   return api.request<T>(config);
 }

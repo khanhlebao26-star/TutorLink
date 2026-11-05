@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
 use App\Http\Controllers\Api\V1\ListingController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationOutboxController;
 use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\ProgramController;
@@ -32,6 +33,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::middleware(EnsureActiveApiActor::class)->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'readAll']);
         Route::get('/programs/{program}/review', [ReviewController::class, 'show'])->whereNumber('program');
         Route::get('/admin/reviews', [ReviewController::class, 'index']);
         Route::get('/admin/reviews/{review}', [ReviewController::class, 'detail'])->whereNumber('review');

@@ -1,0 +1,121 @@
+name: FE phase 2 integration (manual)
+on: workflow_dispatch
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      mailpit:
+        image: axllent/mailpit:latest
+        ports: ["1025:1025", "8025:8025"]
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: tutorlink_test
+          POSTGRES_USER: tutorlink_test_runner
+          POSTGRES_PASSWORD: tutorlink_test_password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U tutorlink_test_runner -d tutorlink_test"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      APP_URL: http://localhost:8000
+      FRONTEND_URL: http://localhost:3000
+      ADMIN_PANEL_ENABLED: "false"
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: tutorlink_test
+      DB_USERNAME: tutorlink_test_runner
+      DB_PASSWORD: tutorlink_test_password
+      CACHE_STORE: array
+      SESSION_DRIVER: database
+      SESSION_COOKIE: tutorlink-session
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: smtp
+      MAIL_HOST: 127.0.0.1
+      MAIL_PORT: 1025
+      MAIL_FROM_ADDRESS: test@example.test
+      MAIL_FROM_NAME: TutorLink
+      SANCTUM_STATEFUL_DOMAINS: localhost:3000
+      TELESCOPE_ENABLED: "false"
+      PULSE_ENABLED: "false"
+      MONITORING_ALERTS_ENABLED: "false"
+      E2E_BASE_URL: http://localhost:3000
+      E2E_MAILPIT_URL: http://localhost:8025
+      E2E_API_URL: http://localhost:8000
+      E2E_PASSWORD: Demo-pass-2026
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_DATA_MODE: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo_pgsql, intl, zip, sockets
+          coverage: pcov
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: |
+          cp backend/.env.example backend/.env
+          composer install --working-dir=backend --no-interaction --prefer-dist
+          npm ci --prefix backend
+          npm ci --prefix frontend
+          (cd backend && npx playwright install --with-deps chromium)
+          cd frontend && npx playwright install --with-deps chromium
+      - name: Backend regression and coverage
+        working-directory: backend
+        run: php scripts/test-suite.php --coverage
+      - name: Frontend quality
+        working-directory: frontend
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run test:coverage
+          npm run build
+      - name: API source contract
+        working-directory: backend
+        run: |
+          php scripts/test-console.php openapi:export
+          php scripts/verify-openapi-routes.php
+      - name: Seed guarded browser dataset
+        working-directory: backend
+        run: php artisan db:seed --class=FrontendDemoSeeder --force --no-interaction
+      - name: Start local services
+        run: |
+          cd backend
+          ADMIN_PANEL_ENABLED=true php artisan serve --host=localhost --port=8000 --no-reload > /tmp/backend-e2e.log 2>&1 &
+          cd ../frontend
+          npm run start -- --hostname localhost --port 3000 > /tmp/frontend-e2e.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/auth/login >/dev/null && curl -fsS http://localhost:8000/up >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: Real Playwright journey
+        working-directory: frontend
+        run: npm run test:e2e
+      - name: Pest Browser
+        working-directory: backend
+        run: vendor/bin/pest --configuration=phpunit.browser.xml --ci --trace
+      - name: Separate codebase coverage gate
+        run: python3 frontend/scripts/check-codebase-coverage.py frontend/coverage/coverage-summary.json backend/build/reports/clover.xml
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fe-phase2-quality
+          path: |
+            frontend/coverage/
+            frontend/test-results/
+            frontend/playwright-report/
+            backend/build/reports/
+            backend/tests/Browser/Screenshots/
+            backend/tests/Browser/Traces/
+            docs/api/openapi.json
+            /tmp/*-e2e.log

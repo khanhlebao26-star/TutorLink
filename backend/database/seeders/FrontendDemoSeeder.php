@@ -44,7 +44,12 @@ class FrontendDemoSeeder extends Seeder
             DB::table('conversations')->where('id', $chat)->update(['context_listing_id' => $listing->id]);
             $message = MessageSendFixtures::seed($chat, $tutor, ['body' => 'Chào bạn! Mình có thể giúp bạn xây dựng lộ trình giao tiếp phù hợp với công việc.']);
             MessageSendFixtures::seed($chat, $customer, ['body' => 'Mình muốn luyện nói và chuẩn bị cho buổi phỏng vấn.']);
-            $pending = TestActors::tutor();
+            $pending = ProgramApiFixtures::eligibleTutor();
+            $avatarPath = 'tests/frontend-demo-avatar.png';
+            Storage::disk('local')->put($avatarPath, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aPoUAAAAASUVORK5CYII='));
+            $avatar = DB::table('files')->insertGetId(['owner_id' => $pending->id, 'disk' => 'local', 'object_key' => $avatarPath, 'original_name' => 'avatar.png', 'mime_type' => 'image/png', 'size_bytes' => Storage::disk('local')->size($avatarPath), 'purpose' => 'avatar', 'visibility' => 'private', 'scan_status' => 'clean', 'created_at' => now(), 'updated_at' => now()]);
+            $pending->tutorProfile->specializations()->sync([$specialization]);
+            $pending->tutorProfile->forceFill(['avatar_file_id' => $avatar])->save();
             $pending->forceFill(['full_name' => 'Hồ sơ demo cần xét duyệt'])->save();
             $pending->tutorProfile->forceFill(['headline' => 'Gia sư tiếng Anh giao tiếp', 'status' => 'submitted', 'submitted_at' => now(), 'assigned_admin_id' => $admin->id, 'assignment_version' => 1])->save();
             DB::table('reports')->insert(['reporter_id' => $customer->id, 'resource_type' => 'message', 'resource_id' => $message, 'reason' => 'other', 'details' => 'Báo cáo minh họa để kiểm tra quyền evidence.', 'status' => 'open', 'assigned_admin_id' => $admin->id, 'assignment_version' => 1, 'created_at' => now(), 'updated_at' => now()]);
@@ -52,7 +57,7 @@ class FrontendDemoSeeder extends Seeder
             ProgramApiFixtures::addMember($completed, $tutor, 'tutor');
             ProgramApiFixtures::addMember($completed, $customer, 'customer');
             DB::table('reviews')->insert(['program_id' => $completed, 'customer_id' => $customer->id, 'tutor_profile_id' => $tutor->tutorProfile->id, 'rating' => 5, 'comment' => 'Gia sư tận tâm, lộ trình rõ ràng.', 'visibility' => 'visible', 'version' => 1, 'created_at' => now(), 'updated_at' => now()]);
-            foreach (DB::table('files')->where('owner_id', $tutor->id)->get() as $file) {
+            foreach (DB::table('files')->whereIn('owner_id', [$tutor->id, $pending->id])->where('purpose', 'verification_document')->get() as $file) {
                 Storage::disk($file->disk)->put($file->object_key, '%PDF-1.4 demo fixture');
             }
         });

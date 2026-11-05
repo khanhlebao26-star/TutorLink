@@ -45,3 +45,5 @@ Architecture also contains `Other source files.md` with links to its five non-Go
 - [BE-D04 — Issue #78: Program Workspace Progress, Announcement và Fee](handover/BE-D04-handover.md): test report, schema/API delta, source/build identity, test→local evidence index và dữ liệu nghiệm thu còn giữ; [test report](handover/BE-D04-test-report.md) · [plan](handover/BE-D04-plan.md). Kết quả actual chỉ áp dụng cho local Docker Compose.
 
 - [FE-K01 / FE-D01 / FE-H01 — bàn giao code](handover/FE-K01-D01-H01-handover.md): Program/Invitation/chat, onboarding, Filament/Blade; phiên bản cuối chờ người dùng tự test và reviewer nghiệm thu.
+
+- [FE phase 2 — bổ sung code và quality setup](handover/FE-K02-D02-H02-handover.md): Session/Task/notification/trust, Browser/E2E config; chưa nghiệm thu runtime hoặc coverage.

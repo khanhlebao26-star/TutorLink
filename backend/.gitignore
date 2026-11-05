@@ -30,3 +30,6 @@ Thumbs.db
 /public/css/filament/
 /public/js/filament/
 /public/fonts/filament/
+
+/tests/Browser/Screenshots/
+/tests/Browser/Traces/

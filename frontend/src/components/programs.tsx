@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import {ProgramTrust} from "./trust-workspace";
-import {WorkspaceNavigation} from "./workspace-tabs";
+import {WorkspaceNavigation} from "./workspace-navigation";
 import { useCallback, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell, useActor } from "./app-shell";
