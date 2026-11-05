@@ -1,0 +1,47 @@
+
+  Dropping all tables .......................................... 110.62ms DONE
+
+   INFO  Preparing database.
+
+  Creating migration table ....................................... 4.00ms DONE
+
+   INFO  Running migrations.
+
+  0001_01_01_000000_create_users_table ........................... 7.02ms DONE
+  0001_01_01_000001_create_cache_table ........................... 2.74ms DONE
+  0001_01_01_000002_create_jobs_table ............................ 5.75ms DONE
+  2026_10_06_155651_create_personal_access_tokens_table .......... 2.57ms DONE
+  2026_10_07_000050_create_sessions_table ........................ 0.40ms DONE
+  2026_10_07_000100_extend_users_and_create_files_table .......... 6.87ms DONE
+  2026_10_07_000200_create_identity_and_catalog_tables .......... 31.53ms DONE
+  2026_10_07_000300_create_messaging_tables ..................... 11.01ms DONE
+  2026_10_07_000400_create_program_and_learning_tables .......... 32.25ms DONE
+  2026_10_07_000500_create_operations_and_trust_tables .......... 22.75ms DONE
+  2026_10_07_000600_add_purpose_to_files_table ................... 0.82ms DONE
+  2026_10_07_000700_add_admin_approval_fields .................... 1.75ms DONE
+  2026_10_07_000700_add_tutor_onboarding_file_links .............. 1.12ms DONE
+  2026_10_12_000800_align_identity_status_constraints ............ 1.92ms DONE
+  2026_10_13_162057_add_public_slug_to_tutor_profiles_table ...... 1.02ms DONE
+  2026_10_20_075315_align_user_and_tutor_profile_statuses ........ 3.15ms DONE
+  2026_10_20_101959_add_two_factor_columns_to_users_table ........ 1.05ms DONE
+  2026_10_20_102000_create_passkeys_table ........................ 4.49ms DONE
+  2026_10_22_000000_align_program_schema_with_domain_design ..... 10.32ms DONE
+  2026_10_22_073014_add_admin_assignment_columns_to_tutor_profiles_and_reports  6.19ms DONE
+  2026_10_22_073015_create_notification_outbox_and_add_event_key_to_notifications  5.08ms DONE
+  2026_10_22_073016_add_submission_versioning_and_idempotency .... 7.80ms DONE
+  2026_10_22_080000_enforce_utc_timestamps_and_vnd_currency ..... 22.73ms DONE
+  2026_10_25_000000_preserve_outbox_timestamp_precision .......... 5.74ms DONE
+  2026_10_26_212524_add_invitation_acceptance_support_tables ..... 9.08ms DONE
+  2026_10_27_074546_add_h02_approval_support ..................... 6.50ms DONE
+  2026_10_28_034616_align_messaging_contract ..................... 3.43ms DONE
+  2026_10_28_140000_prepare_message_sending ...................... 1.59ms DONE
+  2026_10_28_200000_add_file_scan_evidence ....................... 1.09ms DONE
+  2026_10_30_180000_create_realtime_sessions_table ............... 3.62ms DONE
+  2026_11_01_014629_add_version_and_terminal_replay_to_program_sessions  1.97ms DONE
+  2026_11_01_023131_preserve_program_session_timestamp_precision . 2.41ms DONE
+  2026_11_01_233000_add_be_d04_workspace_schema ................. 15.47ms DONE
+  2026_11_02_000000_enforce_d04_fee_currency ..................... 0.65ms DONE
+  2026_11_02_052431_add_h04_review_report_controls ............... 4.88ms DONE
+  2026_11_02_150959_create_telescope_entries_table ............... 5.74ms DONE
+  2026_11_02_151000_create_pulse_tables .......................... 8.73ms DONE
+  2026_11_03_135735_create_marketplace_cache_versions ............ 3.31ms DONE

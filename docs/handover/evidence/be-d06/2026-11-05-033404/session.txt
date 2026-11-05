@@ -1,0 +1,21 @@
+Started: 2026-11-05T03:34:04+07:00
+d157a8eeae662c01d6bd6b031ea53c26a5b05688
+ M backend/app/Http/Controllers/Api/V1/AnnouncementController.php
+ M backend/app/Http/Controllers/Api/V1/FeeRecordController.php
+ M backend/app/Http/Controllers/Api/V1/InvitationController.php
+ M backend/app/Http/Controllers/Api/V1/ProgramController.php
+ M backend/app/Http/Controllers/Api/V1/ProgramOverviewController.php
+ M backend/app/Http/Controllers/Api/V1/ProgressRecordController.php
+ M backend/app/Http/Controllers/Api/V1/TaskController.php
+ M backend/tests/Feature/ProgramLifecycleApiTest.php
+ M backend/tests/Feature/TaskWorkflowApiTest.php
+ M "docs/Architecture & Technical Design/API Route Catalog.md"
+ M docs/README.md
+ M docs/api/README.md
+ M docs/api/openapi.json
+?? compose.d06.runtime.testing.yml
+?? compose.d06.testing.yml
+?? docs/handover/BE-D06-contract.md
+?? docs/handover/BE-D06-plan.md
+?? docs/handover/evidence/be-d04/test/2026-11-01-2252/
+?? docs/handover/evidence/be-d06/

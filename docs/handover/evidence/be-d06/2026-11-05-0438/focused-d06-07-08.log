@@ -1,0 +1,150 @@
+time="2026-11-05T04:43:02+07:00" level=warning msg="Found orphan containers (tutorlink-scheduler-1, tutorlink-broadcast-worker-1, tutorlink-slack-worker-1, tutorlink-outbox-worker-1, tutorlink-backend-1, tutorlink-pgadmin-1, tutorlink-db-1, tutorlink-frontend-1, tutorlink-mailpit-1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container tutorlink-test-db-1 Running
+ Image tutorlink-h01-backend-test:local Building
+#1 [internal] load local bake definitions
+#1 reading from stdin 612B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile.testing
+#2 transferring dockerfile: 1.01kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/composer:2
+#4 DONE 1.0s
+
+#3 [internal] load metadata for docker.io/library/php:8.3-cli
+#3 DONE 1.0s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 181B done
+#5 DONE 0.0s
+
+#6 [stage-0 1/9] FROM docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a
+#6 resolve docker.io/library/php:8.3-cli@sha256:600bce7c7acf524756e5aac989f4a763aed709960d7326970bb670f46efee53a 0.0s done
+#6 DONE 0.0s
+
+#7 FROM docker.io/library/composer:2@sha256:5190d9b445add2fa26090108273cb1ef1e1af98175201c737b85b3c4f90fbf7c
+#7 resolve docker.io/library/composer:2@sha256:5190d9b445add2fa26090108273cb1ef1e1af98175201c737b85b3c4f90fbf7c 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 27.81kB done
+#8 DONE 0.0s
+
+#9 [stage-0 2/9] RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 update     && apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=30 install -y --no-install-recommends git unzip libpq-dev libzip-dev libicu-dev     && docker-php-ext-install pdo_pgsql zip intl     && pecl install pcov-1.0.12     && docker-php-ext-enable pcov     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [stage-0 4/9] COPY docker/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+#10 CACHED
+
+#11 [stage-0 3/9] COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+#11 CACHED
+
+#12 [stage-0 8/9] COPY . .
+#12 CACHED
+
+#13 [stage-0 6/9] COPY composer.json composer.lock ./
+#13 CACHED
+
+#14 [stage-0 7/9] RUN composer install     --no-interaction     --prefer-dist     --no-progress     --no-scripts
+#14 CACHED
+
+#15 [stage-0 5/9] WORKDIR /var/www/html
+#15 CACHED
+
+#16 [stage-0 9/9] RUN mkdir -p storage/framework/cache     storage/framework/sessions     storage/framework/views     bootstrap/cache     && chmod -R ug+rw storage bootstrap/cache
+#16 CACHED
+
+#17 exporting to image
+#17 exporting layers done
+#17 exporting manifest sha256:0eed2ce20ac54dc24bf7bb2e998c72f206dffd26502e5187765b66e9fa6657a7 done
+#17 exporting config sha256:3746c3c0d6352b4bf715c10a8af8a034591a3d27b41524aaf2ed0dccdb725e28 done
+#17 exporting attestation manifest sha256:79c320d29b065a8b09e7d21d291f649f75d89aecac93d41cdf75ed5f814a10cf done
+#17 exporting manifest list sha256:4272a44d5717dbace16d69abac505e12083fe31830bb5a96b8f5f82d707f4ab3 done
+#17 naming to docker.io/library/tutorlink-h01-backend-test:local done
+#17 unpacking to docker.io/library/tutorlink-h01-backend-test:local done
+#17 DONE 0.0s
+
+#18 resolving provenance for metadata file
+#18 DONE 0.0s
+ Image tutorlink-h01-backend-test:local Built
+ Container tutorlink-test-db-1 Waiting
+ Container tutorlink-test-db-1 Healthy
+ Container tutorlink-backend-test-run-758bbaa98357 Creating
+ Container tutorlink-backend-test-run-758bbaa98357 Created
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ApiFrameworkErrorResponseTest[39m
+  [32;1m✓[39;22m[90m [39m[90mapi framework errors share the safe envelope and keep retry after[39m[90m   [39m [90m0.11s[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AdminApprovalAuditTest[39m
+  [32;1m✓[39;22m[90m [39m[90madmin queue defaults to submitted and has stable sort orders[39m[90m        [39m [90m0.60s[39m
+  [32;1m✓[39;22m[90m [39m[90mrequest changes resubmit and approve records every decision[39m[90m         [39m [90m0.10s[39m
+  [32;1m✓[39;22m[90m [39m[90mapproval decisions require a reason[39m[90m                                 [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90madmin without permission and non admin cannot review profiles[39m[90m       [39m [90m0.04s[39m
+  [32;1m✓[39;22m[90m [39m[90minvalid tutor profile status filters are rejected[39m[90m                   [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90monly reviewer with permission can download verification document[39m[90m    [39m [90m0.07s[39m
+  [32;1m✓[39;22m[90m [39m[90maccount and profile suspension are separate and audited[39m[90m             [39m [90m0.06s[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\AuthFileProfileTest[39m
+  [32;1m✓[39;22m[90m [39m[90mcustomer registration creates a customer[39m[90m                            [39m [90m0.06s[39m
+  [32;1m✓[39;22m[90m [39m[90mtutor registration creates a tutor[39m[90m                                  [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mregistration sends a frontend email verification link[39m[90m               [39m [90m0.04s[39m
+  [32;1m✓[39;22m[90m [39m[90mcustomer exactly fifteen can register[39m[90m                               [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mcustomer one day under fifteen cannot register[39m[90m                      [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mtutor exactly eighteen can register[39m[90m                                 [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mtutor one day under eighteen cannot register[39m[90m                        [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mrole cannot be changed through me[39m[90m                                   [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90munauthenticated api request returns json 401[39m[90m                        [39m [90m0.02s[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin and current user work[39m[90m                                         [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90memail verification marks the user verified[39m[90m                          [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mpassword reset sends a frontend link[39m[90m                                [39m [90m0.23s[39m
+  [32;1m✓[39;22m[90m [39m[90mpassword reset updates the password[39m[90m                                 [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mexpired password reset token is rejected[39m[90m                            [39m [90m0.23s[39m
+  [32;1m✓[39;22m[90m [39m[90minvalid password reset token is rejected[39m[90m                            [39m [90m0.23s[39m
+  [32;1m✓[39;22m[90m [39m[90mpassword reset is throttled for sixty seconds[39m[90m                       [39m [90m0.43s[39m
+  [32;1m✓[39;22m[90m [39m[90mlocal admin seeder is idempotent and grants all permissions[39m[90m         [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mcsrf mismatch returns json 419 for api requests[39m[90m                     [39m [90m0.02s[39m
+  [32;1m✓[39;22m[90m [39m[90minvalid payload returns json 422 with field errors[39m[90m                  [39m [90m0.02s[39m
+  [32;1m✓[39;22m[90m [39m[90munverified user cannot upload business file[39m[90m                         [39m [90m0.02s[39m
+  [32;1m✓[39;22m[90m [39m[90mfile can be completed and only owner can download or delete[39m[90m         [39m [90m0.04s[39m
+  [32;1m✓[39;22m[90m [39m[90msubmitted tutor profile cannot be edited[39m[90m                            [39m [90m0.08s[39m
+  [32;1m✓[39;22m[90m [39m[90mtutor profile stores specialization and avatar[39m[90m                      [39m [90m0.06s[39m
+  [32;1m✓[39;22m[90m [39m[90mcompleted verification document can be attached to tutor profile[39m[90m    [39m [90m0.07s[39m
+  [32;1m✓[39;22m[90m [39m[90mcatalog can be seeded and read[39m[90m                                      [39m [90m0.04s[39m
+  [32;1m✓[39;22m[90m [39m[90mlogin is rate limited[39m[90m                                               [39m [90m0.03s[39m
+  [32;1m✓[39;22m[90m [39m[90mregister is rate limited[39m[90m                                            [39m [90m0.02s[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\TrustWorkflowApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit creates one Review only after completion and hides it from publi[39m[90m…[39m [90m0.09s[39m
+  [32;1m✓[39;22m[90m [39m[90mit refuses invalid Reviews and outsiders[39m[90m                            [39m [90m0.05s[39m
+  [32;1m✓[39;22m[90m [39m[90mit revokes evidence at reassignment and closure and exposes only th[39m[90m…[39m [90m0.12s[39m
+  [32;1m✓[39;22m[90m [39m[90mit restricts audit to current assignments and masks raw JSONB while[39m[90m…[39m [90m0.05s[39m
+  [32;1m✓[39;22m[90m [39m[90mit enforces Report scope validation and quota without charging a ma[39m[90m…[39m [90m0.11s[39m
+  [32;1m✓[39;22m[90m [39m[90mit rolls back Report decisions and evidence reads if the audit writ[39m[90m…[39m [90m0.05s[39m
+  [32;1m✓[39;22m[90m [39m[90mit keeps open and recent Reports while purging closed Reports older[39m[90m…[39m [90m0.04s[39m
+  [32;1m✓[39;22m[90m [39m[90mit enforces the daily Report quota independently from the hourly li[39m[90m…[39m [90m0.05s[39m
+  [32;1m✓[39;22m[90m [39m[90mit refuses ambiguous legacy Report rows before changing schema with[39m[90m…[39m [90m0.02s[39m
+  [32;1m✓[39;22m[90m [39m[90mit refuses ambiguous legacy Report rows before changing schema with[39m[90m…[39m [90m0.02s[39m
+  [32;1m✓[39;22m[90m [39m[90mit refuses ambiguous legacy Report rows before changing schema with[39m[90m…[39m [90m0.02s[39m
+  [32;1m✓[39;22m[90m [39m[90mit separates coordinator summaries from evidence and supports scope[39m[90m…[39m [90m0.09s[39m
+  [32;1m✓[39;22m[90m [39m[90mit does not expose private Listing or Profile content after the res[39m[90m…[39m [90m0.07s[39m
+  [32;1m✓[39;22m[90m [39m[90mit does not expose private Listing or Profile content after the res[39m[90m…[39m [90m0.05s[39m
+  [32;1m✓[39;22m[90m [39m[90mit does not disclose a Review whose Tutor is no longer publicly eli[39m[90m…[39m [90m0.04s[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\PhaseFiveMarketplaceTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit rechecks public eligibility on every surface after cached verifi[39m[90m…[39m [90m0.12s[39m
+  [32;1m✓[39;22m[90m [39m[90mit invalidates listing profile catalog and moderation mutations inc[39m[90m…[39m [90m0.09s[39m
+  [32;1m✓[39;22m[90m [39m[90mit expires required documents without waiting for a scheduler or ca[39m[90m…[39m [90m0.08s[39m
+  [32;1m✓[39;22m[90m [39m[90mit isolates cache generations across rollback and safely falls back[39m[90m…[39m [90m0.06s[39m
+  [32;1m✓[39;22m[90m [39m[90mit bounds embedded cards with stable pagination and never publishes[39m[90m…[39m [90m0.08s[39m
+  [32;1m✓[39;22m[90m [39m[90mit caches only anonymous public DTOs and marks authenticated and pr[39m[90m…[39m [90m0.06s[39m
+  [32;1m✓[39;22m[90m [39m[90mit keeps query counts bounded as public and assigned admin pages gr[39m[90m…[39m [90m0.20s[39m
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\MarketplaceCacheTransactionTest[39m
+  [32;1m✓[39;22m[90m [39m[90mother connections use the old cache until commit then immediately d[39m[90m…[39m [90m0.17s[39m
+
+  [90mTests:[39m    [32;1m58 passed[39;22m[90m (488 assertions)[39m
+  [90mDuration:[39m [39m4.73s[39m

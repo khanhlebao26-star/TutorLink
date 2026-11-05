@@ -1,0 +1,797 @@
+{
+  "base_url": "http://127.0.0.1:18006",
+  "fixture_scope": "Synthetic BE-D04 fixtures in isolated tutorlink_test",
+  "trace": [
+    {
+      "actor": "anonymous",
+      "method": "GET",
+      "path": "/up",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, private"
+      },
+      "response": {
+        "status": "up"
+      },
+      "check": {
+        "label": "health",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "anonymous_csrf",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 419,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "51a6b213-be2f-4bd8-8ca8-2cebf7705201"
+      },
+      "response": {
+        "code": "csrf_token_mismatch",
+        "message": "The request could not be completed.",
+        "request_id": "51a6b213-be2f-4bd8-8ca8-2cebf7705201",
+        "errors": {}
+      },
+      "check": {
+        "label": "missing_csrf_header",
+        "expected_status": 419,
+        "passed": true
+      }
+    },
+    {
+      "actor": "anonymous",
+      "method": "GET",
+      "path": "/api/v1/programs/1/overview",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "2e4e9cff-0179-4d7b-a40b-046ae45ec847"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "2e4e9cff-0179-4d7b-a40b-046ae45ec847",
+        "errors": {}
+      },
+      "check": {
+        "label": "unauthenticated_overview",
+        "expected_status": 401,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "request_body": null,
+      "request_headers": {},
+      "status": 204,
+      "headers": {
+        "Cache-Control": "no-cache, private"
+      },
+      "response": null,
+      "check": {
+        "label": "owner_csrf_cookie",
+        "expected_status": 204,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private"
+      },
+      "response": {
+        "data": {
+          "id": 1,
+          "status": "active"
+        }
+      },
+      "check": {
+        "label": "owner_login",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "request_body": null,
+      "request_headers": {},
+      "status": 204,
+      "headers": {
+        "Cache-Control": "no-cache, private"
+      },
+      "response": null,
+      "check": {
+        "label": "member_csrf_cookie",
+        "expected_status": 204,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private"
+      },
+      "response": {
+        "data": {
+          "id": 8,
+          "status": "active"
+        }
+      },
+      "check": {
+        "label": "member_login",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "GET",
+      "path": "/api/v1/programs/1/overview",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "94e9a025-e213-4d3c-9940-51262bed39ca"
+      },
+      "response": {
+        "data": {
+          "task_counts": {}
+        }
+      },
+      "check": {
+        "label": "program_overview",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/progress-records?per_page=2",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "53c43337-41eb-4a50-bdae-c81a78889c89"
+      },
+      "response": {
+        "data_count": 2,
+        "data": [
+          {
+            "id": 2,
+            "version": 1,
+            "created_at": "2026-10-22T12:00:00.000000Z",
+            "updated_at": "2026-10-22T12:00:00.000000Z"
+          },
+          {
+            "id": 1,
+            "version": 1,
+            "created_at": "2026-10-22T12:00:00.000000Z",
+            "updated_at": "2026-10-22T12:00:00.000000Z"
+          }
+        ],
+        "meta": {
+          "current_page": 1,
+          "per_page": 2,
+          "total": 55,
+          "last_page": 28
+        }
+      },
+      "check": {
+        "label": "progress_list",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/announcements?per_page=2",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "71bc69c5-0dfd-4d77-b9b6-2c1875a5c7c2"
+      },
+      "response": {
+        "data_count": 2,
+        "data": [
+          {
+            "id": 2,
+            "title": "D04 Fixture Published Tie B",
+            "body": "Synthetic published announcement for BE-D04.",
+            "files": [],
+            "version": 1,
+            "created_at": "2026-10-20T03:00:00.000000Z",
+            "updated_at": "2026-10-20T03:00:00.000000Z"
+          },
+          {
+            "id": 1,
+            "title": "D04 Fixture Published Tie A",
+            "body": "Synthetic published announcement for BE-D04.",
+            "files": [
+              {
+                "id": 1,
+                "original_name": "d04-valid.pdf",
+                "mime_type": "application/pdf",
+                "size_bytes": 74
+              }
+            ],
+            "version": 1,
+            "created_at": "2026-10-20T03:00:00.000000Z",
+            "updated_at": "2026-10-20T03:00:00.000000Z"
+          }
+        ],
+        "meta": {
+          "current_page": 1,
+          "per_page": 2,
+          "total": 2,
+          "last_page": 1
+        }
+      },
+      "check": {
+        "label": "announcement_list",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/announcements/1",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "37a643bb-0574-4fcb-8f4a-fcd7234006a6"
+      },
+      "response": {
+        "data": {
+          "id": 1,
+          "title": "D04 Fixture Published Tie A",
+          "body": "Synthetic published announcement for BE-D04.",
+          "files": [
+            {
+              "id": 1,
+              "original_name": "d04-valid.pdf",
+              "mime_type": "application/pdf",
+              "size_bytes": 74
+            }
+          ],
+          "version": 1,
+          "created_at": "2026-10-20T03:00:00.000000Z",
+          "updated_at": "2026-10-20T03:00:00.000000Z"
+        }
+      },
+      "check": {
+        "label": "announcement_detail",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/fee-records?per_page=2",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "76078b6b-4d89-44c0-b578-12309c143581"
+      },
+      "response": {
+        "data_count": 2,
+        "data": [
+          {
+            "id": 59,
+            "amount_minor": 275000,
+            "currency": "VND",
+            "status": "declared",
+            "version": 1,
+            "created_at": "2026-11-01T05:00:00.000000Z",
+            "updated_at": "2026-10-31T17:00:00.000000Z"
+          },
+          {
+            "id": 58,
+            "amount_minor": 250000,
+            "currency": "VND",
+            "status": "declared",
+            "version": 1,
+            "created_at": "2026-10-01T05:00:00.000000Z",
+            "updated_at": "2026-10-31T17:00:00.000000Z"
+          }
+        ],
+        "meta": {
+          "current_page": 1,
+          "per_page": 2,
+          "total": 59,
+          "last_page": 30
+        }
+      },
+      "check": {
+        "label": "fee_list",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/tasks?per_page=5",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "28cbd9d4-a4d4-4904-b37f-ad8a9b99fec5"
+      },
+      "response": {
+        "data_count": 5,
+        "data": [
+          {
+            "id": 1,
+            "title": "D04 Fixture Task Todo",
+            "due_at": "2026-11-06T17:00:00Z",
+            "status": "todo",
+            "version": 1
+          },
+          {
+            "id": 2,
+            "title": "D04 Fixture Task In_progress",
+            "due_at": "2026-10-27T17:00:00Z",
+            "status": "in_progress",
+            "version": 1
+          }
+        ],
+        "meta": {
+          "current_page": 1,
+          "per_page": 5,
+          "total": 5,
+          "last_page": 1
+        }
+      },
+      "check": {
+        "label": "task_list",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/tasks/999999/submission",
+      "request_body": null,
+      "request_headers": {},
+      "status": 404,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "80a01258-afd6-4287-a297-b08fa0558d75"
+      },
+      "response": {
+        "code": "resource_not_found",
+        "message": "The request could not be completed.",
+        "request_id": "80a01258-afd6-4287-a297-b08fa0558d75",
+        "errors": {}
+      },
+      "check": {
+        "label": "unknown_task",
+        "expected_status": 404,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/start",
+      "request_body": {
+        "expected_version": 1
+      },
+      "request_headers": {},
+      "status": 403,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "a5b5c2fd-6136-4311-9bfc-5e3b8f9c472a"
+      },
+      "response": {
+        "code": "permission_denied",
+        "message": "The request could not be completed.",
+        "request_id": "a5b5c2fd-6136-4311-9bfc-5e3b8f9c472a",
+        "errors": {}
+      },
+      "check": {
+        "label": "wrong_actor_cannot_start_task",
+        "expected_status": 403,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/start",
+      "request_body": {
+        "expected_version": 1
+      },
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "204b71ae-6a14-4efa-b8fd-e29e2d1eec5d"
+      },
+      "response": {
+        "data": {
+          "id": 1,
+          "title": "D04 Fixture Task Todo",
+          "due_at": "2026-11-06T17:00:00Z",
+          "status": "in_progress",
+          "version": 2
+        }
+      },
+      "check": {
+        "label": "start_task",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/start",
+      "request_body": {
+        "expected_version": 1
+      },
+      "request_headers": {},
+      "status": 409,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "1539c417-d29c-48e9-9779-49c74e2e54bc"
+      },
+      "response": {
+        "code": "stale_task_version",
+        "message": "stale task version",
+        "request_id": "1539c417-d29c-48e9-9779-49c74e2e54bc",
+        "errors": {}
+      },
+      "check": {
+        "label": "stale_task_version",
+        "expected_status": 409,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "D06 HTTP smoke submission"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000601"
+      },
+      "status": 201,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "da378a61-31e1-4abd-8622-738b2bb3221c"
+      },
+      "response": {
+        "data": {
+          "id": 3,
+          "submission_version": 1,
+          "status": "submitted",
+          "feedback": null
+        }
+      },
+      "check": {
+        "label": "create_submission",
+        "expected_status": 201,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "D06 HTTP smoke submission"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000601"
+      },
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "b4419fd2-ace3-4c66-ace2-bf253468f981"
+      },
+      "response": {
+        "data": {
+          "id": 3,
+          "submission_version": 1,
+          "status": "submitted",
+          "feedback": null
+        }
+      },
+      "check": {
+        "label": "replay_submission",
+        "expected_status": 200,
+        "passed": true,
+        "same_resource_id": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "Stale D06 submission version"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000604"
+      },
+      "status": 409,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "e84f0d56-0f33-4182-89b3-d0dc98ecb154"
+      },
+      "response": {
+        "code": "stale_submission_version",
+        "message": "stale submission version",
+        "request_id": "e84f0d56-0f33-4182-89b3-d0dc98ecb154",
+        "errors": {}
+      },
+      "check": {
+        "label": "stale_submission_version",
+        "expected_status": 409,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "Different D06 payload"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000601"
+      },
+      "status": 409,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "b89d0f24-572e-4cd7-af33-4d764b4ebea2"
+      },
+      "response": {
+        "code": "idempotency_conflict",
+        "message": "idempotency conflict",
+        "request_id": "b89d0f24-572e-4cd7-af33-4d764b4ebea2",
+        "errors": {}
+      },
+      "check": {
+        "label": "submission_key_payload_mismatch",
+        "expected_status": 409,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": -1,
+        "content": "Invalid version"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000602"
+      },
+      "status": 422,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "7bd68bfb-ed32-4663-bda6-1b76244edcad"
+      },
+      "response": {
+        "code": "validation_failed",
+        "message": "The given data was invalid.",
+        "request_id": "7bd68bfb-ed32-4663-bda6-1b76244edcad",
+        "errors": {
+          "expected_submission_version": [
+            "The expected submission version field must be at least 0."
+          ]
+        }
+      },
+      "check": {
+        "label": "invalid_submission_version",
+        "expected_status": 422,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/submission/review",
+      "request_body": {
+        "expected_submission_version": 1,
+        "feedback": "D06 HTTP smoke accepted"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000603"
+      },
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "e5989780-6f6a-4b92-91cc-53545479e96e"
+      },
+      "response": {
+        "data": {
+          "id": 3,
+          "submission_version": 1,
+          "version": 4,
+          "status": "accepted",
+          "feedback": "D06 HTTP smoke accepted"
+        }
+      },
+      "check": {
+        "label": "accept_submission",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/submission/review",
+      "request_body": {
+        "expected_submission_version": 1,
+        "feedback": "D06 HTTP smoke accepted"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000603"
+      },
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "ae2114c0-5d52-4705-a26c-080067f73ff1"
+      },
+      "response": {
+        "data": {
+          "id": 3,
+          "status": "accepted",
+          "version": 4,
+          "feedback": "D06 HTTP smoke accepted",
+          "submission_version": 1
+        }
+      },
+      "check": {
+        "label": "replay_feedback",
+        "expected_status": 200,
+        "passed": true,
+        "same_resource_id": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/submission/review",
+      "request_body": {
+        "expected_submission_version": 1,
+        "feedback": "Changed D06 feedback"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000603"
+      },
+      "status": 409,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "9391a101-9172-41e1-96d4-174348c0427d"
+      },
+      "response": {
+        "code": "idempotency_key_reused",
+        "message": "idempotency key reused",
+        "request_id": "9391a101-9172-41e1-96d4-174348c0427d",
+        "errors": {}
+      },
+      "check": {
+        "label": "feedback_key_payload_mismatch",
+        "expected_status": 409,
+        "passed": true
+      }
+    },
+    {
+      "actor": "synthetic_rate_limit_probe",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 429,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "b335d6cb-fed5-4ff9-9551-acd1278fec1e",
+        "Retry-After": "60"
+      },
+      "response": {
+        "code": "rate_limited",
+        "message": "The request could not be completed.",
+        "request_id": "b335d6cb-fed5-4ff9-9551-acd1278fec1e",
+        "errors": {}
+      },
+      "attempts_before_limit": [
+        401,
+        401,
+        401,
+        401,
+        401
+      ],
+      "check": {
+        "label": "login_rate_limit",
+        "expected_status": 429,
+        "passed": true,
+        "prior_attempts_were_401": true
+      }
+    }
+  ],
+  "passed": true
+}

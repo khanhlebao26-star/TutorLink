@@ -1,0 +1,37 @@
+{
+  "result": "pass",
+  "image": "tutorlink-d06-backend-test:local",
+  "command": [
+    "php",
+    "artisan",
+    "serve",
+    "--host=0.0.0.0",
+    "--port=8000"
+  ],
+  "ports": [
+    {
+      "mode": "ingress",
+      "host_ip": "127.0.0.1",
+      "target": 8000,
+      "published": "18006",
+      "protocol": "tcp"
+    }
+  ],
+  "evidence_mount": [
+    {
+      "type": "bind",
+      "source": "/home/dunggiait/Developer/WebDesign/EM4/TutorLink/outputs/be-d06",
+      "target": "/evidence",
+      "bind": {}
+    }
+  ],
+  "database": {
+    "APP_ENV": "testing",
+    "DB_CONNECTION": "pgsql",
+    "DB_HOST": "test-db",
+    "DB_DATABASE": "tutorlink_test",
+    "QUEUE_CONNECTION": "sync",
+    "MAIL_MAILER": "array",
+    "BROADCAST_CONNECTION": "null"
+  }
+}

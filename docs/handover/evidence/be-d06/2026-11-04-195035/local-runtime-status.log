@@ -1,0 +1,12 @@
+tutorlink-d06-test-test-db-1	postgres:16-alpine	Up 4 minutes (healthy)	5432/tcp
+tutorlink-scheduler-1	tutorlink-k02-worker:local	Up About an hour	8000/tcp
+tutorlink-slack-worker-1	tutorlink-k02-worker:local	Restarting (1) 15 seconds ago
+tutorlink-outbox-worker-1	tutorlink-k02-worker:local	Restarting (1) 15 seconds ago
+tutorlink-backend-1	tutorlink-backend	Exited (0) 2 days ago
+tutorlink-broadcast-worker-1	tutorlink-broadcast-worker	Restarting (1) 13 seconds ago
+tutorlink-backend-test-1	95916de4c502	Exited (137) 2 days ago
+tutorlink-test-db-1	postgres:16-alpine	Exited (0) 2 days ago
+tutorlink-pgadmin-1	dpage/pgadmin4:9.17	Up About an hour	443/tcp, 127.0.0.1:5050->80/tcp
+tutorlink-db-1	postgres:16-alpine	Exited (0) 2 days ago
+tutorlink-frontend-1	node:22-bookworm-slim	Exited (137) 2 days ago
+tutorlink-mailpit-1	axllent/mailpit:latest	Exited (0) 2 days ago

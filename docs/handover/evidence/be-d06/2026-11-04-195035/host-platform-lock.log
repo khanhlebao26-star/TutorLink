@@ -1,0 +1,28 @@
+Cannot create cache directory /home/dunggiait/.cache/composer/files/, or directory is not writable. Proceeding without cache. See also cache-read-only config if your filesystem is read-only.
+Checking platform requirements using the lock file
+composer-plugin-api  2.6.0      success
+composer-runtime-api 2.2.2      success
+ext-ctype            *          success provided by symfony/polyfill-ctype
+ext-curl             8.3.6      success
+ext-date             8.3.6      success
+ext-dom              20031129   success
+ext-fileinfo         8.3.6      success
+ext-filter           8.3.6      success
+ext-hash             8.3.6      success
+ext-iconv            8.3.6      success
+ext-intl             8.3.6      success
+ext-json             8.3.6      success
+ext-libxml           8.3.6      success
+ext-mbstring         *          success provided by symfony/polyfill-mbstring
+ext-openssl          8.3.6      success
+ext-pcre             8.3.6      success
+ext-phar             8.3.6      success
+ext-reflection       8.3.6      success
+ext-session          8.3.6      success
+ext-simplexml        8.3.6      success
+ext-tokenizer        8.3.6      success
+ext-xml              8.3.6      success
+ext-xmlreader        8.3.6      success
+ext-xmlwriter        8.3.6      success
+ext-zip              1.22.3     success
+php                  8.3.6      success

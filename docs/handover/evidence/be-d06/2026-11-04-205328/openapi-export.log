@@ -1,0 +1,12 @@
+ Container tutorlink-d06-test-backend-test-run-daae9d350386 Creating
+ Container tutorlink-d06-test-backend-test-run-daae9d350386 Created
+
+   INFO  Running migrations.
+
+  2026_11_02_000000_enforce_d04_fee_currency ..................... 3.67ms DONE
+  2026_11_02_052431_add_h04_review_report_controls .............. 16.16ms DONE
+  2026_11_02_150959_create_telescope_entries_table .............. 11.29ms DONE
+  2026_11_02_151000_create_pulse_tables .......................... 9.57ms DONE
+  2026_11_03_135735_create_marketplace_cache_versions ............ 4.83ms DONE
+
+OpenAPI document exported to ../docs/api/openapi.json.

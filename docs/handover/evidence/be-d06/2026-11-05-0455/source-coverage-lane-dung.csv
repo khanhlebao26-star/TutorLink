@@ -1,0 +1,16 @@
+source_file,inventory_operations,clover_statements_covered,clover_statements_total,coverage_percent
+Http/Controllers/Api/V1/AnnouncementController.php,5,326,331,98.49
+Http/Controllers/Api/V1/CatalogController.php,2,31,31,100.00
+Http/Controllers/Api/V1/FeeRecordController.php,7,324,331,97.89
+Http/Controllers/Api/V1/InvitationAcceptController.php,1,45,51,88.24
+Http/Controllers/Api/V1/InvitationController.php,5,63,78,80.77
+Http/Controllers/Api/V1/ListingController.php,7,209,245,85.31
+Http/Controllers/Api/V1/ProgramController.php,8,95,101,94.06
+Http/Controllers/Api/V1/ProgramOverviewController.php,1,73,73,100.00
+Http/Controllers/Api/V1/ProgressRecordController.php,3,101,102,99.02
+Http/Controllers/Api/V1/PublicTutorController.php,1,26,26,100.00
+Http/Controllers/Api/V1/PublicTutorReviewController.php,1,59,59,100.00
+Http/Controllers/Api/V1/ReviewController.php,2,57,58,98.28
+Http/Controllers/Api/V1/SessionController.php,2,102,108,94.44
+Http/Controllers/Api/V1/TaskController.php,11,294,301,97.67
+TOTAL,56,1805,1895,95.25

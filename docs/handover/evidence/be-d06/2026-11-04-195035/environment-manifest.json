@@ -1,0 +1,165 @@
+{
+  "task": "D06-02",
+  "captured_at": "2026-11-04T19:55:17+07:00",
+  "source_commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688",
+  "branch": "be-d06",
+  "source_locks": {
+    "backend/composer.lock": {
+      "sha256": "56b6094f45759aa5667f6c16378c59862eca00a6d7fdd5b1d28931395d09bb0b",
+      "bytes": 545449,
+      "versions": {
+        "dedoc/scramble": "v0.13.49",
+        "laravel/framework": "v13.35.0",
+        "pestphp/pest": "v4.7.8"
+      }
+    },
+    "frontend/package-lock.json": {
+      "sha256": "3a30ab82cd559848f375c70741c215b170d6070cc52e827ff0e5d479c3043f2a",
+      "bytes": 239456,
+      "lockfile_version": 3
+    }
+  },
+  "compose": {
+    "project": "tutorlink-d06-test",
+    "files": [
+      "compose.testing.yml",
+      "compose.d06.testing.yml",
+      "compose.d06.runtime.testing.yml"
+    ],
+    "sha256": {
+      "compose.testing.yml": "74309c3f9c8ef472fd22924076fd85a6215606903f7d028a2ea2c3c8355724d2",
+      "compose.d06.testing.yml": "71c2c577ee64cc20178d92bbbcc739ec38eaa23c4365bfb4562b4a2110465fdf",
+      "compose.d06.runtime.testing.yml": "2c24c717cd5519f4c15d2fbf4e2dabefe815df2715f83a0250dc009139675f9b"
+    },
+    "config_validation": "pass",
+    "test_db_service": "healthy; no host port published; tmpfs data",
+    "runtime_override": "validated; host bind 127.0.0.1:18006 -> container 8000; not started"
+  },
+  "images": {
+    "runner": {
+      "tag": "tutorlink-d06-backend-test:local",
+      "id": "sha256:1fb3547c839c02445392925b2c9b05469911f7d364e444bbed45ced01bc7a0b9",
+      "build": "success",
+      "config_sha256": "sha256:1e1bc5f89d2ae5dec5fd961d30e225cd3cbc4d5536fe8198c85c74c94d909c80"
+    },
+    "postgres": {
+      "tag": "postgres:16-alpine",
+      "id": "sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea",
+      "server_version": "PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit"
+    },
+    "default_compose_tag_observation": {
+      "tag": "tutorlink-h01-backend-test:local",
+      "refreshed_during_initial_build": true,
+      "config_sha256": "sha256:1e1bc5f89d2ae5dec5fd961d30e225cd3cbc4d5536fe8198c85c74c94d909c80",
+      "stopped_container_restarted": false
+    }
+  },
+  "runner": {
+    "php": "8.3.36",
+    "laravel": "13.35.0",
+    "composer_platform_check": "pass",
+    "artisan_bootstrap": "pass",
+    "app_env": "testing",
+    "db": {
+      "driver": "pgsql",
+      "host": "test-db",
+      "database": "tutorlink_test",
+      "username": "tutorlink_test_runner",
+      "server_address": "172.30.0.2",
+      "connect": "pass",
+      "database_create_privilege": true,
+      "public_schema_create_privilege": true
+    },
+    "queue": "sync",
+    "mail": "array",
+    "broadcast": "null",
+    "evidence_mount": "outputs/be-d06:/evidence"
+  },
+  "host": {
+    "php": "8.3.6",
+    "composer_platform_check_lock": "pass",
+    "composer_platform_check_vendor": "pass",
+    "test_database_guard": "blocked safely (configured app DB is not an allowed isolated test target)",
+    "artisan_bootstrap": "failed: Laravel\\Telescope\\Telescope class missing"
+  },
+  "local_runtime": {
+    "backend": "exited",
+    "database": "exited",
+    "broadcast_worker": "restarting",
+    "outbox_worker": "restarting",
+    "slack_worker": "restarting",
+    "http_smoke_ready": false
+  },
+  "commands": {
+    "compose_config_test": "pass",
+    "test_db_up": "pass",
+    "runner_build": "pass",
+    "runner_composer_platform": "pass",
+    "runner_test_console_check": "pass",
+    "runner_artisan_version": "pass",
+    "db_privileges_read_only": "pass",
+    "host_platform_lock": "pass",
+    "host_platform_vendor": "pass",
+    "host_guard": "failed_safe",
+    "host_artisan_version": "failed_missing_telescope",
+    "migration_or_reset": "not_run",
+    "test_suite": "not_run",
+    "http_smoke": "not_run"
+  },
+  "working_tree_at_capture": {
+    "status_porcelain": [
+      " M docs/README.md",
+      "?? compose.d06.runtime.testing.yml",
+      "?? compose.d06.testing.yml",
+      "?? docs/handover/BE-D06-contract.md",
+      "?? docs/handover/BE-D06-plan.md",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/pending.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/rejected.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/valid.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_owner.pdf",
+      "?? docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_purpose.pdf",
+      "?? docs/handover/evidence/be-d06/2026-11-04-193718/baseline.md",
+      "?? docs/handover/evidence/be-d06/2026-11-04-193718/dependency-refs.md",
+      "?? docs/handover/evidence/be-d06/2026-11-04-193718/gap-register.md",
+      "?? docs/handover/evidence/be-d06/2026-11-04-193718/source-manifest.json",
+      "?? docs/handover/evidence/be-d06/2026-11-04-195035/compose-profile.json",
+      "?? docs/handover/evidence/be-d06/2026-11-04-195035/environment-manifest.json",
+      "?? docs/handover/evidence/be-d06/2026-11-04-195035/environment.md"
+    ],
+    "tracked_diff_sha256": "898bc56db9712dcbddfe21ba20c3919d03b300c68d7af4e368f8366892868735",
+    "tracked_diff_bytes": 1038,
+    "untracked_file_sha256": {
+      "compose.d06.runtime.testing.yml": "2c24c717cd5519f4c15d2fbf4e2dabefe815df2715f83a0250dc009139675f9b",
+      "compose.d06.testing.yml": "71c2c577ee64cc20178d92bbbcc739ec38eaa23c4365bfb4562b4a2110465fdf",
+      "docs/handover/BE-D06-contract.md": "91340a6fe64e770a4d0a88ed71bdadfb254b1c3188d2f2d144f0713dcd18e325",
+      "docs/handover/BE-D06-plan.md": "4fca264e234105786e45110d8fc281ea71c2418ab63cef270de14ae85724ef9e",
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/pending.pdf": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c",
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/rejected.pdf": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c",
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/valid.pdf": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c",
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_owner.pdf": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c",
+      "docs/handover/evidence/be-d04/test/2026-11-01-2252/D04-03/storage/private/be-d04/fixtures/wrong_purpose.pdf": "47d80a37999a93103790423b97982fcc7b40812d718119b27a0bb522ca6c050c",
+      "docs/handover/evidence/be-d06/2026-11-04-193718/baseline.md": "e1466c20ef77b0f3a45dd58af52cc31c404204b00222c245e638c43c8df2ae7f",
+      "docs/handover/evidence/be-d06/2026-11-04-193718/dependency-refs.md": "0f3ff8808269aee4b4b68f601598ce601dcceb5162861612053b7eb5309eb22a",
+      "docs/handover/evidence/be-d06/2026-11-04-193718/gap-register.md": "4c7985d8146fd571c68f59f29995277642062793df11e9c6e235a21437298438",
+      "docs/handover/evidence/be-d06/2026-11-04-193718/source-manifest.json": "8f1b679c0e0d548e176e460cf22339619d8528fc7d438c240b5b572e18d7ee35",
+      "docs/handover/evidence/be-d06/2026-11-04-195035/compose-profile.json": "c32b8202cf02ad08273720a4523dbbf91205b13a33fc50e5701f530535444385",
+      "docs/handover/evidence/be-d06/2026-11-04-195035/environment.md": "70ddb2d83763fbbf3f038c988d331e372de7b70e60c619c98b4214c970f26d2c"
+    }
+  },
+  "exit_codes": {
+    "docker_compose_config_base_and_d06": 0,
+    "docker_compose_config_http_profile": 0,
+    "test_db_up": 0,
+    "runner_build": 0,
+    "runner_guard": 0,
+    "runner_composer_check_platform_reqs": 0,
+    "runner_artisan_version": 0,
+    "test_db_privilege_query": 0,
+    "host_composer_check_platform_reqs_lock": 0,
+    "host_composer_check_platform_reqs_vendor": 0,
+    "host_test_console_check": 1,
+    "host_artisan_version": 1,
+    "local_runtime_status_snapshot": 0,
+    "migration_reset_seed_test_suite_http_smoke": null
+  }
+}

@@ -1,0 +1,4 @@
+Command: docker compose -f compose.testing.yml -f compose.d06.testing.yml -p tutorlink-d06-test run --rm --no-deps --entrypoint php backend-test scripts/test-console.php check
+Exit status: 1
+Observed: SQLSTATE[08006] [7] connection to server at "test-db" (172.30.0.2), port 5432 failed: Connection refused.
+Context: this run started immediately after starting test-db and before the PostgreSQL healthcheck passed. The command was rerun after `docker compose up -d --wait test-db`; see guard.log.

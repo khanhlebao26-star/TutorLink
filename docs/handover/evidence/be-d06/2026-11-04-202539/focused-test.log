@@ -1,0 +1,27 @@
+ Container tutorlink-d06-test-backend-test-run-2fd84a68d038 Creating
+ Container tutorlink-d06-test-backend-test-run-2fd84a68d038 Created
+
+   FAIL  Tests\Feature\ProgramLifecycleApiTest
+  ⨯ it returns 403 for an inactive Tutor before changing Program lifecy… 0.49s
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\ProgramLifecycleApiTest > it return…  QueryException
+  SQLSTATE[23514]: Check violation: 7 ERROR:  new row for relation "users" violates check constraint "users_status_check"
+DETAIL: [redacted synthetic row; invalid status=inactive]. (Connection: pgsql, Host: test-db, Port: 5432, Database: tutorlink_test, SQL: update "users" set "status" = inactive where "id" = 1)
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:626
+    622▕             $statement = $this->getPdo()->prepare($query);
+    623▕
+    624▕             $this->bindValues($statement, $this->prepareBindings($bindings));
+    625▕
+  ➜ 626▕             $statement->execute();
+    627▕
+    628▕             $this->recordsHaveBeenModified(
+    629▕                 ($count = $statement->rowCount()) > 0
+    630▕             );
+
+      +6 vendor frames
+  7   tests/Feature/ProgramLifecycleApiTest.php:112
+
+
+  Tests:    1 failed (0 assertions)
+  Duration: 0.63s
