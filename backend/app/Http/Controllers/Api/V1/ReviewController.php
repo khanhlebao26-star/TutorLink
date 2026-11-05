@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Reviews\ModerateReview;
 use App\Http\Controllers\Controller;
 use App\Models\Program;
 use App\Support\TrustWorkflow;
@@ -143,21 +144,8 @@ class ReviewController extends Controller
     {
         $flow->permission($request, 'admin.reviews.moderate');
         $flow->fields($request, ['expected_version', 'reason']);
-        $data = $request->validate(['expected_version' => 'required|integer:strict|min:1', 'reason' => ['required', 'string', 'max:2000', 'regex:/\S/u']]);
+        $result = app(ModerateReview::class)->execute($request->user(), $review, $visibility, $request->all());
 
-        return DB::transaction(function () use ($request, $review, $visibility, $flow, $data): JsonResponse {
-            $flow->lockActor($request);
-            $flow->permission($request, 'admin.reviews.moderate');
-            $row = DB::table('reviews')->where('id', $review)->lockForUpdate()->first();
-            abort_unless($row, 404);
-            if ((int) $row->version !== $data['expected_version'] || $row->visibility === $visibility) {
-                $flow->fail($request, 409, 'stale_review_version', 'Review has changed.');
-            }
-            DB::table('reviews')->where('id', $review)->update(['visibility' => $visibility, 'version' => $row->version + 1, 'updated_at' => now('UTC')]);
-            $flow->audit($request, $visibility === 'hidden' ? 'review.hide' : 'review.restore', 'review', $review,
-                ['visibility' => $row->visibility, 'version' => (int) $row->version], ['visibility' => $visibility, 'version' => $row->version + 1], $data['reason']);
-
-            return response()->json(['data' => $flow->reviewData(DB::table('reviews')->find($review))]);
-        }, 3);
+        return response()->json(['data' => $result]);
     }
 }

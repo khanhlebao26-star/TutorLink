@@ -71,8 +71,8 @@ export async function transitionOwnerListing(id: number, status: "active" | "ina
 export async function archiveOwnerListing(id: number): Promise<void> {
   await request({ method: "DELETE", url: `/me/listings/${id}` }, true);
 }
-export async function getPublicTutor(slug: string): Promise<TutorPublic> {
-  const response = await request<ApiEnvelope<TutorPublic>>({ method: "GET", url: `/tutors/${encodeURIComponent(slug)}` });
+export async function getPublicTutor(slug: string, listingsPage = 1): Promise<TutorPublic> {
+  const response = await request<ApiEnvelope<TutorPublic>>({ method: "GET", url: `/tutors/${encodeURIComponent(slug)}`, params: { listings_page: listingsPage } });
   return response.data.data;
 }
 export async function getTutorReviews(slug: string, page = 1): Promise<TutorReviewCollection> {

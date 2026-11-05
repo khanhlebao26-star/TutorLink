@@ -223,15 +223,16 @@ Route::prefix('v1')->group(function () {
             ->middleware(['signed', 'throttle:6,1'])
             ->name('verification.verify');
 
+        Route::post('/email/verification-notification', [
+            AuthController::class,
+            'resendVerification',
+        ])->middleware('throttle:6,1')
+            ->name('verification.send');
+
         Route::middleware('auth:web')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout'])
                 ->name('auth.logout');
 
-            Route::post('/email/verification-notification', [
-                AuthController::class,
-                'resendVerification',
-            ])->middleware('throttle:6,1')
-                ->name('verification.send');
         });
     });
 

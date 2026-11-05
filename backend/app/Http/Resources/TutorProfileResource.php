@@ -16,6 +16,12 @@ class TutorProfileResource extends JsonResource
             'specialization_id' => $this->specializations->first()?->id,
             'avatar_file_id' => $this->avatar_file_id,
             'verification_document_file_id' => $this->verificationDocuments->first()?->file_id,
+            'verification_documents' => $this->when($request->user()?->id === $this->user_id, fn () => $this->verificationDocuments->map(fn ($document) => [
+                'id' => (int) $document->id, 'file_id' => (int) $document->file_id,
+                'tutor_profile_id' => (int) $document->tutor_profile_id,
+                'document_type' => $document->document_type, 'status' => $document->status,
+                'expires_at' => $document->expires_at?->toISOString(),
+            ])->values()),
             'qualification_claims' => $this->qualification_claims ?? [],
             'revision' => app(TutorProfileRevisions::class)->latest($this->resource),
             'headline' => $this->headline,

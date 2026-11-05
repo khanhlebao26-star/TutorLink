@@ -6,6 +6,7 @@ use App\Support\AdminAuthorization;
 use App\Support\AdminPermissions;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
@@ -21,8 +22,13 @@ use Laravel\Sanctum\HasApiTokens;
 
 #[Fillable(['full_name', 'email', 'password_hash', 'role', 'status', 'permissions', 'date_of_birth', 'terms_version'])]
 #[Hidden(['password_hash', 'remember_token', 'permissions'])]
-class User extends Authenticatable implements FilamentUser, MustVerifyEmailContract
+class User extends Authenticatable implements FilamentUser, HasName, MustVerifyEmailContract
 {
+    public function getFilamentName(): string
+    {
+        return $this->full_name;
+    }
+
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, MustVerifyEmailTrait, Notifiable, SoftDeletes;
 

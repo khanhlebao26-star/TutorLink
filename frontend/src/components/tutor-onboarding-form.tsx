@@ -54,7 +54,11 @@ function statusTone(
   return "neutral";
 }
 
+function editableProfile(profile:TutorProfile|null):TutorProfile|null {
+ return profile?.status==="approved"&&profile.revision?{...profile,...profile.revision.payload,revision:profile.revision}:profile;
+}
 function profileIsLocked(profile: TutorProfile | null) {
+  if(profile?.status==="approved")return !!profile.revision&&!["draft","changes_requested","approved"].includes(profile.revision.status);
   return profile !== null
     && profile.status !== "draft"
     && profile.status !== "changes_requested";
@@ -63,6 +67,7 @@ function profileIsLocked(profile: TutorProfile | null) {
 function fieldStep(name: string) {
   if (name === "headline" || name === "bio") return 1;
   if (name === "specialization_id") return 2;
+  if (name.startsWith("qualification_claims")) return 3;
   if (name === "experience_years") return 3;
   if (name === "avatar_file_id") return 1;
   if (name === "verification_document_file_id" || name === "document_type") return 4;
@@ -71,11 +76,12 @@ function fieldStep(name: string) {
 
 export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingData; onReload: () => void }) {
   const [profile, setProfile] = useState<TutorProfile | null>(data.profile);
-  const [headline, setHeadline] = useState(data.profile?.headline ?? "");
-  const [bio, setBio] = useState(data.profile?.bio ?? "");
-  const [experienceYears, setExperienceYears] = useState(String(data.profile?.experience_years ?? ""));
-  const [specializationId, setSpecializationId] = useState(String(data.profile?.specialization_id ?? ""));
-  const [documentType, setDocumentType] = useState("teaching_certificate");
+  const [headline, setHeadline] = useState(editableProfile(data.profile)?.headline ?? "");
+  const [bio, setBio] = useState(editableProfile(data.profile)?.bio ?? "");
+  const [experienceYears, setExperienceYears] = useState(String(editableProfile(data.profile)?.experience_years ?? ""));
+  const [specializationId, setSpecializationId] = useState(String(editableProfile(data.profile)?.specialization_id ?? ""));
+  const [documentType, setDocumentType] = useState("identity_card");
+  const [claims,setClaims]=useState(data.profile?.revision?.payload.qualification_claims??data.profile?.qualification_claims??[]);
   const [step, setStep] = useState(1);
   const [furthestStep, setFurthestStep] = useState(1);
   const [uploads, setUploads] = useState<Record<UploadPurpose, UploadState>>({
@@ -93,17 +99,17 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
   useEffect(() => {
     setProfile(data.profile);
-    setHeadline(data.profile?.headline ?? "");
-    setBio(data.profile?.bio ?? "");
-    setExperienceYears(String(data.profile?.experience_years ?? ""));
-    setSpecializationId(String(data.profile?.specialization_id ?? ""));
+    setHeadline(editableProfile(data.profile)?.headline ?? "");
+    setBio(editableProfile(data.profile)?.bio ?? "");
+    setExperienceYears(String(editableProfile(data.profile)?.experience_years ?? ""));
+    setSpecializationId(String(editableProfile(data.profile)?.specialization_id ?? ""));
     setUploads({ avatar: { ...emptyUpload }, verification_document: { ...emptyUpload } });
     setQueuedAvatar(null);
   }, [data]);
 
   const locked = profileIsLocked(profile);
   const changesRequested =
-    profile?.status === "changes_requested";
+    profile?.status === "changes_requested" || profile?.revision?.status === "changes_requested";
   const busy = saving || Object.values(uploads).some((upload) => upload.busy);
   const verified = Boolean(data.user.email_verified_at);
   const attachedAvatar = Boolean(profile?.avatar_file_id);
@@ -119,6 +125,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
   function applyProfile(next: TutorProfile) {
     setProfile(next);
+    next=editableProfile(next)!;
     setHeadline(next.headline ?? "");
     setBio(next.bio ?? "");
     setExperienceYears(String(next.experience_years ?? ""));
@@ -146,6 +153,8 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
   function draftInput() {
     return {
+      expected_version: profile?.status==="approved" ? (["draft","changes_requested"].includes(profile.revision?.status??"")?profile.revision?.version:0):undefined,
+      qualification_claims:claims,
       headline: headline.trim(),
       bio: bio.trim(),
       experience_years: Number(experienceYears),
@@ -203,7 +212,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
   async function attachCompleted(purpose: UploadPurpose, fileId: number) {
     const attached = purpose === "avatar"
-      ? await attachTutorAvatar(fileId)
+      ? await attachTutorAvatar(fileId, profile?.status==="approved"&&profile.revision&&["draft","changes_requested"].includes(profile.revision.status)?profile.revision.version:0)
       : (await createVerificationDocument({ fileId, documentType: documentType.trim() }), await getTutorProfile());
     setProfile(attached);
     setUploads((current) => ({
@@ -413,29 +422,18 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
           <div>
             <strong className="onboarding-field-label">
               {label}
-              {purpose === "avatar" ? <span className="onboarding-required"> *</span> : <span className="muted"> · Không bắt buộc</span>}
+              {purpose === "avatar" ? <span className="onboarding-required"> *</span> : <span className="muted"> · Giấy tờ định danh bắt buộc</span>}
             </strong>
             <p>
               {purpose === "avatar"
                 ? "Ảnh hồ sơ rõ mặt, JPG hoặc PNG, tối đa 5 MB (5.000.000 byte)."
-                : "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 5 MB (5.000.000 byte). Có thể bổ sung sau."}
+                : "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 5 MB (5.000.000 byte). Cần giấy tờ định danh và tài liệu khớp bằng cấp đã khai báo. Complete chỉ kiểm tra kỹ thuật; nội dung được duyệt riêng."}
             </p>
           </div>
         </div>
         {purpose === "verification_document" ? (
           <div className="onboarding-field onboarding-document-type">
-            <Field label="Loại tài liệu" htmlFor="tutor-document_type" error={fieldError("document_type")}>
-              <Input
-                value={documentType}
-                maxLength={50}
-                disabled={locked || busy}
-                aria-invalid={Boolean(fieldError("document_type"))}
-                onChange={(event) => {
-                  setDocumentType(event.target.value);
-                  setFieldErrors((current) => ({ ...current, document_type: [] }));
-                }}
-              />
-            </Field>
+            <Field label="Loại tài liệu *" htmlFor="tutor-document_type" error={fieldError("document_type")}><Select value={documentType} disabled={locked||busy} onChange={event=>setDocumentType(event.target.value)}><option value="identity_card">CCCD / CMND</option><option value="passport">Hộ chiếu</option><option value="degree">Bằng cấp</option><option value="certificate">Chứng chỉ</option><option value="other">Khác</option></Select></Field>
           </div>
         ) : null}
         <input
@@ -511,7 +509,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         <div className="onboarding-panel-heading">
           <div>
             <h2>{step === 1 ? "Thông tin cơ bản" : step === 2 ? "Chuyên môn giảng dạy" : step === 3 ? "Kinh nghiệm giảng dạy" : step === 4 ? "Tài liệu xác minh" : "Xem lại hồ sơ"}</h2>
-            <p>{step === 1 ? "Giúp học viên hiểu rõ hơn về bạn và cách bạn giảng dạy." : step === 2 ? "Chọn chuyên môn phù hợp nhất với dịch vụ giảng dạy của bạn." : step === 3 ? "Chia sẻ số năm kinh nghiệm giảng dạy." : step === 4 ? "Tải lên tài liệu chứng minh thông tin chuyên môn." : "Kiểm tra thông tin trước khi gửi xét duyệt."}</p>
+            <p>{step === 1 ? "Giúp học viên hiểu rõ hơn về bạn và cách bạn giảng dạy." : step === 2 ? "Chọn chuyên môn phù hợp nhất với dịch vụ giảng dạy của bạn." : step === 3 ? "Chia sẻ số năm kinh nghiệm giảng dạy." : step === 4 ? "Tải giấy tờ định danh và tài liệu tương ứng với bằng cấp đã khai báo. File complete chỉ xác nhận kiểm tra kỹ thuật; nội dung được duyệt riêng." : "Kiểm tra thông tin trước khi gửi xét duyệt."}</p>
           </div>
           <div className="onboarding-heading-status">
             <Badge tone={statusTone(profile)} className={`onboarding-status-pill ${changesRequested ? "is-warning" : profile?.status === "approved" ? "is-success" : ""}`}>
@@ -552,6 +550,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
         {step === 3 ? (
           <div className="onboarding-fields">
+            <div><h3>Bằng cấp / Chứng chỉ khai báo</h3><p className="muted">Mỗi loại đã khai báo cần tài liệu xác minh tương ứng.</p>{claims.map((claim,index)=><div className="button-row" key={index}><Select aria-label={`Loại chứng nhận ${index+1}`} disabled={locked||busy} value={claim.type} onChange={e=>setClaims(claims.map((c,i)=>i===index?{...c,type:e.target.value as "degree"|"certificate"}:c))}><option value="degree">Bằng cấp</option><option value="certificate">Chứng chỉ</option></Select><Input aria-label={`Tên chứng nhận ${index+1}`} maxLength={160} required disabled={locked||busy} value={claim.name} onChange={e=>setClaims(claims.map((c,i)=>i===index?{...c,name:e.target.value}:c))}/><Button variant="ghost" disabled={locked||busy} onClick={()=>setClaims(claims.filter((_,i)=>i!==index))}>Xóa</Button></div>)}<Button variant="outline" disabled={locked||busy||claims.length>=20} onClick={()=>setClaims([...claims,{type:"degree",name:""}])}>+ Thêm bằng cấp / chứng chỉ</Button></div>
             <div className="onboarding-field onboarding-years-field">
               <Field label="Số năm kinh nghiệm *" htmlFor="tutor-experience_years" error={fieldError("experience_years")} hint="Nhập số năm hoàn chỉnh, từ 0 đến 80.">
                 <Input type="number" min={0} max={80} step={1} value={experienceYears} disabled={locked || busy} required aria-invalid={Boolean(fieldError("experience_years"))} onChange={(event) => { setExperienceYears(event.target.value); clearFieldError("experience_years"); }} />
@@ -566,6 +565,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
         {step === 4 ? (
           <div className="onboarding-fields">
+            {profile?.verification_documents?.map(document=><p key={document.id}>#{document.id} · {document.document_type} · {document.status}</p>)}
             {renderUpload("verification_document", "Tài liệu xác minh")}
             <div className="onboarding-document-summary">
               <strong>Yêu cầu tải tệp</strong>
@@ -623,6 +623,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         ) : null}
         </div>
 
+        {profile?.revision&&<p role="status">Bản sửa #{profile.revision.revision_no}: {profile.revision.status} · {profile.revision.review_reason}</p>}
         {error ? <p className="onboarding-alert onboarding-form-notice" role="alert">{error}</p> : null}
         {message ? <p className="onboarding-inline-success onboarding-form-notice" role="status">{message}</p> : null}
         {locked && !changesRequested ? <p className="onboarding-lock-note onboarding-form-notice">Hồ sơ đã gửi hoặc đã được xét duyệt nên hiện chỉ có thể xem lại.</p> : null}

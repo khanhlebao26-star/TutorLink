@@ -48,6 +48,7 @@ export interface Availability { timezone: string; rules: AvailabilityRule[] }
 export interface PublicTutorSpecialization { id: number; name: string; slug: string; subcategory: string | null; category: string | null }
 export interface PublicTutorAvailabilityRule extends AvailabilityRule { timezone: string }
 export interface TutorPublic {
+  messaging_user_id: number;
   slug: string;
   name: string | null;
   headline: string;
@@ -55,7 +56,9 @@ export interface TutorPublic {
   experience_years: number;
   specializations: PublicTutorSpecialization[];
   availability_rules: PublicTutorAvailabilityRule[];
-  listings: PublicListing[];
+  listings: Pick<PublicListing, "slug" | "title" | "delivery_mode" | "city" | "district" | "price_from_minor" | "currency" | "price_unit" | "specialization_name">[];
+  avatar: null;
+  listings_meta: { page: number; per_page: 10; has_more: boolean; next_page: number | null };
 }
 export interface VisibleReview {
   id: number;

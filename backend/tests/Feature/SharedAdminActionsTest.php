@@ -142,6 +142,7 @@ it('keeps Filament panels closed until Gate BE and requires fresh verified Admin
     expect(TestActors::customer()->canAccessPanel($panel))->toBeFalse();
     $admin->forceFill(['permissions' => []])->save();
     expect($admin->canAccessPanel($panel))->toBeFalse();
+    config(['admin.panel_enabled' => false]);
     $this->get('/admin')->assertNotFound();
     $this->get('/admin/login')->assertNotFound();
 });

@@ -1,6 +1,3 @@
 <?php
 
-return [
-    // Enable only after the backend gate and a separately reviewed panel implementation.
-    'panel_enabled' => false,
-];
+return ['panel_enabled' => env('ADMIN_PANEL_ENABLED', false)];

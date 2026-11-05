@@ -1,14 +1,16 @@
 "use client";
 
+import {OpenChatButton} from "./open-chat-button";
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { getPublicTutor, deliveryLabels, formatListingPrice } from "@/lib/data/marketplace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { PublicAvailability } from "./public-availability";
 import { Badge, ErrorActions, StatePanel } from "./ui";
 
 export function PublicTutor({ slug }: { slug: string }) {
-  const load = useCallback(() => getPublicTutor(slug), [slug]);
+  const [page, setPage] = useState(1);
+  const load = useCallback(() => getPublicTutor(slug, page), [slug, page]);
   const { data, error, loading, reload } = useAsyncData(load);
 
   if (loading) return <StatePanel kind="loading" message="Đang tải hồ sơ gia sư…" />;
@@ -85,13 +87,13 @@ export function PublicTutor({ slug }: { slug: string }) {
             {data.listings.length ? (
               <div className="public-listings-grid">
                 {data.listings.map((listing) => (
-                  <Link className="card public-listing-card" href={`/marketplace/${encodeURIComponent(listing.slug)}`} key={listing.id}>
+                  <Link className="card public-listing-card" href={`/marketplace/${encodeURIComponent(listing.slug)}`} key={listing.slug}>
                     <div className="public-detail-tags">
                       <Badge tone="brand">{deliveryLabels[listing.delivery_mode]}</Badge>
                       {listing.city ? <Badge>{listing.city}</Badge> : null}
                     </div>
                     <h3>{listing.title}</h3>
-                    <p>{[listing.category_name, listing.subcategory_name, listing.specialization_name].filter(Boolean).join(" · ")}</p>
+                    <p>{[listing.specialization_name].filter(Boolean).join(" · ")}</p>
                     <strong>{formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit)}</strong>
                   </Link>
                 ))}
@@ -99,11 +101,16 @@ export function PublicTutor({ slug }: { slug: string }) {
             ) : (
               <StatePanel kind="empty" message="Gia sư chưa có dịch vụ đang công khai." />
             )}
+            <nav aria-label="Trang dịch vụ gia sư" className="button-row">
+              <button className="button button-secondary" disabled={page === 1} onClick={() => setPage(page - 1)}>Trang trước</button>
+              <span>Trang {page}</span>
+              <button className="button button-secondary" disabled={!data.listings_meta.has_more} onClick={() => setPage(data.listings_meta.next_page ?? page)}>Trang sau</button>
+            </nav>
           </section>
         </div>
 
         <aside className="public-tutor-sidebar" aria-label="Thông tin gia sư">
-          <PublicAvailability availability={availability} />
+          <section id="contact" className="card"><h2>Trao đổi cùng gia sư</h2><OpenChatButton peerId={data.messaging_user_id}/></section><PublicAvailability availability={availability} />
         </aside>
       </div>
     </section>

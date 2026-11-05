@@ -2,7 +2,7 @@
 
 import { AppShell } from "@/components/app-shell";
 import { Badge, Button, DataTable, ErrorActions, Field, StatePanel } from "@/components/ui";
-import { describeApiError } from "@/lib/api/client";
+import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { getAdminTutorProfile, getAdminTutorProfiles, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
 import type { AdminTutorProfile, TutorProfileStatus } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
@@ -98,13 +98,14 @@ export default function AdminPage() {
           setActionMessage("Đã cập nhật trạng thái tài khoản. Chưa tải được quyền thao tác mới; hãy tải lại hồ sơ.");
         }
       } else {
-        setDetail(await performAdminTutorAction(detail.profile.id, action, reason.trim()));
+        setDetail(await performAdminTutorAction(detail.profile.id, action, reason.trim(), detail));
       }
       setReason("");
       reload();
     } catch (nextError) {
+      if(nextError instanceof ApiClientError && [403,404].includes(nextError.status??0))setDetail(null);
       setActionError(describeApiError(nextError));
-      try { setDetail(await getAdminTutorProfile(detail.profile.id)); } catch { /* Keep the existing detail with its error. */ }
+      try { setDetail(await getAdminTutorProfile(detail.profile.id)); } catch { setDetail(null); }
     } finally {
       setSaving(false);
     }

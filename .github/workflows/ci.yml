@@ -150,7 +150,7 @@ jobs:
           if-no-files-found: warn
 
   frontend:
-    name: Frontend lint and build
+    name: Frontend tests, lint and build
     runs-on: ubuntu-latest
 
     defaults:
@@ -173,5 +173,20 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Frontend tests and coverage
+        run: npm run test:coverage -- --reporter=default --reporter=junit --outputFile.junit=coverage/junit.xml
+
       - name: Build
         run: npm run build
+
+      - name: Upload frontend evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: frontend/coverage/
+          retention-days: 14
+          if-no-files-found: warn

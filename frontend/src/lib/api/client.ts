@@ -1,6 +1,7 @@
 import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
 
 type ApiErrorBody = {
+  code?: string;
   message?: string;
   errors?: Record<string, string[]>;
   request_id?: string;
@@ -36,6 +37,7 @@ export class ApiClientError extends Error {
   code?: string;
   fieldErrors?: Record<string, string[]>;
   requestId?: string;
+  retryAfter?: number;
 
   constructor(
     message: string,
@@ -44,6 +46,7 @@ export class ApiClientError extends Error {
       code?: string;
       fieldErrors?: Record<string, string[]>;
       requestId?: string;
+      retryAfter?: number;
     },
   ) {
     super(message);
@@ -52,6 +55,7 @@ export class ApiClientError extends Error {
     this.code = options?.code;
     this.fieldErrors = options?.fieldErrors;
     this.requestId = options?.requestId;
+    this.retryAfter = options?.retryAfter;
   }
 }
 
@@ -72,20 +76,25 @@ export const api = axios.create({
   withXSRFToken: true,
 });
 
-function toApiClientError(error: unknown): ApiClientError {
+export function toApiClientError(error: unknown): ApiClientError {
   if (error instanceof ApiClientError) return error;
   const axiosError = error as AxiosError<ApiErrorBody>;
   const response = axiosError.response;
   const body = response?.data;
   return new ApiClientError(body?.message ?? body?.error?.message ?? (axiosError.message || "Không thể kết nối tới máy chủ."), {
     status: response?.status,
-    code: body?.error?.code,
+    code: body?.code ?? body?.error?.code,
     fieldErrors: body?.errors,
-    requestId: body?.request_id,
+    requestId: body?.request_id ?? response?.headers?.["x-request-id"],
+    retryAfter: response?.headers?.["retry-after"] ? Number(response.headers["retry-after"]) : undefined,
   });
 }
 
-api.interceptors.response.use((response) => response, (error) => Promise.reject(toApiClientError(error)));
+api.interceptors.response.use((response) => response, (error) => {
+  const normalized = toApiClientError(error);
+  if (normalized.status === 401) setAuthHint(false);
+  return Promise.reject(normalized);
+});
 
 export async function initializeCsrf() {
   try {

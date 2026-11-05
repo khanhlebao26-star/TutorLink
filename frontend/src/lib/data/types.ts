@@ -46,6 +46,9 @@ export interface TutorProfile {
   specialization_id: number | null;
   avatar_file_id: number | null;
   verification_document_file_id: number | null;
+  verification_documents?: VerificationDocument[];
+  qualification_claims?: Array<{type:"degree"|"certificate";name:string}>;
+  revision?: {id:number;revision_no:number;status:"draft"|"submitted"|"changes_requested"|"approved"|"rejected";version:number;payload:Partial<TutorProfile>;review_reason:string|null}|null;
   headline: string;
   bio?: string | null;
   experience_years: number;
@@ -65,7 +68,7 @@ export interface VerificationDocument {
   tutor_profile_id: number;
   file_id: number;
   document_type: string;
-  status: "pending" | "active" | "rejected" | "expired";
+  status: "pending" | "active" | "approved" | "rejected" | "expired";
   reviewed_at?: string | null;
   original_name?: string | null;
   mime_type?: string;
@@ -75,6 +78,8 @@ export interface VerificationDocument {
 }
 
 export interface AdminTutorProfile {
+  assignment?: {assignment_version:number;assigned_admin_id:number|null};
+  revision?: TutorProfile["revision"];
   allowed_actions: Array<"approve" | "request-changes" | "reject" | "suspend" | "restore" | "account-suspend" | "account-restore">;
   user: User;
   profile: TutorProfile;

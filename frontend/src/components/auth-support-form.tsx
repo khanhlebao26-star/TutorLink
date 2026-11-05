@@ -131,7 +131,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
     setSubmitting(true);
     try {
       if (mode === "verify") {
-        setMessage(await resendVerification());
+        setMessage(await resendVerification(email));
       } else if (mode === "forgot") {
         setMessage(await requestPasswordReset(email));
       } else {
@@ -175,6 +175,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
           </div>
         </div>
         <form className="form-stack auth-verify-resend" onSubmit={submit} aria-busy={isBusy}>
+          <Field htmlFor="verify-email-address" label="Email đã đăng ký" error={fieldError("email")}><input className="input" type="email" required value={email} onChange={event=>setEmail(event.target.value)}/></Field>
           <Button type="submit" disabled={isBusy}>{isBusy ? "Đang xử lý…" : "Gửi lại email xác minh"}</Button>
         </form>
         <div className="auth-card-footer auth-verify-next">

@@ -43,3 +43,5 @@ Architecture also contains `Other source files.md` with links to its five non-Go
 - [BE-D01 — Issue #36: tổng kết và nghiệm thu database](https://github.com/khanhlebao26-star/TutorLink/blob/3512fd74f27cb1c7f7992d6d319f2706c5308d90/docs/handover/BE-D01-issue-36-handover.md) là báo cáo chính thay cho năm báo cáo Task 1–5. Bản chi tiết cũ vẫn có trong lịch sử Git tại commit `6cc1d0b2dfbea701bae7a5617c9c313c5b75270c`.
 
 - [BE-D04 — Issue #78: Program Workspace Progress, Announcement và Fee](handover/BE-D04-handover.md): test report, schema/API delta, source/build identity, test→local evidence index và dữ liệu nghiệm thu còn giữ; [test report](handover/BE-D04-test-report.md) · [plan](handover/BE-D04-plan.md). Kết quả actual chỉ áp dụng cho local Docker Compose.
+
+- [FE-K01 / FE-D01 / FE-H01 — bàn giao code](handover/FE-K01-D01-H01-handover.md): Program/Invitation/chat, onboarding, Filament/Blade; phiên bản cuối chờ người dùng tự test và reviewer nghiệm thu.

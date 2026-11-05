@@ -270,7 +270,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       </fieldset>
 
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
-      {message ? <p className="inline-success" role="status">{message}</p> : null}
+      {message ? <div><p className="inline-success" role="status">{message}</p><Link href={`/auth/verify-email?email=${encodeURIComponent(email)}`}>Mở trang xác minh email →</Link></div> : null}
       <Button type="submit" disabled={submitting}>
         {submitting ? "Đang xử lý…" : mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
       </Button>

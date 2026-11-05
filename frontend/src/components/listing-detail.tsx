@@ -71,7 +71,7 @@ export function ListingDetail({ slug }: { slug: string }) {
                 <span className="public-avatar" aria-hidden="true">{(data.tutor_name?.trim().split(/\s+/).slice(-1)[0]?.[0] ?? "G").toLocaleUpperCase()}</span>
                 <span className="public-tutor-copy">
                   <strong>{data.tutor_name?.trim() || "Gia sư"}</strong>
-                  <span>Xem hồ sơ gia sư</span>
+                  <span>Xem hồ sơ & nhắn tin →</span>
                 </span>
               </Link>
             ) : <p>{data.tutor_name}</p>}

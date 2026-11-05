@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\Admin\ReadAdminReports;
 use App\Actions\Reports\AssignReport;
 use App\Actions\Reports\DecideReport;
 use App\Http\Controllers\Controller;
@@ -137,24 +138,7 @@ class ReportController extends Controller
     #[Response(422, description: 'Authorization, scope, state or validation failure.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
     public function index(Request $request, TrustWorkflow $flow): JsonResponse
     {
-        $scope = $request->query('scope', 'mine');
-        if ($scope === 'mine') {
-            $flow->permission($request, 'admin.reports.view');
-
-            return $this->listing($request, $flow, true);
-        }
-        $flow->permission($request, 'admin.reports.assign');
-        $data = $request->validate(['scope' => 'required|in:unassigned,all', 'per_page' => 'sometimes|integer|min:1|max:50']);
-        $query = DB::table('reports');
-        if ($scope === 'unassigned') {
-            $query->whereNull('assigned_admin_id')->where('status', 'open');
-        }
-        $rows = $query->orderByDesc('id')->paginate($data['per_page'] ?? 20);
-
-        return response()->json(['data' => $rows->getCollection()->map(fn ($row) => [
-            'id' => (int) $row->id, 'status' => $row->status, 'assigned_admin_id' => $row->assigned_admin_id,
-            'assignment_version' => (int) $row->assignment_version,
-        ]), 'meta' => ['current_page' => $rows->currentPage(), 'per_page' => $rows->perPage(), 'total' => $rows->total()]]);
+        return app(ReadAdminReports::class)->index($request, $flow);
     }
 
     private function listing(Request $request, TrustWorkflow $flow, bool $admin): JsonResponse
@@ -190,7 +174,7 @@ class ReportController extends Controller
     #[Response(422, description: 'Authorization, scope, state or validation failure.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
     public function show(Request $request, int $report, TrustWorkflow $flow): JsonResponse
     {
-        return response()->json(['data' => $flow->reportData($flow->report($request, $report))]);
+        return app(ReadAdminReports::class)->show($request, $report, $flow);
     }
 
     /** Assign scoped Report data. */
@@ -253,58 +237,8 @@ class ReportController extends Controller
     #[Response(422, description: 'Authorization, scope, state or validation failure.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
     public function evidence(Request $request, int $report, TrustWorkflow $flow): JsonResponse
     {
-        return DB::transaction(function () use ($request, $report, $flow): JsonResponse {
-            $flow->lockActor($request);
-            $row = $flow->report($request, $report, 'admin.reports.view', true);
-            if ($row->status !== 'open') {
-                $flow->fail($request, 403, 'report_evidence_closed', 'Evidence access ends when the Report closes.');
-            }
-            $data = $this->evidenceData($request, $row);
-            $flow->audit($request, 'evidence.read', 'report', $report, null, ['available' => $data !== null]);
-
-            return response()->json(['data' => $data ?? ['code' => 'evidence_unavailable', 'report_id' => $report]], 200, ['Cache-Control' => 'private, no-store']);
-        }, 3);
+        return app(ReadAdminReports::class)->evidence($request, $report, $flow);
     }
 
     /** @return array<string,mixed>|null */
-    private function evidenceData(Request $request, object $report): ?array
-    {
-        if ($report->resource_type === 'message') {
-            $message = DB::table('messages')->find($report->resource_id);
-            if (! $message) {
-                return null;
-            }
-            $base = DB::table('messages')->where('conversation_id', $message->conversation_id);
-            $earlier = (clone $base)->where(fn ($q) => $q->where('created_at', '<', $message->created_at)->orWhere(fn ($q) => $q->where('created_at', $message->created_at)->where('id', '<', $message->id)))
-                ->orderByDesc('created_at')->orderByDesc('id')->limit(10)->get(['id', 'body', 'created_at'])->reverse()->values();
-            $later = (clone $base)->where(fn ($q) => $q->where('created_at', '>', $message->created_at)->orWhere(fn ($q) => $q->where('created_at', $message->created_at)->where('id', '>', $message->id)))
-                ->orderBy('created_at')->orderBy('id')->limit(5)->get(['id', 'body', 'created_at']);
-
-            return ['resource_type' => 'message', 'messages' => $earlier->concat([(object) ['id' => $message->id, 'body' => $message->body, 'created_at' => $message->created_at]])->concat($later)->map(fn ($m) => ['id' => (int) $m->id, 'body' => $m->body, 'created_at' => CarbonImmutable::parse($m->created_at)->utc()->toISOString()])->values()->all()];
-        }
-        [$table, $fields] = match ($report->resource_type) {
-            'program' => ['programs', ['id', 'status', 'version']],
-            'listing' => ['service_listings', ['id', 'title', 'description', 'status']],
-            'tutor_profile' => ['tutor_profiles', ['id', 'headline', 'bio', 'status']],
-            'review' => ['reviews', ['id', 'rating', 'comment', 'visibility']],
-            default => [null, []],
-        };
-        if ($table === null) {
-            return null;
-        }
-        if (in_array($report->resource_type, ['listing', 'tutor_profile'], true) && ! $this->canReport($request, $report->resource_type, (int) $report->resource_id)) {
-            return null;
-        }
-        $row = DB::table($table)->where('id', $report->resource_id)->first($fields);
-
-        if (! $row) {
-            return null;
-        }
-        $history = DB::table('audit_logs')->where('resource_type', $report->resource_type)
-            ->where('resource_id', $report->resource_id)
-            ->whereIn('action', ['review.hide', 'review.restore', 'listing.hide', 'listing.restore'])
-            ->orderByDesc('id')->limit(20)->get(['id', 'action', 'reason', 'created_at']);
-
-        return ['resource_type' => $report->resource_type, 'resource' => (array) $row, 'moderation_history' => $history->all()];
-    }
 }

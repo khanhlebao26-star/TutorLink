@@ -80,7 +80,7 @@ export async function getAdminTutorProfile(id: number): Promise<AdminTutorProfil
 
 export type AdminAction = "approve" | "request-changes" | "reject" | "suspend" | "restore";
 
-export async function performAdminTutorAction(id: number, action: AdminAction, reason: string): Promise<AdminTutorProfile> {
+export async function performAdminTutorAction(id: number, action: AdminAction, reason: string, context: AdminTutorProfile): Promise<AdminTutorProfile> {
   if (dataMode === "mock") {
     await delay();
     const current = await getAdminTutorProfile(id);
@@ -108,8 +108,10 @@ if (action === "suspend") {
 }    current.profile = profile;
     return (await getAdminTutorProfile(id));
   }
-  const response = await request<ApiEnvelope<AdminTutorProfile>>({ method: "POST", url: `/admin/tutor-profiles/${id}/${action}`, data: { reason } }, true);
-  return unwrap(response.data);
+  const decision=!["suspend","restore"].includes(action);
+  if(decision && context.assignment?.assignment_version === undefined) throw new ApiClientError("Tải lại hồ sơ trước khi quyết định.");
+  await request({ method:"POST", url:`/admin/tutor-profiles/${id}/${action}`, data:{reason,...(decision?{assignment_version:context.assignment?.assignment_version,...(context.revision?{expected_version:context.revision.version}:{})}:{})} },true);
+  return getAdminTutorProfile(id);
 }
 
 export async function performAdminAccountAction(id: number, action: "suspend" | "restore", reason: string): Promise<User> {
@@ -174,9 +176,9 @@ export async function verifyEmail(id: string, hash: string, signature?: { expire
   return unwrap(response.data);
 }
 
-export async function resendVerification(): Promise<string> {
+export async function resendVerification(email?: string): Promise<string> {
   if (dataMode === "mock") { await delay(); return "Verification notification sent."; }
-  const response = await request<{ message: string }>({ method: "POST", url: "/auth/email/verification-notification" }, true);
+  const response = await request<{ message: string }>({ method: "POST", url: "/auth/email/verification-notification", data: email ? {email} : undefined }, true);
   return response.data.message;
 }
 
@@ -210,6 +212,8 @@ export async function getTutorProfile(): Promise<TutorProfile> {
 }
 
 export async function saveTutorProfile(input: {
+  expected_version?: number;
+  qualification_claims?: Array<{type:"degree"|"certificate";name:string}>;
   headline: string;
   bio?: string | null;
   experience_years: number;
@@ -273,7 +277,7 @@ export async function completeFile(fileId: number): Promise<FileRecord> {
   return unwrap(response.data);
 }
 
-export async function attachTutorAvatar(fileId: number): Promise<TutorProfile> {
+export async function attachTutorAvatar(fileId: number, expectedVersion?: number): Promise<TutorProfile> {
   if (dataMode === "mock") {
     await delay();
     return { ...mockTutorOnboarding().profile as TutorProfile, avatar_file_id: fileId };
@@ -281,7 +285,7 @@ export async function attachTutorAvatar(fileId: number): Promise<TutorProfile> {
   const response = await request<ApiEnvelope<TutorProfile>>({
     method: "PUT",
     url: "/tutor/profile/avatar",
-    data: { file_id: fileId },
+    data: { file_id: fileId, ...(expectedVersion!==undefined?{expected_version:expectedVersion}:{}) },
   }, true);
   return unwrap(response.data);
 }

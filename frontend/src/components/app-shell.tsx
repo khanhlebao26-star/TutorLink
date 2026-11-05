@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { describeApiError, ApiClientError, request, setAuthHint } from "@/lib/api/client";
 import { getCurrentUser } from "@/lib/data/services";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
@@ -12,6 +12,9 @@ import { PublicFooter } from "./public-footer";
 import { useSessionHint } from "./session-hint";
 import { Button, StatePanel } from "./ui";
 import "@/app/landing.css";
+
+const ActorContext=createContext<User|null>(null);
+export const useActor=()=>useContext(ActorContext);
 
 const roleLabels: Record<Role, string> = {
   customer: "Học viên",
@@ -98,10 +101,10 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     ? role ?? "admin"
     : pathname === "/profile"
       ? role ?? "tutor"
-      : undefined;
+      : role;
   const user = session.status === "authenticated" ? session.user : null;
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
-  const protectedPage = Boolean(requiredRole) || pathname === "/settings";
+  const protectedPage = Boolean(requiredRole) || pathname === "/settings" || ["/programs", "/invitations", "/messages"].some(prefix => isActive(pathname, prefix));
   const needsLogin = protectedPage && session.status === "guest";
   const needsSessionError = protectedPage && session.status === "error";
   const needsRole = Boolean(protectedPage && user && roleMismatch);
@@ -143,7 +146,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         Tiếp tục đến khu vực của bạn
       </Link>
     </section>
-  ) : children;
+  ) : <ActorContext.Provider value={user}>{children}</ActorContext.Provider>;
 
   if (showPublicFrame) {
     const authFrame = mode === "auth" || isAuthRoute;
@@ -196,7 +199,8 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     : activeRole === "tutor"
       ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Dịch vụ của tôi" }, { href: "/me/availability", label: "Lịch khả dụng" }, { href: "/marketplace", label: "Khám phá dịch vụ" }]
       : [{ href: "/marketplace", label: "Tìm dịch vụ" }];
-  const navItems = [...roleNavItems, { href: "/settings", label: "Cài đặt tài khoản" }];
+  const collaborationNav = activeRole === "admin" ? [] : [{href:"/programs",label:"Program của tôi"},{href:"/invitations",label:"Lời mời học"},{href:"/messages",label:"Tin nhắn"}];
+  const navItems = [...roleNavItems, ...collaborationNav, { href: "/settings", label: "Cài đặt tài khoản" }];
 
   return (
     <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}`}>
@@ -217,7 +221,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         </button>
         <nav className="app-topbar-links" aria-label="Điều hướng chính">
           <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined}>Khám phá dịch vụ</Link>
-          <LocaleDisplay />
+          <Link href="/programs">Program của tôi</Link><Link href="/messages">Tin nhắn</Link><LocaleDisplay />
         </nav>
         <div className="topbar-meta">
           {user ? (
