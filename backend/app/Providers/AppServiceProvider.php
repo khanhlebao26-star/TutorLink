@@ -9,6 +9,7 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
@@ -66,6 +67,20 @@ class AppServiceProvider extends ServiceProvider
                 'expires' => $query['expires'],
                 'signature' => $query['signature'],
             ]);
+        });
+
+        VerifyEmail::toMailUsing(function (User $user, string $url): MailMessage {
+            $data = [
+                'name' => $user->full_name,
+                'email' => $user->getEmailForVerification(),
+                'verificationUrl' => $url,
+                'expiresInMinutes' => (int) config('auth.verification.expire', 60),
+            ];
+
+            return (new MailMessage)
+                ->subject('Xác minh email của bạn | TutorLink')
+                ->view('emails.verify-email', $data)
+                ->text('emails.verify-email-text', $data);
         });
 
         ResetPassword::createUrlUsing(function (User $user, string $token): string {

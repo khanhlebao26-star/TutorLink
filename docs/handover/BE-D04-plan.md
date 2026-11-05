@@ -42,6 +42,8 @@ Với version/replay/no-op/transaction, lưu thêm snapshot DB trước/sau gồ
 
 - [x] **D04-02 — Dựng môi trường test cô lập và chặn nhầm database.**
 
+  **Ghi chú bảo trì 05/11/2026:** Override D04 theo timestamp đã được dọn; entrypoint test hiện tại là `compose.testing.yml`. Mô tả sau là evidence lịch sử, không phải lệnh dựng môi trường hiện hành.
+
   **Thực hiện:** Dùng `compose.testing.yml` với override riêng `compose.be-d04.testing.yml`, kết nối DB clone hiện có `tutorlink_test`, `APP_ENV=testing`. Evidence mount riêng D04; storage/app dùng tmpfs. Network internal; mail array, queue sync, broadcast null; Slack credentials bị xóa; không mở API port.
 
   **Hoàn thành khi:** Runner kiểm environment/cache, host được phép, database/user thực tế và địa chỉ PostgreSQL trước migrate/reset; từ chối DB/host ứng dụng trước khi kết nối. Guard chạy trước test trait truncate. Storage tách biệt và evidence giữ trên host.

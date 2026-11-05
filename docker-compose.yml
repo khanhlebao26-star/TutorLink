@@ -49,9 +49,8 @@ services:
       DB_DATABASE: tutorlink
       DB_USERNAME: tutorlink
       DB_PASSWORD: tutorlink_dev_password
-      MAIL_MAILER: smtp
-      MAIL_HOST: mailpit
-      MAIL_PORT: 1025
+      # Mail transport is configured in backend/.env.docker.
+      # Do not override it here: real SMTP must work for web and workers.
       FRONTEND_URL: http://localhost:3000
     volumes:
       - ./backend:/var/www/html

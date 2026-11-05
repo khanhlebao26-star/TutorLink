@@ -1,6 +1,0 @@
-services:
-  backend-test:
-    image: tutorlink-d06-backend-test:local
-    volumes:
-      - ./outputs/be-d06:/evidence
-      - ./backend/.env.docker:/var/www/html/.env:ro

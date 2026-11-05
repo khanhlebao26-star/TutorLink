@@ -47,3 +47,15 @@ Architecture also contains `Other source files.md` with links to its five non-Go
 - [FE-K01 / FE-D01 / FE-H01 — bàn giao code](handover/FE-K01-D01-H01-handover.md): Program/Invitation/chat, onboarding, Filament/Blade; phiên bản cuối chờ người dùng tự test và reviewer nghiệm thu.
 
 - [FE phase 2 — bổ sung code và quality setup](handover/FE-K02-D02-H02-handover.md): Session/Task/notification/trust, Browser/E2E config; chưa nghiệm thu runtime hoặc coverage.
+
+## Docker hiện hành
+
+- `docker-compose.yml`: môi trường local chính (backend/frontend/PostgreSQL/Reverb và công cụ local).
+- `compose.workers.yml`: bổ sung outbox worker, Slack worker và scheduler khi cần chạy các job nền.
+- `compose.testing.yml` + `backend/Dockerfile.testing`: kiểm thử PostgreSQL cô lập; không dùng database local làm database test.
+- `compose.production.yml` + `backend/Dockerfile.production`, `.dockerignore` riêng và `backend/docker/production/`: bộ deploy/backup/rollback production, còn được runbook sử dụng.
+- `backend/Dockerfile`, `backend/.dockerignore`, `backend/docker/uploads.ini`, `docker/pgadmin/servers.json`: file phụ thuộc của các cấu hình trên.
+
+Dọn ngày 05/11/2026: bỏ bốn Compose override theo từng lần chạy BE-D04/BE-D06 (`compose.be-d04.fixtures.testing.yml`, `compose.be-d04.testing.yml`, `compose.d06.runtime.testing.yml`, `compose.d06.testing.yml`) và `frontend/.dockerignore` không có build context sử dụng. Các override cũ chỉ gắn evidence/storage/port của đợt chạy lịch sử, không phải entrypoint runtime hiện tại. Các lệnh/file name trong evidence cũ chỉ ghi nhận cấu hình tại thời điểm tạo báo cáo; không sửa lại evidence. Có thể khôi phục file lịch sử từ Git nếu cần tái hiện chính xác đợt chạy đó.
+
+Việc xóa file cấu hình không xóa container, image hay volume. Các file `.env` local và dữ liệu PostgreSQL/storage được giữ nguyên.
