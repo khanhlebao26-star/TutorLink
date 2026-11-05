@@ -230,7 +230,7 @@ export async function submitTutorProfile(): Promise<TutorProfile> {
   return unwrap(response.data);
 }
 
-export async function uploadFile(file: File, purpose: FilePurpose): Promise<FileRecord> {
+export async function uploadFile(file: File, purpose: FilePurpose, onProgress?: (percent:number)=>void): Promise<FileRecord> {
   if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
     throw new Error(
       "File phải có dung lượng từ 1 đến 5.000.000 byte (5 MB).",
@@ -254,7 +254,7 @@ export async function uploadFile(file: File, purpose: FilePurpose): Promise<File
   const formData = new FormData();
   formData.append("file", file);
   formData.append("purpose", purpose);
-  const response = await request<ApiEnvelope<FileRecord>>({ method: "POST", url: "/files", data: formData }, true);
+  const response = await request<ApiEnvelope<FileRecord>>({ method: "POST", url: "/files", data: formData, onUploadProgress: event => {if(event.total)onProgress?.(Math.round(event.loaded/event.total*100));} }, true);
   return unwrap(response.data);
 }
 

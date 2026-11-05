@@ -104,7 +104,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
       : role;
   const user = session.status === "authenticated" ? session.user : null;
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
-  const protectedPage = Boolean(requiredRole) || pathname === "/settings" || ["/programs", "/invitations", "/messages"].some(prefix => isActive(pathname, prefix));
+  const protectedPage = Boolean(requiredRole) || pathname === "/settings" || ["/programs", "/invitations", "/messages", "/reports"].some(prefix => isActive(pathname, prefix));
   const needsLogin = protectedPage && session.status === "guest";
   const needsSessionError = protectedPage && session.status === "error";
   const needsRole = Boolean(protectedPage && user && roleMismatch);
@@ -199,7 +199,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     : activeRole === "tutor"
       ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Dịch vụ của tôi" }, { href: "/me/availability", label: "Lịch khả dụng" }, { href: "/marketplace", label: "Khám phá dịch vụ" }]
       : [{ href: "/marketplace", label: "Tìm dịch vụ" }];
-  const collaborationNav = activeRole === "admin" ? [] : [{href:"/programs",label:"Program của tôi"},{href:"/invitations",label:"Lời mời học"},{href:"/messages",label:"Tin nhắn"}];
+  const collaborationNav = activeRole === "admin" ? [] : [{href:"/programs",label:"Program của tôi"},{href:"/invitations",label:"Lời mời học"},{href:"/messages",label:"Tin nhắn"},{href:"/reports",label:"Báo cáo của tôi"}];
   const navItems = [...roleNavItems, ...collaborationNav, { href: "/settings", label: "Cài đặt tài khoản" }];
 
   return (

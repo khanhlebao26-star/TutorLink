@@ -38,6 +38,7 @@ export class ApiClientError extends Error {
   fieldErrors?: Record<string, string[]>;
   requestId?: string;
   retryAfter?: number;
+  blockers?: {sessions:number[];tasks:number[]};
 
   constructor(
     message: string,
@@ -81,13 +82,16 @@ export function toApiClientError(error: unknown): ApiClientError {
   const axiosError = error as AxiosError<ApiErrorBody>;
   const response = axiosError.response;
   const body = response?.data;
-  return new ApiClientError(body?.message ?? body?.error?.message ?? (axiosError.message || "Không thể kết nối tới máy chủ."), {
+  const normalized = new ApiClientError(body?.message ?? body?.error?.message ?? (axiosError.message || "Không thể kết nối tới máy chủ."), {
     status: response?.status,
     code: body?.code ?? body?.error?.code,
     fieldErrors: body?.errors,
     requestId: body?.request_id ?? response?.headers?.["x-request-id"],
     retryAfter: response?.headers?.["retry-after"] ? Number(response.headers["retry-after"]) : undefined,
   });
+  const blockers=(body?.errors as unknown as {blockers?:{sessions?:unknown;tasks?:unknown}})?.blockers;
+  if(blockers&&Array.isArray(blockers.sessions)&&Array.isArray(blockers.tasks))normalized.blockers={sessions:blockers.sessions.filter((id):id is number=>Number.isSafeInteger(id)),tasks:blockers.tasks.filter((id):id is number=>Number.isSafeInteger(id))};
+  return normalized;
 }
 
 api.interceptors.response.use((response) => response, (error) => {

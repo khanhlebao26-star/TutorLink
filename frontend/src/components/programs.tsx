@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import {ProgramTrust} from "./trust-workspace";
+import {WorkspaceNavigation} from "./workspace-tabs";
 import { useCallback, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell, useActor } from "./app-shell";
@@ -173,7 +175,7 @@ export function ProgramDetail({ id }: { id: number }) {
       key.current = null;
       result.reload();
     } catch (e) {
-      setError(describeApiError(e));
+      setError(describeApiError(e)+(e instanceof ApiClientError&&e.blockers?` Còn buổi học: ${e.blockers.sessions.join(", ")||"không"}; bài tập: ${e.blockers.tasks.join(", ")||"không"}.`:""));
     } finally {
       setBusy(false);
     }
@@ -181,7 +183,7 @@ export function ProgramDetail({ id }: { id: number }) {
   return (
     <AppShell title="Workspace">
       <section className="content-stack workspace-page">
-        <Link href="/programs">← Program của tôi</Link>
+        <Link href="/programs">← Program của tôi</Link><WorkspaceNavigation id={id} active="overview"/>
         <ApiState {...result} />
         {error && (
           <p role="alert" className="field-error">
@@ -190,7 +192,7 @@ export function ProgramDetail({ id }: { id: number }) {
         )}
         {result.data && (
           <>
-            <header className="workspace-heading">
+            {result.data.program.status==="completed"&&<ProgramTrust id={id}/>}<header className="workspace-heading">
               <div>
                 <Badge tone="brand">
                   {programStatuses[result.data.program.status]}

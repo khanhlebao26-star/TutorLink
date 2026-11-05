@@ -104,3 +104,5 @@
     grid-template-columns: 1fr;
   }
 }
+
+.workspace-fields{border:0;padding:0;display:grid;gap:16px} .workspace-page summary{cursor:pointer;font-weight:600;padding:12px 0}
