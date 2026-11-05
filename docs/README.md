@@ -26,6 +26,8 @@ Architecture also contains `Other source files.md` with links to its five non-Go
 
 ## Issue handover
 
+- [BE-H06 — Gate BE](handover/BE-H06-gate-be.md): kiểm thử local ngày 05/11/2026, 832 test, coverage 94,26%; quyết định **Blocked**, FE giữ Blocked tới khi đủ merge/CI/owner confirmation và ba chữ ký.
+
 - [BE-D06 — Contract kiểm chứng và phát hành API](handover/BE-D06-contract.md) · [Plan và tiêu chí hoàn thành](handover/BE-D06-plan.md): baseline `d157a8e`, 123 operations; inventory/metadata, PostgreSQL tests/coverage, fixture FE và release snapshot. Đây là đầu vào triển khai, chưa nghiệm thu D06.
 
 - [BE-D05 + BE-H05 — Phase 5](handover/BE-D05-BE-H05-handover.md): marketplace gate/cache/query và backend quản trị dùng chung; thêm dashboard aggregate, chưa mở UI Filament; xem evidence và giới hạn local trong bàn giao.

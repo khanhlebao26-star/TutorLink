@@ -1,0 +1,36 @@
+{
+  "checked_date": "2026-11-05",
+  "main_sha": "fb54886617524e43727705f7f6ee86bed4135ef9",
+  "pr87": [
+    {
+      "number": 87,
+      "state": "closed",
+      "merged_at": "2026-11-05T00:47:41Z",
+      "html_url": "https://github.com/khanhlebao26-star/TutorLink/pull/87",
+      "merge_commit_sha": "08ab0dc8efc70d9f1a1b901bbacc98e76e538015"
+    }
+  ],
+  "pr87_reviews": [],
+  "latest_ci": [
+    {
+      "head_sha": "cc3adc63cb736c56b0993b4b59d7b69a7234a876",
+      "conclusion": "success",
+      "html_url": "https://github.com/khanhlebao26-star/TutorLink/actions/runs/41943434134",
+      "name": "CI"
+    },
+    {
+      "head_sha": "fb54886617524e43727705f7f6ee86bed4135ef9",
+      "conclusion": "success",
+      "html_url": "https://github.com/khanhlebao26-star/TutorLink/actions/runs/41657166262",
+      "name": "CI"
+    },
+    {
+      "head_sha": "a24ba746500724f1445e6ae48475d9f2c6ea7e4b",
+      "conclusion": "success",
+      "html_url": "https://github.com/khanhlebao26-star/TutorLink/actions/runs/41657140579",
+      "name": "CI"
+    }
+  ],
+  "check_runs_on_merge_sha": 0,
+  "ci_cc3adc_tree_equals_merge_tree": true
+}

@@ -1,0 +1,23 @@
+{
+  "backend/Dockerfile.testing": true,
+  "backend/app/Http/Controllers/Api/V1/AnnouncementController.php": true,
+  "backend/app/Http/Controllers/Api/V1/FeeRecordController.php": true,
+  "backend/app/Http/Controllers/Api/V1/InvitationController.php": true,
+  "backend/app/Http/Controllers/Api/V1/ListingController.php": true,
+  "backend/app/Http/Controllers/Api/V1/ProgramController.php": true,
+  "backend/app/Http/Controllers/Api/V1/ProgramOverviewController.php": true,
+  "backend/app/Http/Controllers/Api/V1/ProgressRecordController.php": true,
+  "backend/app/Http/Controllers/Api/V1/TaskController.php": true,
+  "backend/bootstrap/app.php": true,
+  "backend/d06-smoke.env": true,
+  "backend/scripts/be-d06-fixtures.php": true,
+  "backend/scripts/be-d06-http-smoke.py": true,
+  "backend/tests/Feature/AdminApprovalAuditTest.php": true,
+  "backend/tests/Feature/ApiFrameworkErrorResponseTest.php": true,
+  "backend/tests/Feature/AuthFileProfileTest.php": true,
+  "backend/tests/Feature/ProgramLifecycleApiTest.php": true,
+  "backend/tests/Feature/TaskWorkflowApiTest.php": true,
+  "compose.d06.runtime.testing.yml": true,
+  "compose.d06.testing.yml": true,
+  "docs/api/openapi.json": true
+}

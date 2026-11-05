@@ -1,0 +1,682 @@
+{
+  "base_url": "http://127.0.0.1:18016",
+  "fixture_scope": "Synthetic BE-D04 fixtures in isolated tutorlink_test",
+  "trace": [
+    {
+      "actor": "anonymous",
+      "method": "GET",
+      "path": "/up",
+      "request_body": null,
+      "request_headers": {},
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache, private"
+      },
+      "response": {
+        "status": "up"
+      },
+      "check": {
+        "label": "health",
+        "expected_status": 200,
+        "passed": true
+      }
+    },
+    {
+      "actor": "anonymous_csrf",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 419,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "e3538f99-5460-45c5-bbb4-6cfbb736e941"
+      },
+      "response": {
+        "code": "csrf_token_mismatch",
+        "message": "The request could not be completed.",
+        "request_id": "e3538f99-5460-45c5-bbb4-6cfbb736e941",
+        "errors": {}
+      },
+      "check": {
+        "label": "missing_csrf_header",
+        "expected_status": 419,
+        "passed": true
+      }
+    },
+    {
+      "actor": "anonymous",
+      "method": "GET",
+      "path": "/api/v1/programs/1/overview",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "c861258d-a94f-4d09-bf48-f1bde450ba48"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "c861258d-a94f-4d09-bf48-f1bde450ba48",
+        "errors": {}
+      },
+      "check": {
+        "label": "unauthenticated_overview",
+        "expected_status": 401,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "request_body": null,
+      "request_headers": {},
+      "status": 204,
+      "headers": {
+        "Cache-Control": "no-cache, private"
+      },
+      "response": null,
+      "check": {
+        "label": "owner_csrf_cookie",
+        "expected_status": 204,
+        "passed": true
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 500,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "0803012e-6a21-48bc-bca6-cc7eea5a3cf1"
+      },
+      "response": {
+        "code": "internal_error",
+        "message": "The request could not be completed.",
+        "request_id": "0803012e-6a21-48bc-bca6-cc7eea5a3cf1",
+        "errors": {}
+      },
+      "check": {
+        "label": "owner_login",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/sanctum/csrf-cookie",
+      "request_body": null,
+      "request_headers": {},
+      "status": 204,
+      "headers": {
+        "Cache-Control": "no-cache, private"
+      },
+      "response": null,
+      "check": {
+        "label": "member_csrf_cookie",
+        "expected_status": 204,
+        "passed": true
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 500,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "94582021-f085-423a-9bf4-8337e1f33dc6"
+      },
+      "response": {
+        "code": "internal_error",
+        "message": "The request could not be completed.",
+        "request_id": "94582021-f085-423a-9bf4-8337e1f33dc6",
+        "errors": {}
+      },
+      "check": {
+        "label": "member_login",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "GET",
+      "path": "/api/v1/programs/1/overview",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "9fad20d3-5ab9-428d-a399-9e947280379e"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "9fad20d3-5ab9-428d-a399-9e947280379e",
+        "errors": {}
+      },
+      "check": {
+        "label": "program_overview",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/progress-records?per_page=2",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "9abb8cd1-dc6d-4d80-a006-94fd4e182408"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "9abb8cd1-dc6d-4d80-a006-94fd4e182408",
+        "errors": {}
+      },
+      "check": {
+        "label": "progress_list",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/announcements?per_page=2",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "f15f9548-065d-4000-932b-04483e409db1"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "f15f9548-065d-4000-932b-04483e409db1",
+        "errors": {}
+      },
+      "check": {
+        "label": "announcement_list",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/announcements/1",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "d2015258-0404-482f-9e15-4e137f6d7c38"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "d2015258-0404-482f-9e15-4e137f6d7c38",
+        "errors": {}
+      },
+      "check": {
+        "label": "announcement_detail",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/fee-records?per_page=2",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "dc1ad7f9-d366-48b5-830c-d6f41611286c"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "dc1ad7f9-d366-48b5-830c-d6f41611286c",
+        "errors": {}
+      },
+      "check": {
+        "label": "fee_list",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/programs/1/tasks?per_page=5",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "f11cdcab-3689-4ee5-8dfd-8189d57f3378"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "f11cdcab-3689-4ee5-8dfd-8189d57f3378",
+        "errors": {}
+      },
+      "check": {
+        "label": "task_list",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "GET",
+      "path": "/api/v1/tasks/999999/submission",
+      "request_body": null,
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "9dd0fe03-8e19-4f6b-87a9-96bdfd8097b1"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "9dd0fe03-8e19-4f6b-87a9-96bdfd8097b1",
+        "errors": {}
+      },
+      "check": {
+        "label": "unknown_task",
+        "expected_status": 404,
+        "passed": false
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/start",
+      "request_body": {
+        "expected_version": 1
+      },
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "75115c0f-8939-4378-822d-dc6d2d72045c"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "75115c0f-8939-4378-822d-dc6d2d72045c",
+        "errors": {}
+      },
+      "check": {
+        "label": "wrong_actor_cannot_start_task",
+        "expected_status": 403,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/start",
+      "request_body": {
+        "expected_version": 1
+      },
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "c077d909-2272-47b5-baaa-3a6c99bf2698"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "c077d909-2272-47b5-baaa-3a6c99bf2698",
+        "errors": {}
+      },
+      "check": {
+        "label": "start_task",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/start",
+      "request_body": {
+        "expected_version": 1
+      },
+      "request_headers": {},
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "d13906f3-326b-4c21-8e3e-17290da1f581"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "d13906f3-326b-4c21-8e3e-17290da1f581",
+        "errors": {}
+      },
+      "check": {
+        "label": "stale_task_version",
+        "expected_status": 409,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "D06 HTTP smoke submission"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000601"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "6270b6c5-c6ba-4672-9398-43339a173c40"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "6270b6c5-c6ba-4672-9398-43339a173c40",
+        "errors": {}
+      },
+      "check": {
+        "label": "create_submission",
+        "expected_status": 201,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "D06 HTTP smoke submission"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000601"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "bbd7ce70-d0e9-43a9-a71c-9270f4cca89c"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "bbd7ce70-d0e9-43a9-a71c-9270f4cca89c",
+        "errors": {}
+      },
+      "check": {
+        "label": "replay_submission",
+        "expected_status": 200,
+        "passed": false,
+        "same_resource_id": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "Stale D06 submission version"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000604"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "e2719ca0-4e18-4712-8e1e-11b09f00d1ec"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "e2719ca0-4e18-4712-8e1e-11b09f00d1ec",
+        "errors": {}
+      },
+      "check": {
+        "label": "stale_submission_version",
+        "expected_status": 409,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": 0,
+        "content": "Different D06 payload"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000601"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "505c819d-6bbc-4efa-a5c6-724cda412ad2"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "505c819d-6bbc-4efa-a5c6-724cda412ad2",
+        "errors": {}
+      },
+      "check": {
+        "label": "submission_key_payload_mismatch",
+        "expected_status": 409,
+        "passed": false
+      }
+    },
+    {
+      "actor": "late_member",
+      "method": "PUT",
+      "path": "/api/v1/tasks/1/submission",
+      "request_body": {
+        "expected_submission_version": -1,
+        "content": "Invalid version"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000602"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "81781146-cd28-4b6e-a621-1750778dc102"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "81781146-cd28-4b6e-a621-1750778dc102",
+        "errors": {}
+      },
+      "check": {
+        "label": "invalid_submission_version",
+        "expected_status": 422,
+        "passed": false
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/submission/review",
+      "request_body": {
+        "expected_submission_version": 1,
+        "feedback": "D06 HTTP smoke accepted"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000603"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "f232afe0-f5bd-4d5a-a182-1425bf592ae7"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "f232afe0-f5bd-4d5a-a182-1425bf592ae7",
+        "errors": {}
+      },
+      "check": {
+        "label": "accept_submission",
+        "expected_status": 200,
+        "passed": false
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/submission/review",
+      "request_body": {
+        "expected_submission_version": 1,
+        "feedback": "D06 HTTP smoke accepted"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000603"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "87a47c70-4266-4f94-b9b8-6df4dd97bdd0"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "87a47c70-4266-4f94-b9b8-6df4dd97bdd0",
+        "errors": {}
+      },
+      "check": {
+        "label": "replay_feedback",
+        "expected_status": 200,
+        "passed": false,
+        "same_resource_id": false
+      }
+    },
+    {
+      "actor": "owner",
+      "method": "POST",
+      "path": "/api/v1/tasks/1/submission/review",
+      "request_body": {
+        "expected_submission_version": 1,
+        "feedback": "Changed D06 feedback"
+      },
+      "request_headers": {
+        "Idempotency-Key": "00000000-0000-4000-8000-000000000603"
+      },
+      "status": 401,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "507c7561-3fcb-493c-9c7b-92f6ff4c9cc9"
+      },
+      "response": {
+        "code": "unauthenticated",
+        "message": "Authentication is required.",
+        "request_id": "507c7561-3fcb-493c-9c7b-92f6ff4c9cc9",
+        "errors": {}
+      },
+      "check": {
+        "label": "feedback_key_payload_mismatch",
+        "expected_status": 409,
+        "passed": false
+      }
+    },
+    {
+      "actor": "synthetic_rate_limit_probe",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "request_body": {
+        "email": "[synthetic fixture actor]",
+        "password": "[redacted]"
+      },
+      "request_headers": {},
+      "status": 429,
+      "headers": {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, private",
+        "X-Request-ID": "1d2c88c0-df22-4379-b15b-c628197c9429",
+        "Retry-After": "60"
+      },
+      "response": {
+        "code": "rate_limited",
+        "message": "The request could not be completed.",
+        "request_id": "1d2c88c0-df22-4379-b15b-c628197c9429",
+        "errors": {}
+      },
+      "attempts_before_limit": [
+        500,
+        500,
+        500,
+        500,
+        500
+      ],
+      "check": {
+        "label": "login_rate_limit",
+        "expected_status": 429,
+        "passed": false,
+        "prior_attempts_were_401": false
+      }
+    }
+  ],
+  "passed": false
+}
