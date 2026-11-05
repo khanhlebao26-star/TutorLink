@@ -3,11 +3,11 @@
   "release_status": "candidate; external acceptance gates remain open",
   "created_date": "2026-11-05",
   "timezone": "Asia/Ho_Chi_Minh",
-  "tested_source_commit": "cb881f02bfde6ddab340eb2c0316781677d73117",
+  "tested_source_commit": "ec0640d01f02b731d54082adfb08611a53105c1c",
   "pr_branch": "be-d06",
   "pr_base": {
-    "branch": "main",
-    "commit": "fb54886617524e43727705f7f6ee86bed4135ef9"
+    "branch": "be-k06",
+    "commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688"
   },
   "baseline_analysis_commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688",
   "source_file_sha256": {
@@ -47,14 +47,17 @@
     "warnings": 52
   },
   "tests": {
+    "compose_project": "tutorlink-d06-k06-verify-20261105",
+    "database": "tutorlink_test",
+    "database_user": "tutorlink_test_runner",
     "groups": {
       "d04_preflight": {
         "tests": 7,
         "assertions": 27
       },
       "regression": {
-        "tests": 741,
-        "assertions": 5327
+        "tests": 746,
+        "assertions": 5369
       },
       "d04_api": {
         "tests": 77,
@@ -66,14 +69,14 @@
       }
     },
     "totals": {
-      "tests": 826,
-      "assertions": 7324,
+      "tests": 831,
+      "assertions": 7366,
       "failures": 0,
       "errors": 0,
       "skipped": 0
     },
     "backend_coverage": {
-      "lines": "93.42% (8321/8907)",
+      "lines": "93.59% (8336/8907)",
       "methods": "79.97% (479/599)",
       "classes": "61.78% (118/191)"
     },
@@ -107,14 +110,16 @@
     "http_transcript": "docs/handover/evidence/be-d06/2026-11-05-0443/http-smoke.json",
     "database_snapshot": "docs/handover/evidence/be-d06/2026-11-05-0443/http-smoke-db-snapshot.txt",
     "operation_test_smoke_map": "docs/handover/evidence/be-d06/2026-11-05-0455/operation-test-smoke-map-dung.csv",
-    "artifact_sha256": "docs/handover/evidence/be-d06/2026-11-05-0455/coverage-artifact-sha256.txt"
+    "artifact_sha256": "docs/handover/evidence/be-d06/2026-11-05-k06-base/coverage-artifact-sha256.txt",
+    "k06_based_full_suite": "docs/handover/evidence/be-d06/2026-11-05-k06-base/full-suite.log",
+    "k06_based_verification_readme": "docs/handover/evidence/be-d06/2026-11-05-k06-base/README.md"
   },
   "open_gates": [
     {
       "id": "github-publication",
       "status": "blocker",
       "owner": "DungGiaIT / repository integration",
-      "next": "Enable Git Data/Contents write access on the connected GitHub integration or provide authenticated Git CLI credentials, then publish branch be-d06."
+      "next": "Enable Git Data/Contents write access on the connected GitHub integration or provide authenticated Git CLI credentials, then publish be-d06 with be-k06 as its base."
     },
     {
       "id": "remote-ci",
@@ -157,6 +162,6 @@
   ],
   "limitations": [
     "No production deployment, browser UI acceptance, or load/SLO test is claimed.",
-    "The earlier pre-rebase 831-test artifacts include four tests from the separate K06 branch and are retained as superseded."
+    "The temporary main-based detour's 826-test artifacts are retained for traceability; the release result is the 831-test run on the be-k06 baseline."
   ]
 }

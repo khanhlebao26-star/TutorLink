@@ -15,7 +15,7 @@ Operation/schema detail: [OpenAPI operation and schema delta](openapi-operation-
 ## Runtime and test result
 
 - Synthetic fixtures are reproducible in a disposable PostgreSQL test project and expose aliases rather than stable numeric IDs to FE examples.
-- Final grouped regression on the main-based D06 commit: 826 tests / 7,324 assertions; zero failures, errors, or skips.
+- Final grouped regression on the D06 commit based on `be-k06`: 831 tests / 7,366 assertions; zero failures, errors, or skips. Line coverage is 93.59% (8,336/8,907).
 - Live loopback cookie/CSRF HTTP smoke: 26/26 passed, with a database snapshot for Task/Submission/replay/feedback state.
 - OpenAPI: 123/123 route parity, deterministic export hash, Redocly zero errors and 52 classified warnings.
 
@@ -23,7 +23,7 @@ See [test report](test-report.md), [runtime identity](runtime-identity.md), and 
 
 ## Known follow-up gates
 
-- GitHub publication and issue handoff are blocked: the connected `DungGiaIT` account can read the repository and reports `push: true`, but both Git Data blob creation and issue-comment creation returned HTTP 403 `Resource not accessible by integration`; shell Git has no username credential and `gh` is not installed. No remote branch, PR, issue comment, CI run, or Khanh review request exists yet. See [publication blocker evidence](publication-blocker.md).
+- The intended PR base is `be-k06` at `d157a8e`, not `main` at `fb54886`; local `be-d06` now descends from the K06 tip. GitHub publication and issue handoff are blocked: the connected `DungGiaIT` account can read the repository and reports `push: true`, but both Git Data blob creation and issue-comment creation returned HTTP 403 `Resource not accessible by integration`; shell Git has no username credential and `gh` is not installed. No remote D06 branch, PR, issue comment, CI run, or Khanh review request exists yet. See [publication blocker evidence](publication-blocker.md).
 - Remote CI must pass on the final PR revision.
 - Khanh's review must be requested and completed. Local review confirmation for D06-07 was already recorded; this does not replace the PR review gate.
 - The operation inventory has 67 routes whose owner is still unconfirmed. The issue's owner-wide acceptance cannot be marked complete until the endpoint owners are identified and confirm their lane metadata; Dũng coordinates this follow-up.

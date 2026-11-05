@@ -1,0 +1,6 @@
+ Container tutorlink-d06-k06-verify-20261105-test-db-1 Running 
+ Container tutorlink-d06-k06-verify-20261105-test-db-1 Waiting 
+ Container tutorlink-d06-k06-verify-20261105-test-db-1 Healthy 
+ Container tutorlink-d06-k06-verify-20261105-backend-test-run-5fce8c6774d2 Creating 
+ Container tutorlink-d06-k06-verify-20261105-backend-test-run-5fce8c6774d2 Created 
+SAFE: test database identity verified. driver=pgsql config_cache=absent configured_host=test-db database=tutorlink_test username=tutorlink_test_runner server_address=192.168.64.2

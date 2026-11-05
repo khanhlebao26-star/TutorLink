@@ -1,6 +1,6 @@
 # BE-D06 — Runtime identity
 
-Captured on 05/11/2026 (Asia/Ho_Chi_Minh) from the isolated `tutorlink-d06-smoke` Compose project. The tested D06 source revision is `cb881f02bfde6ddab340eb2c0316781677d73117`, based on main `fb54886617524e43727705f7f6ee86bed4135ef9`.
+Captured on 05/11/2026 (Asia/Ho_Chi_Minh) from the isolated `tutorlink-d06-smoke` Compose project. The tested D06 runtime source revision is `ec0640d01f02b731d54082adfb08611a53105c1c`, based on `be-k06` `d157a8eeae662c01d6bd6b031ea53c26a5b05688`. The 21-file release manifest hash check passes for this revision. Runtime PHP and OpenAPI content are identical to the temporary main-based detour; the final suite also includes K06 tests from the correct baseline.
 
 | Component | Identity and state |
 | --- | --- |
