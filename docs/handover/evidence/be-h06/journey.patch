@@ -1,0 +1,105 @@
+--- /dev/null
++++ b/backend/tests/Feature/BackendGateJourneyTest.php
+@@ -0,0 +1,102 @@
++<?php
++
++use App\Models\File;
++use App\Models\Specialization;
++use App\Models\User;
++use Database\Seeders\CatalogSeeder;
++use Illuminate\Auth\Notifications\VerifyEmail;
++use Illuminate\Foundation\Testing\RefreshDatabase;
++use Illuminate\Support\Facades\Auth;
++use Illuminate\Support\Facades\DB;
++use Illuminate\Support\Facades\Notification;
++use Illuminate\Support\Facades\Storage;
++use Illuminate\Support\Facades\URL;
++use Illuminate\Support\Str;
++use Tests\Support\TestActors;
++use Tests\TestCase;
++
++uses(TestCase::class, RefreshDatabase::class);
++
++function h06Actor(TestCase $test, User $actor): TestCase
++{
++    Auth::forgetGuards();
++
++    return $test->actingAs($actor, 'web');
++}
++
++it('carries one accepted offer through learning completion review and scoped report handling', function () {
++    $this->freezeTime();
++    Notification::fake();
++    Storage::fake('local');
++    $this->seed(CatalogSeeder::class);
++    $key = fn () => ['Idempotency-Key' => (string) Str::uuid()];
++    $this->postJson('/api/v1/auth/register', ['full_name' => 'H06 Customer', 'email' => 'h06-customer@example.test', 'password' => 'Password123!', 'password_confirmation' => 'Password123!', 'role' => 'customer', 'date_of_birth' => '1990-01-01', 'terms_version' => 'h06-test'])->assertCreated();
++    $customer = User::where('email', 'h06-customer@example.test')->firstOrFail();
++    expect($customer->email_verified_at)->toBeNull();
++    Notification::assertSentTo($customer, VerifyEmail::class);
++    // Email transport is outside this kernel test; the signed verification endpoint is real.
++    $url = URL::temporarySignedRoute('verification.verify', now()->addMinutes(30), ['id' => $customer->id, 'hash' => sha1($customer->email)]);
++    $this->getJson($url)->assertSuccessful();
++    $customer->refresh();
++    expect($customer->hasVerifiedEmail())->toBeTrue();
++    $this->postJson('/api/v1/auth/login', ['email' => $customer->email, 'password' => 'Password123!'])->assertOk();
++
++    $admin = TestActors::admin();
++    $tutor = TestActors::tutor();
++    $profile = $tutor->tutorProfile;
++    $profile->specializations()->sync([Specialization::value('id')]);
++    foreach (['avatar', 'verification_document'] as $purpose) {
++        $file = File::create(['owner_id' => $tutor->id, 'disk' => 'local', 'object_key' => 'h06/'.$purpose, 'original_name' => 'proof.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 5, 'visibility' => 'private', 'scan_status' => 'clean', 'purpose' => $purpose]);
++        Storage::disk('local')->put($file->object_key, 'proof');
++        if ($purpose === 'avatar') {
++            $profile->update(['avatar_file_id' => $file->id]);
++        } else {
++            $document = $profile->verificationDocuments()->create(['file_id' => $file->id, 'document_type' => 'identity_card', 'status' => 'pending']);
++        }
++    }
++    h06Actor($this, $tutor)->postJson('/api/v1/tutor/profile/submit')->assertOk();
++    h06Actor($this, $admin)->putJson("/api/v1/admin/tutor-profiles/{$profile->id}/assignment", ['assigned_admin_id' => $admin->id, 'assignment_version' => 0, 'reason' => 'H06 reviewer'])->assertOk();
++    $decision = ['assignment_version' => 1, 'reason' => 'H06 approved'];
++    $this->postJson("/api/v1/admin/verification-documents/{$document->id}/approve", $decision)->assertOk();
++    $this->postJson("/api/v1/admin/tutor-profiles/{$profile->id}/approve", $decision)->assertOk();
++    $tutor->unsetRelation('tutorProfile');
++    h06Actor($this, $tutor);
++    $listing = $this->postJson('/api/v1/me/listings', ['specialization_id' => Specialization::value('id'), 'title' => 'H06 English', 'description' => 'Integrated course', 'delivery_mode' => 'online', 'price_from_minor' => 200000, 'currency' => 'VND', 'price_unit' => 'session'])->assertCreated()->json('data.id');
++    $slug = $this->patchJson("/api/v1/me/listings/{$listing}", ['status' => 'active'])->assertOk()->json('data.slug');
++    $this->getJson('/api/v1/listings/'.$slug)->assertOk();
++    $chat = h06Actor($this, $customer)->postJson('/api/v1/conversations', ['peer_user_id' => $tutor->id, 'context_listing_id' => $listing])->assertSuccessful()->json('data.id');
++    $message = $this->postJson("/api/v1/conversations/{$chat}/messages", ['client_message_id' => (string) Str::uuid(), 'message_type' => 'text', 'body' => 'H06 lesson inquiry'])->assertCreated()->json('data.id');
++    h06Actor($this, $tutor);
++    $program = $this->postJson('/api/v1/programs', ['customer_id' => $customer->id, 'source_listing_id' => $listing, 'title' => 'H06 journey', 'delivery_mode' => 'online', 'agreed_fee_minor' => 200000, 'fee_unit' => 'session'])->assertCreated()->json('data.id');
++    $invite = $this->postJson("/api/v1/programs/{$program}/invitations", ['expected_version' => 1], $key())->assertCreated()->json('data.id');
++    h06Actor($this, $customer)->post("/api/v1/invitations/{$invite}/accept", [], ['Accept' => 'application/json', ...$key()])->assertOk();
++    $this->assertDatabaseHas('programs', ['id' => $program, 'status' => 'active']);
++    h06Actor($this, $tutor);
++    $session = $this->postJson("/api/v1/programs/{$program}/sessions", ['title' => 'H06 lesson', 'planned_starts_at' => now()->addHour()->toISOString(), 'planned_ends_at' => now()->addHours(2)->toISOString(), 'delivery_mode' => 'online'], $key())->assertCreated()->json('data.id');
++    $task = $this->postJson("/api/v1/programs/{$program}/tasks", ['title' => 'H06 homework', 'assigned_to' => $customer->id])->assertCreated()->json('data.id');
++    $this->postJson("/api/v1/programs/{$program}/fee-records", ['period' => now()->format('Y-m'), 'amount_minor' => 200000], $key())->assertCreated();
++    $this->postJson("/api/v1/programs/{$program}/complete")->assertConflict();
++    h06Actor($this, $customer)->postJson("/api/v1/programs/{$program}/review", ['rating' => 5], $key())->assertConflict();
++    $this->postJson("/api/v1/tasks/{$task}/start", ['expected_version' => 1])->assertOk();
++    $this->putJson("/api/v1/tasks/{$task}/submission", ['expected_submission_version' => 0, 'content' => 'H06 completed homework'], $key())->assertCreated();
++    h06Actor($this, $tutor)->postJson("/api/v1/tasks/{$task}/submission/review", ['expected_submission_version' => 1, 'feedback' => 'Accepted'], $key())->assertOk();
++    $completeKey = $key();
++    $this->postJson("/api/v1/sessions/{$session}/complete", ['expected_version' => 1], $completeKey)->assertOk();
++    $this->postJson("/api/v1/sessions/{$session}/complete", ['expected_version' => 1], $completeKey)->assertOk();
++    $this->postJson("/api/v1/programs/{$program}/complete")->assertOk();
++    $this->assertDatabaseCount('lesson_sessions', 1);
++    $this->assertDatabaseHas('tasks', ['id' => $task, 'status' => 'completed']);
++    $reviewKey = $key();
++    h06Actor($this, $customer)->postJson("/api/v1/programs/{$program}/review", ['rating' => 5, 'comment' => 'H06 review'], $reviewKey)->assertCreated();
++    $this->postJson("/api/v1/programs/{$program}/review", ['rating' => 5, 'comment' => 'H06 review'], $reviewKey)->assertOk();
++    $this->assertDatabaseCount('reviews', 1);
++    $report = $this->postJson('/api/v1/reports', ['resource_type' => 'message', 'resource_id' => $message, 'reason_code' => 'other', 'description' => 'H06 evidence scope'], $key())->assertCreated()->json('data.id');
++    $outsider = TestActors::customer();
++    h06Actor($this, $outsider)->getJson("/api/v1/programs/{$program}")->assertNotFound();
++    h06Actor($this, $admin)->putJson("/api/v1/admin/reports/{$report}/assignment", ['assigned_admin_id' => $admin->id, 'assignment_version' => 0, 'reason' => 'H06 triage'])->assertOk();
++    $this->getJson("/api/v1/admin/reports/{$report}/evidence")->assertOk();
++    $this->postJson("/api/v1/admin/reports/{$report}/resolve", ['assignment_version' => 1, 'resolution_note' => 'H06 resolved'])->assertOk();
++    $this->getJson("/api/v1/admin/reports/{$report}/evidence")->assertForbidden();
++    expect(DB::table('audit_logs')->where('resource_type', 'report')->where('resource_id', $report)->count())->toBeGreaterThanOrEqual(3);
++    expect(DB::table('notification_outbox')->where('type', 'report_resolved')->where('resource_id', $report)->count())->toBe(1);
++});

@@ -50,34 +50,22 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $isTrustRequest = fn (Request $request): bool => $request->is(
-            'api/v1/programs/*/review',
-            'api/v1/reports',
-            'api/v1/me/reports',
-            'api/v1/me/reports/*',
-            'api/v1/admin/dashboard',
-            'api/v1/admin/reports',
-            'api/v1/admin/reports/*',
-            'api/v1/admin/reviews',
-            'api/v1/admin/reviews/*',
-            'api/v1/admin/audit-logs',
-            'api/v1/admin/audit-logs/*',
-        );
+        $isApiRequest = fn (Request $request): bool => $request->is('api/*');
         $error = function (Request $request, int $status, string $code, string $message, array $errors = []): JsonResponse {
             $requestId = $request->attributes->get('request_id') ?: (string) Str::uuid();
 
             return ApiErrorResponse::make($status, $code, $message, $requestId, $errors);
         };
-        $exceptions->render(function (AuthenticationException $exception, Request $request) use ($isTrustRequest, $error): ?JsonResponse {
-            return $isTrustRequest($request) ? $error($request, 401, 'unauthenticated', 'Authentication is required.') : null;
+        $exceptions->render(function (AuthenticationException $exception, Request $request) use ($isApiRequest, $error): ?JsonResponse {
+            return $isApiRequest($request) ? $error($request, 401, 'unauthenticated', 'Authentication is required.') : null;
         });
-        $exceptions->render(function (ValidationException $exception, Request $request) use ($isTrustRequest, $error): ?JsonResponse {
-            return $isTrustRequest($request)
+        $exceptions->render(function (ValidationException $exception, Request $request) use ($isApiRequest, $error): ?JsonResponse {
+            return $isApiRequest($request)
                 ? $error($request, 422, 'validation_failed', 'The given data was invalid.', $exception->errors())
                 : null;
         });
-        $exceptions->render(function (HttpExceptionInterface $exception, Request $request) use ($isTrustRequest, $error): ?JsonResponse {
-            if (! $isTrustRequest($request)) {
+        $exceptions->render(function (HttpExceptionInterface $exception, Request $request) use ($isApiRequest, $error): ?JsonResponse {
+            if (! $isApiRequest($request)) {
                 return null;
             }
             $status = $exception->getStatusCode();
@@ -85,14 +73,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 403 => 'permission_denied',
                 404 => 'resource_not_found',
                 405 => 'method_not_allowed',
+                409 => 'conflict',
                 419 => 'csrf_token_mismatch',
+                429 => 'rate_limited',
                 default => 'request_failed',
             };
 
             return $error($request, $status, $code, 'The request could not be completed.')->withHeaders($exception->getHeaders());
         });
-        $exceptions->render(function (Throwable $exception, Request $request) use ($isTrustRequest, $error): ?JsonResponse {
-            return $isTrustRequest($request) ? $error($request, 500, 'internal_error', 'The request could not be completed.') : null;
+        $exceptions->render(function (Throwable $exception, Request $request) use ($isApiRequest, $error): ?JsonResponse {
+            return $isApiRequest($request) ? $error($request, 500, 'internal_error', 'The request could not be completed.') : null;
         });
         $exceptions->respond(function (Response $response) {
             if (request()->is('api/*') && $response->getStatusCode() >= 400) {

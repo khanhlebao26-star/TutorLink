@@ -13,6 +13,63 @@ use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
+it('paginates Task lists and Submission history with stable version ordering', function () {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $program = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+    ProgramApiFixtures::addMember($program, $customer, 'customer');
+
+    $this->actingAs($tutor, 'web');
+    $taskIds = [];
+    for ($i = 1; $i <= 21; $i++) {
+        $taskIds[] = $this->postJson("/api/v1/programs/{$program}/tasks", [
+            'title' => "Task {$i}", 'assigned_to' => $customer->id,
+        ])->assertCreated()->json('data.id');
+    }
+
+    $this->getJson("/api/v1/programs/{$program}/tasks")
+        ->assertOk()->assertJsonCount(20, 'data')
+        ->assertJsonPath('meta.current_page', 1)
+        ->assertJsonPath('meta.per_page', 20)
+        ->assertJsonPath('meta.total', 21)
+        ->assertJsonPath('meta.last_page', 2)
+        ->assertJsonPath('data.0.id', $taskIds[0]);
+    $this->getJson("/api/v1/programs/{$program}/tasks?page=2&per_page=20")
+        ->assertOk()->assertJsonCount(1, 'data')
+        ->assertJsonPath('meta.current_page', 2)
+        ->assertJsonPath('meta.per_page', 20)
+        ->assertJsonPath('data.0.id', $taskIds[20]);
+    $this->getJson("/api/v1/programs/{$program}/tasks?per_page=50")
+        ->assertOk()->assertJsonCount(21, 'data')->assertJsonPath('meta.per_page', 50);
+    $this->getJson("/api/v1/programs/{$program}/tasks?per_page=51")->assertUnprocessable();
+    $this->getJson("/api/v1/programs/{$program}/tasks?page=0")->assertUnprocessable();
+
+    $task = $taskIds[0];
+    $this->actingAs($customer, 'web');
+    $this->putJson("/api/v1/tasks/{$task}/submission", [
+        'expected_submission_version' => 0, 'content' => 'Version one',
+    ], ['Idempotency-Key' => (string) Str::uuid()])->assertCreated();
+    $this->putJson("/api/v1/tasks/{$task}/submission", [
+        'expected_submission_version' => 1, 'content' => 'Version two',
+    ], ['Idempotency-Key' => (string) Str::uuid()])->assertCreated();
+
+    $this->getJson("/api/v1/tasks/{$task}/submission/versions?per_page=1")
+        ->assertOk()->assertJsonCount(1, 'data')
+        ->assertJsonPath('meta.current_page', 1)
+        ->assertJsonPath('meta.per_page', 1)
+        ->assertJsonPath('meta.total', 2)
+        ->assertJsonPath('data.0.submission_version', 2)
+        ->assertJsonPath('data.0.content', 'Version two');
+    $this->getJson("/api/v1/tasks/{$task}/submission/versions?page=2&per_page=1")
+        ->assertOk()->assertJsonPath('data.0.submission_version', 1)
+        ->assertJsonPath('data.0.content', 'Version one');
+    $this->getJson("/api/v1/tasks/{$task}/submission/versions?per_page=0")->assertUnprocessable();
+    $this->getJson("/api/v1/tasks/{$task}/submission")
+        ->assertOk()->assertJsonPath('data.submission_version', 2)
+        ->assertJsonPath('data.feedback', null)
+        ->assertJsonPath('data.reviewed_by', null);
+});
+
 it('completes task assignment, versioned submission, revision, and acceptance without losing history', function () {
     $sideEffectCounts = static fn () => [
         'audit_logs' => DB::table('audit_logs')->count(),

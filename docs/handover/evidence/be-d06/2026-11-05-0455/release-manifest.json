@@ -1,0 +1,167 @@
+{
+  "release": "BE-D06 API contract and Dung-lane verification",
+  "release_status": "candidate; external acceptance gates remain open",
+  "created_date": "2026-11-05",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "tested_source_commit": "ec0640d01f02b731d54082adfb08611a53105c1c",
+  "pr_branch": "be-d06",
+  "pr_base": {
+    "branch": "be-k06",
+    "commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688"
+  },
+  "baseline_analysis_commit": "d157a8eeae662c01d6bd6b031ea53c26a5b05688",
+  "source_file_sha256": {
+    "backend/Dockerfile.testing": "4c6feb8e57abf634c61732bc9b25c0d79d466cc6062ee46b56536c7376bed936",
+    "backend/app/Http/Controllers/Api/V1/AnnouncementController.php": "425901add4742d411430088e6ede235643a3ecbf5daa6254f288285bbb52c50a",
+    "backend/app/Http/Controllers/Api/V1/FeeRecordController.php": "4a25467d8dc8d134feabd2526fcb11b72b6bd921598b338fdad5d99d1bdfedc5",
+    "backend/app/Http/Controllers/Api/V1/InvitationController.php": "975744405f9eeee8fdc66b4870ffd4ec59055471ea7cb467fa5a8bdd7e96d135",
+    "backend/app/Http/Controllers/Api/V1/ListingController.php": "1343ef0ad0e597eb22fc76e4659f7f49b5b7deaad313187991db3f77702b924f",
+    "backend/app/Http/Controllers/Api/V1/ProgramController.php": "11112314b306f42fd6eb49952511ebc46477f9e4731412f4d1264bae588ac029",
+    "backend/app/Http/Controllers/Api/V1/ProgramOverviewController.php": "95e086d184f9901f0c640fb04ba3fbbdea91d1ff951ef38026628e6b72e949c4",
+    "backend/app/Http/Controllers/Api/V1/ProgressRecordController.php": "654f569d3b4864b707eebb3619e4353c97377ff7cad53b469733469fac86446a",
+    "backend/app/Http/Controllers/Api/V1/TaskController.php": "b1dc2de2b0e1c43a5c900fcd9ff90f8b9d99864dd3841ffeca2d73ab6364a52d",
+    "backend/bootstrap/app.php": "3fbe30bdb812da21f3c5410a683407c141f795ec018a4cef89faea258b53c261",
+    "backend/d06-smoke.env": "3c9e118f9a179f67b7b73dc33b9a63c82b5ae0e403d1079bb80a27606a068967",
+    "backend/scripts/be-d06-fixtures.php": "981bab5225e3f9d90571215af7fa0e83c9ed7454b01d1c4bca9805358fffb217",
+    "backend/scripts/be-d06-http-smoke.py": "4fdbd2963271059124d35f7e1d5396d146c4be359356e9a749ac00e9a62e74ea",
+    "backend/tests/Feature/AdminApprovalAuditTest.php": "19c7b2006980bc184ff63dff53849b6736aeab9172c62d2861e28d30514a0466",
+    "backend/tests/Feature/ApiFrameworkErrorResponseTest.php": "2ffbe0ce19c9f3bab955d8221a13f4a586bf0bcb4734852ca7eaef3466edd48f",
+    "backend/tests/Feature/AuthFileProfileTest.php": "5a43e0558d9353663d1000cd2b5136c9f8f7fea00d871961e47b40515c2fb2d0",
+    "backend/tests/Feature/ProgramLifecycleApiTest.php": "892788636bfb0341f4faff99db4407450f6b8d42b1f9d57212fe8a778390bbf0",
+    "backend/tests/Feature/TaskWorkflowApiTest.php": "7ba3249bbe6bcee2c8e7f61a92b9a61f6356ee922eff9ff4ef3a71e8816f71c7",
+    "compose.d06.runtime.testing.yml": "6d0d5389da1e9bbf263f3ea88e6643c3b92da5a9adc409a56cd0217f94ec73d4",
+    "compose.d06.testing.yml": "71c2c577ee64cc20178d92bbbcc739ec38eaa23c4365bfb4562b4a2110465fdf",
+    "docs/api/openapi.json": "2a75f1d738dd40f5e946d916bbdaa9c14067b10af4253406a2e88ab96d899046"
+  },
+  "dependency_lock_sha256": {
+    "backend/composer.lock": "56b6094f45759aa5667f6c16378c59862eca00a6d7fdd5b1d28931395d09bb0b"
+  },
+  "openapi": {
+    "path": "docs/api/openapi.json",
+    "operations": 123,
+    "sha256": "2a75f1d738dd40f5e946d916bbdaa9c14067b10af4253406a2e88ab96d899046",
+    "route_parity": "pass 123/123",
+    "repeat_export": "same SHA-256 on both guarded exports",
+    "redocly_cli": "2.60.0",
+    "lint_errors": 0,
+    "warnings": 52
+  },
+  "tests": {
+    "compose_project": "tutorlink-d06-k06-verify-20261105",
+    "database": "tutorlink_test",
+    "database_user": "tutorlink_test_runner",
+    "groups": {
+      "d04_preflight": {
+        "tests": 7,
+        "assertions": 27
+      },
+      "regression": {
+        "tests": 746,
+        "assertions": 5369
+      },
+      "d04_api": {
+        "tests": 77,
+        "assertions": 1077
+      },
+      "d04_race": {
+        "tests": 1,
+        "assertions": 893
+      }
+    },
+    "totals": {
+      "tests": 831,
+      "assertions": 7366,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend_coverage": {
+      "lines": "93.59% (8336/8907)",
+      "methods": "79.97% (479/599)",
+      "classes": "61.78% (118/191)"
+    },
+    "dung_lane_coverage": {
+      "operations": 56,
+      "controller_files": 14,
+      "statements": "95.25% (1805/1895)"
+    },
+    "http_smoke": {
+      "passed": 26,
+      "total": 26
+    }
+  },
+  "runtime": {
+    "compose_project": "tutorlink-d06-smoke",
+    "image": "sha256:955e6d57a4899bb2abb43ccad63755a8f37439c3a66f627497345c19e7aeecf8",
+    "php": "8.3.36",
+    "laravel": "13.35.0",
+    "postgresql": "16.15",
+    "database": "tutorlink_test",
+    "database_user": "tutorlink_test_runner",
+    "migration_count": 38,
+    "latest_migration_batch": 1,
+    "test_database_guard": "pass; configured and connected identity matched",
+    "published_api_port": "127.0.0.1:18006"
+  },
+  "evidence": {
+    "test_report": "docs/handover/evidence/be-d06/2026-11-05-0455/test-report.md",
+    "requirement_case_matrix": "docs/handover/evidence/be-d06/2026-11-05-0455/requirement-case-matrix.md",
+    "runtime_identity": "docs/handover/evidence/be-d06/2026-11-05-0455/runtime-identity.md",
+    "http_transcript": "docs/handover/evidence/be-d06/2026-11-05-0443/http-smoke.json",
+    "database_snapshot": "docs/handover/evidence/be-d06/2026-11-05-0443/http-smoke-db-snapshot.txt",
+    "operation_test_smoke_map": "docs/handover/evidence/be-d06/2026-11-05-0455/operation-test-smoke-map-dung.csv",
+    "artifact_sha256": "docs/handover/evidence/be-d06/2026-11-05-k06-base/coverage-artifact-sha256.txt",
+    "k06_based_full_suite": "docs/handover/evidence/be-d06/2026-11-05-k06-base/full-suite.log",
+    "k06_based_verification_readme": "docs/handover/evidence/be-d06/2026-11-05-k06-base/README.md"
+  },
+  "open_gates": [
+    {
+      "id": "github-publication",
+      "status": "blocker",
+      "owner": "DungGiaIT / repository integration",
+      "next": "Enable Git Data/Contents write access on the connected GitHub integration or provide authenticated Git CLI credentials, then publish be-d06 with be-k06 as its base."
+    },
+    {
+      "id": "remote-ci",
+      "status": "pending",
+      "owner": "Dũng",
+      "next": "After publication, create the PR and wait for all required GitHub Actions checks."
+    },
+    {
+      "id": "review-khanh",
+      "status": "pending",
+      "owner": "Khanh",
+      "next": "After PR publication, request review and resolve findings; no review request has been sent."
+    },
+    {
+      "id": "owner-confirmation",
+      "status": "blocker",
+      "count": 67,
+      "owner": "Dũng coordinates endpoint owners",
+      "next": "Identify the 67 unconfirmed operation owners and obtain metadata/contract confirmation."
+    },
+    {
+      "id": "system-design-source",
+      "status": "blocker",
+      "owner": "Dũng",
+      "next": "Locate the cited authoritative System Design source or keep requirement traceability explicitly unresolved."
+    },
+    {
+      "id": "legacy-k03-1-source",
+      "status": "open documentation gap",
+      "owner": "Dũng",
+      "next": "Locate the authoritative historical report or keep the old reference unresolved."
+    },
+    {
+      "id": "openapi-summaries",
+      "status": "open editorial gap",
+      "count": 47,
+      "owner": "Endpoint owners",
+      "next": "Add owner-approved operation summaries; do not infer the owners."
+    }
+  ],
+  "limitations": [
+    "No production deployment, browser UI acceptance, or load/SLO test is claimed.",
+    "The temporary main-based detour's 826-test artifacts are retained for traceability; the release result is the 831-test run on the be-k06 baseline."
+  ]
+}

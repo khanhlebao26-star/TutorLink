@@ -1,0 +1,8 @@
+{
+    "run_id": "be-k06-20261104-083050-510d",
+    "checked_at": "2026-11-04T08:30:50+00:00",
+    "steps": [],
+    "passed": false,
+    "failure_class": "RuntimeException",
+    "failure": "Smoke requires local PostgreSQL database tutorlink."
+}

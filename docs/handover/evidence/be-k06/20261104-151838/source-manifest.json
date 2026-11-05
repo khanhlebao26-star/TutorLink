@@ -1,0 +1,26 @@
+[
+  {
+    "path": "backend/tests/Feature/SessionApiTest.php",
+    "sha256": "ca3f11e996f0997f8607e6c500686b13f2939fde34a9809f8e4b791befcff199"
+  },
+  {
+    "path": "backend/tests/Feature/SessionTransitionApiTest.php",
+    "sha256": "cfc9a82c7db74f6ed548b57be68c84ba9368920acdd47a88ed60bd31f8f511fa"
+  },
+  {
+    "path": "backend/scripts/be-k06-smoke.php",
+    "sha256": "67d90fd647c0d3c38db64a953207370cfb231dfecda45a20d704760f5b0d73e8"
+  },
+  {
+    "path": "backend/phpunit.xml",
+    "sha256": "8cca5104440c1bd976442455bb2b1d541b107ad2f15c1530e2c073e93cde4c9c"
+  },
+  {
+    "path": "backend/scripts/test-suite.php",
+    "sha256": "417176903ede8e4f3d8dc4cde58713a78eb630db12d304bb5b3363a05000234c"
+  },
+  {
+    "path": "compose.testing.yml",
+    "sha256": "8c85d73c814ad2464ec7631e9c9b614cd605a39442a7de0540cec974257b0160"
+  }
+]

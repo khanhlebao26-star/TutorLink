@@ -1,0 +1,1 @@
+Unsafe test database configuration. Use SQLite :memory: or an explicitly isolated tutorlink_test/tutorlink_phase2_test database.

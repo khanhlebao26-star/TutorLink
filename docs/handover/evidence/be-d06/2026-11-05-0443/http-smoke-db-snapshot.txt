@@ -1,0 +1,4 @@
+task1_submissions=1
+task1_current_submission=3,task_status=completed,task_version=4
+submission=3,submission_version=1,status=accepted,feedback=D06 HTTP smoke accepted
+feedback_receipts=1

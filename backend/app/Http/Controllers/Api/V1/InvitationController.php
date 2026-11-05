@@ -26,7 +26,7 @@ class InvitationController extends Controller
 
     /** List Invitations owned by or addressed to the current actor. */
     #[OpenApiResponse(200, description: 'A paginated list of scoped Invitations.', type: 'array{data:list<InvitationResource>,links:array<string,mixed>,meta:array<string,mixed>}')]
-    #[OpenApiResponse(403, description: 'Only a Tutor or Customer can list Invitations.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The account is inactive or its role cannot list Invitations.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(422, description: 'The pagination query is invalid.', type: self::ERROR_RESPONSE_TYPE)]
     public function index(InvitationIndexRequest $request): JsonResponse
     {
@@ -115,7 +115,7 @@ class InvitationController extends Controller
 
     /** Read one Invitation in the actor's inbox or sent folder. */
     #[OpenApiResponse(200, description: 'Invitation snapshot visible to the current actor.', type: 'array{data:InvitationResource}')]
-    #[OpenApiResponse(403, description: 'Only a Tutor or Customer can read Invitations.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The account is inactive or its role cannot read Invitations.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(404, description: 'Invitation not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     public function show(Request $request, int $invitation): JsonResponse
     {

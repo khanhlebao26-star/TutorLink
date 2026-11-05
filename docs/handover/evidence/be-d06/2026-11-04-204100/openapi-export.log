@@ -1,0 +1,6 @@
+ Container tutorlink-d06-test-backend-test-run-7cc0c1e3cea3 Creating
+ Container tutorlink-d06-test-backend-test-run-7cc0c1e3cea3 Created
+
+   INFO  Nothing to migrate.
+
+file_put_contents(../docs/api/openapi.json): Failed to open stream: No such file or directory

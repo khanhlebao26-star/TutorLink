@@ -32,7 +32,9 @@ class FeeRecordController extends Controller
 {
     private const ERROR_RESPONSE_TYPE = 'array{code: string, message: string, request_id: string, errors: array<string, mixed>}';
 
-    #[OpenApiResponse(status: 200, description: 'Paginated Fee records.', type: 'array{data: list<FeeRecordResource>, meta: array{current_page: int, per_page: int, total: int, last_page: int}}')]
+    private const FEE_RECORD_TYPE = "array{id:int,program_id:int,period:string,period_start:string,period_end:string,amount_minor:int,currency:'VND',status:'declared'|'voided',tutor_payment_mark:'unmarked'|'marked_paid'|'marked_unpaid',version:int,payment_marked_at:string|null,payment_mark_reason:string|null,voided_at:string|null,void_reason:string|null,last_change_reason:string|null,disclaimer:string,created_at:string|null,updated_at:string|null}";
+
+    #[OpenApiResponse(status: 200, description: 'Paginated Fee records with independent Fee state and payment mark.', type: 'array{data: list<'.self::FEE_RECORD_TYPE.'>, meta: array{current_page: int, per_page: int, total: int, last_page: int}}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'The account or operation is forbidden.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Program is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -80,7 +82,7 @@ class FeeRecordController extends Controller
         ]);
     }
 
-    #[OpenApiResponse(status: 200, description: 'Fee record resource.', type: 'array{data: FeeRecordResource}')]
+    #[OpenApiResponse(status: 200, description: 'Fee record resource.', type: 'array{data:'.self::FEE_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'The account is forbidden.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Fee record is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -99,7 +101,7 @@ class FeeRecordController extends Controller
     }
 
     #[OpenApiIgnoreResponse(200)]
-    #[OpenApiResponse(status: 201, description: 'Fee record created.', type: 'array{data: FeeRecordResource}')]
+    #[OpenApiResponse(status: 201, description: 'Fee record created.', type: 'array{data:'.self::FEE_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may create Fee records.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Program is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -173,7 +175,7 @@ class FeeRecordController extends Controller
         );
     }
 
-    #[OpenApiResponse(status: 200, description: 'Fee record updated.', type: 'array{data: FeeRecordResource}')]
+    #[OpenApiResponse(status: 200, description: 'Fee record updated.', type: 'array{data:'.self::FEE_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may update Fee records.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Fee record is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -230,7 +232,7 @@ class FeeRecordController extends Controller
         );
     }
 
-    #[OpenApiResponse(status: 200, description: 'Fee payment mark updated to paid.', type: 'array{data: FeeRecordResource}')]
+    #[OpenApiResponse(status: 200, description: 'Fee payment mark updated to paid.', type: 'array{data:'.self::FEE_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may mark Fee records.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Fee record is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -270,7 +272,7 @@ class FeeRecordController extends Controller
         );
     }
 
-    #[OpenApiResponse(status: 200, description: 'Fee payment mark updated to unpaid.', type: 'array{data: FeeRecordResource}')]
+    #[OpenApiResponse(status: 200, description: 'Fee payment mark updated to unpaid.', type: 'array{data:'.self::FEE_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may mark Fee records.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Fee record is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]
@@ -321,7 +323,7 @@ class FeeRecordController extends Controller
         );
     }
 
-    #[OpenApiResponse(status: 200, description: 'Fee record voided.', type: 'array{data: FeeRecordResource}')]
+    #[OpenApiResponse(status: 200, description: 'Fee record voided.', type: 'array{data:'.self::FEE_RECORD_TYPE.'}')]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'Only the Program owner may void Fee records.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 404, description: 'Fee record is not visible to the actor.', type: self::ERROR_RESPONSE_TYPE)]

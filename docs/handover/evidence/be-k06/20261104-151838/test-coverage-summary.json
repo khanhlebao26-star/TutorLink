@@ -1,0 +1,778 @@
+{
+  "run_id": "20261104-151838",
+  "coverage_source": "backend/app unchanged; same full source denominator in baseline and final",
+  "module_patterns": {
+    "Auth": "Actions/(Auth|Fortify)/|Http/Controllers/Api/V1/(Auth|PersonalAccessToken)Controller.php|Http/Requests/(Login|Register|ForgotPassword|ResetPassword|UpdateMe|UpdatePassword)Request.php|Http/Middleware/EnsureActive",
+    "Files": "Actions/Files/|Http/Controllers/Api/V1/FileController.php|Http/Requests/File(Upload|Link)Request.php|Http/Resources/FileResource.php|Models/File.php|Support/(ZipScanGuard|File)",
+    "Chat": "Actions/Messaging/|Http/Controllers/Api/V1/Conversation|Http/Controllers/BroadcastAuthController.php|Http/Requests/(Conversation|SendText|ReadCursor)|Http/Resources/Conversation|Events/Conversation|Support/RealtimeSessionChannels.php",
+    "Sessions": "Actions/Sessions/|Http/Controllers/Api/V1/SessionController.php|Http/Requests/(SessionApi|CreateSession|UpdateSession|CompleteSession|CancelSession)Request.php|Http/Resources/SessionResource.php|Policies/ProgramSessionPolicy.php|Models/(ProgramSession|LessonSession).php",
+    "Outbox": "Support/NotificationOutbox|Console/Commands/(WorkNotificationOutbox|ProcessNotificationOutbox|MonitorNotificationOutbox|PurgeNotificationData).php|Http/Controllers/Api/V1/NotificationOutboxController.php",
+    "Slack": "Jobs/SendSlackOperationalAlert.php"
+  },
+  "baseline": {
+    "overall": {
+      "statements": 8888,
+      "coveredstatements": 8302,
+      "classes": 191,
+      "methods": 597
+    },
+    "groups": [
+      {
+        "name": "d04-junit",
+        "tests": 77,
+        "assertions": 1077,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "d04-preflight-junit",
+        "tests": 7,
+        "assertions": 27,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "d04-race-junit",
+        "tests": 1,
+        "assertions": 893,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "regression-junit",
+        "tests": 737,
+        "assertions": 5190,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "modules": {
+      "Auth": {
+        "lines": 331,
+        "covered": 322,
+        "percent": 97.28,
+        "files": [
+          {
+            "path": "app/Actions/Auth/RevokeUserSessions.php",
+            "lines": 31,
+            "covered": 31
+          },
+          {
+            "path": "app/Actions/Fortify/CreateNewUser.php",
+            "lines": 15,
+            "covered": 15
+          },
+          {
+            "path": "app/Actions/Fortify/PasswordValidationRules.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Actions/Fortify/ResetUserPassword.php",
+            "lines": 11,
+            "covered": 11
+          },
+          {
+            "path": "app/Actions/Fortify/UpdateUserPassword.php",
+            "lines": 42,
+            "covered": 42
+          },
+          {
+            "path": "app/Actions/Fortify/UpdateUserProfileInformation.php",
+            "lines": 5,
+            "covered": 5
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/AuthController.php",
+            "lines": 91,
+            "covered": 86
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/PersonalAccessTokenController.php",
+            "lines": 36,
+            "covered": 36
+          },
+          {
+            "path": "app/Http/Middleware/EnsureActiveAccount.php",
+            "lines": 16,
+            "covered": 12
+          },
+          {
+            "path": "app/Http/Middleware/EnsureActiveApiActor.php",
+            "lines": 36,
+            "covered": 36
+          },
+          {
+            "path": "app/Http/Requests/ForgotPasswordRequest.php",
+            "lines": 4,
+            "covered": 4
+          },
+          {
+            "path": "app/Http/Requests/LoginRequest.php",
+            "lines": 6,
+            "covered": 6
+          },
+          {
+            "path": "app/Http/Requests/RegisterRequest.php",
+            "lines": 20,
+            "covered": 20
+          },
+          {
+            "path": "app/Http/Requests/ResetPasswordRequest.php",
+            "lines": 7,
+            "covered": 7
+          },
+          {
+            "path": "app/Http/Requests/UpdateMeRequest.php",
+            "lines": 4,
+            "covered": 4
+          },
+          {
+            "path": "app/Http/Requests/UpdatePasswordRequest.php",
+            "lines": 6,
+            "covered": 6
+          }
+        ]
+      },
+      "Files": {
+        "lines": 571,
+        "covered": 526,
+        "percent": 92.12,
+        "files": [
+          {
+            "path": "app/Actions/Files/CompleteFile.php",
+            "lines": 192,
+            "covered": 164
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/FileController.php",
+            "lines": 176,
+            "covered": 173
+          },
+          {
+            "path": "app/Http/Requests/FileLinkRequest.php",
+            "lines": 10,
+            "covered": 10
+          },
+          {
+            "path": "app/Http/Requests/FileUploadRequest.php",
+            "lines": 30,
+            "covered": 28
+          },
+          {
+            "path": "app/Http/Resources/FileResource.php",
+            "lines": 14,
+            "covered": 14
+          },
+          {
+            "path": "app/Models/File.php",
+            "lines": 19,
+            "covered": 16
+          },
+          {
+            "path": "app/Support/ZipScanGuard.php",
+            "lines": 130,
+            "covered": 121
+          }
+        ]
+      },
+      "Chat": {
+        "lines": 784,
+        "covered": 741,
+        "percent": 94.52,
+        "files": [
+          {
+            "path": "app/Actions/Messaging/AdvanceReadCursor.php",
+            "lines": 45,
+            "covered": 42
+          },
+          {
+            "path": "app/Actions/Messaging/IssueConversationRealtime.php",
+            "lines": 47,
+            "covered": 34
+          },
+          {
+            "path": "app/Actions/Messaging/OpenConversation.php",
+            "lines": 141,
+            "covered": 129
+          },
+          {
+            "path": "app/Actions/Messaging/ReadConversations.php",
+            "lines": 61,
+            "covered": 61
+          },
+          {
+            "path": "app/Actions/Messaging/SendTextMessage.php",
+            "lines": 89,
+            "covered": 83
+          },
+          {
+            "path": "app/Actions/Messaging/SyncConversationLifecycle.php",
+            "lines": 60,
+            "covered": 56
+          },
+          {
+            "path": "app/Events/ConversationMessagesChanged.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/ConversationController.php",
+            "lines": 119,
+            "covered": 119
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/ConversationRealtimeController.php",
+            "lines": 5,
+            "covered": 5
+          },
+          {
+            "path": "app/Http/Controllers/BroadcastAuthController.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Http/Requests/ConversationBroadcastAuthRequest.php",
+            "lines": 15,
+            "covered": 15
+          },
+          {
+            "path": "app/Http/Requests/SendTextMessageRequest.php",
+            "lines": 42,
+            "covered": 42
+          },
+          {
+            "path": "app/Http/Resources/ConversationReadResource.php",
+            "lines": 16,
+            "covered": 16
+          },
+          {
+            "path": "app/Http/Resources/ConversationResource.php",
+            "lines": 11,
+            "covered": 11
+          },
+          {
+            "path": "app/Support/RealtimeSessionChannels.php",
+            "lines": 131,
+            "covered": 126
+          }
+        ]
+      },
+      "Sessions": {
+        "lines": 958,
+        "covered": 852,
+        "percent": 88.94,
+        "files": [
+          {
+            "path": "app/Actions/Sessions/SaveSession.php",
+            "lines": 286,
+            "covered": 247
+          },
+          {
+            "path": "app/Actions/Sessions/TransitionSession.php",
+            "lines": 316,
+            "covered": 270
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/SessionController.php",
+            "lines": 108,
+            "covered": 102
+          },
+          {
+            "path": "app/Http/Requests/CancelSessionRequest.php",
+            "lines": 9,
+            "covered": 9
+          },
+          {
+            "path": "app/Http/Requests/CompleteSessionRequest.php",
+            "lines": 3,
+            "covered": 3
+          },
+          {
+            "path": "app/Http/Requests/CreateSessionRequest.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Http/Requests/SessionApiRequest.php",
+            "lines": 136,
+            "covered": 121
+          },
+          {
+            "path": "app/Http/Requests/UpdateSessionRequest.php",
+            "lines": 16,
+            "covered": 16
+          },
+          {
+            "path": "app/Http/Resources/SessionResource.php",
+            "lines": 34,
+            "covered": 34
+          },
+          {
+            "path": "app/Models/LessonSession.php",
+            "lines": 9,
+            "covered": 9
+          },
+          {
+            "path": "app/Models/ProgramSession.php",
+            "lines": 14,
+            "covered": 14
+          },
+          {
+            "path": "app/Policies/ProgramSessionPolicy.php",
+            "lines": 26,
+            "covered": 26
+          }
+        ]
+      },
+      "Outbox": {
+        "lines": 597,
+        "covered": 547,
+        "percent": 91.62,
+        "files": [
+          {
+            "path": "app/Console/Commands/MonitorNotificationOutbox.php",
+            "lines": 25,
+            "covered": 20
+          },
+          {
+            "path": "app/Console/Commands/ProcessNotificationOutbox.php",
+            "lines": 160,
+            "covered": 146
+          },
+          {
+            "path": "app/Console/Commands/PurgeNotificationData.php",
+            "lines": 70,
+            "covered": 68
+          },
+          {
+            "path": "app/Console/Commands/WorkNotificationOutbox.php",
+            "lines": 22,
+            "covered": 16
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/NotificationOutboxController.php",
+            "lines": 120,
+            "covered": 119
+          },
+          {
+            "path": "app/Support/NotificationOutboxAlerts.php",
+            "lines": 105,
+            "covered": 102
+          },
+          {
+            "path": "app/Support/NotificationOutboxWriter.php",
+            "lines": 95,
+            "covered": 76
+          }
+        ]
+      },
+      "Slack": {
+        "lines": 181,
+        "covered": 167,
+        "percent": 92.27,
+        "files": [
+          {
+            "path": "app/Jobs/SendSlackOperationalAlert.php",
+            "lines": 181,
+            "covered": 167
+          }
+        ]
+      }
+    },
+    "totals": {
+      "tests": 822,
+      "assertions": 7187,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "final": {
+    "overall": {
+      "statements": 8888,
+      "coveredstatements": 8317,
+      "classes": 191,
+      "methods": 597
+    },
+    "groups": [
+      {
+        "name": "d04-junit",
+        "tests": 77,
+        "assertions": 1077,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "d04-preflight-junit",
+        "tests": 7,
+        "assertions": 27,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "d04-race-junit",
+        "tests": 1,
+        "assertions": 893,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "regression-junit",
+        "tests": 742,
+        "assertions": 5230,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "modules": {
+      "Auth": {
+        "lines": 331,
+        "covered": 322,
+        "percent": 97.28,
+        "files": [
+          {
+            "path": "app/Actions/Auth/RevokeUserSessions.php",
+            "lines": 31,
+            "covered": 31
+          },
+          {
+            "path": "app/Actions/Fortify/CreateNewUser.php",
+            "lines": 15,
+            "covered": 15
+          },
+          {
+            "path": "app/Actions/Fortify/PasswordValidationRules.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Actions/Fortify/ResetUserPassword.php",
+            "lines": 11,
+            "covered": 11
+          },
+          {
+            "path": "app/Actions/Fortify/UpdateUserPassword.php",
+            "lines": 42,
+            "covered": 42
+          },
+          {
+            "path": "app/Actions/Fortify/UpdateUserProfileInformation.php",
+            "lines": 5,
+            "covered": 5
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/AuthController.php",
+            "lines": 91,
+            "covered": 86
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/PersonalAccessTokenController.php",
+            "lines": 36,
+            "covered": 36
+          },
+          {
+            "path": "app/Http/Middleware/EnsureActiveAccount.php",
+            "lines": 16,
+            "covered": 12
+          },
+          {
+            "path": "app/Http/Middleware/EnsureActiveApiActor.php",
+            "lines": 36,
+            "covered": 36
+          },
+          {
+            "path": "app/Http/Requests/ForgotPasswordRequest.php",
+            "lines": 4,
+            "covered": 4
+          },
+          {
+            "path": "app/Http/Requests/LoginRequest.php",
+            "lines": 6,
+            "covered": 6
+          },
+          {
+            "path": "app/Http/Requests/RegisterRequest.php",
+            "lines": 20,
+            "covered": 20
+          },
+          {
+            "path": "app/Http/Requests/ResetPasswordRequest.php",
+            "lines": 7,
+            "covered": 7
+          },
+          {
+            "path": "app/Http/Requests/UpdateMeRequest.php",
+            "lines": 4,
+            "covered": 4
+          },
+          {
+            "path": "app/Http/Requests/UpdatePasswordRequest.php",
+            "lines": 6,
+            "covered": 6
+          }
+        ]
+      },
+      "Files": {
+        "lines": 571,
+        "covered": 526,
+        "percent": 92.12,
+        "files": [
+          {
+            "path": "app/Actions/Files/CompleteFile.php",
+            "lines": 192,
+            "covered": 164
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/FileController.php",
+            "lines": 176,
+            "covered": 173
+          },
+          {
+            "path": "app/Http/Requests/FileLinkRequest.php",
+            "lines": 10,
+            "covered": 10
+          },
+          {
+            "path": "app/Http/Requests/FileUploadRequest.php",
+            "lines": 30,
+            "covered": 28
+          },
+          {
+            "path": "app/Http/Resources/FileResource.php",
+            "lines": 14,
+            "covered": 14
+          },
+          {
+            "path": "app/Models/File.php",
+            "lines": 19,
+            "covered": 16
+          },
+          {
+            "path": "app/Support/ZipScanGuard.php",
+            "lines": 130,
+            "covered": 121
+          }
+        ]
+      },
+      "Chat": {
+        "lines": 784,
+        "covered": 741,
+        "percent": 94.52,
+        "files": [
+          {
+            "path": "app/Actions/Messaging/AdvanceReadCursor.php",
+            "lines": 45,
+            "covered": 42
+          },
+          {
+            "path": "app/Actions/Messaging/IssueConversationRealtime.php",
+            "lines": 47,
+            "covered": 34
+          },
+          {
+            "path": "app/Actions/Messaging/OpenConversation.php",
+            "lines": 141,
+            "covered": 129
+          },
+          {
+            "path": "app/Actions/Messaging/ReadConversations.php",
+            "lines": 61,
+            "covered": 61
+          },
+          {
+            "path": "app/Actions/Messaging/SendTextMessage.php",
+            "lines": 89,
+            "covered": 83
+          },
+          {
+            "path": "app/Actions/Messaging/SyncConversationLifecycle.php",
+            "lines": 60,
+            "covered": 56
+          },
+          {
+            "path": "app/Events/ConversationMessagesChanged.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/ConversationController.php",
+            "lines": 119,
+            "covered": 119
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/ConversationRealtimeController.php",
+            "lines": 5,
+            "covered": 5
+          },
+          {
+            "path": "app/Http/Controllers/BroadcastAuthController.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Http/Requests/ConversationBroadcastAuthRequest.php",
+            "lines": 15,
+            "covered": 15
+          },
+          {
+            "path": "app/Http/Requests/SendTextMessageRequest.php",
+            "lines": 42,
+            "covered": 42
+          },
+          {
+            "path": "app/Http/Resources/ConversationReadResource.php",
+            "lines": 16,
+            "covered": 16
+          },
+          {
+            "path": "app/Http/Resources/ConversationResource.php",
+            "lines": 11,
+            "covered": 11
+          },
+          {
+            "path": "app/Support/RealtimeSessionChannels.php",
+            "lines": 131,
+            "covered": 126
+          }
+        ]
+      },
+      "Sessions": {
+        "lines": 958,
+        "covered": 867,
+        "percent": 90.5,
+        "files": [
+          {
+            "path": "app/Actions/Sessions/SaveSession.php",
+            "lines": 286,
+            "covered": 252
+          },
+          {
+            "path": "app/Actions/Sessions/TransitionSession.php",
+            "lines": 316,
+            "covered": 280
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/SessionController.php",
+            "lines": 108,
+            "covered": 102
+          },
+          {
+            "path": "app/Http/Requests/CancelSessionRequest.php",
+            "lines": 9,
+            "covered": 9
+          },
+          {
+            "path": "app/Http/Requests/CompleteSessionRequest.php",
+            "lines": 3,
+            "covered": 3
+          },
+          {
+            "path": "app/Http/Requests/CreateSessionRequest.php",
+            "lines": 1,
+            "covered": 1
+          },
+          {
+            "path": "app/Http/Requests/SessionApiRequest.php",
+            "lines": 136,
+            "covered": 121
+          },
+          {
+            "path": "app/Http/Requests/UpdateSessionRequest.php",
+            "lines": 16,
+            "covered": 16
+          },
+          {
+            "path": "app/Http/Resources/SessionResource.php",
+            "lines": 34,
+            "covered": 34
+          },
+          {
+            "path": "app/Models/LessonSession.php",
+            "lines": 9,
+            "covered": 9
+          },
+          {
+            "path": "app/Models/ProgramSession.php",
+            "lines": 14,
+            "covered": 14
+          },
+          {
+            "path": "app/Policies/ProgramSessionPolicy.php",
+            "lines": 26,
+            "covered": 26
+          }
+        ]
+      },
+      "Outbox": {
+        "lines": 597,
+        "covered": 547,
+        "percent": 91.62,
+        "files": [
+          {
+            "path": "app/Console/Commands/MonitorNotificationOutbox.php",
+            "lines": 25,
+            "covered": 20
+          },
+          {
+            "path": "app/Console/Commands/ProcessNotificationOutbox.php",
+            "lines": 160,
+            "covered": 146
+          },
+          {
+            "path": "app/Console/Commands/PurgeNotificationData.php",
+            "lines": 70,
+            "covered": 68
+          },
+          {
+            "path": "app/Console/Commands/WorkNotificationOutbox.php",
+            "lines": 22,
+            "covered": 16
+          },
+          {
+            "path": "app/Http/Controllers/Api/V1/NotificationOutboxController.php",
+            "lines": 120,
+            "covered": 119
+          },
+          {
+            "path": "app/Support/NotificationOutboxAlerts.php",
+            "lines": 105,
+            "covered": 102
+          },
+          {
+            "path": "app/Support/NotificationOutboxWriter.php",
+            "lines": 95,
+            "covered": 76
+          }
+        ]
+      },
+      "Slack": {
+        "lines": 181,
+        "covered": 167,
+        "percent": 92.27,
+        "files": [
+          {
+            "path": "app/Jobs/SendSlackOperationalAlert.php",
+            "lines": 181,
+            "covered": 167
+          }
+        ]
+      }
+    },
+    "totals": {
+      "tests": 827,
+      "assertions": 7227,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  }
+}

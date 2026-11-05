@@ -1,0 +1,6 @@
+ Container tutorlink-d06-test-backend-test-run-92ec3a5dc99b Creating
+ Container tutorlink-d06-test-backend-test-run-92ec3a5dc99b Created
+
+   INFO  Running migrations.
+
+  2026_11_01_233000_add_be_d04_workspace_schema ................. 63.98ms DONE

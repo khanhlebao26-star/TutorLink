@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\BeD04ConcurrencyRaceTest" file="Be D04Concurrency Race (Tests\Feature\BeD04ConcurrencyRace)" tests="1" assertions="893" errors="0" failures="0" skipped="0" time="22.843448">
+    <testcase name="Contract races repeat three times and observe real postgres lock waits" file="Be D04Concurrency Race (Tests\Feature\BeD04ConcurrencyRace)::Contract races repeat three times and observe real postgres lock waits" class="Tests\Feature\BeD04ConcurrencyRaceTest" classname="Tests.Feature.BeD04ConcurrencyRaceTest" assertions="893" time="22.843448"/>
+  </testsuite>
+</testsuites>

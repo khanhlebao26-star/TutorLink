@@ -1,0 +1,8 @@
+ Container tutorlink-d06-test-backend-test-run-9ba5a63c420f Creating
+ Container tutorlink-d06-test-backend-test-run-9ba5a63c420f Created
+
+  [30;42;1m PASS [39;49;22m[39m Tests\Feature\ProgramLifecycleApiTest[39m
+  [32;1m✓[39;22m[90m [39m[90mit returns 403 for a suspended Tutor before changing Program lifecy[39m[90m…[39m [90m0.57s[39m
+
+  [90mTests:[39m    [32;1m1 passed[39;22m[90m (5 assertions)[39m
+  [90mDuration:[39m [39m0.70s[39m

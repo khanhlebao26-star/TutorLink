@@ -17,6 +17,28 @@ class AdminApprovalAuditTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_admin_queue_defaults_to_submitted_and_has_stable_sort_orders(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $older = $this->createSubmittedProfile(User::factory()->create(['role' => 'tutor']));
+        $tieA = $this->createSubmittedProfile(User::factory()->create(['role' => 'tutor']));
+        $tieB = $this->createSubmittedProfile(User::factory()->create(['role' => 'tutor']));
+        $older->update(['submitted_at' => now()]);
+        $tieA->update(['submitted_at' => now()->subHour()]);
+        $tieB->update(['submitted_at' => now()->subHour()]);
+
+        $default = $this->actingAs($admin)->getJson('/api/v1/admin/tutor-profiles')->assertOk()
+            ->assertJsonPath('meta.current_page', 1)
+            ->assertJsonPath('meta.per_page', 20)
+            ->assertJsonPath('meta.total', 3);
+        self::assertSame([$older->id, $tieB->id, $tieA->id], array_column(array_column($default->json('data'), 'profile'), 'id'));
+
+        $idSort = $this->getJson('/api/v1/admin/tutor-profiles?sort=id_desc')->assertOk();
+        self::assertSame([$tieB->id, $tieA->id, $older->id], array_column(array_column($idSort->json('data'), 'profile'), 'id'));
+
+        $this->getJson('/api/v1/admin/tutor-profiles?per_page=51')->assertUnprocessable();
+    }
+
     public function test_request_changes_resubmit_and_approve_records_every_decision(): void
     {
         $admin = User::factory()->admin()->create();

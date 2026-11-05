@@ -1,0 +1,27 @@
+[
+  {
+    "dependency": "BE-K01",
+    "commit": "36b9d4817ead06c7dd52f060c3fbe93403690c69",
+    "present_in_origin_main": true
+  },
+  {
+    "dependency": "BE-K02",
+    "commit": "7834e5f42fe9410f2e576c08de0325b6d8b6d8a3",
+    "present_in_origin_main": true
+  },
+  {
+    "dependency": "BE-K03",
+    "commit": "8e7cdaf674f7c2a8927a243eac86a5ce1bf0f004",
+    "present_in_origin_main": true
+  },
+  {
+    "dependency": "BE-K04",
+    "commit": "135efcc8ec5c4c73cff8d58cabc62a17772234bf",
+    "present_in_origin_main": true
+  },
+  {
+    "dependency": "BE-K05",
+    "commit": "01c073b7dc83004d0d05a701b61370b62baf5589",
+    "present_in_origin_main": true
+  }
+]

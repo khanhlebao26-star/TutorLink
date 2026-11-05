@@ -1,0 +1,2 @@
+{"status":"ready","app":"ok","db":"ok","workers":{"outbox-worker":"ok","slack-worker":"ok","broadcast-worker":"ok","scheduler":"ok"}}
+HTTP_STATUS=200

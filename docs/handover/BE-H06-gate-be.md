@@ -1,0 +1,43 @@
+# BE-H06 — Quyết định Gate BE ngày 05/11/2026
+
+**Kết luận: BLOCKED — giữ mọi FE ticket ở Blocked.** Đây là kết quả nghiệm thu kỹ thuật H06 và checklist để nhóm duyệt; chưa phải chữ ký thay Khanh/Dũng/Hoàng. Không thay trạng thái ticket từ xa, không mở panel Filament.
+
+Owner: Hoàng. Reviewer: Dũng. Nhánh: `codex/2w-be-h06`. Base đã pull: `08ab0dc8efc70d9f1a1b901bbacc98e76e538015` (PR #87 D06 → be-k06). Working tree sạch trước H06. Phạm vi dùng ba mô tả K06/D06/H06 người dùng cung cấp; chưa đối chiếu độc lập nguồn System Design §12–14.
+
+## Checklist nghiệm thu
+
+- **Pass — tích hợp tại nhánh kiểm thử:** PR #87 đã merge D06 vào be-k06. Tất cả 21 hash source/artifact của release manifest D06 khớp checkout. [Provenance](evidence/be-h06/d06-source-provenance.json). Tài liệu D06 ghi publication bị chặn là snapshot cũ; PR #87 và CI đã có, không tiếp tục dùng blocker cũ đó như trạng thái hiện tại.
+- **Blocked — merge vào release/main:** GitHub main vẫn `fb54886617524e43727705f7f6ee86bed4135ef9`; K06/D06 còn ở be-k06. H06 thêm một test chưa commit. Cần commit/PR và tích hợp đúng nhánh release được nhóm duyệt; không tự merge khi thiếu review.
+- **Pass — migration/seed/backfill test:** PostgreSQL 16 test riêng, legacy D04 preflight 7 test/27 assertions; migrate:fresh và fixtures D04, backfill/constraint/race trong harness đều đạt. Không reset hoặc migrate database ứng dụng. Đây không chứng minh migration dữ liệu production đã chạy.
+- **Pass — regression và coverage:** 832 test / 7.409 assertions, 0 error/failure/skipped. Nhóm regression 747/5.412, D04 fixtures 77/1.077, race D04 1/893, preflight 7/27. Coverage toàn `backend/app` 94,26% (8.396/8.907), vượt yêu cầu >70%; không giảm source filter. [Log](evidence/be-h06/full-suite.log), [coverage](evidence/be-h06/coverage.txt), [machine checklist và JUnit](evidence/be-h06/gate-decision.json).
+- **Pass — API journey liên module:** test mới `backend/tests/Feature/BackendGateJourneyTest.php`, 44 assertions. Đăng ký Customer → ký URL xác minh → login → submit Tutor → assign reviewer → duyệt document/Profile → tạo/publish Listing → chat/message → Program Draft → send/accept Invitation → Session/Task/Fee → chặn complete khi còn việc và Review sớm → start/submit/review Task → complete Session + replay → complete Program → Review + replay → Report message → outsider bị chặn → assign/read evidence/resolve → evidence sau đóng bị chặn. Kiểm persisted state, unique actual/Review, audit và outbox. [Log](evidence/be-h06/journey.log), [patch chính xác](evidence/be-h06/journey.patch).
+- **Giới hạn của journey:** đây là HTTP kernel feature test, đổi actor bằng actingAs; không gọi đó là browser smoke. Notification fake chỉ kiểm gửi VerifyEmail; xác minh qua signed endpoint thật. Tutor/account và File metadata complete được dựng bằng fixture, Storage fake, không claim đã upload/quét nội dung/xác minh con người hoặc gửi email thật.
+- **Pass — smoke HTTP thật:** chạy lại công cụ D06 trên runtime demo riêng, 26/26 request check đạt với cookie jar/CSRF thật. Kiểm login/401/403/404/409/419/422/429, Task/Submission/feedback, replay cùng ID, version, Overview/Progress/Announcement/Fee. [Transcript đã redact](evidence/be-h06/http-smoke.json). Không gán 26 bước này thành full journey browser, UI hoặc production acceptance.
+- **Pass — native outbox và scheduler một lượt:** bổ sung Program pause qua HTTP demo; native `outbox:work --once` xử lý đúng 1 event và DB có đúng 1 notification `program_paused`. Scheduler chạy heartbeat/invitations:expire/outbox:monitor đạt. [Delivery](evidence/be-h06/worker-delivery.log), [worker](evidence/be-h06/outbox-worker.log), [scheduler](evidence/be-h06/scheduler-run.log). Không suy ra continuous daemon/restart/reboot hoặc regular Slack queue đã được chứng nhận.
+- **Pass — Scramble:** export lại từ code, artifact giữ nguyên SHA-256 D06, parity 123 operations, Redocly 2.60.0 không lỗi/52 warnings đã phân loại ở D06. [Export](evidence/be-h06/openapi-export.log), [parity](evidence/be-h06/openapi-parity.log), [lint](evidence/be-h06/openapi-lint.log). Không lấy 131 operations draft hoặc 123 registered làm số chức năng đã nghiệm thu.
+- **Pass kế thừa — Slack thật K06:** K06 có message API HTTP 200/ok=true, permalink, queue thử riêng và native worker tại commit `2ba9047`; giữ tách biệt khỏi fake tests hiện vừa chạy. [K06 report](BE-K06-test-report.md), [tin thử được K06 ghi nhận](https://laraveltelesc-cjr9660.slack.com/archives/C0C8BM660TB/p1793780886888319). H06 không gửi tin Slack mới, không claim regular slack-worker đã tiêu thụ queue slack hoặc người dùng đã đọc. Các class Slack không đổi giữa source K06 và release D06.
+- **Pass có giới hạn — CI đã có:** [CI D06 thành công tại cc3adc6](https://github.com/khanhlebao26-star/TutorLink/actions/runs/41943434134); Git tree của cc3adc6 và commit merge 08ab0dc giống hệt nhau. Main cũng có CI xanh ở revision cũ. **Blocked:** chưa có CI trên revision chứa test H06/PR release cuối; không gắn CI cũ thành xanh cho patch chưa push. [Snapshot GitHub](evidence/be-h06/github-status.json).
+- **Blocked — owner/reviewer và scope:** D06 release vẫn ghi 67 operation chưa có owner confirmation, 47 summary warnings chờ owner, các route conditional D23 vẫn planned. Cần nhóm xác nhận phạm vi Gate và lane metadata; không tự tick các route thiếu hoặc phát hành success giả. Danh sách route và mapping dùng [D06 release notes](evidence/be-d06/2026-11-05-0455/release-notes.md) và [D23 status](evidence/be-d06/2026-11-05-034651/planned-routes.md).
+- **Blocked — ba chữ ký:** Khanh Pending, Dũng Pending, Hoàng Pending trên checklist cuối. Người dùng báo K06/D06 đã done là đầu vào làm H06, không tự thay bằng ba chữ ký. GitHub PR #87 chưa có review submission được API công khai trả về; không suy ra chưa từng trao đổi ngoài GitHub.
+- **Not tested:** nguồn System Design đầy đủ, production migration/load/backup-restore/TLS/host reboot, UI/WebSocket browser acceptance và chuỗi toàn phần qua TCP. Các mục ngoài acceptance kỹ thuật hiện tại không tự biến thành lỗi P0/P1; nhóm cần ghi phạm vi/ngoại lệ rõ khi ký.
+
+## Runtime và tính tái lập
+
+Suite dùng project `tutorlink-h06-test`; smoke dùng `tutorlink-h06-smoke`. Cả hai có PostgreSQL `tutorlink_test`, user `tutorlink_test_runner`, network DB internal-only, runner có TestDatabaseGuard. Image test PHP 8.3.36 có intl/zip/pdo_pgsql và vendor đúng composer.lock, source hiện tại được bind từ workspace. Runtime HTTP chỉ mở `127.0.0.1:18016`; PHP dev server chỉ dùng cho smoke local, không là evidence production.
+
+Đợt smoke đầu bị connection refused do network internal-only, sau đó login 500 vì server con đọc .env legacy và trỏ 127.0.0.1:5432 trong container. Đã gắn file synthetic `backend/d06-smoke.env` read-only đúng vị trí, thêm bridge cho cổng loopback và no-reload; không sửa .env thật hoặc application source. [Transcript lỗi môi trường](evidence/be-h06/http-smoke-environment-failed.json) được giữ riêng; lượt cuối 26/26 mới được tính Pass. Tất cả email/notification sink của demo là array/null; monitoring alerts ngoài đã tắt.
+
+Lệnh suite: `php scripts/test-suite.php --coverage`; source filter, runner và dependency không đổi trong H06. Demo: migrate:fresh + d04:seed bằng test-console guarded, chạy `be-d06-http-smoke.py` với BE_D06_SMOKE_URL loopback. H06 chỉ thêm test tích hợp và hồ sơ nghiệm thu; **API/schema delta: không có**. Bằng chứng gắn base commit + SHA-256 test mới ở gate-decision.json; cần commit patch để hoàn tất provenance release.
+
+## Việc cần làm để mở Gate
+
+1. Hoàng kiểm diff/test/report H06 rồi commit và tạo PR; merge K06/D06/H06 vào release/main theo quy trình nhóm.
+2. Dũng/Khanh xác nhận contract inventory và phạm vi các route conditional; xử lý lỗi chặn nếu review phát hiện. Không đóng toàn bộ API chỉ bằng count/lint.
+3. CI revision cuối xanh; gắn URL/commit vào checklist này.
+4. Khanh, Dũng, Hoàng ký checklist trên đúng revision; quyết định Gate Pass bằng một cập nhật rõ ràng. Trước đó mọi FE ticket vẫn Blocked. Chưa chỉnh trạng thái ticket/issue từ xa trong lượt này.
+
+## Comment issue để người dùng đăng
+
+BE-H06 đã thực hiện kiểm thử kỹ thuật trên `08ab0dc` + patch journey mới: 832 test/7.409 assertions, coverage 94,26%, HTTP demo 26/26, Scramble parity 123/lint đạt; native worker xử lý 1 event → 1 notification, scheduler một lượt đạt. Slack thật kế thừa evidence K06, ghi riêng với fake tests; không gửi tin mới. API/schema không đổi.
+
+**Gate hiện BLOCKED, FE giữ Blocked:** còn commit/PR H06 và merge K06/D06 vào release/main, CI revision cuối, owner/scope confirmation D06 và ba chữ ký Khanh/Dũng/Hoàng. Báo cáo/evidence: `docs/handover/BE-H06-gate-be.md`. Không coi status done của từng lane hoặc CI ancestor là nghiệm thu Gate chung.

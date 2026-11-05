@@ -1,0 +1,65 @@
+{
+  "gate": "BLOCKED",
+  "frontend_tickets": "Blocked; remote tickets not modified",
+  "date": "2026-11-05",
+  "branch": "codex/2w-be-h06",
+  "base_commit": "08ab0dc8efc70d9f1a1b901bbacc98e76e538015",
+  "source_tree": "80a9bb0beb1a27046b08e8d0ea4668a87ff8c782",
+  "api_sha256": "2a75f1d738dd40f5e946d916bbdaa9c14067b10af4253406a2e88ab96d899046",
+  "lock_sha256": "56b6094f45759aa5667f6c16378c59862eca00a6d7fdd5b1d28931395d09bb0b",
+  "new_test_sha256": "5274bd7a29673439d1b9355685685d4522e608800db953b34ed916b0ce4c1a4d",
+  "groups": {
+    "d04-preflight": {
+      "tests": 7,
+      "assertions": 27,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "regression": {
+      "tests": 747,
+      "assertions": 5412,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "d04": {
+      "tests": 77,
+      "assertions": 1077,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "d04-race": {
+      "tests": 1,
+      "assertions": 893,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    }
+  },
+  "totals": {
+    "tests": 832,
+    "assertions": 7409,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "line_coverage": {
+    "percent": 94.26,
+    "covered": 8396,
+    "total": 8907
+  },
+  "openapi_operations": 123,
+  "lint_warnings": 52,
+  "live_http_checks": 26,
+  "kernel_journey_assertions": 44,
+  "new_slack_message_sent": false,
+  "api_schema_delta": "none",
+  "h06_changes_committed": false,
+  "signoffs": {
+    "Khanh": "Pending; not inferred from task request or owner completion statement",
+    "Dung": "Pending; not inferred from task request or owner completion statement",
+    "Hoang": "Pending; not inferred from task request or owner completion statement"
+  }
+}

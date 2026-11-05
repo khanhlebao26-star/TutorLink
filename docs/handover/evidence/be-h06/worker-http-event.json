@@ -1,0 +1,24 @@
+{
+  "actor": "owner",
+  "method": "POST",
+  "path": "/api/v1/programs/1/pause",
+  "request_body": null,
+  "request_headers": {},
+  "status": 200,
+  "headers": {
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store, private",
+    "X-Request-ID": "4d6f0e2f-1edb-462e-814a-fac8a2d266fc"
+  },
+  "response": {
+    "data": {
+      "id": 1,
+      "status": "paused",
+      "version": 1,
+      "title": "D04 Fixture Active",
+      "goal": "Synthetic workspace fixture.",
+      "currency": "VND",
+      "planned_session_count": 8
+    }
+  }
+}

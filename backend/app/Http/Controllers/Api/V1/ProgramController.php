@@ -171,6 +171,7 @@ class ProgramController extends Controller
 
     /** Pause an active Program. */
     #[OpenApiResponse(200, description: 'Program paused.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(409, description: 'The Program cannot be paused from its current status.', type: self::ERROR_RESPONSE_TYPE)]
     public function pause(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse
@@ -180,6 +181,7 @@ class ProgramController extends Controller
 
     /** Resume a paused Program. */
     #[OpenApiResponse(200, description: 'Program resumed.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(409, description: 'The Program cannot be resumed from its current status.', type: self::ERROR_RESPONSE_TYPE)]
     public function resume(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse
@@ -189,6 +191,7 @@ class ProgramController extends Controller
 
     /** Complete a Program after all Sessions and Tasks are terminal. */
     #[OpenApiResponse(200, description: 'Program completed.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(409, description: 'The Program cannot be completed yet.', type: self::ERROR_RESPONSE_TYPE)]
     public function complete(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse
@@ -198,6 +201,7 @@ class ProgramController extends Controller
 
     /** Cancel a Draft, Active, or Paused Program. */
     #[OpenApiResponse(200, description: 'Program cancelled.', type: 'array{data:ProgramResource}')]
+    #[OpenApiResponse(403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(404, description: 'Program not found in the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(409, description: 'The Program cannot be cancelled from its current state or still has blockers.', type: self::ERROR_RESPONSE_TYPE)]
     public function cancel(ProgramActionRequest $request, int $program, TransitionProgram $transition): JsonResponse

@@ -30,7 +30,7 @@ Tutor giao công việc cho Customer member trong đúng Program và theo dõi t
 # 4\. Chênh lệch/câu hỏi mở
 
 * Actor todo → in\_progress là Customer assignee theo hình Task & Submission trong Business Rules và WF05; start khi Paused và edit/cancel đã được chốt tại BR-19.
-* BE-D03 có cột `version`, route Task và test API; race PostgreSQL hiện có probe chạy lại được trong suite. [Báo cáo/evidence](../../handover/BE-D03-issue-74-test-report.md). UI và trạng thái quá hạn chưa được chứng nhận. Task-specific audit/outbox event chưa được tích hợp; retry được kiểm tra riêng và không thêm dòng audit/outbox/notification.
+* BE-D03 có cột `version`, route Task và test API; race PostgreSQL hiện có probe chạy lại được trong suite. [Báo cáo/evidence](https://github.com/khanhlebao26-star/TutorLink/blob/9c9d7468853aadbc2c32928fa55598e945d04d4c/docs/handover/BE-D03-issue-74-test-report.md). UI và trạng thái quá hạn chưa được chứng nhận. Task-specific audit/outbox event chưa được tích hợp; retry được kiểm tra riêng và không thêm dòng audit/outbox/notification.
 
 # 5\. Nguồn
 

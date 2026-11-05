@@ -1,0 +1,93 @@
+{
+    "fixture_set": "BE-D04 synthetic fixtures",
+    "database": "tutorlink_test",
+    "generated_at": "2026-11-04T22:44:50+00:00",
+    "aliases": {
+        "actors": {
+            "owner": {
+                "id": 1,
+                "role": "tutor",
+                "status": "active"
+            },
+            "other_tutor": {
+                "id": 2,
+                "role": "tutor",
+                "status": "active"
+            },
+            "member": {
+                "id": 3,
+                "role": "customer",
+                "status": "active"
+            },
+            "outsider": {
+                "id": 4,
+                "role": "customer",
+                "status": "active"
+            },
+            "admin": {
+                "id": 5,
+                "role": "admin",
+                "status": "active"
+            },
+            "inactive": {
+                "id": 6,
+                "role": "customer",
+                "status": "suspended"
+            },
+            "revoked_member": {
+                "id": 7,
+                "role": "customer",
+                "status": "active"
+            },
+            "late_member": {
+                "id": 8,
+                "role": "customer",
+                "status": "active"
+            }
+        },
+        "programs": {
+            "active": 1,
+            "paused": 2,
+            "completed": 3,
+            "cancelled": 4
+        },
+        "announcements": {
+            "published_tie_a": 1,
+            "published_tie_b": 2,
+            "draft_owner_only": 3,
+            "published_before_revocation": 4
+        },
+        "tasks": {
+            "todo": 1,
+            "in_progress": 2,
+            "submitted": 3,
+            "completed": 4,
+            "cancelled": 5
+        },
+        "fees": {
+            "zero_amount_declared": 1,
+            "current_period_declared": 59
+        },
+        "progress": {
+            "latest_tie_a": 1,
+            "latest_tie_b": 2,
+            "count_sample_last": 55
+        },
+        "files": {
+            "valid": 1,
+            "wrong_owner": 2,
+            "wrong_purpose": 3,
+            "pending": 4,
+            "rejected": 5
+        },
+        "sessions": {
+            "upcoming_session": 1,
+            "completed_session": 2,
+            "cancelled_session": 3
+        },
+        "submissions": {
+            "current_pending": 1,
+            "current_accepted": 2
+        }
+    }
+}

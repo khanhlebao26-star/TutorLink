@@ -8,6 +8,9 @@ use App\Support\ApiErrorResponse;
 use App\Support\TaskSubmissionRequestHash;
 use Carbon\CarbonImmutable;
 use Dedoc\Scramble\Attributes\HeaderParameter;
+use Dedoc\Scramble\Attributes\QueryParameter;
+use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,15 +19,39 @@ use stdClass;
 
 class TaskController extends Controller
 {
+    private const ERROR_RESPONSE_TYPE = 'array{code:string,message:string,request_id:string,errors?:array<string,list<string>>}';
+
+    private const TASK_TYPE = 'array{id:int,program_id:int,title:string,description:string|null,due_at:string|null,assigned_to:int|null,status:string,version:int,current_submission_id:int|null,file_ids:list<int>}';
+
+    private const SUBMISSION_TYPE = 'array{id:int,task_id:int,submission_version:int,content:string|null,status:string,submitted_at:string,feedback:string|null,reviewed_by:int|null,reviewed_at:string|null,file_ids:list<int>}';
+
+    private const FEEDBACK_TYPE = 'array{id:int,task_id:int,submission_version:int,version:int,status:string,feedback:string|null,reviewed_by:int|null,reviewed_at:string|null}';
+
+    #[OpenApiResponse(200, description: 'Tasks ordered by ascending id for the visible Program.', type: 'array{data:list<'.self::TASK_TYPE.'>,meta:array{current_page:int,per_page:int,total:int,last_page:int}}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The actor account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Program does not exist or is outside the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Pagination query is invalid.', type: self::ERROR_RESPONSE_TYPE)]
+    #[QueryParameter('page', 'One-based page number.', type: 'integer', default: 1)]
+    #[QueryParameter('per_page', 'Page size: 1–50.', type: 'integer', default: 20)]
     public function index(Request $request, int $program): JsonResponse
     {
+        $page = $this->pagination($request);
         $record = DB::table('programs')->find($program);
         abort_unless($record && $this->role($record, $request), 404);
 
-        return response()->json(['data' => DB::table('tasks')->where('program_id', $program)
-            ->orderBy('id')->get()->map(fn ($task) => $this->taskData($task))]);
+        $tasks = DB::table('tasks')->where('program_id', $program)
+            ->orderBy('id')->paginate($page['per_page'], ['*'], 'page', $page['page']);
+
+        return response()->json($this->paginated($tasks, fn ($task) => $this->taskData($task)));
     }
 
+    #[OpenApiResponse(201, description: 'Task created with version 1.', type: 'array{data:'.self::TASK_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'Only the Program owner may create Tasks.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Program does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Program state does not allow Task creation.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Task fields, assignee membership, or attachments are invalid.', type: self::ERROR_RESPONSE_TYPE)]
     public function store(Request $request, int $program): JsonResponse
     {
         $data = $request->validate([
@@ -63,6 +90,10 @@ class TaskController extends Controller
         });
     }
 
+    #[OpenApiResponse(200, description: 'Task fields, current submission id, and linked file ids.', type: 'array{data:'.self::TASK_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The actor account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist or is outside the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     public function show(Request $request, int $task): JsonResponse
     {
         [$record, $program] = $this->visibleTask($request, $task);
@@ -70,6 +101,12 @@ class TaskController extends Controller
         return response()->json(['data' => $this->taskData($record)]);
     }
 
+    #[OpenApiResponse(200, description: 'Updated Task resource and incremented version.', type: 'array{data:'.self::TASK_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'Only the Program owner may edit this Task.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Task version is stale or Task/Program state disallows editing.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Expected version, fields, or attachments are invalid.', type: self::ERROR_RESPONSE_TYPE)]
     public function update(Request $request, int $task): JsonResponse
     {
         $data = $request->validate([
@@ -97,6 +134,12 @@ class TaskController extends Controller
         });
     }
 
+    #[OpenApiResponse(200, description: 'Task started with the incremented version.', type: 'array{data:'.self::TASK_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'Only the assigned active Customer may start this Task.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Task version is stale or Task/Program state disallows starting.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Expected version is invalid.', type: self::ERROR_RESPONSE_TYPE)]
     public function start(Request $request, int $task): JsonResponse
     {
         $data = $request->validate(['expected_version' => 'required|integer|min:1']);
@@ -111,6 +154,12 @@ class TaskController extends Controller
         });
     }
 
+    #[OpenApiResponse(200, description: 'Task cancelled with the incremented version.', type: 'array{data:'.self::TASK_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'Only the Program owner may cancel this Task.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Task version is stale or Task/Program state disallows cancellation.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Expected version is invalid.', type: self::ERROR_RESPONSE_TYPE)]
     public function cancel(Request $request, int $task): JsonResponse
     {
         $data = $request->validate(['expected_version' => 'required|integer|min:1']);
@@ -125,6 +174,10 @@ class TaskController extends Controller
         });
     }
 
+    #[OpenApiResponse(200, description: 'Current Submission resource, or null when none exists.', type: 'array{data:'.self::SUBMISSION_TYPE.'|null}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The actor account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist or is outside the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     public function submission(Request $request, int $task): JsonResponse
     {
         [$record] = $this->visibleTask($request, $task);
@@ -133,14 +186,31 @@ class TaskController extends Controller
         return response()->json(['data' => $current ? $this->submissionData($current) : null]);
     }
 
+    #[OpenApiResponse(200, description: 'Submission history ordered by descending submission_version.', type: 'array{data:list<'.self::SUBMISSION_TYPE.'>,meta:array{current_page:int,per_page:int,total:int,last_page:int}}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'The actor account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist or is outside the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Pagination query is invalid.', type: self::ERROR_RESPONSE_TYPE)]
+    #[QueryParameter('page', 'One-based page number.', type: 'integer', default: 1)]
+    #[QueryParameter('per_page', 'Page size: 1–50.', type: 'integer', default: 20)]
     public function versions(Request $request, int $task): JsonResponse
     {
+        $page = $this->pagination($request);
         $this->visibleTask($request, $task);
+        $versions = DB::table('task_submissions')->where('task_id', $task)
+            ->orderByDesc('submission_version')
+            ->paginate($page['per_page'], ['*'], 'page', $page['page']);
 
-        return response()->json(['data' => DB::table('task_submissions')->where('task_id', $task)
-            ->orderByDesc('submission_version')->get()->map(fn ($row) => $this->submissionData($row))]);
+        return response()->json($this->paginated($versions, fn ($row) => $this->submissionData($row)));
     }
 
+    #[OpenApiResponse(200, description: 'Replay of the previously stored Submission for the same actor, key, and payload.', type: 'array{data:'.self::SUBMISSION_TYPE.'}')]
+    #[OpenApiResponse(201, description: 'New Submission version stored.', type: 'array{data:'.self::SUBMISSION_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'Only the assigned active Customer may submit.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Submission version is stale, Task state conflicts, or the key was used with another payload.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Payload, UUID Idempotency-Key, or attachments are invalid.', type: self::ERROR_RESPONSE_TYPE)]
     #[HeaderParameter('Idempotency-Key', 'UUID used to replay the same Submission request.', required: true, type: 'string', format: 'uuid')]
     public function submit(Request $request, int $task): JsonResponse
     {
@@ -210,11 +280,23 @@ class TaskController extends Controller
     }
 
     #[HeaderParameter('Idempotency-Key', 'UUID retained for 30 days to replay this feedback decision.', required: true, type: 'string', format: 'uuid')]
+    #[OpenApiResponse(200, description: 'Feedback decision for the exact current Submission version.', type: 'array{data:'.self::FEEDBACK_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'Only the Program owner may provide feedback.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Submission version is stale, Task state conflicts, or the key was used with another payload.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Feedback, expected version, or UUID Idempotency-Key is invalid.', type: self::ERROR_RESPONSE_TYPE)]
     public function review(Request $request, int $task): JsonResponse
     {
         return $this->feedback($request, $task, 'accepted');
     }
 
+    #[OpenApiResponse(200, description: 'Feedback decision for the exact current Submission version.', type: 'array{data:'.self::FEEDBACK_TYPE.'}')]
+    #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(403, description: 'Only the Program owner may provide feedback.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(404, description: 'Task does not exist.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(409, description: 'Submission version is stale, Task state conflicts, or the key was used with another payload.', type: self::ERROR_RESPONSE_TYPE)]
+    #[OpenApiResponse(422, description: 'Feedback, expected version, or UUID Idempotency-Key is invalid.', type: self::ERROR_RESPONSE_TYPE)]
     #[HeaderParameter('Idempotency-Key', 'UUID retained for 30 days to replay this feedback decision.', required: true, type: 'string', format: 'uuid')]
     public function requestRevision(Request $request, int $task): JsonResponse
     {
@@ -314,6 +396,29 @@ class TaskController extends Controller
 
             return $change($record, $program);
         }, 3);
+    }
+
+    private function pagination(Request $request): array
+    {
+        $data = $request->validate([
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
+        ]) + ['page' => 1, 'per_page' => 20];
+
+        return ['page' => (int) $data['page'], 'per_page' => (int) $data['per_page']];
+    }
+
+    private function paginated(LengthAwarePaginator $page, callable $map): array
+    {
+        return [
+            'data' => $page->getCollection()->map($map)->values(),
+            'meta' => [
+                'current_page' => $page->currentPage(),
+                'per_page' => $page->perPage(),
+                'total' => $page->total(),
+                'last_page' => $page->lastPage(),
+            ],
+        ];
     }
 
     private function lockedTask(Request $request, int $task, string $requiredRole): array

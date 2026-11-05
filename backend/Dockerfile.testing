@@ -24,6 +24,8 @@ RUN composer install \
 
 COPY . .
 
+RUN APP_ENV=testing APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= php artisan package:discover --ansi
+
 RUN mkdir -p storage/framework/cache \
     storage/framework/sessions \
     storage/framework/views \

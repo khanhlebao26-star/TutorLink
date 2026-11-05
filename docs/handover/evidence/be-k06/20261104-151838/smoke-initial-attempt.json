@@ -1,0 +1,8 @@
+{
+    "run_id": "be-k06-20261104-082117-9fpu",
+    "checked_at": "2026-11-04T08:21:17+00:00",
+    "steps": [],
+    "passed": false,
+    "failure_class": "Error",
+    "failure": "Smoke stopped; inspect local runtime without publishing secrets."
+}

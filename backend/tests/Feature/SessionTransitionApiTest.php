@@ -289,6 +289,54 @@ it('rejects stale versions before creating an actual', function () {
     $this->assertDatabaseCount('idempotency_receipts', 1);
 });
 
+it('returns 409 without side effects when the Session version is exhausted', function (string $action) {
+    DB::table('program_sessions')->where('id', $this->sessionId)->update(['version' => 2147483647]);
+    $payload = ['expected_version' => 2147483647];
+    if ($action === 'cancel') {
+        $payload['reason'] = 'Cancel boundary fixture';
+    }
+
+    $this->postJson(
+        "{$this->url}/{$action}",
+        $payload,
+        ['Idempotency-Key' => (string) Str::uuid()],
+    )->assertConflict()->assertJsonPath('code', 'session_version_exhausted');
+
+    $this->assertDatabaseHas('program_sessions', [
+        'id' => $this->sessionId, 'status' => 'scheduled',
+        'version' => 2147483647, 'terminal_replay' => null,
+    ]);
+    $this->assertDatabaseCount('lesson_sessions', 0);
+    $this->assertDatabaseCount('audit_logs', 1);
+    $this->assertDatabaseCount('idempotency_receipts', 1);
+    $this->assertDatabaseCount('notification_outbox', 0);
+})->with(['complete', 'cancel']);
+
+it('returns 409 without overwriting an actual attached to a scheduled Session', function () {
+    $actualId = DB::table('lesson_sessions')->insertGetId([
+        'program_session_id' => $this->sessionId, 'status' => 'completed',
+        'completion_note' => 'Existing actual must be preserved',
+    ]);
+
+    $this->postJson(
+        "{$this->url}/complete",
+        ['expected_version' => 1],
+        ['Idempotency-Key' => (string) Str::uuid()],
+    )->assertConflict()->assertJsonPath('code', 'session_actual_conflict');
+
+    $this->assertDatabaseHas('program_sessions', [
+        'id' => $this->sessionId, 'status' => 'scheduled',
+        'version' => 1, 'terminal_replay' => null,
+    ]);
+    $this->assertDatabaseHas('lesson_sessions', [
+        'id' => $actualId, 'completion_note' => 'Existing actual must be preserved',
+    ]);
+    $this->assertDatabaseCount('lesson_sessions', 1);
+    $this->assertDatabaseCount('audit_logs', 1);
+    $this->assertDatabaseCount('idempotency_receipts', 1);
+    $this->assertDatabaseCount('notification_outbox', 0);
+});
+
 it('rejects key reuse with another payload or action', function () {
     $key = (string) Str::uuid();
 

@@ -1,0 +1,9 @@
+{
+    "pending_jobs": 0,
+    "failed_jobs": 0,
+    "pending_outbox": 0,
+    "demo_outbox_count": 1,
+    "demo_outbox_processed": 1,
+    "demo_message_count": 1,
+    "demo_actual_count": 1
+}

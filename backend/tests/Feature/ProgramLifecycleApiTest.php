@@ -103,6 +103,24 @@ it('returns 404 when another Tutor attempts a Program lifecycle action', functio
     $this->assertDatabaseCount('audit_logs', 0);
 });
 
+it('returns 403 for a suspended Tutor before changing Program lifecycle state', function () {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $programId = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+    ProgramApiFixtures::addMember($programId, $tutor, 'tutor');
+    ProgramApiFixtures::addMember($programId, $customer, 'customer');
+    DB::table('users')->where('id', $tutor->id)->update(['status' => 'suspended']);
+
+    $this->actingAs($tutor->fresh(), 'web')
+        ->postJson("/api/v1/programs/{$programId}/pause")
+        ->assertForbidden()
+        ->assertJsonPath('code', 'account_inactive');
+
+    $this->assertDatabaseHas('programs', ['id' => $programId, 'status' => 'active', 'version' => 1]);
+    $this->assertDatabaseCount('audit_logs', 0);
+    $this->assertDatabaseCount('notification_outbox', 0);
+});
+
 it('rejects a transition outside the allowed state without side effects', function () {
     $tutor = ProgramApiFixtures::eligibleTutor();
     $customer = TestActors::customer();
