@@ -2,7 +2,13 @@ import { AppShell } from "@/components/app-shell";
 import { AuthForm } from "@/components/auth-form";
 import { AuthLayout } from "@/components/auth-layout";
 
-export default function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ role?: string | string[] }>;
+}) {
+  const initialRole = (await searchParams).role === "tutor" ? "tutor" : "customer";
+
   return (
     <AppShell title="Đăng ký" mode="auth">
       <AuthLayout
@@ -13,7 +19,7 @@ export default function RegisterPage() {
         tagline={<><span>Kết nối<br />Tri thức<br />Mở lối</span><span className="auth-slogan-accent">tương lai</span></>}
         secondaryTagline={"Học tốt hơn\nMỗi ngày"}
       >
-        <AuthForm mode="register" />
+        <AuthForm key={initialRole} mode="register" initialRole={initialRole} />
       </AuthLayout>
     </AppShell>
   );

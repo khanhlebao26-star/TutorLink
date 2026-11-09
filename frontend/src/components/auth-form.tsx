@@ -5,8 +5,10 @@ import { getCurrentUser, login, register } from "@/lib/data/services";
 import type { RegisterRole } from "@/lib/data/types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { Button, Field } from "./ui";
+
+const subscribeToReadiness = () => () => {};
 
 function maxBirthDate(minAge: number) {
   const date = new Date();
@@ -80,7 +82,7 @@ function PasswordField({
   );
 }
 
-export function AuthForm({ mode }: { mode: "login" | "register" }) {
+export function AuthForm({ mode, initialRole = "customer" }: { mode: "login" | "register"; initialRole?: RegisterRole }) {
   const router = useRouter();
   const submittingRef = useRef(false);
   const [fullName, setFullName] = useState("");
@@ -88,12 +90,15 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [role, setRole] = useState<RegisterRole>("customer");
+  const [role, setRole] = useState<RegisterRole>(initialRole);
   const [remember, setRemember] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [submitting, setSubmitting] = useState(false);
+  // Keep the server-rendered form disabled until React can handle input and submit.
+  const ready = useSyncExternalStore(subscribeToReadiness, () => true, () => false);
+  const formBusy = !ready || submitting;
   const minAge = role === "tutor" ? 18 : 15;
   const birthDateHint = `Bạn phải từ đủ ${minAge} tuổi.`;
   const latestBirthDate = maxBirthDate(minAge);
@@ -151,8 +156,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const confirmationError = fieldError("password_confirmation");
 
   return (
-    <form className="form-stack auth-form" onSubmit={submit} aria-busy={submitting}>
-      <fieldset className="auth-fields" disabled={submitting}>
+    <form className="form-stack auth-form" onSubmit={submit} aria-busy={formBusy}>
+      <fieldset className="auth-fields" disabled={formBusy}>
         <legend className="auth-visually-hidden">{mode === "login" ? "Thông tin đăng nhập" : "Thông tin tài khoản"}</legend>
       {mode === "register" ? (
         <>
@@ -271,7 +276,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
 
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
       {message ? <div><p className="inline-success" role="status">{message}</p><Link href={`/auth/verify-email?email=${encodeURIComponent(email)}`}>Mở trang xác minh email →</Link></div> : null}
-      <Button type="submit" disabled={submitting}>
+      <Button type="submit" disabled={formBusy}>
         {submitting ? "Đang xử lý…" : mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
       </Button>
     </form>

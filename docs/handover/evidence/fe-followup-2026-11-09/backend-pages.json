@@ -1,0 +1,142 @@
+{
+  "/admin/operations": {
+    "url": "/admin/operations",
+    "heading": "Điều hành TutorLink",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Điều hành TutorLink DashboardAuditTrang nghiệp vụ Blade Hồ sơ gia sư Được giao cho tôi Chờ duyệt: 1 Chưa phân công Đã duyệt: 1 Báo cáo Được giao cho tôi Đang mở: 1 Chưa phân công Đánh giá Công khai 1 Thông báo ",
+    "buttons": [
+      "\n                \n            "
+    ],
+    "alerts": []
+  },
+  "/admin/operations?section=audit": {
+    "url": "/admin/operations?section=audit",
+    "heading": "Điều hành TutorLink",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Điều hành TutorLink DashboardAuditTrang nghiệp vụ Blade Audit chỉ đọc ID Hành động Đối tượng Trước / Sau Lý do 8 evidence.read report #1 Trước — Sau 7 evidence.read report #1 Trước — Sau 3 verification_document.v",
+    "buttons": [
+      "\n                \n            "
+    ],
+    "alerts": []
+  },
+  "/admin/operations?section=profile&recordId=2": {
+    "url": "/admin/operations?section=profile&recordId=2",
+    "heading": "Điều hành TutorLink",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Điều hành TutorLink DashboardAuditTrang nghiệp vụ Blade Chờ duyệt Hồ sơ demo cần xét duyệt Gia sư tiếng Anh giao tiếp Tutor profile for automated tests. Kinh nghiệm: 0 năm · Phiên bản phân công 1 Tài liệu xác minh i",
+    "buttons": [
+      "\n                \n            ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Phê duyệt\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Yêu cầu chỉnh sửa\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Từ chối\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Đình chỉ hồ sơ\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Đình chỉ tài khoản\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Tải phiên bản mới nhất\n            \n    \n    \n    "
+    ],
+    "alerts": []
+  },
+  "/admin/operations?section=profile-assignment&recordId=2": {
+    "url": "/admin/operations?section=profile-assignment&recordId=2",
+    "heading": "Điều hành TutorLink",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Điều hành TutorLink DashboardAuditTrang nghiệp vụ Blade Phân công #2 · submitted · v1 ID quản trị nhận việc (để trống để thu hồi) Cập nhật phân công Lý do / Kết quả xử lý Tải phiên bản mới nhất",
+    "buttons": [
+      "\n                \n            ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Cập nhật phân công\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Tải phiên bản mới nhất\n            \n    \n    \n    "
+    ],
+    "alerts": []
+  },
+  "/admin/operations?section=report&recordId=1": {
+    "url": "/admin/operations?section=report&recordId=1",
+    "heading": "Điều hành TutorLink",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Điều hành TutorLink DashboardAuditTrang nghiệp vụ Blade Báo cáo ID 1 Loại đối tượng message Mã đối tượng 1 Phân loại other Mô tả Báo cáo minh họa để kiểm tra quyền evidence. Trạng thái open Quản trị được giao 3 Phiên b",
+    "buttons": [
+      "\n                \n            ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Giải quyết\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Bác bỏ\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Tải phiên bản mới nhất\n            \n    \n    \n    "
+    ],
+    "alerts": []
+  },
+  "/admin/operations?section=report-assignment&recordId=1": {
+    "url": "/admin/operations?section=report-assignment&recordId=1",
+    "heading": "Điều hành TutorLink",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Điều hành TutorLink DashboardAuditTrang nghiệp vụ Blade Phân công #1 · open · v1 ID quản trị nhận việc (để trống để thu hồi) Cập nhật phân công Lý do / Kết quả xử lý Tải phiên bản mới nhất",
+    "buttons": [
+      "\n                \n            ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Cập nhật phân công\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Tải phiên bản mới nhất\n            \n    \n    \n    "
+    ],
+    "alerts": []
+  },
+  "/admin/operations?section=review&recordId=1": {
+    "url": "/admin/operations?section=review&recordId=1",
+    "heading": "Điều hành TutorLink",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Điều hành TutorLink DashboardAuditTrang nghiệp vụ Blade Đánh giá 5/5 · visible Gia sư tận tâm, lộ trình rõ ràng. Ẩn đánh giá Lý do / Kết quả xử lý Tải phiên bản mới nhất",
+    "buttons": [
+      "\n                \n            ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Ẩn đánh giá\n            \n    \n    \n    ",
+      "\n            \n                        \n        \n        \n    \n        \n            \n                        Tải phiên bản mới nhất\n            \n    \n    \n    "
+    ],
+    "alerts": []
+  },
+  "/admin-business/assigned-profiles": {
+    "url": "/admin-business/assigned-profiles",
+    "heading": "Hồ sơ được giao",
+    "text": "TutorLink Admin Hồ sơ được giao Filament Hồ sơ được giao Chỉ hiển thị hồ sơ thuộc phân công hiện tại của bạn. Trạng thái submitted changes_requested approved rejected suspended Lọc hồ sơ Chờ duyệt Hồ sơ demo cần xét duyệt Gia sư tiếng Anh giao tiếp Xem chi tiết → Trang 1 · 1 hồ sơ",
+    "buttons": [
+      "Lọc hồ sơ"
+    ],
+    "alerts": []
+  },
+  "/admin-business/assigned-profiles/2": {
+    "url": "/admin-business/assigned-profiles/2",
+    "heading": "Hồ sơ demo cần xét duyệt",
+    "text": "TutorLink Admin Hồ sơ được giao Filament ← Hồ sơ được giao Chờ duyệt Hồ sơ demo cần xét duyệt Gia sư tiếng Anh giao tiếp Tutor profile for automated tests. Kinh nghiệm: 0 năm · Phiên bản phân công 1 Tài liệu xác minh identity_card identity.pdf · approved · 1024 byte Tải tài liệu Lý do quyết địn",
+    "buttons": [
+      "Phê duyệt",
+      "Yêu cầu chỉnh sửa",
+      "Từ chối",
+      "Đình chỉ hồ sơ",
+      "Đình chỉ tài khoản"
+    ],
+    "alerts": []
+  },
+  "/admin/tutor-profiles": {
+    "url": "/admin/tutor-profiles",
+    "heading": "Hồ Sơ Gia Sưs",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Hồ Sơ Gia Sưs List Hồ Sơ Gia Sưs 2 results Loading... Id Status Assigned admin id Assignment version 2 submitted 3 1 Mở Phân công 1 approved 0 Mở Phân công Showing 1 to 2 of 2 results Per pag",
+    "buttons": [
+      "\n                \n            ",
+      "\n                                                                                                                    Id\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Status\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Assigned admin id\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Assignment version\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    "
+    ],
+    "alerts": []
+  },
+  "/admin/reports": {
+    "url": "/admin/reports",
+    "heading": "Báo Cáos",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Báo Cáos List Báo Cáos 1 result Loading... Id Status Assigned admin id Assignment version 1 open 3 1 Mở Phân công Showing 1 result Per page 5 10 25 50",
+    "buttons": [
+      "\n                \n            ",
+      "\n                                                                                                                    Id\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Status\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Assigned admin id\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Assignment version\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    "
+    ],
+    "alerts": []
+  },
+  "/admin/reviews": {
+    "url": "/admin/reviews",
+    "heading": "Đánh Giás",
+    "text": "Skip to content TutorLink Admin Điều hành TutorLink Báo cáo Đánh giá Hồ sơ gia sư Đánh Giás List Đánh Giás 1 result Loading... Id Program id Rating Visibility Version 1 3 5 visible 1 Mở Showing 1 result Per page 5 10 25 50",
+    "buttons": [
+      "\n                \n            ",
+      "\n                                                                                                                    Id\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Program id\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Rating\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Visibility\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    ",
+      "\n                                                                                                                    Version\n                                                        \n                                                        \n  \n\n\n                                                            \n        \n        \n    \n                                                    "
+    ],
+    "alerts": []
+  }
+}

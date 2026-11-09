@@ -92,7 +92,7 @@ export default function Home() {
               <li><span aria-hidden="true">✓</span> Cập nhật lịch khả dụng theo kế hoạch</li>
             </ul>
             <div className="landing-actions">
-              <Link className="button button-primary" href="/auth/register">Tạo tài khoản Tutor</Link>
+              <Link className="button button-primary" href="/auth/register?role=tutor">Tạo tài khoản Tutor</Link>
               <Link className="landing-text-link" href="/profile">Mở hồ sơ của tôi <span aria-hidden="true">→</span></Link>
             </div>
           </div>

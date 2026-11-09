@@ -32,6 +32,14 @@ it("keeps void separate from a tutor payment declaration", () => {
   ).not.toContain("Tutor đánh dấu đã trả");
 });
 
+it.each([
+  ["marked_paid", "Tutor đánh dấu đã trả"],
+  ["marked_unpaid", "Tutor đánh dấu chưa trả"],
+] as const)("displays the server payment mark %s", (mark, label) => {
+  expect(feeLabel({ id: 1, version: 2, status: "declared", tutor_payment_mark: mark }))
+    .toBe(`Đã khai báo · ${label}`);
+});
+
 it("preserves real Program blocker ids from structured server responses", () => {
   const error = toApiClientError({
     response: {

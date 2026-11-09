@@ -8,7 +8,7 @@ import * as services from "@/lib/data/services";
 import type {TutorOnboardingData,TutorProfile} from "@/lib/data/types";
 const {push}=vi.hoisted(()=>({push:vi.fn()}));
 vi.mock("next/navigation",()=>({useRouter:()=>({push})}));
-vi.mock("@/lib/data/services",async original=>({...await original<typeof import("@/lib/data/services")>(),login:vi.fn(),getCurrentUser:vi.fn(),register:vi.fn(),saveTutorProfile:vi.fn()}));
+vi.mock("@/lib/data/services",async original=>({...await original<typeof import("@/lib/data/services")>(),login:vi.fn(),getCurrentUser:vi.fn(),register:vi.fn(),saveTutorProfile:vi.fn(),submitTutorProfile:vi.fn()}));
 beforeEach(()=>vi.clearAllMocks());
 it("displays a login failure without persisting a secret or redirecting",async()=>{
  vi.mocked(services.login).mockRejectedValue(new ApiClientError("Invalid credentials.",{status:401}));
@@ -29,4 +29,38 @@ it("shows revision content for resubmission and uses the current revision versio
 });
 it("locks a submitted revision while preserving the approved profile",()=>{
  render(<TutorOnboardingForm data={data({...profile,revision:{...profile.revision!,status:"submitted"}})} onReload={vi.fn()}/>);expect(screen.getByLabelText("Tiêu đề hồ sơ *")).toBeDisabled();expect(services.saveTutorProfile).not.toHaveBeenCalled();
+});
+
+it("shows the error beside a blank qualification name before saving the draft", async () => {
+  const draft = { ...profile, status: "draft", revision: null } as const;
+  render(<TutorOnboardingForm data={data(draft)} onReload={vi.fn()} />);
+  await userEvent.click(screen.getByRole("button", { name: /Tiếp theo/ }));
+  await userEvent.click(screen.getByRole("button", { name: /Tiếp theo/ }));
+  await userEvent.click(screen.getByRole("button", { name: /Thêm bằng cấp/ }));
+  await userEvent.type(screen.getByLabelText("Tên chứng nhận 1"), "   ");
+  await userEvent.click(screen.getByRole("button", { name: /Tiếp theo/ }));
+  expect(screen.getByLabelText("Tên chứng nhận 1")).toHaveAccessibleDescription("Vui lòng nhập tên bằng cấp hoặc chứng chỉ.");
+  expect(services.saveTutorProfile).not.toHaveBeenCalled();
+});
+
+it.each([
+  ["2000-01-01T00:00:00Z", /Cần tải CCCD \/ CMND hoặc hộ chiếu còn hiệu lực/],
+  [null, /Cần tải tài liệu xác minh chứng chỉ đã khai báo/],
+] as const)("blocks submission until required documents are present (passport expiry %s)", async (expiresAt, message) => {
+  const draft: TutorProfile = {
+    ...profile,
+    status: "draft",
+    revision: null,
+    qualification_claims: [{ type: "certificate", name: "Teaching certificate" }],
+    verification_documents: [{ id: 1, tutor_profile_id: 1, file_id: 5, document_type: "passport", status: "pending", expires_at: expiresAt }],
+  };
+  vi.mocked(services.saveTutorProfile).mockResolvedValue(draft);
+  render(<TutorOnboardingForm data={data(draft)} onReload={vi.fn()} />);
+  for (let step = 0; step < 4; step += 1) {
+    await userEvent.click(screen.getByRole("button", { name: /Tiếp theo/ }));
+  }
+  await userEvent.click(screen.getByRole("button", { name: /Gửi xét duyệt/ }));
+  expect(await screen.findByText(message)).toBeVisible();
+  expect(services.saveTutorProfile).toHaveBeenCalledTimes(1);
+  expect(services.submitTutorProfile).not.toHaveBeenCalled();
 });

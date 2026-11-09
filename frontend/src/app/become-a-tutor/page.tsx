@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 
+const tutorRegistration = "/auth/register?role=tutor";
+
 const tutorSteps = [
-  { title: "Tạo tài khoản", text: "Chọn vai trò Tutor khi đăng ký trên TutorLink.", href: "/auth/register", action: "Đăng ký" },
+  { title: "Tạo tài khoản", text: "Chọn vai trò Tutor khi đăng ký trên TutorLink.", href: tutorRegistration, action: "Đăng ký" },
   { title: "Hoàn thiện hồ sơ", text: "Giới thiệu kinh nghiệm và chuyên môn của bạn.", href: "/profile", action: "Mở hồ sơ" },
   { title: "Tạo dịch vụ", text: "Mô tả dịch vụ, hình thức dạy và mức phí.", href: "/me/listings/new", action: "Quản lý dịch vụ" },
   { title: "Cập nhật lịch", text: "Chia sẻ những khung giờ bạn có thể nhận học viên.", href: "/me/availability", action: "Quản lý lịch" },
@@ -26,7 +28,7 @@ export default function BecomeATutorPage() {
             <h1>Chia sẻ kiến thức,<br /><span>lan tỏa giá trị.</span></h1>
             <p className="landing-lead">Đưa chuyên môn của bạn đến gần hơn với những người đang tìm kiếm sự hướng dẫn phù hợp.</p>
             <div className="landing-actions">
-              <Link className="button button-primary" href="/auth/register">Tạo tài khoản Tutor <span aria-hidden="true">→</span></Link>
+              <Link className="button button-primary" href={tutorRegistration}>Tạo tài khoản Tutor <span aria-hidden="true">→</span></Link>
               <Link className="button button-secondary" href="/profile">Mở hồ sơ của tôi</Link>
             </div>
             <p className="landing-trust-line"><span aria-hidden="true">✦</span> Hồ sơ, dịch vụ và lịch khả dụng trong một tài khoản</p>
@@ -97,7 +99,7 @@ export default function BecomeATutorPage() {
           <p className="landing-eyebrow">CÂU HỎI THƯỜNG GẶP</p>
           <h2 id="tutor-faq-title">Bắt đầu từ đâu?</h2>
           <p>Tìm hiểu các bước cơ bản để giới thiệu dịch vụ của bạn.</p>
-          <Link className="landing-text-link" href="/auth/register">Tạo tài khoản <span aria-hidden="true">→</span></Link>
+          <Link className="landing-text-link" href={tutorRegistration}>Tạo tài khoản <span aria-hidden="true">→</span></Link>
         </div>
         <div className="landing-faq-list">
           <details className="landing-faq-item">
@@ -122,7 +124,7 @@ export default function BecomeATutorPage() {
           <p>Tạo hồ sơ và chia sẻ những dịch vụ bạn muốn cung cấp.</p>
         </div>
         <div className="landing-cta-actions">
-          <Link className="button landing-cta-light" href="/auth/register">Tạo tài khoản Tutor <span aria-hidden="true">→</span></Link>
+          <Link className="button landing-cta-light" href={tutorRegistration}>Tạo tài khoản Tutor <span aria-hidden="true">→</span></Link>
           <Link className="button landing-cta-quiet" href="/profile">Mở hồ sơ của tôi</Link>
         </div>
       </section>

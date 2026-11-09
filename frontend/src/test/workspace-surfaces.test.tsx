@@ -1,20 +1,24 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 import { WorkspaceTabPage } from "@/components/workspace-tabs";
+import { useActor } from "@/components/app-shell";
 import { Notifications } from "@/components/notifications";
 import { getProgram } from "@/lib/data/collaboration";
 import { workspaceRead } from "@/lib/data/workspace";
 import { ApiClientError } from "@/lib/api/client";
 vi.mock("@/components/app-shell", () => ({
   AppShell: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  useActor: () => ({ id: 4, role: "tutor" }),
+  useActor: vi.fn(),
 }));
 vi.mock("@/lib/data/collaboration", () => ({ getProgram: vi.fn() }));
 vi.mock("@/lib/data/workspace", async (original) => ({
   ...(await original<typeof import("@/lib/data/workspace")>()),
   workspaceRead: vi.fn(),
 }));
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(useActor).mockReturnValue({ id: 4, role: "tutor" } as never);
+});
 it("Paused allows existing Session complete/cancel but no create or edit", async () => {
   vi.mocked(getProgram).mockResolvedValue({
     id: 8,
@@ -68,6 +72,31 @@ it("terminal Program never exposes Session mutations", async () => {
   expect(
     screen.queryByRole("button", { name: "Hoàn thành buổi học" }),
   ).toBeNull();
+});
+
+it.each([
+  ["tutor", "all", "draft"],
+  ["customer", "published", "published"],
+] as const)("loads announcements for the %s scope", async (role, queryState, rowState) => {
+  vi.mocked(useActor).mockReturnValue({ id: role === "tutor" ? 4 : 5, role } as never);
+  vi.mocked(getProgram).mockResolvedValue({
+    id: 8,
+    title: "Lessons",
+    status: "active",
+    allowed_actions: role === "tutor" ? ["pause"] : [],
+  } as never);
+  vi.mocked(workspaceRead).mockResolvedValue({
+    data: [{ id: 12, version: 1, author_id: 4, title: "Class update", state: rowState }],
+    meta: { last_page: 1 },
+  } as never);
+
+  render(<WorkspaceTabPage id={8} tab="announcements" />);
+
+  await screen.findByRole("heading", { name: "Class update" });
+  expect(workspaceRead).toHaveBeenCalledWith("/programs/8/announcements", { page: 1, state: queryState });
+  const publish = screen.queryByRole("button", { name: "Đăng thông báo" });
+  if (role === "tutor") expect(publish).toBeEnabled();
+  else expect(publish).toBeNull();
 });
 it("lost notification access produces a forbidden state without a content link", async () => {
   vi.mocked(workspaceRead).mockRejectedValue(

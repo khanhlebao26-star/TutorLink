@@ -1,0 +1,27 @@
+{
+  "approvedList": {
+    "method": "GET",
+    "status": 200,
+    "profile": {
+      "id": 2,
+      "status": "approved",
+      "assigned_admin_id": 3,
+      "assignment_version": 3
+    }
+  },
+  "detail": {
+    "method": "GET",
+    "status": 200,
+    "profileStatus": "approved",
+    "assigned_admin_id": 3,
+    "assignment_version": 3
+  },
+  "ui": {
+    "h1": "Duyệt Tutor",
+    "detailStatus": "Đã duyệt",
+    "buttons": [
+      "Suspend profile",
+      "Suspend account"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "label": "Guest mobile keyboard menu",
+    "status": "Pass",
+    "evidence": "/me 401"
+  },
+  {
+    "label": "Admin header matches allowed collaboration routes",
+    "status": "Pass",
+    "evidence": "Program/chat both 403 and hidden; profile review and monitoring links visible"
+  }
+]

@@ -118,6 +118,27 @@ h2 { letter-spacing: -.025em; }
   justify-content: center;
   width: 34px;
 }
+.account-menu { position: relative; }
+.account-avatar { cursor: pointer; }
+.account-avatar:hover, .account-avatar[aria-expanded="true"] { background: var(--accent-soft); }
+.account-menu-panel:not([hidden]) { display: grid; }
+.account-menu-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px #071a4c1f;
+  gap: 10px;
+  inset-inline-end: 0;
+  min-width: 200px;
+  padding: 12px;
+  position: absolute;
+  top: calc(100% + 10px);
+  width: min(240px, calc(100vw - 32px));
+  overflow-wrap: anywhere;
+  z-index: 1;
+}
+.account-menu-panel > a { border-radius: 7px; font-size: .875rem; padding: 8px; }
+.account-menu-panel > a:hover { background: var(--surface-soft); }
 .menu-toggle { align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 9px; color: var(--brand); cursor: pointer; display: none; height: 42px; justify-content: center; padding: 8px; width: 44px; }
 .menu-icon { display: grid; gap: 4px; width: 19px; }
 .menu-icon span { background: currentColor; border-radius: 2px; height: 2px; width: 100%; }
@@ -250,6 +271,11 @@ textarea { min-height: 96px; resize: vertical; }
 .admin-actions { border-top: 1px solid var(--line); padding-top: 20px; }
 .checkbox-field { align-items: center; display: flex; gap: 10px; }
 .checkbox-field input { min-height: 0; width: auto; }
+.notifications-page h1 { font-size: clamp(2rem, 3vw, 2.5rem); margin-bottom: 0; }
+.notification-toolbar { align-items: center; display: flex; flex-wrap: wrap; gap: 12px 20px; }
+.notification-filter { cursor: pointer; }
+.notification-filter input { accent-color: var(--accent); height: 16px; padding: 0; width: 16px; }
+.notifications-page .workspace-fields:empty { display: none; }
 
 @media (max-width: 900px) {
   .topbar { gap: 16px; }

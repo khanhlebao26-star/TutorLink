@@ -69,6 +69,7 @@ export interface VerificationDocument {
   file_id: number;
   document_type: string;
   status: "pending" | "active" | "approved" | "rejected" | "expired";
+  expires_at?: string | null;
   reviewed_at?: string | null;
   original_name?: string | null;
   mime_type?: string;

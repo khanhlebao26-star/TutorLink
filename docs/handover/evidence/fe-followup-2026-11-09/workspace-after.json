@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Progress create/edit, real stale 409 preserves draft",
+    "status": "Pass",
+    "evidence": "Create 201, stale PATCH 409, retained 40, reload 35, saved 40, Customer read"
+  },
+  {
+    "label": "Announcement draft/edit/publish and Customer scope",
+    "status": "Pass",
+    "evidence": "Draft hidden from Customer; edit 200, publish 200, content visible after"
+  },
+  {
+    "label": "Fees create, duplicate, payment mark and Customer read",
+    "status": "Pass",
+    "evidence": "Create 201, duplicate 409, paid → unpaid with reason → void, correct Customer labels"
+  },
+  {
+    "label": "Task detail route, Customer submit, Tutor feedback",
+    "status": "Pass",
+    "evidence": "Task detail /programs/5/tasks/3; submit v1 and feedback visible after reload"
+  }
+]

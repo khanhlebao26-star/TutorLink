@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { describeApiError, ApiClientError, request, setAuthHint } from "@/lib/api/client";
+import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { dataMode, describeApiError, ApiClientError, request, setAuthHint } from "@/lib/api/client";
 import { getCurrentUser } from "@/lib/data/services";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
 import { LogoutButton } from "./logout-button";
@@ -47,6 +47,52 @@ function initials(name: string) {
   return name.trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase();
 }
 
+function AccountMenu({ user }: { user: User }) {
+  const [open, setOpen] = useState(false);
+  const container = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const panelId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    const dismissOutside = (event: PointerEvent) => {
+      if (!container.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", dismissOutside);
+    return () => document.removeEventListener("pointerdown", dismissOutside);
+  }, [open]);
+
+  return (
+    <div className="account-menu" ref={container} onBlur={(event) => {
+      if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+    }} onKeyDown={(event) => {
+      if (event.key === "Escape" && open) {
+        setOpen(false);
+        trigger.current?.focus();
+      }
+    }}>
+      <button
+        ref={trigger}
+        className="account-avatar"
+        type="button"
+        aria-label={`Tài khoản ${user.full_name}`}
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((previous) => !previous)}
+      >
+        {initials(user.full_name)}
+      </button>
+      <div className="account-menu-panel" id={panelId} hidden={!open}>
+        {open && <>
+          <strong>{user.full_name}</strong>
+          <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
+          <LogoutButton />
+        </>}
+      </div>
+    </div>
+  );
+}
+
 function LocaleDisplay() {
   return (
     <span className="locale-display">
@@ -58,16 +104,17 @@ function LocaleDisplay() {
 
 export function AppShell({ children, role, title = "TutorLink", mode }: AppShellProps) {
   const pathname = usePathname();
-  const isAuthRoute = pathname.startsWith("/auth/");
-  const publicMode = mode === "public" || mode === "auth" || isAuthRoute;
+  const authFrame = mode === "auth" || pathname.startsWith("/auth/");
+  const publicMode = mode === "public" || authFrame;
   const sessionHint = useSessionHint();
+  const mockPublicGuest = publicMode && dataMode === "mock" && !sessionHint;
   const [session, setSession] = useState<Session>({ status: "loading" });
   const [menuOpen, setMenuOpen] = useState(false);
   const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     let current = true;
-    if (publicMode) return;
+    if (authFrame || mockPublicGuest) return;
 
     const sessionRequest = pathname.startsWith("/me/") || pathname === "/settings"
       ? request<ApiEnvelope<User>>({ method: "GET", url: "/me" }).then((response) => response.data.data)
@@ -87,7 +134,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     });
 
     return () => { current = false; };
-  }, [pathname, publicMode, retry]);
+  }, [pathname, authFrame, mockPublicGuest, retry]);
 
   useEffect(() => {
     const refreshAccount = () => setRetry((value) => value + 1);
@@ -102,7 +149,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     : pathname === "/profile"
       ? role ?? "tutor"
       : role;
-  const user = session.status === "authenticated" ? session.user : null;
+  const user = !authFrame && !mockPublicGuest && session.status === "authenticated" ? session.user : null;
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
   const protectedPage = Boolean(requiredRole) || pathname === "/settings" || ["/programs", "/invitations", "/messages", "/reports", "/notifications"].some(prefix => isActive(pathname, prefix));
   const needsLogin = protectedPage && session.status === "guest";
@@ -113,7 +160,8 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
   // Rendering the public shell for this intermediate state causes a full
   // header/sidebar replacement as soon as the session request resolves.
   const showPublicFrame = publicMode || (!user && !protectedPage && !sessionHint);
-  const showPublicActions = publicMode || session.status !== "loading";
+  const showGuestActions = !user && (authFrame || mockPublicGuest || session.status === "guest" ||
+    (session.status === "error" && !sessionHint));
 
   const accessContent = needsLoading ? (
     <StatePanel kind="loading" message="Đang xác minh phiên đăng nhập…" />
@@ -149,7 +197,6 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
   ) : <ActorContext.Provider value={user}>{children}</ActorContext.Provider>;
 
   if (showPublicFrame) {
-    const authFrame = mode === "auth" || isAuthRoute;
     return (
       <div className={`app-frame public-frame${authFrame ? " auth-frame" : ""}`}>
         <header className="topbar public-topbar">
@@ -169,7 +216,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
           </button>
           <nav id="public-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
             <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Khám phá dịch vụ</Link>
-            {showPublicActions ? <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dành cho người dạy</Link> : null}
+            {publicMode || showGuestActions ? <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dành cho người dạy</Link> : null}
             <Link href="/#why-tutorlink" onClick={() => setMenuOpen(false)}>Về chúng tôi</Link>
             <form className="public-search" action="/marketplace" method="get">
               <label className="landing-sr-only" htmlFor="public-search-q">Tìm dịch vụ</label>
@@ -179,14 +226,16 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
           </nav>
           <div className="public-actions">
             <LocaleDisplay />
-            {showPublicActions ? <>
+            {user ? <AccountMenu key={pathname} user={user} /> : showGuestActions ? <>
               <Link className="public-login" href="/auth/login">Đăng nhập</Link>
               <Link className="button button-primary" href="/auth/register">Đăng ký</Link>
-            </> : null}
+            </> : session.status === "error" ? (
+              <Button variant="secondary" onClick={() => setRetry((value) => value + 1)}>Thử lại phiên đăng nhập</Button>
+            ) : null}
           </div>
         </header>
         <main className={`page-content${authFrame ? " auth-page-content" : ""}`}>
-          {protectedPage ? accessContent : children}
+          {accessContent}
         </main>
         {!authFrame ? <PublicFooter /> : null}
       </div>
@@ -221,14 +270,18 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         </button>
         <nav className="app-topbar-links" aria-label="Điều hướng chính">
           <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined}>Khám phá dịch vụ</Link>
-          <Link href="/programs">Program của tôi</Link><Link href="/messages">Tin nhắn</Link><LocaleDisplay />
+          {user?.role === "admin" ? roleNavItems.map(({ href, label }) => (
+            <Link key={href} href={href} aria-current={isActive(pathname, href) ? "page" : undefined}>{label}</Link>
+          )) : user ? (
+            <>
+              <Link href="/programs" aria-current={isActive(pathname, "/programs") ? "page" : undefined}>Program của tôi</Link>
+              <Link href="/messages" aria-current={isActive(pathname, "/messages") ? "page" : undefined}>Tin nhắn</Link>
+            </>
+          ) : null}
+          <LocaleDisplay />
         </nav>
         <div className="topbar-meta">
-          {user ? (
-            <span className="account-avatar" role="img" aria-label={`Tài khoản ${user.full_name}`} title={user.full_name}>
-              {initials(user.full_name)}
-            </span>
-          ) : null}
+          {user ? <AccountMenu key={pathname} user={user} /> : null}
         </div>
       </header>
       <div className="app-layout">

@@ -1,0 +1,177 @@
+{
+  "loginLanding": "/admin",
+  "admin": {
+    "detailHeading": "Hồ sơ demo cần xét duyệt",
+    "docLinks": [
+      {
+        "label": "Tải xuống",
+        "href": "http://localhost:8001/api/v1/files/2/download"
+      }
+    ],
+    "allowedButtons": [
+      "Approve",
+      "Request Changes",
+      "Reject",
+      "Suspend profile",
+      "Suspend account"
+    ],
+    "reasonRequiredHint": 1,
+    "blankReasonError": "",
+    "download": {
+      "suggestedFilename": "identity.pdf",
+      "failure": null
+    },
+    "mobile": {
+      "viewport": 390,
+      "scrollWidth": 390,
+      "innerWidth": 390,
+      "tableScrollWidth": 680,
+      "tableClientWidth": 680
+    },
+    "keyboard": [
+      {
+        "tag": "A",
+        "label": "TutorLink Việt Nam",
+        "text": "TutorLink✦Vietnam",
+        "id": ""
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Mở menu tài khoản",
+        "text": "",
+        "id": ""
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Tài khoản Hoàng · Admin demo",
+        "text": "AD",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "label": null,
+        "text": "Đang chờYêu cầu chỉnh sửaĐã duyệtTừ chốiĐình chỉ h",
+        "id": "admin-status"
+      },
+      {
+        "tag": "NEXTJS-PORTAL",
+        "label": null,
+        "text": "",
+        "id": ""
+      },
+      {
+        "tag": "BODY",
+        "label": null,
+        "text": "TutorLink✦VietnamKhám phá dịch vụDuyệt hồ sơ Tutor",
+        "id": ""
+      },
+      {
+        "tag": "A",
+        "label": "TutorLink Việt Nam",
+        "text": "TutorLink✦Vietnam",
+        "id": ""
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Mở menu tài khoản",
+        "text": "",
+        "id": ""
+      },
+      {
+        "tag": "BUTTON",
+        "label": "Tài khoản Hoàng · Admin demo",
+        "text": "AD",
+        "id": ""
+      },
+      {
+        "tag": "SELECT",
+        "label": null,
+        "text": "Đang chờYêu cầu chỉnh sửaĐã duyệtTừ chốiĐình chỉ h",
+        "id": "admin-status"
+      },
+      {
+        "tag": "BUTTON",
+        "label": null,
+        "text": "Mở hồ sơ",
+        "id": ""
+      },
+      {
+        "tag": "NEXTJS-PORTAL",
+        "label": null,
+        "text": "",
+        "id": ""
+      }
+    ],
+    "loadingVisible": true,
+    "emptyState": true,
+    "errorState": [
+      "Không thể tải dữ liệuQA simulated errorThử lại",
+      ""
+    ],
+    "pageErrors": []
+  },
+  "monitoring": {
+    "heading": "Giám sát hệ thống",
+    "links": [
+      "TutorLink✦Vietnam",
+      "Khám phá dịch vụ",
+      "Duyệt hồ sơ Tutor",
+      "Giám sát hệ thống",
+      "Duyệt hồ sơ Tutor",
+      "Giám sát hệ thống",
+      "Cài đặt tài khoản",
+      "Mở Telescope",
+      "Mở Pulse"
+    ]
+  },
+  "backend": {
+    "/admin/operations": {
+      "status": 200,
+      "location": null
+    },
+    "/admin/operations?section=audit": {
+      "status": 200,
+      "location": null
+    },
+    "/admin/operations?section=profile&recordId=1": {
+      "status": 404,
+      "location": null
+    },
+    "/admin/operations?section=report&recordId=1": {
+      "status": 200,
+      "location": null
+    },
+    "/admin/operations?section=review&recordId=1": {
+      "status": 200,
+      "location": null
+    },
+    "/admin/operations?section=profile-assignment&recordId=1": {
+      "status": 200,
+      "location": null
+    },
+    "/admin/operations?section=report-assignment&recordId=1": {
+      "status": 200,
+      "location": null
+    },
+    "/admin-business/assigned-profiles": {
+      "status": 200,
+      "location": null
+    },
+    "/admin/reports": {
+      "status": 200,
+      "location": null
+    },
+    "/admin/reviews": {
+      "status": 200,
+      "location": null
+    },
+    "/telescope": {
+      "status": 404,
+      "location": null
+    },
+    "/pulse": {
+      "status": 200,
+      "location": null
+    }
+  }
+}

@@ -12,7 +12,7 @@ export interface WorkspaceRow {
   note?: string;
   period?: string;
   amount_minor?: number;
-  tutor_payment_mark?: string;
+  tutor_payment_mark?: "unmarked" | "marked_paid" | "marked_unpaid";
   disclaimer?: string;
   planned_starts_at?: string;
   planned_ends_at?: string;
@@ -66,7 +66,11 @@ export function retryIdentity(
     : { payload: text, key: crypto.randomUUID() };
 }
 export function feeLabel(row: WorkspaceRow) {
-  return `${row.status === "voided" ? "Đã hủy khai báo" : "Đã khai báo"} · ${row.tutor_payment_mark === "paid" ? "Tutor đánh dấu đã trả" : row.tutor_payment_mark === "unpaid" ? "Tutor đánh dấu chưa trả" : "Chưa đánh dấu thanh toán"}`;
+  const declaration = row.status === "voided" ? "Đã hủy khai báo" : "Đã khai báo";
+  const payment = row.tutor_payment_mark === "marked_paid" ? "Tutor đánh dấu đã trả"
+    : row.tutor_payment_mark === "marked_unpaid" ? "Tutor đánh dấu chưa trả"
+    : "Chưa đánh dấu thanh toán";
+  return `${declaration} · ${payment}`;
 }
 
 export function localTimestamp(value?: string) {

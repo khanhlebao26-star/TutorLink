@@ -99,15 +99,16 @@ function TabContent({
 }) {
   const actor = useActor();
   const [page, setPage] = useState(1);
+  const announcementState = actor?.role === "tutor" ? "all" : "published";
   const load = useCallback(
     async () => ({
       program: await getProgram(id),
       rows: await workspaceRead<Collection<WorkspaceRow>>(
         `/programs/${id}/${paths[tab]}`,
-        { page },
+        tab === "announcements" ? { page, state: announcementState } : { page },
       ),
     }),
-    [id, tab, page],
+    [id, tab, page, announcementState],
   );
   const result = useAsyncData(load);
   const owner = !!result.data?.program.allowed_actions.length;
@@ -125,7 +126,7 @@ function TabContent({
           <p className="muted">
             {result.data.program.title} · {result.data.program.status}
           </p>
-          {owner && active && (
+          {owner && (active || (paused && tab === "announcements")) && (
             <Card>
               <details>
                 <summary>Tạo mới</summary>
@@ -374,7 +375,7 @@ function TabContent({
                   <p className="muted">{row.disclaimer}</p>
                   {writable && row.status === "declared" && (
                     <>
-                      <WorkspaceForm
+                      {row.tutor_payment_mark !== "marked_paid" && <WorkspaceForm
                         url={`/fee-records/${row.id}`}
                         method="PATCH"
                         fields={[
@@ -391,13 +392,16 @@ function TabContent({
                         fixed={{ expected_version: row.version }}
                         label="Sửa khai báo"
                         onSaved={result.reload}
-                      />
+                      />}
                       <div className="form-grid">
-                        {["mark-paid", "mark-unpaid", "void"].map((action) => (
+                        {["mark-paid", "mark-unpaid", "void"].filter((action) =>
+                          action === "void" || ((row.amount_minor ?? 0) > 0 &&
+                            row.tutor_payment_mark !== (action === "mark-paid" ? "marked_paid" : "marked_unpaid")),
+                        ).map((action) => (
                           <WorkspaceForm
                             key={action}
                             url={`/fee-records/${row.id}/${action}`}
-                            fields={action === "void" ? [reason] : []}
+                            fields={action === "void" || (action === "mark-unpaid" && row.tutor_payment_mark === "marked_paid") ? [reason] : []}
                             fixed={{ expected_version: row.version }}
                             label={
                               {

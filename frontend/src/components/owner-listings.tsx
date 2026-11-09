@@ -134,7 +134,7 @@ export function OwnerListings() {
       <header className="owner-heading">
         <div>
           <h1>Dịch vụ của tôi</h1>
-          <p className="muted">Tạo, chỉnh sửa và quản lý dịch vụ bạn cung cấp. Chỉ gia sư đã được phê duyệt mới có thể công khai dịch vụ.</p>
+          <p className="muted">Tạo, chỉnh sửa và quản lý dịch vụ sau khi hồ sơ gia sư được phê duyệt.</p>
         </div>
         {!busy && collection?.meta.allowed_actions.includes("create") ? <Link className="button button-primary" href="/me/listings/new">＋ Tạo dịch vụ mới</Link> : null}
       </header>
@@ -142,6 +142,12 @@ export function OwnerListings() {
       {notice ? <p role="status" className="owner-notice">{notice}</p> : null}
       {loading ? (
         <StatePanel kind="loading" message="Đang tải dịch vụ của bạn…" />
+      ) : error instanceof ApiClientError && error.status === 403 ? (
+        <StatePanel
+          kind="error"
+          message="Để quản lý dịch vụ, tài khoản gia sư cần hoạt động, đã xác minh email và có hồ sơ được phê duyệt. Bạn có thể kiểm tra tiến độ trong Hồ sơ Tutor."
+          action={<Link className="button button-secondary" href="/profile">Mở Hồ sơ Tutor</Link>}
+        />
       ) : !collection ? (
         <StatePanel
           kind="error"

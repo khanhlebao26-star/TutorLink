@@ -12,10 +12,14 @@ import { Button, ErrorActions, Field, StatePanel } from "./ui";
 export function AvailabilityEditor() {
   const load = useCallback(() => getOwnerAvailability(), []);
   const result = useAsyncData(load);
+  const needsProfile = result.error?.status === 422;
   return <section className="availability-page content-stack">
     <div><h1>Lịch khả dụng</h1><p className="muted">Thiết lập các khung giờ bạn có thể dạy, lặp lại mỗi tuần.</p></div>
     <p className="availability-notice"><strong>Lịch chỉ để tham khảo, không giữ chỗ.</strong><br />Bạn và học viên cần trao đổi để thống nhất lịch học trực tiếp.</p>
-    {result.loading ? <StatePanel kind="loading" message="Đang tải lịch khả dụng…" /> : result.error ? <StatePanel kind="error" message={describeApiError(result.error)} action={<ErrorActions login={result.error.status === 401 || result.error.status === 419} onRetry={result.reload} />} /> : result.data ? <ScheduleForm initial={result.data} /> : null}
+    {result.loading ? <StatePanel kind="loading" message="Đang tải lịch khả dụng…" /> : needsProfile ? (
+      <StatePanel kind="empty" message="Hãy tạo và lưu bản nháp hồ sơ gia sư để thiết lập lịch khả dụng."
+        action={<Link className="button button-secondary" href="/profile">Mở Hồ sơ Tutor</Link>} />
+    ) : result.error ? <StatePanel kind="error" message={describeApiError(result.error)} action={<ErrorActions login={result.error.status === 401 || result.error.status === 419} onRetry={result.reload} />} /> : result.data ? <ScheduleForm initial={result.data} /> : null}
   </section>;
 }
 

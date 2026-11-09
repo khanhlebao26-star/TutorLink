@@ -85,6 +85,9 @@ test("real recipient invitation -> sessions -> submission -> feedback -> complet
       .getByLabel("Tiêu đề", { exact: true })
       .fill("E2E speaking task");
     await taskForm.getByRole("button", { name: "Lưu", exact: true }).click();
+    await expect(
+      tutor.getByRole("heading", { name: "E2E speaking task", exact: true }),
+    ).toBeVisible();
     const tasks = await data(tutor, `/programs/${id}/tasks`);
     const task = tasks.data.find(
       (t: { title: string }) => t.title === "E2E speaking task",
@@ -106,6 +109,7 @@ test("real recipient invitation -> sessions -> submission -> feedback -> complet
     await review
       .getByRole("button", { name: "Duyệt bài nộp", exact: true })
       .click();
+    await expect(review).toHaveCount(0);
     await tutor.goto(`/programs/${id}`);
     await tutor
       .getByRole("button", { name: "Hoàn thành", exact: true })

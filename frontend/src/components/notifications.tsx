@@ -65,28 +65,36 @@ function NotificationList() {
   );
   const result = useAsyncData(load);
   return (
-    <section className="content-stack">
+    <section className="content-stack notifications-page">
       <h1>Thông báo</h1>
-      <label>
-        <input
-          type="checkbox"
-          checked={unread}
-          onChange={(e) => {
-            setUnread(e.target.checked);
-            setPage(1);
-          }}
-        />{" "}
-        Chỉ chưa đọc
-      </label>
+      <div className="notification-toolbar">
+        <label className="checkbox-field notification-filter">
+          <input
+            type="checkbox"
+            checked={unread}
+            onChange={(e) => {
+              setUnread(e.target.checked);
+              setPage(1);
+            }}
+          />
+          Chỉ chưa đọc
+        </label>
+        {result.data && (
+          <>
+            <span className="muted">{result.data.count.data.count} chưa đọc</span>
+            {result.data.count.data.count > 0 && (
+              <WorkspaceForm
+                url="/notifications/read-all"
+                label="Đánh dấu tất cả đã đọc"
+                onSaved={result.reload}
+              />
+            )}
+          </>
+        )}
+      </div>
       <ApiState {...result} />
       {result.data && (
         <>
-          <p>{result.data.count.data.count} chưa đọc</p>
-          <WorkspaceForm
-            url="/notifications/read-all"
-            label="Đánh dấu tất cả đã đọc"
-            onSaved={result.reload}
-          />
           {result.data.items.data.length === 0 && (
             <StatePanel kind="empty" message="Không có thông báo." />
           )}
@@ -118,18 +126,20 @@ function NotificationList() {
               )}
             </Card>
           ))}
-          <div className="button-row">
-            <Button disabled={page === 1} onClick={() => setPage(page - 1)}>
-              Trước
-            </Button>
-            <span>Trang {page}</span>
-            <Button
-              disabled={page >= (result.data.items.meta?.last_page ?? 1)}
-              onClick={() => setPage(page + 1)}
-            >
-              Sau
-            </Button>
-          </div>
+          {(page > 1 || (result.data.items.meta?.last_page ?? 1) > 1) && (
+            <div className="button-row">
+              <Button disabled={page === 1} onClick={() => setPage(page - 1)}>
+                Trước
+              </Button>
+              <span>Trang {page}</span>
+              <Button
+                disabled={page >= (result.data.items.meta?.last_page ?? 1)}
+                onClick={() => setPage(page + 1)}
+              >
+                Sau
+              </Button>
+            </div>
+          )}
         </>
       )}
     </section>

@@ -8,7 +8,9 @@ vi.mock("@/lib/data/workspace", async (original) => ({
   ...(await original<typeof import("@/lib/data/workspace")>()),
   workspaceWrite: vi.fn(),
 }));
-beforeEach(() => vi.mocked(workspaceWrite).mockReset());
+beforeEach(() => {
+  vi.mocked(workspaceWrite).mockReset();
+});
 it("keeps input on conflict and requires a deliberate reload", async () => {
   const reload = vi.fn();
   vi.mocked(workspaceWrite).mockRejectedValue(

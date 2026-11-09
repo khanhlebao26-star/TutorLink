@@ -103,6 +103,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     setBio(editableProfile(data.profile)?.bio ?? "");
     setExperienceYears(String(editableProfile(data.profile)?.experience_years ?? ""));
     setSpecializationId(String(editableProfile(data.profile)?.specialization_id ?? ""));
+    setClaims(editableProfile(data.profile)?.qualification_claims ?? []);
     setUploads({ avatar: { ...emptyUpload }, verification_document: { ...emptyUpload } });
     setQueuedAvatar(null);
   }, [data]);
@@ -112,7 +113,8 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     profile?.status === "changes_requested" || profile?.revision?.status === "changes_requested";
   const busy = saving || Object.values(uploads).some((upload) => upload.busy);
   const verified = Boolean(data.user.email_verified_at);
-  const attachedAvatar = Boolean(profile?.avatar_file_id);
+  const avatarFileId = editableProfile(profile)?.avatar_file_id;
+  const attachedAvatar = Boolean(avatarFileId);
   const attachedDocument = Boolean(profile?.verification_document_file_id);
 
   function fieldError(name: string) {
@@ -130,6 +132,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     setBio(next.bio ?? "");
     setExperienceYears(String(next.experience_years ?? ""));
     setSpecializationId(String(next.specialization_id ?? ""));
+    setClaims(next.qualification_claims ?? []);
   }
 
   async function handleProfileError(reason: unknown) {
@@ -154,12 +157,22 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
   function draftInput() {
     return {
       expected_version: profile?.status==="approved" ? (["draft","changes_requested"].includes(profile.revision?.status??"")?profile.revision?.version:0):undefined,
-      qualification_claims:claims,
+      qualification_claims: claims.map((claim) => ({ ...claim, name: claim.name.trim() })),
       headline: headline.trim(),
       bio: bio.trim(),
       experience_years: Number(experienceYears),
       specialization_id: Number(specializationId),
     };
+  }
+
+  function qualificationNameErrors(): FieldErrors {
+    const errors: FieldErrors = {};
+    claims.forEach((claim, index) => {
+      if (!claim.name.trim()) {
+        errors[`qualification_claims.${index}.name`] = ["Vui lòng nhập tên bằng cấp hoặc chứng chỉ."];
+      }
+    });
+    return errors;
   }
 
   function validateStepFields(targetStep: number) {
@@ -174,12 +187,13 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
       if (!selected) errors.specialization_id = ["Vui lòng chọn một chuyên môn đang hoạt động."];
     }
     if (targetStep === 3) {
+      Object.assign(errors, qualificationNameErrors());
       const years = Number(experienceYears);
       if (experienceYears === "" || !Number.isInteger(years) || years < 0 || years > 80) {
         errors.experience_years = ["Nhập số năm kinh nghiệm từ 0 đến 80."];
       }
     }
-    const checkedFields = targetStep === 1 ? ["headline", "bio"] : targetStep === 2 ? ["specialization_id"] : ["experience_years"];
+    const checkedFields = targetStep === 1 ? ["headline", "bio"] : targetStep === 2 ? ["specialization_id"] : ["experience_years", ...claims.map((_, index) => `qualification_claims.${index}.name`)];
     setFieldErrors((current) => ({ ...current, ...Object.fromEntries(checkedFields.map((name) => [name, errors[name] ?? []])) }));
     const firstField = Object.keys(errors)[0];
     if (firstField) {
@@ -215,6 +229,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
       ? await attachTutorAvatar(fileId, profile?.status==="approved"&&profile.revision&&["draft","changes_requested"].includes(profile.revision.status)?profile.revision.version:0)
       : (await createVerificationDocument({ fileId, documentType: documentType.trim() }), await getTutorProfile());
     setProfile(attached);
+    clearFieldError(purpose === "avatar" ? "avatar_file_id" : "verification_document_file_id");
     setUploads((current) => ({
       ...current,
       [purpose]: { ...current[purpose], message: purpose === "avatar" ? "Đã tải ảnh đại diện lên." : "Đã tải tài liệu xác minh lên.", error: "", busy: false },
@@ -356,7 +371,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
   }
 
   function allProfileFieldsValid() {
-    const errors: FieldErrors = {};
+    const errors: FieldErrors = qualificationNameErrors();
     if (!headline.trim()) errors.headline = ["Vui lòng nhập tiêu đề hồ sơ."];
     if (!bio.trim()) errors.bio = ["Vui lòng giới thiệu ngắn về bạn."];
     if (!data.specializations.some((item) => item.status === "active" && String(item.id) === specializationId)) {
@@ -376,6 +391,23 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
       setStep(1);
       setUploads((current) => ({ ...current, avatar: { ...current.avatar, error: "Cần tải ảnh đại diện trước khi gửi hồ sơ." } }));
       return false;
+    }
+
+    const documents = profile?.verification_documents;
+    if (documents !== undefined) {
+      const validTypes = new Set(documents.filter((document) =>
+        document.status !== "rejected" && document.status !== "expired" &&
+        (!document.expires_at || Date.parse(document.expires_at) > Date.now()),
+      ).map((document) => document.document_type));
+      const missingIdentity = !validTypes.has("identity_card") && !validTypes.has("passport");
+      const missingQualification = claims.find((claim) => !validTypes.has(claim.type));
+      if (missingIdentity || missingQualification) {
+        setStep(4);
+        setFieldErrors({ verification_document_file_id: [missingIdentity
+          ? "Cần tải CCCD / CMND hoặc hộ chiếu còn hiệu lực trước khi gửi hồ sơ."
+          : `Cần tải tài liệu xác minh ${missingQualification?.type === "degree" ? "bằng cấp" : "chứng chỉ"} đã khai báo.`] });
+        return false;
+      }
     }
 
     return true;
@@ -408,7 +440,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
   function renderUpload(purpose: UploadPurpose, label: string) {
     const state = uploads[purpose];
     const file = purpose === "avatar" ? queuedAvatar : null;
-    const attachedFileId = purpose === "avatar" ? profile?.avatar_file_id : profile?.verification_document_file_id;
+    const attachedFileId = purpose === "avatar" ? avatarFileId : profile?.verification_document_file_id;
     const uploadFieldError = fieldError(purpose === "avatar" ? "avatar_file_id" : "verification_document_file_id");
     const inputId = `tutor-${purpose}-file`;
     const errorId = `tutor-${purpose}-error`;
@@ -458,7 +490,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         </label>
         {!verified && purpose === "verification_document" ? <p className="onboarding-inline-note">Xác minh email trước khi tải tài liệu. <a href="/auth/verify-email">Xác minh email</a></p> : null}
         {!profile && purpose === "verification_document" ? <p className="onboarding-inline-note">Lưu các bước thông tin trước khi tải tài liệu.</p> : null}
-        {attachedFileId ? <p className="onboarding-upload-status is-complete" role="status">✓ {purpose === "avatar" ? "Đã tải ảnh đại diện lên." : "Đã tải tài liệu xác minh lên."}</p> : null}
+        {attachedFileId && !state.message ? <p className="onboarding-upload-status is-complete" role="status">✓ {purpose === "avatar" ? "Đã tải ảnh đại diện lên." : "Đã tải tài liệu xác minh lên."}</p> : null}
         {file ? <p className="onboarding-upload-status">Đã chọn: {file.name}</p> : null}
         {state.file ? <p className="onboarding-upload-status">{state.file.original_name ?? (state.file.complete ? "Tệp đã tải lên" : "Đang hoàn tất tải lên")}</p> : null}
         {state.message ? <p className="onboarding-inline-success" role="status">{state.message}</p> : null}
@@ -550,7 +582,37 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
         {step === 3 ? (
           <div className="onboarding-fields">
-            <div><h3>Bằng cấp / Chứng chỉ khai báo</h3><p className="muted">Mỗi loại đã khai báo cần tài liệu xác minh tương ứng.</p>{claims.map((claim,index)=><div className="button-row" key={index}><Select aria-label={`Loại chứng nhận ${index+1}`} disabled={locked||busy} value={claim.type} onChange={e=>setClaims(claims.map((c,i)=>i===index?{...c,type:e.target.value as "degree"|"certificate"}:c))}><option value="degree">Bằng cấp</option><option value="certificate">Chứng chỉ</option></Select><Input aria-label={`Tên chứng nhận ${index+1}`} maxLength={160} required disabled={locked||busy} value={claim.name} onChange={e=>setClaims(claims.map((c,i)=>i===index?{...c,name:e.target.value}:c))}/><Button variant="ghost" disabled={locked||busy} onClick={()=>setClaims(claims.filter((_,i)=>i!==index))}>Xóa</Button></div>)}<Button variant="outline" disabled={locked||busy||claims.length>=20} onClick={()=>setClaims([...claims,{type:"degree",name:""}])}>+ Thêm bằng cấp / chứng chỉ</Button></div>
+            <div>
+              <h3>Bằng cấp / Chứng chỉ khai báo</h3>
+              <p className="muted">Mỗi loại đã khai báo cần tài liệu xác minh tương ứng.</p>
+              {claims.map((claim, index) => {
+                const nameField = `qualification_claims.${index}.name`;
+                return (
+                  <div className="button-row" key={index}>
+                    <Select aria-label={`Loại chứng nhận ${index + 1}`} disabled={locked || busy} value={claim.type}
+                      onChange={(event) => setClaims(claims.map((item, i) => i === index
+                        ? { ...item, type: event.target.value === "certificate" ? "certificate" : "degree" }
+                        : item))}>
+                      <option value="degree">Bằng cấp</option>
+                      <option value="certificate">Chứng chỉ</option>
+                    </Select>
+                    <Field label={`Tên chứng nhận ${index + 1}`} htmlFor={`tutor-${nameField}`} error={fieldError(nameField)}>
+                      <Input maxLength={160} required disabled={locked || busy} value={claim.name}
+                        onChange={(event) => {
+                          setClaims(claims.map((item, i) => i === index ? { ...item, name: event.target.value } : item));
+                          clearFieldError(nameField);
+                        }} />
+                    </Field>
+                    <Button variant="ghost" disabled={locked || busy} onClick={() => {
+                      setClaims(claims.filter((_, i) => i !== index));
+                      setFieldErrors((current) => Object.fromEntries(Object.entries(current).filter(([key]) => !key.startsWith("qualification_claims."))));
+                    }}>Xóa</Button>
+                  </div>
+                );
+              })}
+              <Button variant="outline" disabled={locked || busy || claims.length >= 20}
+                onClick={() => setClaims([...claims, { type: "degree", name: "" }])}>+ Thêm bằng cấp / chứng chỉ</Button>
+            </div>
             <div className="onboarding-field onboarding-years-field">
               <Field label="Số năm kinh nghiệm *" htmlFor="tutor-experience_years" error={fieldError("experience_years")} hint="Nhập số năm hoàn chỉnh, từ 0 đến 80.">
                 <Input type="number" min={0} max={80} step={1} value={experienceYears} disabled={locked || busy} required aria-invalid={Boolean(fieldError("experience_years"))} onChange={(event) => { setExperienceYears(event.target.value); clearFieldError("experience_years"); }} />
@@ -571,14 +633,12 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
               <strong>Yêu cầu tải tệp</strong>
               <p>Tải lên bằng cấp hoặc chứng chỉ rõ nét để người xét duyệt xác minh chuyên môn của bạn.</p>
             </div>
-            {uploads.avatar.error || queuedAvatar || !attachedAvatar ? (
-              <div className="onboarding-avatar-summary">
-                <span>{attachedAvatar ? "✓ Ảnh đại diện đã gắn" : "Ảnh đại diện còn thiếu"}</span>
-                {!attachedAvatar ? <Button variant="ghost" className="onboarding-link-button" type="button" onClick={() => setStep(1)}>Quay lại bước ảnh đại diện</Button> : null}
-                {uploads.avatar.error ? <span className="onboarding-field-error" role="alert">{uploads.avatar.error}</span> : null}
-                {!attachedAvatar && (uploads.avatar.file || queuedAvatar) && uploads.avatar.error ? <Button variant="ghost" className="onboarding-link-button" type="button" disabled={busy || locked} onClick={() => void retryUpload("avatar")}>Thử tải ảnh lại</Button> : null}
-              </div>
-            ) : null}
+            <div className="onboarding-avatar-summary">
+              <span role="status">{uploads.avatar.busy ? uploads.avatar.message : attachedAvatar ? "✓ Ảnh đại diện đã gắn" : "Ảnh đại diện còn thiếu"}</span>
+              {!attachedAvatar ? <Button variant="ghost" className="onboarding-link-button" type="button" disabled={busy} onClick={() => setStep(1)}>Quay lại bước ảnh đại diện</Button> : null}
+              {uploads.avatar.error ? <span className="onboarding-field-error" role="alert">{uploads.avatar.error}</span> : null}
+              {!attachedAvatar && (uploads.avatar.file || queuedAvatar) && uploads.avatar.error ? <Button variant="ghost" className="onboarding-link-button" type="button" disabled={busy || locked} onClick={() => void retryUpload("avatar")}>Thử tải ảnh lại</Button> : null}
+            </div>
           </div>
         ) : null}
 

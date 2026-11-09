@@ -1,0 +1,12 @@
+[
+  {
+    "label": "Task attachment, scoped download and revision history",
+    "status": "Pass",
+    "evidence": "PDF upload 100%, tutor download, outsider 403, revision v1 and v2 retained"
+  },
+  {
+    "label": "Customer submits Program report and sees own status",
+    "status": "Pass",
+    "evidence": "Report created, visible only in reporter list"
+  }
+]
