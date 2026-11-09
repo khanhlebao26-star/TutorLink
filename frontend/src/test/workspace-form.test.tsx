@@ -26,12 +26,12 @@ it("keeps input on conflict and requires a deliberate reload", async () => {
     />,
   );
   await userEvent.click(
-    screen.getByRole("button", { name: "Lưu", exact: true }),
+    screen.getByRole("button", { name: /^Lưu$/ }),
   );
   expect(await screen.findByText("Changed")).toBeVisible();
   expect(screen.getByLabelText("Tiêu đề")).toHaveValue("My draft");
   expect(
-    screen.getByRole("button", { name: "Lưu", exact: true }),
+    screen.getByRole("button", { name: /^Lưu$/ }),
   ).toBeDisabled();
   expect(reload).not.toHaveBeenCalled();
   await userEvent.click(

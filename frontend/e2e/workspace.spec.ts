@@ -154,5 +154,5 @@ test("admin approves the assigned complete fixture through shared Filament actio
     .getByLabel("Lý do / Kết quả xử lý")
     .fill("E2E approval after checking required documents");
   await page.getByRole("button", { name: "Phê duyệt", exact: true }).click();
-  await expect(page.getByText("Đã cập nhật", { exact: true })).toBeVisible();
+  await expect(page.getByText("Đã duyệt", { exact: true })).toBeVisible();
 });

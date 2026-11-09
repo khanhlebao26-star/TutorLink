@@ -48,11 +48,14 @@ Architecture also contains `Other source files.md` with links to its five non-Go
 
 - [FE phase 2 — bổ sung code và quality setup](handover/FE-K02-D02-H02-handover.md): Session/Task/notification/trust, Browser/E2E config; chưa nghiệm thu runtime hoặc coverage.
 
+- [Điều phối test FE 09/11/2026](handover/FE-test-coordination-2026-11-09.md): ba lane Tutor/Customer/Admin, runtime PostgreSQL/Mailpit cô lập và evidence kiểm tra chung; xem trạng thái từng case, không suy Gate FE Pass từ readiness hoặc build.
+
 ## Docker hiện hành
 
 - `docker-compose.yml`: môi trường local chính (backend/frontend/PostgreSQL/Reverb và công cụ local).
 - `compose.workers.yml`: bổ sung outbox worker, Slack worker và scheduler khi cần chạy các job nền.
 - `compose.testing.yml` + `backend/Dockerfile.testing`: kiểm thử PostgreSQL cô lập; không dùng database local làm database test.
+- `compose.fe-testing.yml` + `docker/fe-testing.env`: bổ sung browser test server cổng 3001/8001 và Mailpit 8026 khi ghép cùng cấu hình local/testing; dùng DB `test-db`, dependency volumes/image local hiện có, storage/build riêng và che `.env` thật. Mailpit này phục vụ test email, không thay cấu hình Gmail SMTP của môi trường chính. Lệnh vận hành trong [báo cáo điều phối](handover/FE-test-coordination-2026-11-09.md).
 - `compose.production.yml` + `backend/Dockerfile.production`, `.dockerignore` riêng và `backend/docker/production/`: bộ deploy/backup/rollback production, còn được runbook sử dụng.
 - `backend/Dockerfile`, `backend/.dockerignore`, `backend/docker/uploads.ini`, `docker/pgadmin/servers.json`: file phụ thuộc của các cấu hình trên.
 
