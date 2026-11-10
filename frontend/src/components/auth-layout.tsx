@@ -39,6 +39,8 @@ export function AuthLayout({
       <span className="auth-orb auth-orb-pink" aria-hidden="true" />
       <span className="auth-orb auth-orb-bottom-left" aria-hidden="true" />
       <span className="auth-orb auth-orb-bottom-right" aria-hidden="true" />
+      <span className="auth-bubble auth-bubble-left" aria-hidden="true" />
+      <span className="auth-bubble auth-bubble-right" aria-hidden="true" />
       <span className="auth-spark auth-spark-one" aria-hidden="true" />
       <span className="auth-spark auth-spark-two" aria-hidden="true" />
 
@@ -50,7 +52,7 @@ export function AuthLayout({
               src={`/figma/auth/${illustration === "student-man" ? "student-man" : illustration === "student-woman" ? "student-woman" : "verification-envelope"}.png`}
               alt=""
               fill
-              sizes="(max-width: 780px) 0px, 520px"
+              sizes={illustration === "student-woman" ? "(max-width: 780px) 0px, 560px" : "(max-width: 780px) 0px, 520px"}
               priority
             />
           ) : (

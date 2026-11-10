@@ -218,11 +218,11 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
             <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Khám phá dịch vụ</Link>
             {publicMode || showGuestActions ? <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dành cho người dạy</Link> : null}
             <Link href="/#why-tutorlink" onClick={() => setMenuOpen(false)}>Về chúng tôi</Link>
-            <form className="public-search" action="/marketplace" method="get">
+            {!authFrame ? <form className="public-search" action="/marketplace" method="get">
               <label className="landing-sr-only" htmlFor="public-search-q">Tìm dịch vụ</label>
               <input id="public-search-q" type="search" name="q" placeholder="Tìm dịch vụ…" />
               <button type="submit" aria-label="Tìm dịch vụ">⌕</button>
-            </form>
+            </form> : null}
           </nav>
           <div className="public-actions">
             <LocaleDisplay />

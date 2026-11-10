@@ -92,18 +92,40 @@ h2 { letter-spacing: -.025em; }
   letter-spacing: -.06em;
   line-height: 1;
   position: relative;
+  transition: opacity .16s ease, transform .16s ease;
 }
+.brand:hover { color: var(--brand); opacity: .88; transform: translateY(-1px); }
 .brand strong { color: var(--accent); }
 .brand-star { color: var(--accent); font-size: .85rem; margin-left: 1px; }
 .brand small { align-self: flex-end; color: var(--brand); font-size: .55rem; font-weight: 700; left: 30px; letter-spacing: 0; position: absolute; top: 100%; }
-.public-topbar { gap: clamp(16px, 3vw, 48px); padding-inline: clamp(18px, 8vw, 123px); }
-.public-nav { align-items: center; display: flex; flex: 1; gap: clamp(18px, 4vw, 56px); justify-content: center; }
+.public-topbar { gap: clamp(12px, 2vw, 30px); padding-inline: clamp(18px, 5vw, 80px); }
+.public-nav { align-items: center; display: flex; flex: 1; gap: clamp(16px, 2vw, 28px); justify-content: center; min-width: 0; }
+.public-nav > a { flex: 0 0 auto; white-space: nowrap; }
 .public-nav a, .sidebar-nav a { color: var(--brand); font-size: .8125rem; font-weight: 600; }
+.public-nav > a { position: relative; transition: color .16s ease; }
+.public-nav > a::after {
+  background: var(--accent);
+  border-radius: 99px;
+  bottom: 0;
+  content: "";
+  height: 2px;
+  left: 0;
+  position: absolute;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .16s ease;
+  width: 100%;
+}
+.public-nav > a:hover { color: var(--accent-dark); }
+.public-nav > a:hover::after { transform: scaleX(1); }
 .public-nav a[aria-current="page"] { color: var(--accent-dark); }
 .public-actions { align-items: center; display: flex; flex: 0 0 auto; gap: 20px; }
 .locale-display { align-items: center; color: var(--brand); display: inline-flex; font-size: .8125rem; font-weight: 700; gap: 7px; white-space: nowrap; }
 .locale-display img { flex: 0 0 auto; }
-.public-login { color: var(--accent-dark); font-size: .9rem; font-weight: 700; }
+.public-login { color: var(--accent-dark); font-size: .9rem; font-weight: 700; transition: color .16s ease; }
+.public-login:hover { color: var(--brand); text-decoration: underline; text-underline-offset: 4px; }
+.public-topbar .menu-toggle { transition: background .16s ease, border-color .16s ease, color .16s ease; }
+.public-topbar .menu-toggle:hover { background: var(--accent-soft); border-color: #ff9bd1; color: var(--accent-dark); }
 .topbar-meta { align-items: center; display: flex; flex: 0 0 auto; justify-content: flex-end; }
 .account-avatar {
   align-items: center;
@@ -290,7 +312,7 @@ textarea { min-height: 96px; resize: vertical; }
   .public-topbar .menu-toggle, .app-topbar .menu-toggle { display: inline-flex; margin-left: auto; }
   .public-nav { background: #fff; border-top: 1px solid var(--line); display: none; flex-basis: 100%; flex-direction: column; gap: 0; order: 4; padding: 8px 0; }
   .public-nav.is-open { display: flex; }
-  .public-nav a { padding: 10px 4px; width: 100%; }
+  .public-nav > a { flex: initial; padding: 10px 4px; white-space: normal; width: 100%; }
   .public-actions { gap: 12px; order: 3; }
   .public-actions .button { min-height: 40px; padding: 8px 13px; }
   .public-actions .locale-display { display: none; }

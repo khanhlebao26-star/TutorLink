@@ -91,6 +91,7 @@ export function AuthForm({ mode, initialRole = "customer" }: { mode: "login" | "
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [role, setRole] = useState<RegisterRole>(initialRole);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [remember, setRemember] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -262,6 +263,15 @@ export function AuthForm({ mode, initialRole = "customer" }: { mode: "login" | "
             </div>
             {fieldError("role") ? <span className="auth-field-error" id="role-error" role="alert">{fieldError("role")}</span> : null}
           </fieldset>
+          <label className="auth-terms-consent">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(event) => setAcceptedTerms(event.target.checked)}
+              required
+            />
+            <span>Tôi đồng ý với <strong>Điều khoản sử dụng</strong> của TutorLink.</span>
+          </label>
         </>
       ) : (
         <div className="auth-form-options">
