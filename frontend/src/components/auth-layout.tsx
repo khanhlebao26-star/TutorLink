@@ -46,10 +46,10 @@ export function AuthLayout({
 
       {illustration ? (
         <div className={`auth-illustration auth-illustration-${illustration}`} aria-hidden="true">
-          {illustration === "student-man" || illustration === "student-woman" || illustration === "verification" ? (
+          {illustration === "student-man" || illustration === "student-woman" || illustration === "verification" || illustration === "forgot" ? (
             <Image
               className="auth-illustration-image"
-              src={`/figma/auth/${illustration === "student-man" ? "student-man" : illustration === "student-woman" ? "student-woman" : "verification-envelope"}.png`}
+              src={illustration === "forgot" ? "/figma/auth/forgot-password-v2.png" : `/figma/auth/${illustration === "student-man" ? "student-man" : illustration === "student-woman" ? "student-woman" : "verification-envelope"}.png`}
               alt=""
               fill
               sizes={illustration === "student-woman" ? "(max-width: 780px) 0px, 560px" : "(max-width: 780px) 0px, 520px"}

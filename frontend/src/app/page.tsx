@@ -1,19 +1,29 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
+import { FeaturedServices } from "@/components/featured-services";
+import { FeaturedTutors } from "@/components/featured-tutors";
+import { StudentTestimonials } from "@/components/student-testimonials";
 import { CatalogLinks } from "./become-a-tutor/catalog-links";
 
 const learningSteps = [
-  { number: "01", title: "Tìm lĩnh vực phù hợp", text: "Bắt đầu từ danh mục dịch vụ đang hoạt động trên TutorLink." },
-  { number: "02", title: "Khám phá lựa chọn", text: "Dùng bộ lọc để tìm theo hình thức, khu vực hoặc mức phí." },
-  { number: "03", title: "Xem thông tin chi tiết", text: "Đọc mô tả dịch vụ và hồ sơ người dạy trước khi chọn." },
+  { number: "1", icon: "search", title: "Tìm dịch vụ", text: "Khám phá các dịch vụ phù hợp với mục tiêu của bạn." },
+  { number: "2", icon: "chat", title: "Nhắn tin trao đổi", text: "Trao đổi trực tiếp để hiểu rõ nội dung và lộ trình." },
+  { number: "3", icon: "program", title: "Tham gia Program", text: "Bắt đầu hành trình phát triển cùng người dạy phù hợp." },
 ];
 
 const platformFeatures = [
-  { icon: "01", title: "Danh mục đang hoạt động", text: "Chọn từ những lĩnh vực hiện có trên hệ thống." },
-  { icon: "02", title: "Thông tin dịch vụ rõ ràng", text: "Xem mô tả, hình thức dạy, khu vực và mức phí." },
-  { icon: "03", title: "Tìm theo nhu cầu", text: "Lọc dịch vụ theo cách học, địa điểm và khoảng phí." },
-  { icon: "04", title: "Hồ sơ và lịch khả dụng", text: "Tìm hiểu người dạy và xem các khung giờ đã chia sẻ." },
+  { icon: "verified", title: "Hồ sơ đã xác thực", text: "Thông tin chuyên môn và danh tính người dạy được kiểm duyệt." },
+  { icon: "plan", title: "Lộ trình rõ ràng", text: "Mục tiêu, nội dung và tiến độ được thống nhất ngay từ đầu." },
+  { icon: "flexible", title: "Kết nối linh hoạt", text: "Học trực tuyến hoặc trực tiếp theo thời gian phù hợp với bạn." },
+  { icon: "support", title: "Luôn được hỗ trợ", text: "Đội ngũ TutorLink sẵn sàng đồng hành trong suốt chương trình." },
+];
+
+const platformStats = [
+  { value: "10.000+", label: "Người học" },
+  { value: "1.200+", label: "Tutor & Coach" },
+  { value: "4.9/5", label: "Điểm hài lòng" },
+  { value: "96%", label: "Đạt mục tiêu" },
 ];
 
 function SectionIntro({ eyebrow, title, text, id }: { eyebrow: string; title: string; text?: string; id?: string }) {
@@ -24,103 +34,94 @@ function SectionIntro({ eyebrow, title, text, id }: { eyebrow: string; title: st
   </div>;
 }
 
+function StepIcon({ name }: { name: string }) {
+  if (name === "search") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2" /><path d="m15 15 4.5 4.5" /></svg>;
+  if (name === "chat") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 11h16M4 16h10" /><path d="m5 20 3-3h12V4H4v13" /></svg>;
+  return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-1.7-1.1-4.7-5.9-2.2-7.5 2.1-1.3 3.2 1.2 2.2 3.4 1-2.2 3.2-4.7 5.1-3.2 2.1 1.7-1 5.9-3.1 7.3 2.3-1.3 7.1-1.9 7.4.8.3 2.6-4.4 3.1-7.3 1.8 2.2 1.9 3.7 6.3 1.1 7.2-2.5.9-4-3.4-3.2-6.2-.9 2.8-3.7 6.4-5.8 4.5-2-1.9.7-5.8 3.2-7.1-2.8.8-7.3.3-7-2.4.2-2.6 4.8-2.6 7.6-.6Z" /></svg>;
+}
+
+function WhyIcon({ name }: { name: string }) {
+  if (name === "verified") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 12 4 4 8-9" /></svg>;
+  if (name === "plan") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>;
+  if (name === "flexible") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></svg>;
+  return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.2 8.8c0 4.3-8.2 10-8.2 10s-8.2-5.7-8.2-10a4.1 4.1 0 0 1 8.2-1 4.1 4.1 0 0 1 8.2 1Z" /></svg>;
+}
+
 export default function Home() {
   return <AppShell mode="public" title="TutorLink">
     <div className="marketing-page">
       <section className="landing-hero">
-        <div className="landing-inner landing-hero-grid">
-          <div className="landing-hero-copy">
-            <p className="landing-eyebrow">HỌC TẬP · RÈN LUYỆN · PHÁT TRIỂN</p>
-            <h1>Kết nối đúng người,<br /><span>phát triển đúng mục tiêu.</span></h1>
-            <p className="landing-lead">Khám phá dịch vụ, tìm hiểu hồ sơ người dạy và chọn người đồng hành phù hợp với điều bạn muốn đạt được.</p>
-            <div className="landing-actions">
-              <Link className="button button-primary" href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
-              <Link className="button button-secondary" href="/become-a-tutor">Tôi muốn giảng dạy</Link>
+        <div className="landing-inner landing-hero-container">
+          <div className="landing-hero-grid">
+            <div className="landing-hero-copy">
+              <p className="landing-eyebrow">HỌC TẬP · RÈN LUYỆN · PHÁT TRIỂN</p>
+              <h1>Kết nối đúng người,<br /><span>phát triển đúng mục tiêu.</span></h1>
+              <p className="landing-lead">Khám phá dịch vụ, tìm hiểu hồ sơ người dạy và chọn người đồng hành phù hợp với điều bạn muốn đạt được.</p>
+              <div className="landing-actions">
+                <Link className="button button-primary" href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
+                <Link className="button button-secondary" href="/become-a-tutor">Tôi muốn giảng dạy</Link>
+              </div>
+              <div className="landing-student-rating" aria-label="Đánh giá 4,9 trên 5 từ hơn 2.000 học viên">
+                <div className="landing-student-avatars" aria-hidden="true"><span>M</span><span>T</span><span>L</span></div>
+                <span><strong>4.9/5</strong><small>từ hơn 2.000 học viên</small></span>
+              </div>
             </div>
-            <p className="landing-trust-line"><span aria-hidden="true">✦</span> Tìm kiếm theo danh mục, hình thức và khu vực</p>
+            <div className="landing-hero-art">
+              <div className="landing-art-halo" aria-hidden="true" />
+              <span className="landing-hero-sparks" aria-hidden="true"><i /><i /><i /></span>
+              <Image className="landing-hero-person" src="/figma/auth/student-woman.png" alt="Học viên đang học trực tuyến bên máy tính" width={707} height={734} priority />
+              <div className="landing-art-rating"><strong>4.9 <span aria-hidden="true">★</span></strong><small>Đánh giá trung bình</small></div>
+              <div className="landing-art-trust"><strong>10K+</strong><small>Người học tin tưởng</small></div>
+            </div>
           </div>
-          <div className="landing-hero-art">
-            <div className="landing-art-halo" aria-hidden="true" />
-            <Image className="landing-hero-person" src="/figma/auth/student-woman.png" alt="Học viên đang học trực tuyến bên máy tính" width={707} height={734} priority />
-            <div className="landing-art-note"><span className="landing-note-icon" aria-hidden="true">⌕</span><span><strong>Tìm theo cách của bạn</strong><small>Lĩnh vực · hình thức · khu vực</small></span></div>
-          </div>
+          <CatalogLinks />
         </div>
-      </section>
-
-      <section className="landing-section landing-categories landing-inner" aria-labelledby="landing-categories-title">
-        <SectionIntro id="landing-categories-title" eyebrow="BẮT ĐẦU TỪ ĐIỀU BẠN QUAN TÂM" title="Tìm dịch vụ theo lĩnh vực" text="Danh mục được lấy trực tiếp từ những lĩnh vực đang hoạt động trên TutorLink." />
-        <CatalogLinks />
       </section>
 
       <section className="landing-steps-wrap">
         <div className="landing-section landing-inner">
-          <SectionIntro eyebrow="3 BƯỚC ĐỂ KHÁM PHÁ" title="Bắt đầu thật đơn giản" text="Từ nhu cầu của bạn đến thông tin dịch vụ phù hợp, mọi thứ đều dễ theo dõi." />
+          <SectionIntro eyebrow="3 BƯỚC KẾT NỐI" title="Bắt đầu thật đơn giản" text="Chỉ vài phút để tìm đúng người đồng hành cho mục tiêu của bạn." />
           <ol className="landing-steps">
-            {learningSteps.map((step) => <li className="landing-step" key={step.number}>
-              <span className="landing-step-number">{step.number}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
+            {learningSteps.map((step, index) => <li className={`landing-step landing-step-${step.icon}`} key={step.number}>
+              <span className="landing-step-icon"><StepIcon name={step.icon} /></span>
+              <div className="landing-step-copy">
+                <div className="landing-step-heading"><span className="landing-step-number">{step.number}</span><h3>{step.title}</h3></div>
+                <p>{step.text}</p>
+              </div>
+              {index < learningSteps.length - 1 ? <span className="landing-step-arrow" aria-hidden="true">→</span> : null}
             </li>)}
           </ol>
         </div>
       </section>
 
-      <section className="landing-section landing-inner" id="why-tutorlink" aria-labelledby="landing-features-title">
-        <SectionIntro id="landing-features-title" eyebrow="VÌ SAO CHỌN TUTORLINK?" title="Mọi thông tin cần thiết, ở đúng nơi" text="Tìm hiểu dịch vụ và người dạy với những chi tiết giúp bạn đưa ra lựa chọn phù hợp." />
-        <div className="landing-feature-grid">
-          {platformFeatures.map((feature) => <article className="landing-feature" key={feature.icon}>
-            <span className="landing-feature-icon" aria-hidden="true">{feature.icon}</span>
-            <h3>{feature.title}</h3>
-            <p>{feature.text}</p>
-          </article>)}
-        </div>
-      </section>
+      <FeaturedServices />
 
-      <section className="landing-tutor-callout">
-        <div className="landing-inner landing-tutor-grid">
-          <div className="landing-tutor-art">
-            <div className="landing-tutor-halo" aria-hidden="true" />
-            <Image src="/figma/auth/student-man.png" alt="Người dạy chia sẻ kiến thức qua máy tính" width={784} height={858} />
-          </div>
-          <div className="landing-tutor-copy">
-            <p className="landing-eyebrow">DÀNH CHO NGƯỜI DẠY</p>
-            <h2>Chia sẻ kiến thức,<br /><span>lan tỏa giá trị.</span></h2>
-            <p>Tạo hồ sơ, đăng dịch vụ và quản lý lịch khả dụng của bạn trong cùng một tài khoản TutorLink.</p>
-            <ul className="landing-check-list">
-              <li><span aria-hidden="true">✓</span> Giới thiệu kinh nghiệm và chuyên môn</li>
-              <li><span aria-hidden="true">✓</span> Tạo dịch vụ với hình thức và mức phí riêng</li>
-              <li><span aria-hidden="true">✓</span> Cập nhật lịch khả dụng theo kế hoạch</li>
-            </ul>
-            <div className="landing-actions">
-              <Link className="button button-primary" href="/auth/register?role=tutor">Tạo tài khoản Tutor</Link>
-              <Link className="landing-text-link" href="/profile">Mở hồ sơ của tôi <span aria-hidden="true">→</span></Link>
+      <section className="landing-why-section" id="why-tutorlink" aria-labelledby="landing-features-title">
+        <div className="landing-inner">
+          <div className="landing-why-grid">
+            <div className="landing-why-copy">
+              <p className="landing-eyebrow">VÌ SAO CHỌN TUTORLINK?</p>
+              <h2 id="landing-features-title">Đồng hành đúng cách,<br /><span>tiến bộ mỗi ngày</span></h2>
+              <p>Chúng tôi giúp bạn tìm đúng người hướng dẫn, trao đổi rõ ràng và theo dõi hành trình phát triển trong một không gian duy nhất.</p>
+              <Link className="landing-why-link" href="/become-a-tutor">Tìm hiểu về TutorLink <span aria-hidden="true">→</span></Link>
+            </div>
+            <div className="landing-why-cards">
+              {platformFeatures.map((feature) => <article className={`landing-why-card landing-why-card-${feature.icon}`} key={feature.icon}>
+                <span className="landing-why-icon"><WhyIcon name={feature.icon} /></span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+              </article>)}
             </div>
           </div>
+          <div className="landing-stats-bar" aria-label="Thống kê TutorLink">
+            {platformStats.map((stat) => <div className="landing-stat" key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}
+          </div>
         </div>
       </section>
 
-      <section className="landing-section landing-inner landing-faq" id="faq" aria-labelledby="landing-faq-title">
-        <div className="landing-faq-intro">
-          <p className="landing-eyebrow">CÂU HỎI THƯỜNG GẶP</p>
-          <h2 id="landing-faq-title">Bạn muốn biết thêm?</h2>
-          <p>Những thông tin hữu ích để bạn bắt đầu với TutorLink.</p>
-          <Link className="landing-text-link" href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
-        </div>
-        <div className="landing-faq-list">
-          <details className="landing-faq-item">
-            <summary>Tôi có thể xem dịch vụ trước khi đăng ký không?</summary>
-            <p>Có. Bạn có thể xem danh mục, tìm dịch vụ và đọc thông tin công khai mà không cần đăng nhập.</p>
-          </details>
-          <details className="landing-faq-item">
-            <summary>Làm sao để tìm dịch vụ phù hợp?</summary>
-            <p>Mở Marketplace để duyệt danh mục hoặc lọc theo hình thức, khu vực và mức phí.</p>
-          </details>
-          <details className="landing-faq-item">
-            <summary>Tôi muốn trở thành người dạy thì bắt đầu ở đâu?</summary>
-            <p>Tạo tài khoản và chọn vai trò Tutor trong biểu mẫu đăng ký, sau đó hoàn thiện hồ sơ của bạn.</p>
-          </details>
-        </div>
-      </section>
+      <FeaturedTutors />
+
+      <StudentTestimonials />
 
       <section className="landing-final-cta landing-inner" aria-label="Bắt đầu với TutorLink">
         <div>

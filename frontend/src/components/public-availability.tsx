@@ -12,24 +12,28 @@ const weekdays: Record<number, string> = {
 
 export function PublicAvailability({ availability }: { availability?: Availability | null }) {
   if (!availability) return null;
-  const rules = availability?.rules.slice().sort((a, b) => a.weekday - b.weekday || a.start_time.localeCompare(b.start_time)) ?? [];
+  const rulesByWeekday = new Map<number, string[]>();
+  availability.rules
+    .slice()
+    .sort((a, b) => a.weekday - b.weekday || a.start_time.localeCompare(b.start_time))
+    .forEach((rule) => {
+      const slots = rulesByWeekday.get(rule.weekday) ?? [];
+      slots.push(`${rule.start_time}–${rule.end_time}`);
+      rulesByWeekday.set(rule.weekday, slots);
+    });
 
   return (
     <section className="card public-availability" aria-labelledby="availability-title">
       <div className="public-section-heading">
-        <h2 id="availability-title">Khung giờ thường dạy</h2>
+        <h2 id="availability-title">Lịch trống <small>(tham khảo)</small></h2>
         {availability?.timezone ? <span className="public-timezone">Múi giờ: {availability.timezone}</span> : null}
       </div>
-      {rules.length ? (
-        <ul className="availability-list">
-          {rules.map((rule, index) => (
-            <li key={`${rule.weekday}-${rule.start_time}-${index}`}>
-              <strong>{weekdays[rule.weekday] ?? `Thứ ${rule.weekday}`}</strong>
-              <span>{rule.start_time}–{rule.end_time}</span>
-            </li>
-          ))}
-        </ul>
-      ) : <p className="muted public-no-availability">Chưa có khung giờ công khai.</p>}
+      <ul className="availability-list">
+        {Object.entries(weekdays).map(([weekday, label]) => {
+          const slots = rulesByWeekday.get(Number(weekday)) ?? [];
+          return <li key={weekday}><strong>{label}</strong><span>{slots.length ? slots.join(", ") : "Chưa cập nhật"}</span></li>;
+        })}
+      </ul>
       <p className="public-reference-note">Lịch tham khảo theo tuần, không giữ chỗ. Bạn và người dạy cần thống nhất lịch học.</p>
     </section>
   );

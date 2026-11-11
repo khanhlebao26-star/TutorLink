@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { dataMode, describeApiError, ApiClientError, request, setAuthHint } from "@/lib/api/client";
 import { getCurrentUser } from "@/lib/data/services";
+import { favoriteUpdateEvent, getFavoriteTutors } from "@/lib/data/favorites";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
 import { LogoutButton } from "./logout-button";
 import { PublicFooter } from "./public-footer";
@@ -45,6 +46,14 @@ function MenuIcon() {
 
 function initials(name: string) {
   return name.trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase();
+}
+
+function BrandMark() {
+  return <svg className="brand-mark" viewBox="0 0 32 28" fill="none" aria-hidden="true">
+    <path d="M2 4.2c5.1-1.9 9.7-.8 14 3.1v17c-4.3-3.9-8.9-5-14-3.1v-17Z" fill="currentColor" />
+    <path d="M30 4.2c-5.1-1.9-9.7-.8-14 3.1v17c4.3-3.9 8.9-5 14-3.1v-17Z" fill="currentColor" />
+    <path d="M16 7.4v16.8" stroke="white" strokeWidth="1.5" />
+  </svg>;
 }
 
 function AccountMenu({ user }: { user: User }) {
@@ -109,6 +118,8 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
   const sessionHint = useSessionHint();
   const mockPublicGuest = publicMode && dataMode === "mock" && !sessionHint;
   const [session, setSession] = useState<Session>({ status: "loading" });
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [favoriteCount, setFavoriteCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [retry, setRetry] = useState(0);
 
@@ -150,8 +161,41 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
       ? role ?? "tutor"
       : role;
   const user = !authFrame && !mockPublicGuest && session.status === "authenticated" ? session.user : null;
+  useEffect(() => {
+    let current = true;
+    if (!user) {
+      setUnreadNotifications(0);
+      return;
+    }
+    request<ApiEnvelope<{ count: number }>>({ method: "GET", url: "/notifications/unread-count" })
+      .then((response) => {
+        if (current) setUnreadNotifications(response.data.data.count);
+      })
+      .catch(() => {
+        if (current) setUnreadNotifications(0);
+      });
+    return () => { current = false; };
+  }, [user?.id, pathname]);
+  useEffect(() => {
+    let current = true;
+    const loadFavorites = () => {
+      if (!user) {
+        setFavoriteCount(0);
+        return;
+      }
+      getFavoriteTutors()
+        .then((favorites) => { if (current) setFavoriteCount(favorites.length); })
+        .catch(() => { if (current) setFavoriteCount(0); });
+    };
+    loadFavorites();
+    window.addEventListener(favoriteUpdateEvent, loadFavorites);
+    return () => {
+      current = false;
+      window.removeEventListener(favoriteUpdateEvent, loadFavorites);
+    };
+  }, [user?.id, pathname]);
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
-  const protectedPage = Boolean(requiredRole) || pathname === "/settings" || ["/programs", "/invitations", "/messages", "/reports", "/notifications"].some(prefix => isActive(pathname, prefix));
+  const protectedPage = Boolean(requiredRole) || pathname === "/settings" || ["/programs", "/invitations", "/messages", "/reports", "/notifications", "/favorites"].some(prefix => isActive(pathname, prefix));
   const needsLogin = protectedPage && session.status === "guest";
   const needsSessionError = protectedPage && session.status === "error";
   const needsRole = Boolean(protectedPage && user && roleMismatch);
@@ -201,6 +245,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
       <div className={`app-frame public-frame${authFrame ? " auth-frame" : ""}`}>
         <header className="topbar public-topbar">
           <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
+            <BrandMark />
             <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
             <small>Vietnam</small>
           </Link>
@@ -218,15 +263,30 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
             <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Khám phá dịch vụ</Link>
             {publicMode || showGuestActions ? <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dành cho người dạy</Link> : null}
             <Link href="/#why-tutorlink" onClick={() => setMenuOpen(false)}>Về chúng tôi</Link>
-            {!authFrame ? <form className="public-search" action="/marketplace" method="get">
-              <label className="landing-sr-only" htmlFor="public-search-q">Tìm dịch vụ</label>
-              <input id="public-search-q" type="search" name="q" placeholder="Tìm dịch vụ…" />
-              <button type="submit" aria-label="Tìm dịch vụ">⌕</button>
-            </form> : null}
           </nav>
           <div className="public-actions">
+            {!authFrame ? <Link className="public-search-trigger" href="/marketplace" aria-label="Tìm dịch vụ">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="10.5" cy="10.5" r="6.5" />
+                <path d="m6 15-3.5 3.5" />
+              </svg>
+            </Link> : null}
             <LocaleDisplay />
-            {user ? <AccountMenu key={pathname} user={user} /> : showGuestActions ? <>
+            {user ? <>
+              <Link className="public-header-favorite" href="/favorites" aria-label={`Yêu thích${favoriteCount ? `, ${favoriteCount} hồ sơ đã lưu` : ""}`} title="Yêu thích">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z" />
+                </svg>
+                {favoriteCount > 0 ? <span className="public-favorite-count">{favoriteCount > 99 ? "99+" : favoriteCount}</span> : null}
+              </Link>
+              <Link className="public-header-notifications" href="/notifications" aria-label="Thông báo" title="Thông báo">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" />
+                </svg>
+                {unreadNotifications > 0 ? <span className="public-notification-dot" aria-label={`${unreadNotifications} thông báo chưa đọc`} /> : null}
+              </Link>
+              <AccountMenu key={pathname} user={user} />
+            </> : showGuestActions ? <>
               <Link className="public-login" href="/auth/login">Đăng nhập</Link>
               <Link className="button button-primary" href="/auth/register">Đăng ký</Link>
             </> : session.status === "error" ? (
@@ -255,6 +315,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}`}>
       <header className="topbar app-topbar">
         <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
+          <BrandMark />
           <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
           <small>Vietnam</small>
         </Link>

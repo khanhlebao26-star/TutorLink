@@ -83,7 +83,7 @@ h2 { letter-spacing: -.025em; }
   z-index: 10;
 }
 .brand {
-  align-items: baseline;
+  align-items: center;
   color: var(--brand);
   display: inline-flex;
   flex: 0 0 auto;
@@ -94,10 +94,11 @@ h2 { letter-spacing: -.025em; }
   position: relative;
   transition: opacity .16s ease, transform .16s ease;
 }
+.brand-mark { color: var(--accent); flex: 0 0 31px; height: 28px; margin-right: 5px; width: 31px; }
 .brand:hover { color: var(--brand); opacity: .88; transform: translateY(-1px); }
 .brand strong { color: var(--accent); }
 .brand-star { color: var(--accent); font-size: .85rem; margin-left: 1px; }
-.brand small { align-self: flex-end; color: var(--brand); font-size: .55rem; font-weight: 700; left: 30px; letter-spacing: 0; position: absolute; top: 100%; }
+.brand small { align-self: flex-end; color: var(--brand); font-size: .55rem; font-weight: 700; left: 38px; letter-spacing: 0; position: absolute; top: 100%; }
 .public-topbar { gap: clamp(12px, 2vw, 30px); padding-inline: clamp(18px, 5vw, 80px); }
 .public-nav { align-items: center; display: flex; flex: 1; gap: clamp(16px, 2vw, 28px); justify-content: center; min-width: 0; }
 .public-nav > a { flex: 0 0 auto; white-space: nowrap; }
@@ -250,7 +251,7 @@ textarea { min-height: 96px; resize: vertical; }
 
 .app-topbar { min-height: 61px; padding: 8px clamp(16px, 1.7vw, 34px); }
 .app-topbar .brand { font-size: 1.4rem; }
-.app-topbar .brand small { font-size: .5rem; left: 25px; }
+.app-topbar .brand small { font-size: .5rem; left: 35px; }
 .app-topbar-links { align-items: center; display: flex; flex: 1; gap: 28px; justify-content: flex-start; margin-left: clamp(18px, 2.2vw, 42px); }
 .app-topbar-links a { color: var(--brand); font-size: .8125rem; font-weight: 600; }
 .app-topbar-links a[aria-current="page"] { color: var(--accent-dark); }

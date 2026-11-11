@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\ConversationController;
 use App\Http\Controllers\Api\V1\ConversationRealtimeController;
 use App\Http\Controllers\Api\V1\FeeRecordController;
+use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
@@ -253,6 +254,15 @@ Route::prefix('v1')->group(function () {
         ->where('slug', '[a-z0-9-]+');
 
     Route::middleware(['auth:web', EnsureActiveAccount::class])->group(function () {
+        Route::get('/me/favorites', [FavoriteController::class, 'index'])
+            ->name('favorites.index');
+        Route::post('/me/favorites/{slug}', [FavoriteController::class, 'store'])
+            ->where('slug', '[a-z0-9-]+')
+            ->name('favorites.store');
+        Route::delete('/me/favorites/{slug}', [FavoriteController::class, 'destroy'])
+            ->where('slug', '[a-z0-9-]+')
+            ->name('favorites.destroy');
+
         Route::get('/me/availability-rules', [
             AvailabilityRuleController::class,
             'index',
