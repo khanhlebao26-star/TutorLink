@@ -12,7 +12,13 @@ export interface Conversation {
   id: number;
   status: string;
   context_listing_id: number | null;
-  peer: { id: number; display_name: string };
+  peer: {
+    id: number;
+    display_name: string;
+    tutor_slug?: string | null;
+    tutor_headline?: string | null;
+    tutor_specializations?: string | null;
+  };
   unread_count: number;
   last_read_message_id: number | null;
   preview: { id: number; text: string; created_at: string } | null;

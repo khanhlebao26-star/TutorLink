@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {ProgramTrust} from "./trust-workspace";
 import {WorkspaceNavigation} from "./workspace-navigation";
-import { useCallback, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell, useActor } from "./app-shell";
 import { ApiState } from "./api-state";
@@ -37,8 +37,35 @@ function ProgramsContent() {
  const actor=useActor();
   const [page, setPage] = useState(1),
     [status, setStatus] = useState("all");
+  const [filterLoading, setFilterLoading] = useState(false);
+  const filterTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (filterTimer.current) clearTimeout(filterTimer.current);
+  }, []);
+  const selectStatus = (value: string) => {
+    if (value === status) return;
+    if (filterTimer.current) clearTimeout(filterTimer.current);
+    setStatus(value);
+    setFilterLoading(true);
+    filterTimer.current = setTimeout(() => {
+      setFilterLoading(false);
+      filterTimer.current = null;
+    }, 420);
+  };
   const load = useCallback(() => listPrograms(page), [page]);
   const result = useAsyncData(load);
+  const programs = result.data?.data ?? [];
+  const visiblePrograms = programs.filter((program) => status === "all" || program.status === status);
+  const statusCounts = programs.reduce<Record<string, number>>((counts, program) => {
+    counts[program.status] = (counts[program.status] ?? 0) + 1;
+    return counts;
+  }, {});
+  const filters = [
+    { value: "all", label: "Tất cả", count: programs.length },
+    ...Object.entries(programStatuses)
+      .filter(([value]) => value !== "draft")
+      .map(([value, label]) => ({ value, label, count: statusCounts[value] ?? 0 })),
+  ];
   return (
     <>
       <section className="content-stack workspace-page">
@@ -51,75 +78,55 @@ function ProgramsContent() {
           </div>
           {actor?.role==="tutor"&&<Link className="button button-primary" href="/programs/new">+ Tạo Program</Link>}
         </header>
-        <nav className="workspace-filters" aria-label="Trạng thái Program">
-          {Object.entries({ all: "Tất cả", ...programStatuses }).map(
-            ([value, label]) => (
+        <nav className="workspace-filters program-status-filters" aria-label="Trạng thái Program">
+          {filters.map(({ value, label, count }) => (
               <Button
                 key={value}
                 variant={status === value ? "primary" : "ghost"}
                 aria-pressed={status === value}
-                onClick={() => setStatus(value)}
+                onClick={() => selectStatus(value)}
               >
-                {label}
+                <span>{label}</span><span className="program-filter-count">{count}</span>
               </Button>
-            ),
-          )}
+          ))}
         </nav>
-        <p className="muted">Bộ lọc áp dụng trên trang hiện tại.</p>
-        <ApiState {...result} />
-        {result.data && (
+        {filterLoading && result.data ? (
+          <StatePanel kind="loading" message="Đang cập nhật danh sách chương trình..." />
+        ) : <ApiState {...result} />}
+        {result.data && !filterLoading && (
           <>
-            <div className="program-grid">
-              {result.data.data
-                .filter((p) => status === "all" || p.status === status)
-                .map((p) => (
-                  <Card key={p.id} className="program-card">
-                    <div className="program-card-heading">
-                      <span className="program-monogram" aria-hidden="true">
-                        ▤
-                      </span>
-                      <Badge
-                        tone={
-                          p.status === "active"
-                            ? "success"
-                            : p.status === "paused"
-                              ? "warning"
-                              : "brand"
-                        }
-                      >
-                        {programStatuses[p.status]}
-                      </Badge>
-                    </div>
+            {visiblePrograms.length ? <div className="program-grid">
+              {visiblePrograms.map((p) => (
+                <Card key={p.id} className="program-card program-showcase-card">
+                  <div className="program-art" aria-hidden="true">
+                    <span className="program-art-orbit" />
+                    <svg viewBox="0 0 64 64" fill="none"><rect x="13" y="12" width="38" height="43" rx="8"/><path d="M22 8v9m20-9v9M14 25h36M23 34h18M23 42h11"/></svg>
+                    <Badge tone={p.status === "active" ? "success" : p.status === "paused" ? "warning" : "brand"}>{programStatuses[p.status]}</Badge>
+                  </div>
+                  <div className="program-card-content">
                     <h2>{p.title}</h2>
-                    <p className="muted">
-                      {deliveryLabels[p.delivery_mode]} ·{" "}
-                      {formatListingPrice(
-                        p.agreed_fee_minor,
-                        p.currency,
-                        p.fee_unit,
-                      )}
-                    </p>
-                    <p>{p.goal || "Chưa có mục tiêu học tập."}</p>
-                    <div className="program-card-footer">
-                      <span>#{p.id}</span>
-                      <Link
-                        className="button button-outline"
-                        href={`/programs/${p.id}`}
-                      >
-                        {p.status === "draft" ? "Xem bản nháp" : "Mở workspace"}{" "}
-                        →
-                      </Link>
+                    <p className="program-participant"><span aria-hidden="true">♙</span> {actor?.role === "tutor" ? `Học viên #${p.customer_id}` : `Program #${p.id}`}</p>
+                    <div className="program-tags">
+                      <span>{p.level || "Chương trình học"}</span>
+                      <span>{deliveryLabels[p.delivery_mode]}</span>
+                      {p.planned_session_count ? <span>{p.planned_session_count} buổi</span> : null}
                     </div>
-                  </Card>
-                ))}
-            </div>
-            {!result.data.data.length && (
-              <StatePanel
-                kind="empty"
-                message="Chưa có Program. Học viên có thể xem lời mời trước khi tham gia."
-                action={<Link href="/invitations">Xem lời mời →</Link>}
-              />
-            )}
+                    <p className="program-goal"><span aria-hidden="true">◉</span> {p.goal || "Theo dõi mục tiêu và tiến độ học tập cùng nhau."}</p>
+                    <p className="program-schedule"><span aria-hidden="true">▦</span> {p.schedule_note || (p.status === "completed" ? "Chương trình đã hoàn thành" : "Chưa có lịch học tiếp theo")}</p>
+                    <Link className="button button-outline program-open-link" href={`/programs/${p.id}`}>
+                      {p.status === "completed" || p.status === "cancelled" ? "Xem lại chương trình" : "Mở workspace"} <span aria-hidden="true">→</span>
+                    </Link>
+                  </div>
+                </Card>
+              ))}
+            </div> : <div className="program-empty-callout">
+              <span className="program-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 6.2c-2.1-1.6-5.2-2.2-9-1.7v13c3.8-.5 6.9.1 9 1.7m0-13c2.1-1.6 5.2-2.2 9-1.7v13c-3.8-.5-6.9.1-9 1.7m0-13v13"/></svg></span>
+              <div>
+                <h2>{programs.length ? `Chưa có Program ${status === "all" ? "nào" : `ở trạng thái “${programStatuses[status as Program["status"]]}”`}` : "Bạn chưa đăng ký dịch vụ nào"}</h2>
+                <p>{programs.length ? "Bạn chưa đăng ký dịch vụ nào trong mục này. Thử chọn trạng thái khác để xem Program của bạn." : "Hãy kiểm tra Lời mời học. Khi bạn chấp nhận lời mời, Program sẽ xuất hiện ở đây."}</p>
+              </div>
+              {!programs.length ? <Link className="button button-primary" href="/invitations">Xem lời mời Program <span aria-hidden="true">→</span></Link> : null}
+            </div>}
             <nav className="button-row" aria-label="Phân trang">
               <Button
                 variant="outline"

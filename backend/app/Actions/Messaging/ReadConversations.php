@@ -41,6 +41,7 @@ final class ReadConversations
                 $join->on('peer.conversation_id', 'c.id')->where('peer.user_id', '!=', $actor->id);
             })
             ->join('users as peer_user', 'peer_user.id', '=', 'peer.user_id')
+            ->leftJoin('tutor_profiles as peer_tutor', 'peer_tutor.user_id', '=', 'peer.user_id')
             ->leftJoin('messages as latest', function (JoinClause $join) use ($latestId): void {
                 $join->on('latest.conversation_id', 'c.id')->where('latest.id', '=', $latestId);
             })
@@ -58,12 +59,21 @@ final class ReadConversations
                 'c.created_at',
                 'peer.user_id as peer_id',
                 'peer_user.full_name as peer_name',
+                'peer_tutor.public_slug as peer_tutor_slug',
+                'peer_tutor.headline as peer_tutor_headline',
                 'read_message.id as last_read_message_id',
                 'latest.id as latest_message_id',
                 'latest.message_type as latest_message_type',
                 'latest.body as latest_body',
                 'latest.created_at as latest_message_at',
             ])
+            ->selectSub(
+                DB::table('tutor_specializations as peer_ts')
+                    ->join('specializations as peer_spec', 'peer_spec.id', '=', 'peer_ts.specialization_id')
+                    ->selectRaw("string_agg(peer_spec.name, ', ' ORDER BY peer_spec.name)")
+                    ->whereColumn('peer_ts.tutor_profile_id', 'peer_tutor.id'),
+                'peer_tutor_specializations',
+            )
             ->selectSub($unread, 'unread_count')
             ->selectRaw('CASE WHEN latest.id IS NULL THEN 0 ELSE 1 END AS has_message')
             ->selectRaw('COALESCE(latest.created_at, c.created_at) AS activity_at')

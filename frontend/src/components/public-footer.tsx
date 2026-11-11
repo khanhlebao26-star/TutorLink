@@ -37,9 +37,9 @@ export function PublicFooter() {
           <span>Câu chuyện cộng đồng</span>
           <span>Tuyển dụng</span>
         </div>
-        <div>
+        <div id="support">
           <h2>Hỗ trợ</h2>
-          <span>Trung tâm trợ giúp</span>
+          <Link href="/support">Trung tâm hỗ trợ</Link>
           <span>Điều khoản sử dụng</span>
           <span>Chính sách bảo mật</span>
           <span>Liên hệ</span>

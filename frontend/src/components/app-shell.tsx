@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { dataMode, describeApiError, ApiClientError, request, setAuthHint } from "@/lib/api/client";
@@ -10,6 +9,7 @@ import { favoriteUpdateEvent, getFavoriteTutors } from "@/lib/data/favorites";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
 import { LogoutButton } from "./logout-button";
 import { PublicFooter } from "./public-footer";
+import { FavoritesLoadingState } from "./favorites-loading-state";
 import { useSessionHint } from "./session-hint";
 import { Button, StatePanel } from "./ui";
 import "@/app/landing.css";
@@ -42,6 +42,55 @@ function isActive(pathname: string, href: string) {
 
 function MenuIcon() {
   return <span className="menu-icon" aria-hidden="true"><span /><span /><span /></span>;
+}
+
+function MessagingLoadingState() {
+  return <section className="message-page-loading" role="status" aria-label="Đang tải hộp thư">
+    <div className="message-loading-sidebar" aria-hidden="true">
+      <div className="message-loading-title"><span className="message-loading-line is-title" /><span className="message-loading-line is-short" /></div>
+      <span className="message-loading-search" />
+      {[0, 1, 2, 3].map((item) => <div className="message-loading-contact" key={item}>
+        <span className="message-loading-avatar" />
+        <span className="message-loading-contact-copy"><i /><i /></span>
+      </div>)}
+    </div>
+    <div className="message-loading-thread" aria-hidden="true">
+      <div className="message-loading-thread-heading"><span className="message-loading-avatar" /><span><i /><i /></span></div>
+      <div className="message-loading-messages"><i /><i /><i /><i /></div>
+      <div className="message-loading-composer"><i /><b>➤</b></div>
+    </div>
+    <aside className="message-loading-context" aria-hidden="true"><i /><i /><i /><i /><i /></aside>
+    <div className="message-loading-status"><span className="message-loading-spinner" aria-hidden="true" /><span><strong>Đang kết nối hộp thư</strong><small>Đang xác minh phiên đăng nhập và tải cuộc trò chuyện…</small></span></div>
+  </section>;
+}
+
+function ReportsLoadingState() {
+  return <section className="reports-loading-state" role="status" aria-label="Đang tải trang báo cáo">
+    <div className="reports-loading-banner">
+      <span className="reports-loading-spinner" aria-hidden="true" />
+      <span><strong>Đang chuẩn bị báo cáo của bạn</strong><small>Đang xác minh phiên và tải thông tin an toàn…</small></span>
+      <span className="reports-loading-banner-mark" aria-hidden="true">▤</span>
+    </div>
+    <div className="reports-loading-heading" aria-hidden="true">
+      <i className="reports-skeleton reports-skeleton-eyebrow" />
+      <i className="reports-skeleton reports-skeleton-title" />
+      <i className="reports-skeleton reports-skeleton-subtitle" />
+    </div>
+    <div className="reports-loading-stats" aria-hidden="true">
+      {[0, 1, 2].map((item) => <div className="reports-loading-stat" key={item}>
+        <i className="reports-skeleton reports-skeleton-stat-icon" />
+        <span><i className="reports-skeleton reports-skeleton-stat-label" /><i className="reports-skeleton reports-skeleton-stat-value" /></span>
+      </div>)}
+    </div>
+    <div className="reports-loading-list" aria-hidden="true">
+      <div className="reports-loading-list-head"><span><i className="reports-skeleton reports-skeleton-list-title" /><i className="reports-skeleton reports-skeleton-list-subtitle" /></span><i className="reports-skeleton reports-skeleton-filter" /></div>
+      {[0, 1, 2].map((item) => <div className="reports-loading-row" key={item}>
+        <i className="reports-skeleton reports-skeleton-row-icon" />
+        <span><i className="reports-skeleton reports-skeleton-row-title" /><i className="reports-skeleton reports-skeleton-row-meta" /><i className="reports-skeleton reports-skeleton-row-description" /></span>
+        <i className="reports-skeleton reports-skeleton-row-action" />
+      </div>)}
+    </div>
+  </section>;
 }
 
 function initials(name: string) {
@@ -94,7 +143,13 @@ function AccountMenu({ user }: { user: User }) {
       <div className="account-menu-panel" id={panelId} hidden={!open}>
         {open && <>
           <strong>{user.full_name}</strong>
-          <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
+          {user.role === "customer" ? <nav className="account-menu-links" aria-label="Điều hướng tài khoản học viên">
+            <Link href="/invitations" onClick={() => setOpen(false)}>Lời mời học</Link>
+            <Link href="/reports" onClick={() => setOpen(false)}>Báo cáo của tôi</Link>
+            <Link href="/messages" onClick={() => setOpen(false)}>Tin nhắn</Link>
+            <Link href="/notifications" onClick={() => setOpen(false)}>Thông báo</Link>
+            <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt</Link>
+          </nav> : <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>}
           <LogoutButton />
         </>}
       </div>
@@ -105,8 +160,8 @@ function AccountMenu({ user }: { user: User }) {
 function LocaleDisplay() {
   return (
     <span className="locale-display">
-      <Image src="/figma/auth/globe.svg" alt="" width={20} height={20} />
-      Tiếng Việt, VND
+      <span className="locale-flag" aria-hidden="true">🇻🇳</span>
+      Tiếng Việt <span className="locale-caret" aria-hidden="true">⌄</span>
     </span>
   );
 }
@@ -208,7 +263,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     (session.status === "error" && !sessionHint));
 
   const accessContent = needsLoading ? (
-    <StatePanel kind="loading" message="Đang xác minh phiên đăng nhập…" />
+    isActive(pathname, "/messages") ? <MessagingLoadingState /> : isActive(pathname, "/favorites") ? <FavoritesLoadingState /> : isActive(pathname, "/reports") ? <ReportsLoadingState /> : <StatePanel kind="loading" message="Đang xác minh phiên đăng nhập…" />
   ) : needsLogin ? (
     <section className="card access-state">
       <p className="eyebrow">Khu vực tài khoản</p>
@@ -260,17 +315,17 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
             <MenuIcon />
           </button>
           <nav id="public-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
-            <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Khám phá dịch vụ</Link>
-            {publicMode || showGuestActions ? <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dành cho người dạy</Link> : null}
-            <Link href="/#why-tutorlink" onClick={() => setMenuOpen(false)}>Về chúng tôi</Link>
+            <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
+            <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dịch vụ <span className="public-nav-caret" aria-hidden="true">⌄</span></Link>
+            <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
+            <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
           </nav>
           <div className="public-actions">
-            {!authFrame ? <Link className="public-search-trigger" href="/marketplace" aria-label="Tìm dịch vụ">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="10.5" cy="10.5" r="6.5" />
-                <path d="m6 15-3.5 3.5" />
-              </svg>
-            </Link> : null}
+            {!authFrame ? <form className="public-header-search" action="/marketplace" method="get" role="search">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4.2 4.2" /></svg>
+              <label className="landing-sr-only" htmlFor="public-header-query">Tìm gia sư, môn học hoặc kỹ năng</label>
+              <input id="public-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
+            </form> : null}
             <LocaleDisplay />
             {user ? <>
               <Link className="public-header-favorite" href="/favorites" aria-label={`Yêu thích${favoriteCount ? `, ${favoriteCount} hồ sơ đã lưu` : ""}`} title="Yêu thích">
@@ -303,23 +358,35 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
   }
 
   const activeRole = user?.role ?? role ?? "customer";
+  const messagingRoute = pathname === "/messages" || pathname.startsWith("/messages/");
   const roleNavItems = activeRole === "admin"
     ? [{ href: "/admin", label: "Duyệt hồ sơ Tutor" },{href:"/monitoring",label:"Giám sát hệ thống"}]
     : activeRole === "tutor"
       ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Dịch vụ của tôi" }, { href: "/me/availability", label: "Lịch khả dụng" }, { href: "/marketplace", label: "Khám phá dịch vụ" }]
-      : [{ href: "/marketplace", label: "Tìm dịch vụ" }];
-  const collaborationNav = activeRole === "admin" ? [] : [{href:"/programs",label:"Program của tôi"},{href:"/invitations",label:"Lời mời học"},{href:"/messages",label:"Tin nhắn"},{href:"/reports",label:"Báo cáo của tôi"},{href:"/notifications",label:"Thông báo"}];
-  const navItems = [...roleNavItems, ...collaborationNav, { href: "/settings", label: "Cài đặt tài khoản" }];
+      : [];
+  const collaborationNav = activeRole === "admin" ? [] : [
+    { href: "/programs", label: "Program của tôi" },
+    { href: "/invitations", label: "Lời mời học" },
+    ...(activeRole === "customer" ? [] : [{ href: "/messages", label: "Tin nhắn" }]),
+    { href: "/reports", label: "Báo cáo của tôi" },
+    { href: "/notifications", label: "Thông báo" },
+  ];
+  const navItems = [
+    ...roleNavItems,
+    ...collaborationNav,
+    { href: "/settings", label: "Cài đặt tài khoản" },
+    ...(activeRole === "admin" || activeRole === "customer" ? [] : [{ href: "/support", label: "Hỗ trợ" }]),
+  ];
 
   return (
-    <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}`}>
-      <header className="topbar app-topbar">
+    <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}${messagingRoute ? " messaging-shell" : ""}`}>
+      <header className="topbar public-topbar authenticated-public-topbar">
         <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
           <BrandMark />
           <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
           <small>Vietnam</small>
         </Link>
-        <button
+        {!messagingRoute ? <button
           className="menu-toggle"
           type="button"
           aria-label={menuOpen ? "Đóng menu tài khoản" : "Mở menu tài khoản"}
@@ -328,25 +395,35 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
           onClick={() => setMenuOpen((open) => !open)}
         >
           <MenuIcon />
-        </button>
-        <nav className="app-topbar-links" aria-label="Điều hướng chính">
-          <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined}>Khám phá dịch vụ</Link>
-          {user?.role === "admin" ? roleNavItems.map(({ href, label }) => (
-            <Link key={href} href={href} aria-current={isActive(pathname, href) ? "page" : undefined}>{label}</Link>
-          )) : user ? (
-            <>
-              <Link href="/programs" aria-current={isActive(pathname, "/programs") ? "page" : undefined}>Program của tôi</Link>
-              <Link href="/messages" aria-current={isActive(pathname, "/messages") ? "page" : undefined}>Tin nhắn</Link>
-            </>
-          ) : null}
-          <LocaleDisplay />
+        </button> : null}
+        <nav id="authenticated-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
+          <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
+          <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dịch vụ <span className="public-nav-caret" aria-hidden="true">⌄</span></Link>
+          <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
+          <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
         </nav>
-        <div className="topbar-meta">
-          {user ? <AccountMenu key={pathname} user={user} /> : null}
+        <div className="public-actions">
+          <form className="public-header-search" action="/marketplace" method="get" role="search">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4.2 4.2" /></svg>
+            <label className="landing-sr-only" htmlFor="authenticated-header-query">Tìm gia sư, môn học hoặc kỹ năng</label>
+            <input id="authenticated-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
+          </form>
+          <LocaleDisplay />
+          {user ? <>
+            <Link className="public-header-favorite" href="/favorites" aria-label={`Yêu thích${favoriteCount ? `, ${favoriteCount} hồ sơ đã lưu` : ""}`} title="Yêu thích">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z" /></svg>
+              {favoriteCount > 0 ? <span className="public-favorite-count">{favoriteCount > 99 ? "99+" : favoriteCount}</span> : null}
+            </Link>
+            <Link className="public-header-notifications" href="/notifications" aria-label="Thông báo" title="Thông báo">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" /></svg>
+              {unreadNotifications > 0 ? <span className="public-notification-dot" aria-label={`${unreadNotifications} thông báo chưa đọc`} /> : null}
+            </Link>
+            <AccountMenu key={pathname} user={user} />
+          </> : null}
         </div>
       </header>
-      <div className="app-layout">
-        <aside id="app-sidebar" className={`app-sidebar${menuOpen ? " is-open" : ""}`} aria-label={`Menu ${roleLabels[activeRole]}`}>
+      <div className={`app-layout${messagingRoute ? " messaging-app-layout" : ""}`}>
+        {!messagingRoute ? <aside id="app-sidebar" className={`app-sidebar${menuOpen ? " is-open" : ""}`} aria-label={`Menu ${roleLabels[activeRole]}`}>
           <p className="sidebar-label">{roleLabels[activeRole]}</p>
           <nav id="app-sidebar-navigation" className="sidebar-nav" aria-label="Điều hướng tài khoản">
             {navItems.map((item) => (
@@ -360,11 +437,10 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
               </Link>
             ))}
           </nav>
-          <div className="sidebar-bottom">{user ? <LogoutButton /> : null}</div>
-        </aside>
+        </aside> : null}
         <main className="app-main">
           <div className="page-content">
-            {pathname !== "/profile" ? <div className="eyebrow">{roleLabels[activeRole]} · {title}</div> : null}
+            {pathname !== "/profile" && !messagingRoute && title ? <div className="eyebrow">{roleLabels[activeRole]} · {title}</div> : null}
             {protectedPage ? accessContent : children}
           </div>
         </main>

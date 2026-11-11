@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useRef, useState } from "react";
 import { AppShell, useActor } from "./app-shell";
 import { Badge, Button, Field, Input, StatePanel } from "./ui";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
@@ -9,7 +8,6 @@ import { usePolling } from "@/lib/hooks/use-polling";
 import {
   conversations,
   conversation,
-  openConversation,
   messages,
   sendMessage,
   markRead,
@@ -26,15 +24,12 @@ export function Messaging({ id }: { id?: number }) {
   );
 }
 function MessagingContent({ id }: { id?: number }) {
-  const router = useRouter();
   const actor=useActor();
   const [items, setItems] = useState<Conversation[]>([]),
     [listCursor, setListCursor] = useState<string | null>(null),
     [listBusy, setListBusy] = useState(false),
     [query, setQuery] = useState("");
-  const [peer, setPeer] = useState(""),
-    [opening, setOpening] = useState(false),
-    [error, setError] = useState("");
+  const [error, setError] = useState("");
   const [current, setCurrent] = useState<Conversation | null>(null),
     [history, setHistory] = useState<Message[]>([]),
     [older, setOlder] = useState<string | null>(null),
@@ -43,6 +38,16 @@ function MessagingContent({ id }: { id?: number }) {
     [sending, setSending] = useState(false),
     [failed, setFailed] = useState<{ body: string; key: string } | null>(null);
   const userId=actor?.id??null;
+  function conversationTime(value: string | null) {
+    if (!value) return "";
+    const date = new Date(value);
+    const today = new Date();
+    if (date.toDateString() === today.toDateString()) return date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) return "Hôm qua";
+    return date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+  }
   const cursor = useRef<string | null>(null),
     initialized = useRef(false),
     read = useRef(0),
@@ -114,20 +119,6 @@ function MessagingContent({ id }: { id?: number }) {
       setListBusy(false);
     }
   }
-  async function open(e: FormEvent) {
-    e.preventDefault();
-    if (opening) return;
-    setOpening(true);
-    setError("");
-    try {
-      const c = await openConversation(Number(peer));
-      router.push(`/messages/${c.id}`);
-    } catch (e) {
-      setError(describeApiError(e));
-    } finally {
-      setOpening(false);
-    }
-  }
   async function send(payload: { body: string; key: string }) {
     if (!id || sendLock.current) return;
     sendLock.current = true;
@@ -147,17 +138,21 @@ function MessagingContent({ id }: { id?: number }) {
     }
   }
   return (
-    <section className="messaging-page">
+    <section className="messaging-page" aria-label="Hộp thư TutorLink">
       <aside className="conversation-list">
-        <h1>Tin nhắn</h1>
-        <Field htmlFor="conversation-search" label="Tìm cuộc trò chuyện">
-          <Input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tên người liên hệ…"
-          />
-        </Field>
+        <div className="conversation-list-heading">
+          <h1>Tin nhắn</h1>
+        </div>
+        <div className="conversation-search-field">
+          <Field htmlFor="conversation-search" label="Tìm cuộc trò chuyện">
+            <Input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tìm kiếm cuộc trò chuyện…"
+            />
+          </Field>
+        </div>
         <div className="conversation-items">
           {items
             .filter((c) =>
@@ -175,15 +170,17 @@ function MessagingContent({ id }: { id?: number }) {
                 <span className="chat-avatar" aria-hidden="true">
                   {c.peer.display_name[0]}
                 </span>
-                <span>
+                <span className="conversation-item-copy">
                   <strong>{c.peer.display_name}</strong>
                   <small>{c.preview?.text || "Bắt đầu trò chuyện"}</small>
                 </span>
+                <time className="conversation-time" dateTime={c.preview?.created_at || undefined}>{conversationTime(c.preview?.created_at || null)}</time>
                 {c.unread_count > 0 && (
                   <Badge tone="brand">{c.unread_count}</Badge>
                 )}
               </Link>
             ))}
+          {!items.filter((c) => c.peer.display_name.toLocaleLowerCase().includes(query.toLocaleLowerCase())).length && <div className="conversation-list-empty"><span aria-hidden="true">⌕</span><strong>{query ? "Không tìm thấy cuộc trò chuyện" : "Chưa có cuộc trò chuyện"}</strong><small>{query ? "Thử tìm bằng tên khác." : "Bắt đầu trò chuyện để kết nối với gia sư hoặc học viên."}</small></div>}
         </div>
         {listCursor && (
           <Button
@@ -194,23 +191,6 @@ function MessagingContent({ id }: { id?: number }) {
             Tải thêm cuộc trò chuyện
           </Button>
         )}
-        <details>
-          <summary>Bắt đầu cuộc trò chuyện</summary>
-          <form onSubmit={open}>
-            <Field htmlFor="chat-peer" label="ID người liên hệ">
-              <Input
-                required
-                min={1}
-                type="number"
-                value={peer}
-                onChange={(e) => setPeer(e.target.value)}
-              />
-            </Field>
-            <Button type="submit" disabled={opening}>
-              Mở cuộc trò chuyện
-            </Button>
-          </form>
-        </details>
       </aside>
       <div className="message-thread">
         {current ? (
@@ -221,9 +201,10 @@ function MessagingContent({ id }: { id?: number }) {
               </span>
               <div>
                 <h2>{current.peer.display_name}</h2>
-                <small>
+                <small className="thread-presence">
+                  <i aria-hidden="true" />
                   {current.status === "active"
-                    ? "Cuộc trò chuyện"
+                    ? "Cuộc trò chuyện đang mở"
                     : "Cuộc trò chuyện đã đóng"}
                 </small>
               </div>
@@ -243,26 +224,31 @@ function MessagingContent({ id }: { id?: number }) {
                 </Button>
               )}
               {history.length ? (
-                history.map((m) => (
-                  <article
-                    key={m.id}
-                    className={`message-bubble${m.sender_id === userId ? " own" : ""}`}
-                  >
-                    <p>
-                      {m.message_type === "text"
-                        ? m.body
-                        : "Tệp từ lịch sử (không hỗ trợ trong chat hiện tại)"}
-                    </p>
-                    <time dateTime={m.created_at}>
-                      {new Date(m.created_at).toLocaleString("vi-VN")}
-                    </time>
-                  </article>
-                ))
+                history.map((m, index) => {
+                  const own = m.sender_id === userId;
+                  const previous = history[index - 1];
+                  const showDay = !previous || new Date(previous.created_at).toDateString() !== new Date(m.created_at).toDateString();
+                  const messageDate = new Date(m.created_at);
+                  const yesterday = new Date();
+                  yesterday.setDate(yesterday.getDate() - 1);
+                  const dayLabel = messageDate.toDateString() === new Date().toDateString()
+                    ? "Hôm nay"
+                    : messageDate.toDateString() === yesterday.toDateString()
+                      ? "Hôm qua"
+                      : messageDate.toLocaleDateString("vi-VN", { day: "numeric", month: "long", year: "numeric" });
+                  return <div className="message-entry" key={m.id}>
+                    {showDay && <div className="message-day"><span>{dayLabel}</span></div>}
+                    <div className={`message-row${own ? " own" : ""}`}>
+                      {!own && <span className="chat-avatar message-peer-avatar" aria-hidden="true">{current.peer.display_name[0]}</span>}
+                      <article className={`message-bubble${own ? " own" : ""}`}>
+                        <p>{m.message_type === "text" ? m.body : "Tệp từ lịch sử (không hỗ trợ trong chat hiện tại)"}</p>
+                        <time dateTime={m.created_at}>{new Date(m.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}{own ? <span className="message-read-mark" aria-label="Đã gửi"> ✓</span> : null}</time>
+                      </article>
+                    </div>
+                  </div>;
+                })
               ) : (
-                <StatePanel
-                  kind="empty"
-                  message="Hãy gửi lời chào để bắt đầu."
-                />
+                <div className="message-empty"><span aria-hidden="true">✦</span><strong>Cuộc trò chuyện mới bắt đầu</strong><p>Gửi lời chào để trao đổi mục tiêu và thống nhất bước tiếp theo.</p></div>
               )}
             </div>
             {failed && (
@@ -318,22 +304,18 @@ function MessagingContent({ id }: { id?: number }) {
                 }
                 aria-label="Gửi tin nhắn"
               >
-                Gửi →
+                <span aria-hidden="true">➤</span>
               </Button>
             </form>
-            <small className="muted">
-              Chỉ gửi văn bản · {draft.length}/4000
-            </small>
+            <small className="muted message-composer-hint">Chỉ gửi văn bản · {draft.length}/4000</small>
           </>
         ) : (
-          <StatePanel
-            kind={id ? "loading" : "empty"}
-            message={
-              id
-                ? "Đang tải cuộc trò chuyện…"
-                : "Chọn một cuộc trò chuyện để bắt đầu."
-            }
-          />
+          id ? <div className="message-thread-loading" role="status" aria-label="Đang tải cuộc trò chuyện">
+            <div className="message-thread-loading-heading"><span /><div><i /><i /></div></div>
+            <div className="message-thread-loading-copy"><strong>Đang mở cuộc trò chuyện</strong><span>Tin nhắn sẽ xuất hiện tại đây trong giây lát.</span></div>
+            <div className="message-thread-loading-bubble is-left" /><div className="message-thread-loading-bubble is-right" />
+            <div className="message-thread-loading-composer"><span /><b>➤</b></div>
+          </div> : <StatePanel kind="empty" message="Chọn một cuộc trò chuyện để bắt đầu." />
         )}
         {Boolean(error || pollingError) && (
           <div role="alert" className="field-error">
@@ -346,25 +328,34 @@ function MessagingContent({ id }: { id?: number }) {
         )}
       </div>
       <aside className="conversation-context">
-        <h2>Thông tin cuộc trò chuyện</h2>
+        <h2>Thông tin liên hệ</h2>
         {current ? (
           <>
-            <p>{current.peer.display_name}</p>
-            <p className="muted">
-              Mọi trao đổi và lời mời được kiểm tra theo quyền tài khoản.
-            </p>
-            {current.context_listing_id && (
-              <p>Dịch vụ nguồn #{current.context_listing_id}</p>
+            <div className="conversation-contact-card">
+              <span className="chat-avatar conversation-contact-avatar" aria-hidden="true">{current.peer.display_name[0]}</span>
+              <strong>{current.peer.display_name}</strong>
+              <small>{actor?.role === "tutor" ? "Học viên TutorLink" : current.peer.tutor_headline || "Gia sư TutorLink"}</small>
+            </div>
+            {actor?.role !== "tutor" && (current.peer.tutor_specializations || current.peer.tutor_slug) && (
+              <div className="conversation-tutor-details">
+                <p className="conversation-context-eyebrow">GIA SƯ DẠY</p>
+                <strong>{current.peer.tutor_specializations || current.peer.tutor_headline || "Thông tin chuyên môn"}</strong>
+                {current.peer.tutor_slug && (
+                  <Link className="button button-outline" href={`/tutors/${current.peer.tutor_slug}`}>Xem hồ sơ gia sư <span aria-hidden="true">→</span></Link>
+                )}
+              </div>
             )}
-{actor?.role==="tutor"&&            <Link
-              className="button button-outline"
-              href={`/programs/new?customer_id=${current.peer.id}${current.context_listing_id ? `&source_listing_id=${current.context_listing_id}` : ""}`}
-            >
-              Tạo Program & lời mời
-            </Link>}
+            {current.context_listing_id ? <div className="conversation-service-card">
+              <p className="conversation-context-eyebrow">DỊCH VỤ ĐANG TRAO ĐỔI</p>
+              <div className="conversation-service-art" aria-hidden="true"><span>✦</span></div>
+              <strong>Dịch vụ TutorLink</strong>
+              <small>Mã dịch vụ #{current.context_listing_id}</small>
+              <Link href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
+            </div> : <p className="conversation-context-note">Hãy trao đổi mục tiêu, nhu cầu và thời gian phù hợp để bắt đầu.</p>}
+            {actor?.role === "tutor" && <Link className="button button-outline conversation-program-link" href={`/programs/new?customer_id=${current.peer.id}${current.context_listing_id ? `&source_listing_id=${current.context_listing_id}` : ""}`}>Tạo Program &amp; lời mời</Link>}
           </>
         ) : (
-          <p className="muted">Chọn người liên hệ để xem thông tin.</p>
+          <div className="conversation-context-empty"><span aria-hidden="true">⌑</span><p>Chọn người liên hệ để xem thông tin và dịch vụ liên quan.</p></div>
         )}
       </aside>
     </section>

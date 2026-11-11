@@ -9,7 +9,7 @@ import type { PublicListing, TutorReviewCollection, TutorReviewAggregate } from 
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { PublicAvailability } from "./public-availability";
 import { FavoriteTutorButton } from "./favorite-tutor-button";
-import { Badge, ErrorActions, StatePanel } from "./ui";
+import { Badge, Button, ErrorActions, StatePanel } from "./ui";
 
 function TutorSkeleton({ className = "" }: { className?: string }) {
   return <span className={`tutor-loading-skeleton ${className}`} />;
@@ -42,6 +42,7 @@ function listingCover(category?: string) {
 }
 
 type RelatedTutor = { listing: PublicListing; rating: TutorReviewAggregate | null };
+type TutorProfileTab = "overview" | "services" | "reviews" | "schedule";
 
 async function loadRelatedTutors(currentSlug: string): Promise<RelatedTutor[]> {
   const response = await searchListings({ sort: "newest", per_page: 30 });
@@ -89,15 +90,24 @@ function PublicTutorLoading() {
   </section>;
 }
 
-export function PublicTutor({ slug }: { slug: string }) {
+export function PublicTutor({ slug, initialTab = "overview" }: { slug: string; initialTab?: TutorProfileTab }) {
+  const [activeTab, setActiveTab] = useState<TutorProfileTab>(initialTab);
   const [page, setPage] = useState(1);
+  const [reviewPage, setReviewPage] = useState(1);
   const [listingSlide, setListingSlide] = useState(0);
   const load = useCallback(() => getPublicTutor(slug, page), [slug, page]);
   const { data, error, loading, reload } = useAsyncData(load);
-  const loadReviews = useCallback(() => getTutorReviews(slug), [slug]);
+  const loadReviews = useCallback(() => getTutorReviews(slug, reviewPage), [slug, reviewPage]);
   const reviews = useAsyncData<TutorReviewCollection>(loadReviews);
   const loadRelated = useCallback(() => loadRelatedTutors(slug), [slug]);
   const relatedTutors = useAsyncData<RelatedTutor[]>(loadRelated);
+  const selectTab = useCallback((tab: TutorProfileTab) => {
+    setActiveTab(tab);
+    const url = new URL(window.location.href);
+    if (tab === "overview") url.searchParams.delete("tab");
+    else url.searchParams.set("tab", tab);
+    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+  }, []);
 
   if (loading) return <PublicTutorLoading />;
   if (error) {
@@ -169,7 +179,7 @@ export function PublicTutor({ slug }: { slug: string }) {
           <h1 id="tutor-profile-name">{name}<span className="tutor-profile-verified" aria-label="Gia sư đã xác minh">✓</span></h1>
           <p className="tutor-profile-headline">{data.headline || "Gia sư / Huấn luyện viên"}</p>
           {city ? <p className="tutor-profile-location"><span><TutorProfileIcon name="location" /></span>{city}</p> : null}
-          {reviews.data?.aggregate.count ? <Link className="tutor-profile-rating" href={`/tutors/${encodeURIComponent(data.slug)}/reviews`}><span aria-hidden="true">★</span><strong>{reviews.data.aggregate.average?.toFixed(1)}</strong><small>({reviews.data.aggregate.count} đánh giá)</small></Link> : reviews.loading ? <span className="tutor-profile-rating-loading">Đang tải đánh giá…</span> : null}
+          {reviews.data?.aggregate.count ? <button className="tutor-profile-rating" onClick={() => selectTab("reviews")} type="button"><span aria-hidden="true">★</span><strong>{reviews.data.aggregate.average?.toFixed(1)}</strong><small>({reviews.data.aggregate.count} đánh giá)</small></button> : reviews.loading ? <span className="tutor-profile-rating-loading">Đang tải đánh giá…</span> : null}
         </div>
         <div className="tutor-profile-actions">
           <OpenChatButton peerId={data.messaging_user_id} contact={chatContact} />
@@ -177,6 +187,26 @@ export function PublicTutor({ slug }: { slug: string }) {
         </div>
       </section>
 
+      <nav className="tutor-profile-tabs" role="tablist" aria-label="Nội dung hồ sơ gia sư">
+        {([
+          ["overview", "Tổng quan"],
+          ["services", "Dịch vụ"],
+          ["reviews", "Đánh giá"],
+          ["schedule", "Lịch học"],
+        ] as const).map(([tab, label]) => <button
+          aria-controls="tutor-profile-active-panel"
+          aria-selected={activeTab === tab}
+          className={activeTab === tab ? "is-active" : ""}
+          id={`tutor-profile-tab-${tab}`}
+          key={tab}
+          onClick={() => selectTab(tab)}
+          role="tab"
+          tabIndex={activeTab === tab ? 0 : -1}
+          type="button"
+        >{label}</button>)}
+      </nav>
+
+      {activeTab === "overview" ? <div className="tutor-profile-tab-panel tutor-profile-overview-panel" id="tutor-profile-active-panel" role="tabpanel" aria-labelledby="tutor-profile-tab-overview" tabIndex={0}>
       <section className="tutor-profile-stats" aria-label="Thông tin nhanh">
         <div><span className="tutor-profile-stat-icon"><TutorProfileIcon name="experience" /></span><span><strong>{data.experience_years}+ năm</strong><small>Kinh nghiệm giảng dạy</small></span></div>
         <div><span className="tutor-profile-stat-icon"><TutorProfileIcon name="services" /></span><span><strong>{listingCount} dịch vụ</strong><small>Đang hoạt động</small></span></div>
@@ -184,7 +214,7 @@ export function PublicTutor({ slug }: { slug: string }) {
         <div><span className="tutor-profile-stat-icon"><TutorProfileIcon name="location" /></span><span><strong>{city || "Linh hoạt"}</strong><small>Khu vực hoạt động</small></span></div>
       </section>
 
-      <div className="tutor-profile-body">
+      <div className="tutor-profile-body" id="overview">
         <div className="tutor-profile-content">
           {data.bio ? <section className="tutor-profile-about" aria-labelledby="tutor-bio-title"><h2 id="tutor-bio-title">Giới thiệu bản thân</h2><p>{data.bio}</p></section> : null}
 
@@ -196,46 +226,16 @@ export function PublicTutor({ slug }: { slug: string }) {
 
         </div>
 
-        <aside className="tutor-profile-sidebar" aria-label="Lịch khả dụng của gia sư">
-          {availability ? <div className="tutor-profile-availability"><PublicAvailability availability={availability} /></div> : <section className="card tutor-profile-no-availability"><h2>Lịch trống</h2><p>Gia sư chưa công khai khung giờ. Hãy nhắn tin để trao đổi lịch phù hợp.</p></section>}
+        <aside className="tutor-profile-sidebar" aria-label="Liên hệ gia sư">
+          <section className="tutor-profile-booking-card">
+            <span className="tutor-profile-booking-icon"><TutorProfileIcon name="warmup" /></span>
+            <h2>Bắt đầu học cùng {name}</h2>
+            <p>Trao đổi mục tiêu và thống nhất lịch phù hợp với gia sư.</p>
+            <button className="button button-primary" onClick={() => setActiveTab("schedule")} type="button">Xem lịch học</button>
+            <OpenChatButton peerId={data.messaging_user_id} contact={chatContact} label="Nhắn tin tư vấn" />
+          </section>
         </aside>
       </div>
-
-      <section className="tutor-profile-services" aria-labelledby="tutor-listings-title">
-        <div className="tutor-profile-section-heading">
-          <div><p className="tutor-profile-services-eyebrow">DỊCH VỤ CỦA {name.toLocaleUpperCase("vi")}</p><h2 id="tutor-listings-title">Dịch vụ đang cung cấp <span>({listingCount})</span></h2></div>
-          <div className="tutor-profile-services-contact"><OpenChatButton className="tutor-profile-contact-button" label={`Trao đổi với ${name} →`} peerId={data.messaging_user_id} contact={chatContact} /></div>
-        </div>
-        {data.listings.length ? <div className={`tutor-profile-carousel${hasListingNavigation ? " has-navigation" : ""}`}>
-          {hasListingNavigation ? <button className="tutor-profile-carousel-arrow" type="button" aria-label="Xem các dịch vụ trước" disabled={!canGoToPreviousListings} onClick={() => {
-            if (listingSlide > 0) setListingSlide(listingSlide - 1);
-            else if (page > 1) { setPage(page - 1); setListingSlide(2); }
-          }}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" /></svg></button> : null}
-          <div className="public-listings-grid">
-          {visibleListings.map((listing) => {
-            const formattedPrice = formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit);
-            const [amount, ...unitParts] = formattedPrice.split(" / ");
-            const category = listing.category_name || "Dịch vụ";
-            return <article className="card public-listing-card tutor-profile-service-card" key={listing.slug}>
-              <Link className="tutor-profile-service-cover" href={`/marketplace/${encodeURIComponent(listing.slug)}`} aria-label={`Xem dịch vụ ${listing.title}`}>
-                <Image alt={`Ảnh minh họa ${category}`} fill sizes="(max-width: 560px) 100vw, (max-width: 860px) 50vw, 33vw" src={listingCover(category)} />
-                <span>{category}</span>
-              </Link>
-              <div className="tutor-profile-service-body">
-                <h3><Link href={`/marketplace/${encodeURIComponent(listing.slug)}`}>{listing.title}</Link></h3>
-                <p className="tutor-profile-service-mode"><i aria-hidden="true" />{deliveryLabels[listing.delivery_mode]}{listing.delivery_mode === "offline" && listing.city ? ` tại ${listing.city}` : ""}</p>
-                <p className="tutor-profile-service-description">{listing.description}</p>
-                <div className="tutor-profile-service-footer"><span><strong>{amount}</strong><small>/ {unitParts.join(" / ")}</small></span><Link href={`/marketplace/${encodeURIComponent(listing.slug)}`}>Xem dịch vụ <span aria-hidden="true">→</span></Link></div>
-              </div>
-            </article>;
-          })}
-          </div>
-          {hasListingNavigation ? <button className="tutor-profile-carousel-arrow" type="button" aria-label="Xem các dịch vụ tiếp theo" disabled={!canGoToNextListings} onClick={() => {
-            if ((listingSlide + 1) * 3 < data.listings.length) setListingSlide(listingSlide + 1);
-            else if (data.listings_meta.has_more) { setPage(data.listings_meta.next_page ?? page + 1); setListingSlide(0); }
-          }}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m9 18 6-6-6-6" /></svg></button> : null}
-        </div> : <StatePanel kind="empty" message="Gia sư chưa có dịch vụ đang công khai." />}
-      </section>
 
       <section className="tutor-profile-journey" aria-labelledby="tutor-journey-title">
         <div className="tutor-profile-journey-heading">
@@ -248,30 +248,6 @@ export function PublicTutor({ slug }: { slug: string }) {
           <article><span className="tutor-profile-journey-icon"><TutorProfileIcon name="practice" /></span><strong className="tutor-profile-journey-number">02</strong><h3>Học qua tình huống</h3><p>Thực hành nội dung sát với mục tiêu giao tiếp hoặc kỹ năng của bạn.</p></article>
           <article><span className="tutor-profile-journey-icon"><TutorProfileIcon name="feedback" /></span><strong className="tutor-profile-journey-number">03</strong><h3>Phản hồi tức thì</h3><p>Sửa phát âm, từ vựng và cách diễn đạt ngay khi thực hành.</p></article>
           <article><span className="tutor-profile-journey-icon"><TutorProfileIcon name="next" /></span><strong className="tutor-profile-journey-number">04</strong><h3>Kế hoạch tiếp theo</h3><p>Nhận ghi chú cùng bài luyện ngắn để duy trì tiến bộ giữa hai buổi.</p></article>
-        </div>
-      </section>
-
-      <section className="tutor-profile-reviews-section" aria-labelledby="tutor-reviews-title">
-        <div className="tutor-profile-review-summary">
-          <p className="tutor-profile-services-eyebrow">ĐÁNH GIÁ ĐÃ XÁC MINH</p>
-          <h2 id="tutor-reviews-title">Học viên nói gì về {name}?</h2>
-          {reviews.data ? <>
-            <div className="tutor-profile-review-score"><strong>{reviews.data.aggregate.average?.toFixed(1) ?? "—"}</strong><span><b aria-label="5 sao">★★★★★</b><small>{reviews.data.aggregate.count} đánh giá</small></span></div>
-            <div className="tutor-profile-rating-bars" aria-label="Phân bố đánh giá">
-              {[5, 4, 3].map((rating) => {
-                const count = reviews.data!.aggregate.histogram[String(rating) as keyof typeof reviews.data.aggregate.histogram];
-                const total = reviews.data!.aggregate.count;
-                return <div key={rating}><span>{rating} sao</span><i><b style={{ width: `${total ? (count / total) * 100 : 0}%` }} /></i><small>{count}</small></div>;
-              })}
-            </div>
-          </> : <p className="tutor-profile-review-loading">{reviews.loading ? "Đang tải đánh giá…" : "Chưa có đánh giá công khai."}</p>}
-        </div>
-        <div className="tutor-profile-review-list">
-          {reviews.data?.data.length ? reviews.data.data.slice(0, 3).map((review) => <article className="tutor-profile-review-card" key={review.id}>
-            <div className="tutor-profile-review-author"><span aria-hidden="true">{tutorInitials(review.author_name)}</span><div><strong>{review.author_name}</strong><b aria-label={`${review.rating} trên 5 sao`}>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</b></div><time>{formatReviewDate(review.created_at)}</time></div>
-            <p>{review.comment || "Học viên đã gửi đánh giá cho buổi học này."}</p>
-          </article>) : <div className="tutor-profile-review-empty">{reviews.loading ? "Đang tải nhận xét…" : "Những đánh giá đầu tiên sẽ xuất hiện tại đây."}</div>}
-          {reviews.data?.aggregate.count ? <Link className="tutor-profile-inline-link" href={`/tutors/${encodeURIComponent(data.slug)}/reviews`}>Xem tất cả {reviews.data.aggregate.count} đánh giá <span aria-hidden="true">→</span></Link> : null}
         </div>
       </section>
 
@@ -329,6 +305,77 @@ export function PublicTutor({ slug }: { slug: string }) {
           <OpenChatButton className="tutor-profile-cta-button" label={`Nhắn tin với ${name}`} peerId={data.messaging_user_id} contact={chatContact} />
         </div>
       </section>
+      </div> : null}
+
+      {activeTab === "services" ? <section className="tutor-profile-tab-panel tutor-profile-services" id="tutor-profile-active-panel" role="tabpanel" aria-labelledby="tutor-profile-tab-services" tabIndex={0}>
+        <div className="tutor-profile-section-heading">
+          <div><p className="tutor-profile-services-eyebrow">DỊCH VỤ CỦA {name.toLocaleUpperCase("vi")}</p><h2 id="tutor-listings-title">Dịch vụ đang cung cấp <span>({listingCount})</span></h2></div>
+          <div className="tutor-profile-services-contact"><OpenChatButton className="tutor-profile-contact-button" label={`Trao đổi với ${name} →`} peerId={data.messaging_user_id} contact={chatContact} /></div>
+        </div>
+        {data.listings.length ? <div className={`tutor-profile-carousel${hasListingNavigation ? " has-navigation" : ""}`}>
+          {hasListingNavigation ? <button className="tutor-profile-carousel-arrow" type="button" aria-label="Xem các dịch vụ trước" disabled={!canGoToPreviousListings} onClick={() => {
+            if (listingSlide > 0) setListingSlide(listingSlide - 1);
+            else if (page > 1) { setPage(page - 1); setListingSlide(2); }
+          }}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" /></svg></button> : null}
+          <div className="public-listings-grid">
+          {visibleListings.map((listing) => {
+            const formattedPrice = formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit);
+            const [amount, ...unitParts] = formattedPrice.split(" / ");
+            const category = primarySpecialization?.category || primarySpecialization?.name || "Dịch vụ";
+            return <article className="card public-listing-card tutor-profile-service-card" key={listing.slug}>
+              <Link className="tutor-profile-service-cover" href={`/marketplace/${encodeURIComponent(listing.slug)}`} aria-label={`Xem dịch vụ ${listing.title}`}>
+                <Image alt={`Ảnh minh họa ${category}`} fill sizes="(max-width: 560px) 100vw, (max-width: 860px) 50vw, 33vw" src={listingCover(category)} />
+                <span>{category}</span>
+              </Link>
+              <div className="tutor-profile-service-body">
+                <h3><Link href={`/marketplace/${encodeURIComponent(listing.slug)}`}>{listing.title}</Link></h3>
+                <p className="tutor-profile-service-mode"><i aria-hidden="true" />{deliveryLabels[listing.delivery_mode]}{listing.delivery_mode === "offline" && listing.city ? ` tại ${listing.city}` : ""}</p>
+                <p className="tutor-profile-service-description">{data.bio || `Dịch vụ ${category.toLocaleLowerCase("vi")} do ${name} hướng dẫn.`}</p>
+                <div className="tutor-profile-service-footer"><span><strong>{amount}</strong><small>/ {unitParts.join(" / ")}</small></span><Link href={`/marketplace/${encodeURIComponent(listing.slug)}`}>Xem dịch vụ <span aria-hidden="true">→</span></Link></div>
+              </div>
+            </article>;
+          })}
+          </div>
+          {hasListingNavigation ? <button className="tutor-profile-carousel-arrow" type="button" aria-label="Xem các dịch vụ tiếp theo" disabled={!canGoToNextListings} onClick={() => {
+            if ((listingSlide + 1) * 3 < data.listings.length) setListingSlide(listingSlide + 1);
+            else if (data.listings_meta.has_more) { setPage(data.listings_meta.next_page ?? page + 1); setListingSlide(0); }
+          }}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m9 18 6-6-6-6" /></svg></button> : null}
+        </div> : <StatePanel kind="empty" message="Gia sư chưa có dịch vụ đang công khai." />}
+      </section> : null}
+
+      {activeTab === "reviews" ? <section className="tutor-profile-tab-panel tutor-profile-reviews-section" id="tutor-profile-active-panel" aria-labelledby="tutor-profile-tab-reviews" role="tabpanel" tabIndex={0}>
+        <div className="tutor-profile-review-summary">
+          <p className="tutor-profile-services-eyebrow">ĐÁNH GIÁ ĐÃ XÁC MINH</p>
+          <h2 id="tutor-reviews-title">Học viên nói gì về {name}?</h2>
+          {reviews.data ? <>
+            <div className="tutor-profile-review-score"><strong>{reviews.data.aggregate.average?.toFixed(1) ?? "—"}</strong><span><b aria-label="5 sao">★★★★★</b><small>{reviews.data.aggregate.count} đánh giá</small></span></div>
+            <div className="tutor-profile-rating-bars" aria-label="Phân bố đánh giá">
+              {[5, 4, 3].map((rating) => {
+                const count = reviews.data!.aggregate.histogram[String(rating) as keyof typeof reviews.data.aggregate.histogram];
+                const total = reviews.data!.aggregate.count;
+                return <div key={rating}><span>{rating} sao</span><i><b style={{ width: `${total ? (count / total) * 100 : 0}%` }} /></i><small>{count}</small></div>;
+              })}
+            </div>
+          </> : <p className="tutor-profile-review-loading">{reviews.loading ? "Đang tải đánh giá…" : "Chưa có đánh giá công khai."}</p>}
+        </div>
+        <div className="tutor-profile-review-list">
+          {reviews.error ? <div className="tutor-profile-review-empty">Không tải được đánh giá. <Button variant="secondary" onClick={reviews.reload}>Thử lại</Button></div> : null}
+          {reviews.data?.data.length ? reviews.data.data.map((review) => <article className="tutor-profile-review-card" key={review.id}>
+            <div className="tutor-profile-review-author"><span aria-hidden="true">{tutorInitials(review.author_name)}</span><div><strong>{review.author_name}</strong><b aria-label={`${review.rating} trên 5 sao`}>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</b></div><time>{formatReviewDate(review.created_at)}</time></div>
+            <p>{review.comment || "Học viên đã gửi đánh giá cho buổi học này."}</p>
+          </article>) : !reviews.error ? <div className="tutor-profile-review-empty">{reviews.loading ? "Đang tải nhận xét…" : "Những đánh giá đầu tiên sẽ xuất hiện tại đây."}</div> : null}
+          {reviews.data && reviews.data.meta.total > reviews.data.meta.per_page ? <nav className="review-pagination" aria-label="Phân trang đánh giá">
+            <Button variant="outline" disabled={reviews.loading || reviews.data.meta.current_page <= 1} onClick={() => setReviewPage((current) => Math.max(1, current - 1))}><span aria-hidden="true">←</span> Trước</Button>
+            <span aria-live="polite">Trang {reviews.data.meta.current_page} / {Math.ceil(reviews.data.meta.total / reviews.data.meta.per_page)}</span>
+            <Button variant="outline" disabled={reviews.loading || reviews.data.meta.current_page >= Math.ceil(reviews.data.meta.total / reviews.data.meta.per_page)} onClick={() => setReviewPage((current) => current + 1)}>Tiếp <span aria-hidden="true">→</span></Button>
+          </nav> : null}
+        </div>
+      </section> : null}
+
+      {activeTab === "schedule" ? <section className="tutor-profile-tab-panel tutor-profile-schedule-panel" id="tutor-profile-active-panel" aria-labelledby="tutor-profile-tab-schedule" role="tabpanel" tabIndex={0}>
+        <div className="tutor-profile-schedule-heading"><div><p className="tutor-profile-services-eyebrow">THỜI GIAN CỦA {name.toLocaleUpperCase("vi")}</p><h2>Lịch học khả dụng</h2><p>Tham khảo khung giờ gia sư thường sắp xếp và chọn thời gian phù hợp với bạn.</p></div>{availability ? <OpenChatButton className="tutor-profile-schedule-contact" peerId={data.messaging_user_id} contact={chatContact} label={`Trao đổi lịch với ${name}`} /> : null}</div>
+        {availability ? <div className="tutor-profile-availability"><PublicAvailability availability={availability} /></div> : <section className="card tutor-profile-no-availability"><h2>Lịch trống</h2><p>Gia sư chưa công khai khung giờ. Hãy nhắn tin để trao đổi lịch phù hợp.</p><OpenChatButton peerId={data.messaging_user_id} contact={chatContact} label={`Nhắn tin với ${name}`} /></section>}
+      </section> : null}
       </div>
     </section>
   );

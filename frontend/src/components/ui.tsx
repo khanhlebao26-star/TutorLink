@@ -96,10 +96,14 @@ export function StatePanel({
 }) {
   return (
     <div className={`state-panel state-${kind}`} role={kind === "error" ? "alert" : "status"}>
-      <strong>
-        {kind === "loading" ? "Đang tải" : kind === "empty" ? "Chưa có dữ liệu" : "Không thể tải dữ liệu"}
-      </strong>
-      <span>{message}</span>
+      {kind === "loading" ? <span className="state-loading-spinner" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="15"/><path d="M20 5a15 15 0 0 1 15 15"/></svg></span> : null}
+      <span className={kind === "loading" ? "state-loading-copy" : undefined}>
+        <strong>
+          {kind === "loading" ? "Đang tải" : kind === "empty" ? "Chưa có dữ liệu" : "Không thể tải dữ liệu"}
+        </strong>
+        <span>{message}</span>
+        {kind === "loading" ? <span className="state-loading-progress" aria-hidden="true"><i /></span> : null}
+      </span>
       {action}
     </div>
   );

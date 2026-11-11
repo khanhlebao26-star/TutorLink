@@ -243,7 +243,7 @@
 .tutor-profile-location { align-items: center; color: #7885a1; display: flex; font-size: .7rem; gap: 7px; margin: 0 0 10px; }
 .tutor-profile-location span { color: #8a96b1; display: inline-flex; }
 .tutor-profile-location svg { height: 14px; width: 14px; }
-.tutor-profile-rating { align-items: center; color: #0b1b4b; display: inline-flex; gap: 7px; text-decoration: none; }
+.tutor-profile-rating { appearance: none; align-items: center; background: transparent; border: 0; color: #0b1b4b; cursor: pointer; display: inline-flex; font: inherit; gap: 7px; padding: 0; text-decoration: none; }
 .tutor-profile-rating > span { color: #f41498; font-size: 1.18rem; }
 .tutor-profile-rating strong { font-size: .95rem; }
 .tutor-profile-rating small, .tutor-profile-rating-loading { color: #8190ad; font-size: .62rem; }
@@ -558,6 +558,112 @@
 .favorites-empty strong { color: #0b1b4b; display: block; margin-bottom: 6px; }
 .favorites-empty p { margin: 0 0 16px; }
 .favorites-error { color: #bd2452; font-size: .8rem; }
+.favorites-loading { background: linear-gradient(145deg, #fff 0%, #fffafe 58%, #f9f6ff 100%); border: 1px solid #eee7f5; border-radius: 20px; box-shadow: 0 18px 48px #1827500a; margin: 0 auto; max-width: 1180px; min-height: 390px; overflow: hidden; padding: clamp(20px, 3vw, 34px); position: relative; }
+.favorites-loading::before { background: radial-gradient(circle, #fce8f6 0, #fce8f600 72%); content: ""; height: 340px; pointer-events: none; position: absolute; right: -110px; top: -170px; width: 340px; }
+.favorites-loading-heading { align-items: center; display: flex; gap: 16px; margin-bottom: 25px; position: relative; }
+.favorites-loading-heart { align-items: center; animation: favorites-heart-pulse 1.5s ease-in-out infinite; background: linear-gradient(145deg, #fff0f8, #f5edff); border: 1px solid #f5d9ec; border-radius: 17px; color: #f41498; display: inline-flex; flex: 0 0 58px; font-size: 2rem; height: 58px; justify-content: center; }
+.favorites-loading-heading .listing-program-eyebrow { margin: 0 0 5px; }
+.favorites-loading-heading h1 { color: #0b1b4b; font-size: clamp(1.55rem, 2.7vw, 2.2rem); letter-spacing: -.04em; margin: 0 0 5px; }
+.favorites-loading-heading > div > p:last-child { color: #7381a1; font-size: .9rem; margin: 0; }
+.favorites-loading-list { display: grid; gap: 11px; position: relative; }
+.favorites-loading-card { align-items: center; background: #ffffffd9; border: 1px solid #e8e9f2; border-radius: 15px; display: grid; gap: 15px; grid-template-columns: 58px minmax(0, 1fr) auto; min-height: 94px; padding: 15px 17px; }
+.favorites-loading-avatar, .favorites-loading-copy i, .favorites-loading-actions i { animation: favorites-shimmer 1.55s ease-in-out infinite; background: linear-gradient(100deg, #f0eff6 20%, #faf9fc 43%, #f0eff6 66%); background-size: 220% 100%; display: block; }
+.favorites-loading-avatar { border-radius: 50%; height: 54px; width: 54px; }
+.favorites-loading-copy { display: grid; gap: 8px; max-width: 420px; }
+.favorites-loading-copy i { border-radius: 999px; height: 10px; }
+.favorites-loading-copy i:first-child { height: 13px; width: 38%; }
+.favorites-loading-copy i:nth-child(2) { width: 57%; }
+.favorites-loading-copy i:last-child { width: 31%; }
+.favorites-loading-actions { display: flex; gap: 8px; }
+.favorites-loading-actions i { border: 1px solid #f1e4ef; border-radius: 9px; height: 35px; width: 86px; }
+.favorites-loading-actions i:last-child { width: 104px; }
+.favorites-loading-status { align-items: center; color: #7a87a5; display: flex; font-size: .74rem; gap: 8px; justify-content: center; margin-top: 21px; position: relative; }
+.favorites-loading-status i { animation: favorites-spin .9s linear infinite; border: 2px solid #f8ddec; border-right-color: #f41498; border-top-color: #f41498; border-radius: 50%; height: 15px; width: 15px; }
+@keyframes favorites-shimmer { to { background-position: -220% 0; } }
+@keyframes favorites-spin { to { transform: rotate(360deg); } }
+@keyframes favorites-heart-pulse { 50% { box-shadow: 0 0 0 7px #f4149810; transform: translateY(-2px) scale(1.04); } }
+@media (max-width: 680px) { .favorites-loading { border-radius: 15px; min-height: 340px; padding: 18px 14px; } .favorites-loading-heading { align-items: flex-start; gap: 12px; } .favorites-loading-heart { flex-basis: 46px; height: 46px; width: 46px; } .favorites-loading-card { gap: 10px; grid-template-columns: 44px minmax(0, 1fr); min-height: 78px; padding: 12px; } .favorites-loading-avatar { height: 42px; width: 42px; } .favorites-loading-actions { display: none; } }
+@media (prefers-reduced-motion: reduce) { .favorites-loading-heart, .favorites-loading-avatar, .favorites-loading-copy i, .favorites-loading-actions i, .favorites-loading-status i { animation: none; } }
+
+/* Updated public tutor profile visual system */
+.tutor-profile-redesign { isolation: isolate; overflow: visible; position: relative; }
+.tutor-profile-inner { gap: 22px; }
+.tutor-profile-hero { background: linear-gradient(100deg, #f7f2ff 0%, #fff 46%, #fff4fb 100%); border: 1px solid #eee6fa; border-radius: 22px; gap: clamp(18px, 2.2vw, 34px); grid-template-columns: minmax(150px, 188px) minmax(0, 1fr) minmax(320px, auto); min-height: 190px; overflow: hidden; padding: 14px clamp(18px, 2.6vw, 38px); position: relative; }
+.tutor-profile-hero::after { background: radial-gradient(ellipse at 100% 50%, #f3dfff 0, #fbeafa 35%, transparent 65%); content: ""; inset: 0 0 0 68%; pointer-events: none; position: absolute; z-index: 0; }
+.tutor-profile-media { position: relative; z-index: 1; }
+.tutor-profile-media { background: linear-gradient(140deg, #f4e9ff, #fce5f4); border: 4px solid #fff; border-radius: 50%; box-shadow: 0 8px 28px #7625a51a; min-height: 166px; width: 166px; }
+.tutor-profile-media::before { height: 150px; right: -55px; top: -95px; width: 150px; }
+.tutor-profile-media::after { height: 100px; left: -50px; width: 120px; }
+.tutor-profile-media .public-avatar-large { flex-basis: 138px; font-size: 2.8rem; height: 138px; width: 138px; }
+.tutor-profile-media-note { bottom: 2px; font-size: .55rem; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.tutor-profile-intro, .tutor-profile-actions { position: relative; z-index: 1; }
+.tutor-profile-intro h1 { font-size: clamp(2rem, 3.3vw, 2.8rem); }
+.tutor-profile-intro > .eyebrow { font-size: .68rem; }
+.tutor-profile-headline { font-size: .98rem; }
+.tutor-profile-location { font-size: .82rem; }
+.tutor-profile-rating strong { font-size: 1.05rem; }
+.tutor-profile-rating small { font-size: .72rem; }
+.tutor-profile-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; }
+.tutor-profile-actions > .button { min-height: 44px; padding-inline: 18px; width: auto; }
+.tutor-profile-actions .listing-secondary-action { min-height: 44px; padding-inline: 18px; width: auto; }
+.tutor-profile-tabs { align-items: stretch; border-bottom: 1px solid #e7e0f1; display: flex; gap: clamp(18px, 3.4vw, 54px); justify-content: center; margin: -3px 0 0; }
+.tutor-profile-tabs button { background: transparent; border: 0; border-bottom: 3px solid transparent; color: #17254c; cursor: pointer; font: inherit; font-size: .82rem; font-weight: 700; padding: 13px 10px 11px; transition: border-color .16s ease, color .16s ease; }
+.tutor-profile-tabs button:hover, .tutor-profile-tabs button.is-active { border-bottom-color: #ed1595; color: #d80c83; }
+.tutor-profile-tabs button:focus-visible { border-radius: 5px 5px 0 0; outline: 3px solid #ed159550; outline-offset: 2px; }
+.tutor-profile-tab-panel { min-width: 0; }
+.tutor-profile-tab-panel.tutor-profile-services { margin-top: 24px; }
+.tutor-profile-tab-panel.tutor-profile-reviews-section { margin-top: 24px; }
+.tutor-profile-schedule-panel { display: grid; gap: 22px; grid-template-columns: minmax(0, 1fr); margin-top: 24px; }
+.tutor-profile-schedule-heading { display: grid; gap: 7px; }
+.tutor-profile-schedule-heading .tutor-profile-services-eyebrow { margin: 0; }
+.tutor-profile-schedule-heading h2 { color: #10234f; font-size: clamp(1.35rem, 2.4vw, 1.8rem); letter-spacing: -.03em; margin: 0; }
+.tutor-profile-schedule-heading > p:last-child { color: #8290ad; font-size: .82rem; line-height: 1.6; margin: 0; }
+.tutor-profile-schedule-panel .tutor-profile-availability { max-width: 720px; width: 100%; }
+.tutor-profile-schedule-panel .tutor-profile-no-availability { max-width: 720px; }
+.tutor-profile-stats { border-radius: 14px; min-height: 76px; }
+.tutor-profile-stats strong { font-size: .82rem; }
+.tutor-profile-stats small { font-size: .66rem; }
+.tutor-profile-stat-icon { color: #7144da; }
+.tutor-profile-stat-icon svg { height: 23px; width: 23px; }
+.tutor-profile-body { gap: clamp(22px, 2.4vw, 36px); grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); margin-top: 24px; }
+.tutor-profile-content { gap: 28px; }
+.tutor-profile-about h2, .tutor-profile-expertise h2, .tutor-profile-section-heading h2 { font-size: 1.18rem; }
+.tutor-profile-about p { font-size: .8rem; }
+.tutor-profile-expertise-row strong { font-size: .78rem; }
+.tutor-profile-expertise-row small { font-size: .7rem; }
+.tutor-profile-booking-card { background: linear-gradient(125deg, #d50a86, #f122a3 72%, #bc36cf); border: 1px solid #e7219c; border-radius: 15px; box-shadow: 0 12px 28px #d60e8e24; color: #fff; display: grid; gap: 9px; grid-template-columns: 38px minmax(0, 1fr); margin-bottom: 14px; padding: 18px; }
+.tutor-profile-booking-icon { align-items: center; background: #ffffff24; border: 1px solid #ffffff44; border-radius: 10px; display: inline-flex; grid-row: span 3; height: 38px; justify-content: center; width: 38px; }
+.tutor-profile-booking-icon svg { height: 21px; width: 21px; }
+.tutor-profile-booking-card h2 { align-self: end; color: #fff; font-size: .96rem; line-height: 1.3; margin: 0; }
+.tutor-profile-booking-card p { color: #ffe5f5; font-size: .69rem; line-height: 1.55; margin: 0; }
+.tutor-profile-booking-card .button { align-items: center; background: #fff; border-color: #fff; box-shadow: none; color: #d80c83; display: inline-flex; grid-column: 1 / -1; justify-content: center; margin-top: 5px; min-height: 40px; text-decoration: none; }
+.tutor-profile-booking-card .button:hover { background: #fff5fb; color: #a50c6b; }
+.tutor-profile-booking-card .button + .button { background: transparent; border-color: #ffffffab; color: #fff; margin-top: 0; }
+.tutor-profile-booking-card .button + .button:hover { background: #ffffff1f; color: #fff; }
+.tutor-profile-availability { border-radius: 15px; }
+.tutor-profile-services { margin-top: 62px; }
+
+@media (max-width: 1180px) {
+  .tutor-profile-hero { grid-template-columns: minmax(135px, 166px) minmax(0, 1fr); }
+  .tutor-profile-media { min-height: 150px; width: 150px; }
+  .tutor-profile-media .public-avatar-large { flex-basis: 124px; height: 124px; width: 124px; }
+  .tutor-profile-actions { grid-column: 2; justify-content: flex-start; }
+}
+
+@media (max-width: 700px) {
+  .tutor-profile-tabs { gap: 8px; justify-content: space-between; overflow-x: auto; }
+  .tutor-profile-tabs button { flex: 0 0 auto; font-size: .72rem; padding-inline: 7px; }
+  .tutor-profile-hero { border-radius: 17px; padding: 18px; }
+  .tutor-profile-actions { grid-column: 1 / -1; }
+}
+
+@media (max-width: 560px) {
+  .tutor-profile-hero { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .tutor-profile-media { min-height: 154px; width: 154px; }
+  .tutor-profile-actions { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; }
+  .tutor-profile-actions > .button, .tutor-profile-actions .listing-secondary-action { width: 100%; }
+  .tutor-profile-booking-card { padding: 15px; }
+}
 
 @media (max-width: 860px) {
   .tutor-profile-services { margin-top: 44px; }
@@ -781,4 +887,137 @@
 @media (prefers-reduced-motion: reduce) {
   .detail-loading-spinner, .detail-loading-progress i, .detail-skeleton, .open-chat-alert, .tutor-loading-spinner, .tutor-loading-skeleton, .tutor-loading-layout { animation: none; }
   .detail-loading-progress i { margin-left: 22%; width: 56%; }
+}
+
+/* Tutor profile weekly schedule tab */
+.tutor-profile-schedule-panel { gap: 24px; }
+.tutor-profile-schedule-heading { align-items: end; display: flex; flex-wrap: wrap; gap: 18px 24px; justify-content: space-between; }
+.tutor-profile-schedule-heading > div:first-child { display: grid; gap: 7px; }
+.tutor-profile-schedule-heading h2 { font-size: clamp(1.55rem, 2.6vw, 2rem); }
+.tutor-profile-schedule-heading > div:first-child > p:last-child { font-size: .9rem; }
+.tutor-profile-schedule-contact { flex: 0 0 auto; min-height: 42px; }
+.tutor-profile-schedule-panel .tutor-profile-availability { max-width: none; width: 100%; }
+.tutor-profile-schedule-panel .tutor-schedule-card { background: linear-gradient(145deg, #fff 0%, #fcfaff 58%, #fff7fb 100%); border: 1px solid #e9e3f3; border-radius: 18px; box-shadow: 0 12px 34px #26366b0b; padding: clamp(20px, 2.5vw, 32px); }
+.tutor-schedule-card-heading { align-items: center; display: flex; gap: 20px; justify-content: space-between; }
+.tutor-schedule-card-heading > div:first-child { display: grid; gap: 6px; }
+.tutor-schedule-card-eyebrow { color: #e70b8d; font-size: .64rem; font-weight: 800; letter-spacing: .1em; }
+.tutor-profile-schedule-panel .tutor-schedule-card-heading h2 { font-size: 1.15rem; margin: 0; }
+.tutor-profile-schedule-panel .tutor-schedule-card-heading h2 small { color: #8994ad; font-size: .72rem; font-weight: 500; }
+.tutor-profile-schedule-panel .tutor-schedule-card-heading .public-timezone { color: #7885a1; font-size: .72rem; margin-top: 0; }
+.tutor-schedule-availability-count { align-items: baseline; background: #fff0f8; border: 1px solid #f9d6eb; border-radius: 12px; color: #6b7693; display: flex; gap: 6px; padding: 10px 14px; white-space: nowrap; }
+.tutor-schedule-availability-count strong { color: #e70b8d; font-size: 1.1rem; }
+.tutor-schedule-availability-count span { font-size: .68rem; }
+.tutor-schedule-legend { align-items: center; display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; }
+.tutor-schedule-legend > span { align-items: center; color: #7784a3; display: inline-flex; font-size: .68rem; gap: 7px; }
+.tutor-schedule-legend i { background: #f41498; border-radius: 50%; height: 8px; width: 8px; }
+.tutor-schedule-legend i.is-unavailable { background: #c8cedd; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list { display: grid; gap: 10px; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 14px 0 0; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li { align-content: start; background: #fff; border: 1px solid #e8eaf2; border-radius: 12px; display: grid; gap: 18px; justify-content: stretch; min-height: 142px; padding: 14px 12px; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li.has-availability { background: linear-gradient(155deg, #fff 0%, #fff8fc 100%); border-color: #f1d5e7; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li.has-availability:hover { border-color: #f5a4cf; box-shadow: 0 8px 20px #e2178d12; transform: translateY(-2px); }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li.no-availability { background: #f8f9fc; }
+.tutor-schedule-day-heading { display: grid; gap: 6px; }
+.tutor-profile-schedule-panel .tutor-schedule-day-heading strong { color: #17254c; font-size: .75rem; }
+.tutor-schedule-day-heading > span { color: #8994ad; font-size: .58rem; }
+.tutor-profile-schedule-panel .has-availability .tutor-schedule-day-heading > span { color: #c30b78; }
+.tutor-schedule-slots { align-content: start; display: flex; flex-wrap: wrap; gap: 6px; }
+.tutor-profile-schedule-panel .tutor-schedule-slots > span { background: #fff0f8; border: 1px solid #f9d9eb; border-radius: 7px; color: #a80e6b; font-size: .61rem; font-variant-numeric: tabular-nums; line-height: 1.3; padding: 6px 7px; text-align: left; white-space: nowrap; }
+.tutor-profile-schedule-panel .tutor-schedule-slots > .tutor-schedule-empty-slot { background: transparent; border: 0; color: #a0a8b9; padding: 0; white-space: normal; }
+.tutor-schedule-reference-note { align-items: flex-start; color: #7784a3; display: flex; font-size: .7rem; gap: 8px; line-height: 1.55; margin: 20px 0 0; }
+.tutor-schedule-reference-note > span { color: #8052e8; font-size: .85rem; }
+
+@media (max-width: 1180px) {
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list li { min-height: 124px; }
+  .tutor-profile-schedule-heading { align-items: start; }
+}
+@media (max-width: 420px) {
+  .tutor-schedule-card-heading { align-items: flex-start; flex-direction: column; }
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list { grid-template-columns: minmax(0, 1fr); }
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list li { min-height: auto; }
+}
+
+/* Favorites cards follow the saved-tutor design, with real tutor/service data when available. */
+.favorites-page { max-width: 1220px; min-height: 48vh; }
+.favorites-breadcrumb { align-items: center; color: #7381a1; display: flex; font-size: .72rem; gap: 10px; margin: 0 0 18px; }
+.favorites-breadcrumb span:first-child { color: #0b1b4b; font-size: .95rem; }
+.favorites-breadcrumb span:last-child { color: #0b1b4b; font-weight: 700; }
+.favorites-page > h1 { font-size: clamp(1.55rem, 2.4vw, 2rem); letter-spacing: -.035em; margin: 0 0 5px; }
+.favorites-intro { color: #7381a1; font-size: .83rem; line-height: 1.55; margin: 0 0 18px; }
+.favorites-count { color: #0b1b4b; font-size: .82rem; margin: 0 0 9px; }
+.favorites-count strong { font-size: .88rem; }
+.favorites-grid { gap: 10px; }
+.favorite-tutor-card { align-items: stretch; border-color: #e5eaf4; border-radius: 14px; box-shadow: 0 5px 18px #12234a08; display: grid; gap: 16px; grid-template-columns: minmax(150px, 198px) minmax(0, 1fr) minmax(145px, 176px); min-height: 222px; padding: 13px; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.favorite-tutor-card:hover { border-color: #e8cde0; box-shadow: 0 12px 28px #17254f10; transform: translateY(-1px); }
+.favorite-tutor-cover { background: linear-gradient(140deg, #fff0f8, #f1eaff); border-radius: 9px; display: block; min-height: 194px; overflow: hidden; position: relative; }
+.favorite-tutor-card-fitness .favorite-tutor-cover { background: linear-gradient(140deg, #eaf6ff, #e9efff); }
+.favorite-tutor-card-sports .favorite-tutor-cover { background: linear-gradient(140deg, #f2ebff, #e8e6ff); }
+.favorite-tutor-cover img { object-fit: cover; transition: transform .35s ease; }
+.favorite-tutor-card:hover .favorite-tutor-cover img { transform: scale(1.035); }
+.favorite-cover-label { background: #fff; border-radius: 999px; bottom: 10px; color: #f41498; font-size: .62rem; font-weight: 750; left: 10px; padding: 6px 10px; position: absolute; }
+.favorite-tutor-copy { align-self: stretch; display: flex; flex-direction: column; min-width: 0; padding: 2px 0 0; }
+.favorite-tutor-copy h2 { font-size: 1rem; letter-spacing: -.02em; line-height: 1.3; margin: 0 0 7px; }
+.favorite-tutor-copy h2 a { color: #0b1b4b; text-decoration: none; }
+.favorite-tutor-copy h2 a:hover { color: #e6108e; }
+.favorite-tutor-owner { align-items: center; color: #0b1b4b; display: inline-flex; font-size: .72rem; gap: 7px; margin: 0 0 8px; text-decoration: none; width: fit-content; }
+.favorite-owner-avatar { align-items: center; background: linear-gradient(145deg, #f41498, #874cff); border: 1px solid #fff; border-radius: 50%; box-shadow: 0 0 0 1px #ece4f4; color: white; display: inline-flex; font-size: .55rem; font-weight: 800; height: 28px; justify-content: center; width: 28px; }
+.favorite-verified { align-items: center; background: #327af2; border-radius: 50%; color: #fff; display: inline-flex; font-size: .56rem; height: 13px; justify-content: center; width: 13px; }
+.favorite-tutor-tags { align-items: center; display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 7px; }
+.favorite-tutor-tags span { background: #fff0f8; border-radius: 999px; color: #e6108e; font-size: .61rem; line-height: 1.25; padding: 5px 10px; }
+.favorite-tutor-card-fitness .favorite-tutor-tags span:first-child { background: #fff0f8; }
+.favorite-tutor-tags span:nth-child(2) { background: #edf2ff; color: #316af2; }
+.favorite-tutor-tags .favorite-mode-tag { background: #e2faf2; color: #129c76; }
+.favorite-tutor-rating { align-items: baseline; color: #0b1b4b; display: flex; font-size: .75rem; gap: 4px; margin: 0 0 6px; }
+.favorite-tutor-rating > span { color: #f41498; font-size: 1.05rem; }
+.favorite-tutor-rating small { color: #7381a1; font-size: .65rem; }
+.favorite-provided-service { margin-top: auto; min-width: 0; }
+.favorite-provided-service > strong { color: #0b1b4b; display: block; font-size: .65rem; margin: 0 0 4px; }
+.favorite-service-detail { align-items: center; border: 1px solid #e7ebf4; border-radius: 8px; display: flex; gap: 9px; min-height: 47px; padding: 6px 8px; }
+.favorite-service-icon { align-items: center; background: #fff0f8; border-radius: 7px; color: #f41498; display: inline-flex; flex: 0 0 29px; font-size: .85rem; height: 29px; justify-content: center; }
+.favorite-service-detail > span:last-child { display: grid; gap: 2px; min-width: 0; }
+.favorite-service-detail b { color: #0b1b4b; font-size: .66rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.favorite-service-detail small { color: #7381a1; font-size: .62rem; }
+.favorite-provided-service > p { color: #7381a1; font-size: .65rem; margin: 5px 0 0; }
+.favorite-tutor-actions { align-items: stretch; display: flex; flex-direction: column; gap: 7px; justify-content: center; padding: 0 3px; }
+.favorite-saved-heart { align-self: flex-end; color: #f41498; font-size: 1.55rem; line-height: 1; margin: -1px 1px 6px; }
+.favorite-tutor-actions a, .favorite-tutor-actions button { align-items: center; border: 1px solid #0b1b4b; border-radius: 7px; color: #0b1b4b; display: inline-flex; font: inherit; font-size: .66rem; font-weight: 750; justify-content: center; min-height: 37px; padding: 7px 9px; text-decoration: none; transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease; }
+.favorite-tutor-actions a:hover, .favorite-tutor-actions button:hover { text-decoration: none; transform: translateY(-1px); }
+.favorite-tutor-actions .favorite-service-action { background: #f41498; border-color: #f41498; color: white; gap: 8px; }
+.favorite-tutor-actions .favorite-service-action:hover { background: #d90b80; border-color: #d90b80; }
+.favorite-tutor-actions .favorite-remove-action { border-color: #f41498; color: #e6108e; cursor: pointer; gap: 7px; }
+.favorite-remove-action svg { fill: none; height: 13px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; width: 13px; }
+.favorite-tutor-actions .favorite-remove-action:disabled { cursor: wait; opacity: .62; }
+.favorite-tutor-actions a:focus-visible, .favorite-tutor-actions button:focus-visible, .favorite-tutor-copy a:focus-visible, .favorite-tutor-cover:focus-visible { outline: 3px solid #f41498; outline-offset: 3px; }
+.favorites-empty { border-radius: 14px; padding: 42px 24px; }
+
+@media (max-width: 900px) {
+  .favorite-tutor-card { gap: 12px; grid-template-columns: minmax(128px, 160px) minmax(0, 1fr) 145px; }
+  .favorite-tutor-cover { min-height: 190px; }
+}
+@media (max-width: 680px) {
+  .favorites-page { min-height: 44vh; }
+  .favorite-tutor-card { align-items: stretch; display: grid; flex-wrap: initial; grid-template-columns: 112px minmax(0, 1fr); min-height: 0; padding: 10px; }
+  .favorite-tutor-cover { grid-row: span 2; min-height: 180px; }
+  .favorite-tutor-copy { padding: 2px 0 0; }
+  .favorite-tutor-copy h2 { font-size: .9rem; }
+  .favorite-tutor-actions { flex-basis: auto; display: grid; grid-column: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-content: stretch; padding: 0; }
+  .favorite-saved-heart { display: none; }
+  .favorite-tutor-actions a, .favorite-tutor-actions button { font-size: .61rem; min-height: 34px; padding: 6px 4px; }
+  .favorite-tutor-actions .favorite-remove-action { grid-column: 1 / -1; }
+  .favorite-tutor-rating { margin-bottom: 3px; }
+  .favorite-provided-service > strong { font-size: .59rem; }
+  .favorite-service-detail { min-height: 42px; padding: 5px; }
+  .favorite-service-detail b { font-size: .58rem; }
+  .favorite-service-detail small { font-size: .56rem; }
+}
+@media (max-width: 430px) {
+  .favorite-tutor-card { grid-template-columns: 1fr; }
+  .favorite-tutor-cover { grid-row: auto; min-height: 175px; }
+  .favorite-tutor-actions { grid-column: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .favorite-tutor-card, .favorite-tutor-cover img, .favorite-tutor-actions a, .favorite-tutor-actions button { transition: none; }
 }
