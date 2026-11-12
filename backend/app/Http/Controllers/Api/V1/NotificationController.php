@@ -61,6 +61,20 @@ class NotificationController extends Controller
         return response()->json(['data' => ['updated_count' => $count]], 200, ['Cache-Control' => 'private, no-store']);
     }
 
+    public function destroy(Request $request, string $notification): JsonResponse
+    {
+        abort_unless(Str::isUuid($notification), 404);
+
+        $deleted = DB::table('notifications')
+            ->where('user_id', $request->user()->id)
+            ->where('id', $notification)
+            ->delete();
+
+        abort_unless($deleted === 1, 404);
+
+        return response()->json(null, 204, ['Cache-Control' => 'private, no-store']);
+    }
+
     private function target(Request $request, mixed $path): ?string
     {
         if (! is_string($path)) {

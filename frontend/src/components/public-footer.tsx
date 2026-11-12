@@ -32,7 +32,7 @@ export function PublicFooter() {
         </div>
         <div>
           <h2>Về TutorLink</h2>
-          <Link href="/#why-tutorlink">Về chúng tôi</Link>
+          <Link href="/about">Về chúng tôi</Link>
           <Link href="/become-a-tutor">Trở thành Tutor</Link>
           <span>Câu chuyện cộng đồng</span>
           <span>Tuyển dụng</span>

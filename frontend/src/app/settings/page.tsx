@@ -109,7 +109,7 @@ export default function SettingsPage() {
   const { data, error, loading, reload } = useAsyncData(load);
   return <AppShell title="">
     <section className="content-stack settings-page">
-      <nav className="settings-breadcrumb" aria-label="Đường dẫn"><Link href="/" aria-label="Trang chủ">⌂</Link><span aria-hidden="true">›</span><span>Cài đặt</span><span aria-hidden="true">›</span><strong>Cài đặt tài khoản</strong></nav>
+      <nav className="settings-breadcrumb" aria-label="Đường dẫn"><Link href="/">Trang chủ</Link><span aria-hidden="true">/</span><span>Cài đặt</span><span aria-hidden="true">/</span><strong>Cài đặt tài khoản</strong></nav>
       <header className="settings-page-heading"><h1>Cài đặt tài khoản</h1><p className="muted">Quản lý thông tin cá nhân của bạn.</p></header>
       {loading ? <StatePanel kind="loading" message="Đang tải thông tin tài khoản…" /> : error ? <StatePanel kind="error" message={describeApiError(error)} action={<ErrorActions login={[401, 419].includes(error.status ?? 0)} onRetry={reload} />} /> : data ? <AccountSettingsForm key={data.id} initialUser={data} /> : null}
     </section>

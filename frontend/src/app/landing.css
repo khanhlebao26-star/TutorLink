@@ -372,14 +372,14 @@
 .public-search-trigger svg { height: 20px; width: 20px; }
 .public-search-trigger svg circle, .public-search-trigger svg path { stroke: currentColor; stroke-linecap: round; stroke-width: 1.8; }
 .public-search-trigger:hover { background: var(--accent-soft); border-color: #ff9bd1; color: var(--accent-dark); transform: translateY(-1px); }
-.public-header-favorite, .public-header-notifications { align-items: center; color: var(--brand); display: inline-flex; flex: 0 0 22px; height: 30px; justify-content: center; position: relative; transition: color .16s ease, transform .16s ease; width: 22px; }
+.public-header-messages, .public-header-favorite, .public-header-notifications { align-items: center; color: var(--brand); display: inline-flex; flex: 0 0 24px; height: 30px; justify-content: center; position: relative; transition: color .16s ease, transform .16s ease; width: 24px; }
 .public-header-favorite { text-decoration: none; }
-.public-header-favorite svg, .public-header-notifications svg { height: 20px; width: 20px; }
-.public-header-favorite svg path, .public-header-notifications svg path { stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
-.public-header-favorite:hover, .public-header-notifications:hover { color: var(--accent-dark); transform: translateY(-1px); }
+.public-header-messages svg, .public-header-favorite svg, .public-header-notifications svg { height: 20px; width: 20px; }
+.public-header-messages svg path, .public-header-favorite svg path, .public-header-notifications svg path { stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.public-header-messages:hover, .public-header-favorite:hover, .public-header-notifications:hover { color: var(--accent-dark); transform: translateY(-1px); }
 .public-notification-dot { background: var(--accent); border: 2px solid #fff; border-radius: 50%; height: 9px; position: absolute; right: -1px; top: 2px; width: 9px; }
 .public-favorite-count { align-items: center; background: var(--accent); border: 2px solid #fff; border-radius: 999px; color: #fff; display: inline-flex; font-size: .52rem; font-weight: 800; height: 17px; justify-content: center; line-height: 1; min-width: 17px; padding-inline: 3px; position: absolute; right: -8px; top: 0; }
-.public-header-notifications:focus-visible { border-radius: 6px; outline: 2px solid var(--accent); outline-offset: 3px; }
+.public-header-messages:focus-visible, .public-header-notifications:focus-visible { border-radius: 6px; outline: 2px solid var(--accent); outline-offset: 3px; }
 
 @media (max-width: 1000px) {
   .landing-inner { padding-inline: 32px; }

@@ -181,9 +181,8 @@ export function ListingDetail({ slug }: { slug: string }) {
 
   return <section className="content-stack listing-detail-page">
     <nav className="public-breadcrumb listing-breadcrumb" aria-label="Đường dẫn">
-      <Link href="/marketplace">Marketplace</Link><span aria-hidden="true">›</span>
-      {data.category_name ? <><span>{data.category_name}</span><span aria-hidden="true">›</span></> : null}
-      {data.subcategory_name ? <><span>{data.subcategory_name}</span><span aria-hidden="true">›</span></> : null}
+      <Link href="/">Trang chủ</Link><span aria-hidden="true">/</span>
+      <Link href="/marketplace">Gia sư</Link><span aria-hidden="true">/</span>
       <span aria-current="page">{data.title}</span>
     </nav>
 

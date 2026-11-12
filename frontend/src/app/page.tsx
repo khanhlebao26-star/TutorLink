@@ -103,7 +103,7 @@ export default function Home() {
               <p className="landing-eyebrow">VÌ SAO CHỌN TUTORLINK?</p>
               <h2 id="landing-features-title">Đồng hành đúng cách,<br /><span>tiến bộ mỗi ngày</span></h2>
               <p>Chúng tôi giúp bạn tìm đúng người hướng dẫn, trao đổi rõ ràng và theo dõi hành trình phát triển trong một không gian duy nhất.</p>
-              <Link className="landing-why-link" href="/become-a-tutor">Tìm hiểu về TutorLink <span aria-hidden="true">→</span></Link>
+              <Link className="landing-why-link" href="/about">Tìm hiểu về TutorLink <span aria-hidden="true">→</span></Link>
             </div>
             <div className="landing-why-cards">
               {platformFeatures.map((feature) => <article className={`landing-why-card landing-why-card-${feature.icon}`} key={feature.icon}>

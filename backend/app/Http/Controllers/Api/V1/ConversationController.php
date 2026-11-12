@@ -29,6 +29,17 @@ class ConversationController extends Controller
 {
     private const ERROR_RESPONSE_TYPE = 'array{code:string,message:string,request_id:string,errors:object|array<string,list<string>>}';
 
+    public function unreadCount(Request $request, ReadConversations $read): JsonResponse
+    {
+        if (! in_array($request->user()->role, ['customer', 'tutor'], true)) {
+            return response()->json(['data' => ['count' => 0]], 200, ['Cache-Control' => 'private, no-store']);
+        }
+
+        $count = DB::query()->fromSub($read->query($request->user()), 'inbox')->sum('unread_count');
+
+        return response()->json(['data' => ['count' => (int) $count]], 200, ['Cache-Control' => 'private, no-store']);
+    }
+
     /**
      * Create, reuse or reopen one Customer–Tutor Conversation.
      *
@@ -209,9 +220,9 @@ class ConversationController extends Controller
         return $validator->validated();
     }
 
-    /** Send a new text message or replay the current sender's idempotency key. */
+    /** Send a text or file attachment message, or replay the sender's idempotency key. */
     #[OpenApiResponse(200, description: 'Same key and canonical payload: existing message, no new side effects or quota charge.', type: 'array{data:MessageResource}')]
-    #[OpenApiResponse(201, description: 'New text message persisted atomically.', type: 'array{data:MessageResource}')]
+    #[OpenApiResponse(201, description: 'New text or attachment message persisted atomically.', type: 'array{data:MessageResource}')]
     #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(403, description: 'The actor is inactive or is not an allowed participant role.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(404, description: 'Conversation not found in the actor membership.', type: self::ERROR_RESPONSE_TYPE)]

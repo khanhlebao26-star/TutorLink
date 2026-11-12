@@ -17,7 +17,7 @@ class SendTextMessage
     /**
      * The payload has already passed SendTextMessageRequest validation.
      *
-     * @param  array{client_message_id:string,message_type:string,body:string,file_ids?:array}  $data
+     * @param  array{client_message_id:string,message_type:string,body:?string,file_ids?:array}  $data
      * @return array{message:stdClass,created:bool}
      */
     public function execute(User $actor, int $conversationId, array $data, string $requestId): array
@@ -64,8 +64,13 @@ class SendTextMessage
             }
 
             $key = strtolower($data['client_message_id']);
-            $body = str_replace(["\r\n", "\r"], "\n", $data['body']);
-            $hash = $this->payloadHash($conversationId, 'text', $body, []);
+            $fileIds = array_values(array_unique(array_map('intval', $data['file_ids'] ?? [])));
+            sort($fileIds);
+            $type = $fileIds ? 'file' : 'text';
+            $body = isset($data['body']) && $data['body'] !== ''
+                ? str_replace(["\r\n", "\r"], "\n", $data['body'])
+                : null;
+            $hash = $this->payloadHash($conversationId, $type, $body, $fileIds);
             $existing = DB::table('messages')->where('sender_id', $currentActor->id)->where('client_message_id', $key)->first();
 
             if ($existing !== null) {
@@ -105,6 +110,26 @@ class SendTextMessage
                 $this->fail(409, 'conversation_unavailable', 'This relationship is not available for new messages.', $requestId);
             }
 
+            $files = collect();
+            if ($fileIds) {
+                $files = DB::table('files')->whereIn('id', $fileIds)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+                if ($files->count() !== count($fileIds)) {
+                    $this->fail(422, 'invalid_message_attachments', 'One or more attachments are unavailable.', $requestId);
+                }
+                foreach ($fileIds as $fileId) {
+                    $file = $files->get($fileId);
+                    if (
+                        $file === null
+                        || (int) $file->owner_id !== (int) $currentActor->id
+                        || $file->purpose !== 'message_attachment'
+                        || $file->visibility !== 'private'
+                        || $file->scan_status !== 'clean'
+                    ) {
+                        $this->fail(422, 'invalid_message_attachments', 'Attachments must be complete private files uploaded by you.', $requestId);
+                    }
+                }
+            }
+
             $now = CarbonImmutable::now('UTC');
             $recent = DB::table('messages')->where('sender_id', $currentActor->id)
                 ->whereIn('message_type', ['text', 'file'])
@@ -127,16 +152,28 @@ class SendTextMessage
                 'conversation_id' => $conversationId,
                 'sender_id' => $currentActor->id,
                 'client_message_id' => $key,
-                'message_type' => 'text',
+                'message_type' => $type,
                 'body' => $body,
                 'payload_hash' => $hash,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ]);
 
-            ConversationMessagesChanged::dispatch($conversationId);
+            foreach ($fileIds as $fileId) {
+                DB::table('file_links')->insert([
+                    'file_id' => $fileId,
+                    'resource_type' => 'message',
+                    'resource_id' => $id,
+                    'purpose' => 'message_attachment',
+                    'created_at' => $timestamp,
+                ]);
+            }
 
-            return ['message' => DB::table('messages')->where('id', $id)->first(), 'created' => true];
+            ConversationMessagesChanged::dispatch($conversationId);
+            $message = DB::table('messages')->where('id', $id)->first();
+            $message->attachments = $files->values();
+
+            return ['message' => $message, 'created' => true];
         }, 3);
     }
 

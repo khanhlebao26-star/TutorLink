@@ -30,6 +30,7 @@ export interface Message {
   client_message_id: string;
   message_type: string;
   body: string | null;
+  attachments?: Array<{ id: number; name: string; mime_type: string; size_bytes: number }>;
   created_at: string;
 }
 export async function conversations(cursor?: string, signal?: AbortSignal) {
@@ -77,13 +78,14 @@ export async function messages(
     })
   ).data;
 }
-export async function sendMessage(id: number, body: string, clientId: string) {
+export async function sendMessage(id: number, body: string, clientId: string, fileIds: number[] = []) {
+  const messageType = fileIds.length ? "file" : "text";
   return (
     await request<{ data: Message }>(
       {
         method: "POST",
         url: `/conversations/${id}/messages`,
-        data: { message_type: "text", body, client_message_id: clientId },
+        data: { message_type: messageType, body: body || null, ...(fileIds.length ? { file_ids: fileIds } : {}), client_message_id: clientId },
       },
       true,
     )

@@ -37,6 +37,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
         Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read']);
+        Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll']);
         Route::get('/programs/{program}/review', [ReviewController::class, 'show'])->whereNumber('program');
         Route::get('/admin/reviews', [ReviewController::class, 'index']);
@@ -155,6 +156,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/tasks/{task}/submission/request-revision', [TaskController::class, 'requestRevision'])->whereNumber('task');
         Route::post('/conversations', [ConversationController::class, 'store'])
             ->name('conversations.store');
+        Route::get('/conversations/unread-count', [ConversationController::class, 'unreadCount']);
         Route::get('/conversations', [ConversationController::class, 'index'])
             ->name('conversations.index');
 

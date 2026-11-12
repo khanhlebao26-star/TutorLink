@@ -586,18 +586,46 @@
 @media (prefers-reduced-motion: reduce) { .favorites-loading-heart, .favorites-loading-avatar, .favorites-loading-copy i, .favorites-loading-actions i, .favorites-loading-status i { animation: none; } }
 
 /* Updated public tutor profile visual system */
+.tutor-profile-identity { align-items: center; display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 1; }
+.tutor-profile-avatar-verified { align-items: center; background: #10b981; border: 3px solid #fff; border-radius: 50%; bottom: 1px; box-shadow: 0 3px 8px #05966924; color: #fff; display: flex; height: 30px; justify-content: center; position: absolute; right: 1px; width: 30px; z-index: 2; }
+.tutor-profile-avatar-verified svg { height: 19px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.4; width: 19px; }
+.tutor-profile-socials { align-items: center; display: flex; gap: 10px; }
+.tutor-profile-socials > a, .tutor-profile-socials > span { align-items: center; background: #ffffffb3; border: 1px solid #e6dfef; border-radius: 50%; color: #53617d; display: inline-flex; height: 32px; justify-content: center; width: 32px; }
+.tutor-profile-socials svg { height: 15px; width: 15px; }
+.tutor-profile-socials > span { opacity: .55; }
+.tutor-profile-socials a:hover { background: #fff; border-color: #f41498; color: #d80c83; }
+.tutor-profile-socials a:focus-visible { outline: 3px solid #ed159550; outline-offset: 3px; }
+.tutor-profile-highlights { align-items: center; border-top: 1px solid #efdfeb; display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 18px; padding-top: 14px; }
+.tutor-profile-highlights > span { align-items: center; display: inline-flex; gap: 5px; }
+.tutor-profile-highlights > span:not(:first-child)::before { background: #cfd5e1; border-radius: 50%; content: ""; height: 3px; margin-right: 10px; width: 3px; }
+.tutor-profile-highlights small { color: #7180a0; font-size: .67rem; }
+.tutor-profile-student-total > strong { color: #0b1b4b; font-size: .85rem; }
+.tutor-profile-response svg { color: #0aaf89; height: 15px; width: 15px; }
+.tutor-profile-response strong { color: #0b1b4b; font-weight: 600; }
+.tutor-profile-trust { background: #ffffffed; border: 1px solid #fce8ef; border-radius: 16px; box-shadow: 0 6px 20px #2025460a; min-width: 0; padding: 20px; position: relative; z-index: 1; }
+.tutor-profile-trust-top { align-items: center; border-bottom: 1px solid #faedf3; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; padding-bottom: 13px; }
+.tutor-profile-trust-top > span { align-items: center; background: #ecfdf5; border: 1px solid #b4f3db; border-radius: 99px; color: #07876d; display: inline-flex; font-size: .59rem; font-weight: 700; gap: 5px; padding: 4px 8px; }
+.tutor-profile-trust-top i { background: #10b981; border-radius: 50%; height: 5px; width: 5px; }
+.tutor-profile-trust-top small { color: #98a4ba; font-size: .48rem; font-weight: 700; letter-spacing: .08em; }
+.tutor-profile-trust h2 { align-items: center; color: #293449; display: flex; font-size: .82rem; gap: 7px; line-height: 1.5; margin: 14px 0 4px; }
+.tutor-profile-trust h2 svg { color: #f41478; flex-shrink: 0; height: 19px; width: 19px; }
+.tutor-profile-trust p { color: #7c889f; font-size: .65rem; line-height: 1.7; margin: 0; }
+.tutor-profile-trust ul { display: grid; gap: 10px; list-style: none; margin: 16px 0; padding: 0; }
+.tutor-profile-trust li { align-items: center; color: #5f6b82; display: flex; font-size: .62rem; gap: 8px; line-height: 1.5; }
+.tutor-profile-trust li > span { align-items: center; background: #d1fae5; border-radius: 50%; color: #059669; display: inline-flex; flex: 0 0 14px; font-size: .55rem; height: 14px; justify-content: center; }
+.tutor-profile-trust-footer { align-items: center; border-top: 1px solid #f1f3f7; color: #8e9bb1; display: flex; flex-wrap: wrap; font-size: .52rem; gap: 8px; justify-content: space-between; padding-top: 13px; }
+.tutor-profile-trust-footer strong { color: #099b7a; font-size: inherit; }
 .tutor-profile-redesign { isolation: isolate; overflow: visible; position: relative; }
 .tutor-profile-inner { gap: 22px; }
-.tutor-profile-hero { background: linear-gradient(100deg, #f7f2ff 0%, #fff 46%, #fff4fb 100%); border: 1px solid #eee6fa; border-radius: 22px; gap: clamp(18px, 2.2vw, 34px); grid-template-columns: minmax(150px, 188px) minmax(0, 1fr) minmax(320px, auto); min-height: 190px; overflow: hidden; padding: 14px clamp(18px, 2.6vw, 38px); position: relative; }
+.tutor-profile-hero { background: linear-gradient(110deg, #fff3f5 0%, #faf6ff 50%, #f4f7ff 100%); border: 1px solid #eee6fa; border-radius: 22px; gap: clamp(18px, 2.2vw, 34px); grid-template-columns: 150px minmax(0, 1fr) 300px; min-height: 260px; overflow: hidden; padding: 26px clamp(18px, 2.6vw, 38px); position: relative; }
 .tutor-profile-hero::after { background: radial-gradient(ellipse at 100% 50%, #f3dfff 0, #fbeafa 35%, transparent 65%); content: ""; inset: 0 0 0 68%; pointer-events: none; position: absolute; z-index: 0; }
 .tutor-profile-media { position: relative; z-index: 1; }
-.tutor-profile-media { background: linear-gradient(140deg, #f4e9ff, #fce5f4); border: 4px solid #fff; border-radius: 50%; box-shadow: 0 8px 28px #7625a51a; min-height: 166px; width: 166px; }
-.tutor-profile-media::before { height: 150px; right: -55px; top: -95px; width: 150px; }
-.tutor-profile-media::after { height: 100px; left: -50px; width: 120px; }
-.tutor-profile-media .public-avatar-large { flex-basis: 138px; font-size: 2.8rem; height: 138px; width: 138px; }
+.tutor-profile-media { background: linear-gradient(140deg, #f4e9ff, #fce5f4); border: 4px solid #fff; border-radius: 50%; box-shadow: 0 8px 28px #7625a51a; min-height: 150px; overflow: visible; width: 150px; }
+.tutor-profile-media::before, .tutor-profile-media::after { display: none; }
+.tutor-profile-media .public-avatar-large { flex-basis: 134px; font-size: 2.8rem; height: 134px; width: 134px; }
 .tutor-profile-media-note { bottom: 2px; font-size: .55rem; left: 50%; transform: translateX(-50%); white-space: nowrap; }
 .tutor-profile-intro, .tutor-profile-actions { position: relative; z-index: 1; }
-.tutor-profile-intro h1 { font-size: clamp(2rem, 3.3vw, 2.8rem); }
+.tutor-profile-intro h1 { font-size: clamp(1.8rem, 3.1vw, 2.7rem); overflow-wrap: anywhere; }
 .tutor-profile-intro > .eyebrow { font-size: .68rem; }
 .tutor-profile-headline { font-size: .98rem; }
 .tutor-profile-location { font-size: .82rem; }
@@ -645,6 +673,8 @@
 
 @media (max-width: 1180px) {
   .tutor-profile-hero { grid-template-columns: minmax(135px, 166px) minmax(0, 1fr); }
+  .tutor-profile-trust { grid-column: 2; }
+  .tutor-profile-identity { align-self: start; grid-row: span 2; }
   .tutor-profile-media { min-height: 150px; width: 150px; }
   .tutor-profile-media .public-avatar-large { flex-basis: 124px; height: 124px; width: 124px; }
   .tutor-profile-actions { grid-column: 2; justify-content: flex-start; }
@@ -654,11 +684,15 @@
   .tutor-profile-tabs { gap: 8px; justify-content: space-between; overflow-x: auto; }
   .tutor-profile-tabs button { flex: 0 0 auto; font-size: .72rem; padding-inline: 7px; }
   .tutor-profile-hero { border-radius: 17px; padding: 18px; }
+  .tutor-profile-trust { grid-column: 1 / -1; width: 100%; }
+  .tutor-profile-identity { grid-row: auto; }
   .tutor-profile-actions { grid-column: 1 / -1; }
 }
 
 @media (max-width: 560px) {
   .tutor-profile-hero { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .tutor-profile-identity { justify-self: center; }
+  .tutor-profile-highlights > span:not(:first-child)::before { display: none; }
   .tutor-profile-media { min-height: 154px; width: 154px; }
   .tutor-profile-actions { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; }
   .tutor-profile-actions > .button, .tutor-profile-actions .listing-secondary-action { width: 100%; }
@@ -722,7 +756,7 @@
   .tutor-profile-carousel-arrow svg { height: 16px; width: 16px; }
   .tutor-profile-redesign { padding-top: 10px; }
   .tutor-profile-hero { grid-template-columns: minmax(0, 1fr); }
-  .tutor-profile-media { min-height: 190px; }
+  .tutor-profile-media { min-height: 154px; }
   .tutor-profile-intro { padding-inline: 3px; }
   .tutor-profile-actions { grid-column: 1; grid-template-columns: minmax(0, 1fr); }
   .tutor-profile-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }

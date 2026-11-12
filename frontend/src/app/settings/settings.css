@@ -5,6 +5,13 @@
 .settings-page-heading h1 { font-size: clamp(1.75rem, 2.4vw, 2.25rem); letter-spacing: -.04em; margin: 0 0 2px; }
 .settings-page-heading p { font-size: .9rem; margin: 0; }
 .settings-content-stack { display: grid; gap: 14px; }
+.settings-shortcuts { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.settings-shortcuts a { align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 14px; color: var(--brand); display: grid; gap: 2px 12px; grid-template-columns: 42px minmax(0, 1fr) 20px; padding: 14px 16px; text-decoration: none; }
+.settings-shortcuts a:hover { background: #fff7fb; border-color: #f4a8d0; }
+.settings-shortcuts a > span { align-items: center; background: var(--accent-soft); border-radius: 12px; color: var(--accent-dark); display: inline-flex; font-size: 1.1rem; font-weight: 800; grid-row: 1 / span 2; height: 42px; justify-content: center; width: 42px; }
+.settings-shortcuts strong { font-size: .9rem; }
+.settings-shortcuts small { color: var(--muted); font-size: .76rem; }
+.settings-shortcuts b { color: var(--accent); grid-column: 3; grid-row: 1 / span 2; }
 .settings-form { display: grid; gap: 14px; padding: 18px; }
 .settings-card-heading { border-bottom: 1px solid var(--line); margin-bottom: 0; padding-bottom: 10px; }
 .settings-grid h2, .settings-form h2 { font-size: 1rem; margin: 0; }
@@ -36,6 +43,7 @@
 .settings-account-status { color: var(--muted); font-size: .72rem; margin: 0; }
 .settings-account-status strong { color: var(--brand); }
 @media (max-width: 640px) {
+  .settings-shortcuts { grid-template-columns: minmax(0, 1fr); }
   .settings-form { padding: 14px; }
   .settings-avatar-row { grid-template-columns: 1fr 1fr; gap: 12px; }
   .settings-avatar-row > .settings-field-label { grid-column: 1 / -1; padding-top: 0; }

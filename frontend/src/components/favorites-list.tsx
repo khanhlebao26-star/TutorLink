@@ -129,7 +129,7 @@ export function FavoritesList() {
   }
 
   return <section className="favorites-page" aria-labelledby="favorites-title">
-    <div className="favorites-breadcrumb"><span aria-hidden="true">⌂</span><span aria-hidden="true">›</span><span>Yêu thích</span></div>
+    <nav className="favorites-breadcrumb" aria-label="Đường dẫn"><Link href="/">Trang chủ</Link><span aria-hidden="true">/</span><span>Yêu thích</span></nav>
     <h1 id="favorites-title">Tutor yêu thích</h1>
     <p className="favorites-intro">Các tutor bạn đã lưu. Bạn có thể xem lại thông tin, dịch vụ hoặc bỏ yêu thích bất cứ lúc nào.</p>
     {error ? <p className="favorites-error" role="alert">{error}</p> : null}

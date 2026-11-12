@@ -324,13 +324,14 @@ textarea { min-height: 96px; resize: vertical; }
 .authenticated-public-topbar .account-menu { flex: 0 0 auto; }
 .authenticated-frame .app-layout { min-height: calc(100vh - 76px); }
 .app-layout { display: grid; grid-template-columns: 180px minmax(0, 1fr); min-height: calc(100vh - 61px); width: 100%; }
+.sidebar-hidden-shell .app-layout { display: block; }
 .app-sidebar { background: #fff; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 18px; padding: 24px 12px 16px; }
 .sidebar-label { color: #8390b0; font-size: .7rem; font-weight: 800; letter-spacing: .09em; margin: 0 12px; text-transform: uppercase; }
 .sidebar-nav { display: grid; gap: 4px; }
 .teaching-management { margin: 12px 0 32px; }
 .teaching-management-heading h1 { font-size: clamp(1.65rem, 2.4vw, 2.25rem); margin: 0 0 8px; }
 .teaching-management-heading p { color: var(--muted); margin: 0 0 24px; line-height: 1.6; }
-.teaching-management-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.teaching-management-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .teaching-management-tabs a { display: flex; align-items: center; gap: 14px; border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; background: white; color: var(--brand); transition: background .18s, border-color .18s; }
 .teaching-management-tabs a:hover { background: #faf6ff; border-color: #d6b8f5; }
 .teaching-management-tabs a[aria-current="page"] { background: #fff2f9; border-color: var(--accent); box-shadow: inset 0 -3px var(--accent); }
@@ -342,6 +343,7 @@ textarea { min-height: 96px; resize: vertical; }
 .teaching-management ~ .owner-listings h1, .teaching-management ~ .workspace-page h1 { font-size: 1.6rem; }
 .teaching-management ~ .workspace-page .program-status-filters { grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); }
 @media (max-width: 640px) {
+  .teaching-management-tabs { grid-template-columns: minmax(0, 1fr); }
   .teaching-management-tabs a { padding: 14px 10px; gap: 8px; }
   .teaching-management-tabs small { display: none; }
   .teaching-tab-icon { width: 32px; height: 32px; }
@@ -357,6 +359,30 @@ textarea { min-height: 96px; resize: vertical; }
 .app-main { background: #fff; min-width: 0; width: 100%; }
 .app-main .page-content { margin: 0; max-width: none; min-width: 0; padding: 20px clamp(16px, 2vw, 32px) 48px; width: 100%; }
 .profile-shell .app-main .page-content { padding: 20px 15px 48px; }
+.tutor-workspace-shell .app-main .page-content { margin: 0 auto; max-width: 1240px; padding: 24px clamp(16px, 3vw, 40px) 56px; }
+.tutor-workspace-profile { background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 14px 36px rgba(20, 35, 79, .06); margin: 0 auto 26px; overflow: hidden; }
+.tutor-profile-cover { background: radial-gradient(ellipse at 18% 20%, rgba(255,255,255,.65), transparent 30%), linear-gradient(120deg, #f9ddec 0%, #f2e9ff 48%, #dfeaff 100%); height: clamp(130px, 18vw, 220px); position: relative; }
+.tutor-profile-cover::after { background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.3) 35% 58%, transparent 58%); content: ""; inset: 0; position: absolute; }
+.tutor-profile-identity { align-items: end; display: flex; gap: 22px; min-height: 126px; padding: 0 30px 20px; }
+.tutor-profile-avatar { align-items: center; background: linear-gradient(140deg, #ed168f, #873cef); border: 6px solid #fff; border-radius: 50%; box-shadow: 0 6px 18px rgba(27, 33, 76, .15); color: #fff; display: flex; flex: 0 0 138px; font-size: 2.3rem; font-weight: 800; height: 138px; justify-content: center; margin-top: -60px; position: relative; }
+.tutor-profile-name { padding-bottom: 2px; }
+.tutor-profile-name p { color: var(--accent-dark); font-size: .72rem; font-weight: 800; letter-spacing: .08em; margin: 0 0 4px; }
+.tutor-profile-name h1 { color: var(--brand); font-size: clamp(1.6rem, 3vw, 2.1rem); letter-spacing: -.035em; margin: 0; }
+.tutor-profile-name span { color: var(--muted); display: block; font-size: .9rem; margin-top: 4px; }
+.tutor-profile-tabs { border-top: 1px solid #edf0f7; display: flex; gap: clamp(18px, 4vw, 50px); overflow-x: auto; padding: 0 30px; }
+.tutor-profile-tabs a { border-bottom: 3px solid transparent; color: #63718d; flex: 0 0 auto; font-size: .9rem; font-weight: 700; padding: 16px 2px 13px; text-decoration: none; }
+.tutor-profile-tabs a:hover { color: var(--accent-dark); }
+.tutor-profile-tabs a[aria-current="page"] { border-bottom-color: var(--accent); color: var(--accent-dark); }
+@media (max-width: 640px) {
+  .tutor-workspace-shell .app-main .page-content { padding: 14px 12px 36px; }
+  .tutor-profile-cover { height: 130px; }
+  .tutor-profile-identity { align-items: center; gap: 12px; min-height: 95px; padding: 0 14px 12px; }
+  .tutor-profile-avatar { border-width: 4px; flex-basis: 90px; font-size: 1.6rem; height: 90px; margin-top: -38px; }
+  .tutor-profile-name h1 { font-size: 1.35rem; }
+  .tutor-profile-name span { font-size: .78rem; }
+  .tutor-profile-tabs { gap: 22px; padding-inline: 16px; }
+  .tutor-profile-tabs a { font-size: .82rem; }
+}
 
 .table-wrap { border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; }
 .data-table { border-collapse: collapse; min-width: 680px; width: 100%; }
@@ -382,9 +408,11 @@ textarea { min-height: 96px; resize: vertical; }
 .checkbox-field { align-items: center; display: flex; gap: 10px; }
 .checkbox-field input { min-height: 0; width: auto; }
 .notifications-page { gap: 16px; margin-inline: auto; max-width: 1160px; }
+.app-layout:has(.notifications-page) { display: block; }
 .notification-heading { align-items: flex-start; display: grid; grid-template-columns: minmax(0, 1fr) auto; }
 .notification-breadcrumb { align-items: center; color: #7584a5; display: flex; font-size: .8rem; gap: 10px; grid-column: 1 / -1; margin-bottom: 4px; }
 .notification-breadcrumb strong { color: var(--brand); font-weight: 700; }
+.notification-breadcrumb a { color: inherit; text-decoration: none; }
 .notification-heading h1 { font-size: clamp(1.7rem, 2vw, 2.05rem); grid-column: 1; margin: 0; }
 .notification-heading > p { color: var(--muted); font-size: .9rem; grid-column: 1; line-height: 1.5; margin: 2px 0 0; }
 .notification-mark-all { align-self: center; grid-column: 2; grid-row: 2 / span 2; }
@@ -392,6 +420,12 @@ textarea { min-height: 96px; resize: vertical; }
 .notification-mark-all .button { background: #fff; border-color: #ff4ca9; box-shadow: none; color: var(--accent-dark); font-size: .82rem; min-height: 40px; }
 .notification-mark-all .button::before { content: "✓"; font-size: .95rem; margin-right: 8px; }
 .notification-mark-all .button:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-dark); }
+.notification-filters { align-items: center; border-bottom: 1px solid #e8edf7; display: flex; flex-wrap: wrap; gap: 9px; padding-bottom: 15px; }
+.notification-filters button { align-items: center; background: #fff; border: 1px solid #e2e7f0; border-radius: 9px; color: #53617d; cursor: pointer; display: inline-flex; font: inherit; font-size: .78rem; gap: 8px; padding: 8px 13px; }
+.notification-filters button.is-active { background: #10234f; border-color: #10234f; color: #fff; font-weight: 700; }
+.notification-filters button > span { background: #fce4f1; border-radius: 99px; color: #e31382; font-size: .68rem; padding: 2px 6px; }
+.notification-load-more { display: flex; justify-content: center; padding: 8px 0 16px; }
+.notification-load-more .button { border-color: #e2e7f0; border-radius: 99px; }
 .notification-group { background: #fff; border: 1px solid #e1e7f4; border-radius: 14px; padding: 18px 20px 4px; }
 .notification-group h2 { border-bottom: 1px solid #e8edf7; color: var(--brand); font-size: 1rem; margin: 0; padding: 0 0 12px; }
 .notification-group-list { display: grid; }
@@ -416,8 +450,19 @@ textarea { min-height: 96px; resize: vertical; }
 .notification-row-action .button { background: #fff; border-color: #12275b; box-shadow: none; color: #10234f; font-size: .73rem; min-height: 36px; padding: 7px 12px; white-space: nowrap; }
 .notification-row-action .button:hover { background: #f5f7fc; border-color: #10234f; color: #10234f; }
 .notification-read-label { color: #8490aa; font-size: .73rem; white-space: nowrap; }
-.notification-more, .notification-more-placeholder { align-items: center; color: #10234f; display: inline-flex; font-size: 1.2rem; height: 28px; justify-content: center; text-decoration: none; width: 18px; }
+.notification-more-wrapper { align-self: start; position: relative; }
+.notification-more, .notification-more-placeholder { align-items: center; background: transparent; border: 0; border-radius: 6px; color: #10234f; cursor: pointer; display: inline-flex; font: inherit; font-size: 1.2rem; height: 28px; justify-content: center; text-decoration: none; width: 18px; }
 .notification-more:hover { color: var(--accent-dark); }
+.notification-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.notification-more-menu { background: #fff; border: 1px solid #e2e7f0; border-radius: 10px; box-shadow: 0 10px 28px #12275b1a; display: grid; gap: 3px; min-width: 180px; padding: 6px; position: absolute; right: 0; top: calc(100% + 4px); z-index: 20; }
+.notification-more-menu > a, .notification-menu-status, .notification-delete-action { background: transparent; border: 0; border-radius: 6px; color: #263657; cursor: pointer; display: block; font: inherit; font-size: .76rem; padding: 9px 10px; text-align: left; text-decoration: none; white-space: nowrap; }
+.notification-more-menu > a:hover { background: #f6f3fa; color: var(--accent-dark); }
+.notification-delete-action { color: #c81e4b; width: 100%; }
+.notification-delete-action:hover { background: #fff1f3; color: #a30e36; }
+.notification-menu-action form, .notification-menu-action .workspace-fields { display: contents; }
+.notification-menu-action .button { background: transparent; border: 0; border-radius: 6px; box-shadow: none; color: #263657; display: block; font-size: .76rem; min-height: 0; padding: 9px 10px; text-align: left; white-space: nowrap; width: 100%; }
+.notification-menu-action .button:hover { background: #f6f3fa; color: var(--accent-dark); }
+.notification-menu-status { color: #8490aa; cursor: default; }
 .notifications-page .state-panel { margin: 0; }
 .notifications-page .workspace-fields:empty { display: none; }
 @media (max-width: 760px) {
@@ -427,9 +472,11 @@ textarea { min-height: 96px; resize: vertical; }
   .notification-icon { height: 40px; width: 40px; }
   .notification-time { grid-column: 3; grid-row: 2; padding-top: 0; }
   .notification-row-action { grid-column: 3; grid-row: 3; }
-  .notification-more, .notification-more-placeholder { grid-column: 4; grid-row: 1; }
+  .notification-more-wrapper, .notification-more-placeholder { grid-column: 4; grid-row: 1; }
 }
 @media (max-width: 480px) {
+  .notification-filters { flex-wrap: nowrap; overflow-x: auto; }
+  .notification-filters button { flex: 0 0 auto; }
   .notification-group { padding: 15px 12px 2px; }
   .notification-row { gap: 9px; grid-template-columns: 8px 36px minmax(0, 1fr) 16px; }
   .notification-icon { height: 36px; width: 36px; }

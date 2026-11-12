@@ -1,11 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "./app-shell";
 import { ApiState } from "./api-state";
 import { WorkspaceForm } from "./workspace-form";
 import { Button, StatePanel } from "./ui";
 import { workspaceRead, type Collection } from "@/lib/data/workspace";
+import { request } from "@/lib/api/client";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 interface Notification {
   id: string;
@@ -43,13 +44,16 @@ const notificationLabels: Record<string, string> = {
 };
 export function Notifications() {
   return (
-    <AppShell title="">
+    <AppShell title="" hideSidebar>
       <NotificationList />
     </AppShell>
   );
 }
 function NotificationList() {
   const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState<NotificationFilter>("all");
+  const [olderNotifications, setOlderNotifications] = useState<Notification[]>([]);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
   const load = useCallback(
     async () => ({
       items: await workspaceRead<Collection<Notification>>("/notifications", {
@@ -63,14 +67,27 @@ function NotificationList() {
     [page],
   );
   const result = useAsyncData(load);
-  const notifications = result.data?.items.data ?? [];
+  const currentNotifications = result.data?.items.data;
+  const notifications = useMemo(() => {
+    const uniqueNotifications = new Map([...olderNotifications, ...(currentNotifications ?? [])].map((notification) => [notification.id, notification]));
+    return [...uniqueNotifications.values()];
+  }, [olderNotifications, currentNotifications]);
+  const filteredNotifications = notifications.filter((notification) => !deletedIds.includes(notification.id) && matchesNotificationFilter(notification, filter));
   const todayKey = new Date().toDateString();
-  const todayItems = notifications.filter((item) => new Date(item.created_at).toDateString() === todayKey);
-  const olderItems = notifications.filter((item) => new Date(item.created_at).toDateString() !== todayKey);
+  const todayItems = filteredNotifications.filter((item) => new Date(item.created_at).toDateString() === todayKey);
+  const olderItems = filteredNotifications.filter((item) => new Date(item.created_at).toDateString() !== todayKey);
+  const lastPage = result.data?.items.meta?.last_page ?? 1;
+  const unreadCount = result.data?.count.data.count ?? 0;
+
+  function selectFilter(nextFilter: NotificationFilter) {
+    setOlderNotifications([]);
+    setPage(1);
+    setFilter(nextFilter);
+  }
   return (
     <section className="content-stack notifications-page">
       <header className="notification-heading">
-        <div className="notification-breadcrumb"><span aria-hidden="true">⌂</span><span aria-hidden="true">›</span><strong>Thông báo</strong></div>
+        <nav className="notification-breadcrumb" aria-label="Đường dẫn"><Link href="/">Trang chủ</Link><span aria-hidden="true">/</span><strong>Thông báo</strong></nav>
         <h1>Thông báo</h1>
         <p>Cập nhật mới nhất về tin nhắn, chương trình, bài tập và trạng thái hồ sơ của bạn.</p>
         {result.data && result.data.count.data.count > 0 && (
@@ -83,33 +100,62 @@ function NotificationList() {
           </div>
         )}
       </header>
+      <nav className="notification-filters" aria-label="Lọc thông báo">
+        {notificationFilters.map(({ key, label }) => <button aria-pressed={filter === key} className={filter === key ? "is-active" : ""} key={key} onClick={() => selectFilter(key)} type="button">
+          {label}{key === "unread" && unreadCount > 0 ? <span>{unreadCount}</span> : null}
+        </button>)}
+      </nav>
       <ApiState {...result} />
       {result.data && (
         <>
-          {notifications.length === 0 && <StatePanel kind="empty" message="Bạn chưa có thông báo mới. Khi có cập nhật, thông báo sẽ xuất hiện tại đây." />}
-          {todayItems.length > 0 && <NotificationGroup title={`Hôm nay (${todayItems.length})`} items={todayItems} onRead={result.reload} />}
-          {olderItems.length > 0 && <NotificationGroup title="Trước đó" items={olderItems} onRead={result.reload} />}
-          {(page > 1 || (result.data.items.meta?.last_page ?? 1) > 1) && (
-            <div className="button-row">
-              <Button disabled={page === 1} onClick={() => setPage(page - 1)}>
-                Trước
-              </Button>
-              <span>Trang {page}</span>
-              <Button
-                disabled={page >= (result.data.items.meta?.last_page ?? 1)}
-                onClick={() => setPage(page + 1)}
-              >
-                Sau
-              </Button>
-            </div>
-          )}
+          {filteredNotifications.length === 0 && <StatePanel kind="empty" message="Bạn chưa có thông báo phù hợp." />}
+          {todayItems.length > 0 && <NotificationGroup title={`Hôm nay (${todayItems.length})`} items={todayItems} onRead={result.reload} onDelete={(id) => setDeletedIds((current) => [...current, id])} />}
+          {olderItems.length > 0 && <NotificationGroup title="Trước đó" items={olderItems} onRead={result.reload} onDelete={(id) => setDeletedIds((current) => [...current, id])} />}
+          {page < lastPage ? <div className="notification-load-more"><Button variant="outline" disabled={result.loading} onClick={() => { setOlderNotifications((current) => [...current, ...(currentNotifications ?? [])]); setPage((current) => current + 1); }}>Tải thêm thông báo cũ <span aria-hidden="true">⌄</span></Button></div> : null}
         </>
       )}
     </section>
   );
 }
 
-function NotificationGroup({ title, items, onRead }: { title: string; items: Notification[]; onRead: () => void }) {
+type NotificationFilter = "all" | "unread" | "program" | "profile" | "system";
+
+const notificationFilters: Array<{ key: NotificationFilter; label: string }> = [
+  { key: "all", label: "Tất cả" },
+  { key: "unread", label: "Chưa đọc" },
+  { key: "program", label: "Khóa học & Lịch học" },
+  { key: "profile", label: "Hồ sơ & Tài khoản" },
+  { key: "system", label: "Hệ thống" },
+];
+
+function matchesNotificationFilter(notification: Notification, filter: NotificationFilter) {
+  if (filter === "all") return true;
+  if (filter === "unread") return notification.read_at === null;
+  if (filter === "program") return notification.type.startsWith("invitation_") || notification.type.startsWith("task_") || notification.type.startsWith("program_") || notification.type === "announcement_published" || notification.type === "fee_record_changed";
+  if (filter === "profile") return notification.type.startsWith("tutor_profile_") || notification.type.startsWith("listing_moderation_");
+  return notification.type.startsWith("report_");
+}
+
+function NotificationGroup({ title, items, onRead, onDelete }: { title: string; items: Notification[]; onRead: () => void; onDelete: (id: string) => void }) {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const openMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!openMenu) return;
+    function closeOnOutsideClick(event: MouseEvent) {
+      if (event.target instanceof Node && !openMenuRef.current?.contains(event.target)) setOpenMenu(null);
+    }
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpenMenu(null);
+    }
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeOnOutsideClick);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [openMenu]);
+
   return <section className="notification-group" aria-label={title}>
     <h2>{title}</h2>
     <div className="notification-group-list">
@@ -127,7 +173,23 @@ function NotificationGroup({ title, items, onRead }: { title: string; items: Not
           <div className="notification-row-action">
             {notification.read_at ? <span className="notification-read-label">Đã đọc</span> : <WorkspaceForm url={`/notifications/${notification.id}/read`} method="PATCH" label="Đánh dấu đã đọc" onSaved={onRead} />}
           </div>
-          <span className="notification-more" aria-hidden="true">⋮</span>
+          <div className="notification-more-wrapper" ref={openMenu === notification.id ? openMenuRef : null}>
+            <button aria-expanded={openMenu === notification.id} aria-haspopup="menu" aria-label={`Thao tác với thông báo: ${notificationLabels[notification.type] ?? "Thông báo mới"}`} aria-controls={`notification-menu-${notification.id}`} className="notification-more" onClick={() => setOpenMenu((current) => current === notification.id ? null : notification.id)} type="button">⋮</button>
+            {openMenu === notification.id ? <div className="notification-more-menu" id={`notification-menu-${notification.id}`} role="menu">
+              <button className="notification-delete-action" onClick={async () => {
+                if (!window.confirm("Bạn có chắc muốn xóa thông báo này?")) return;
+                try {
+                  await request({ method: "DELETE", url: `/notifications/${encodeURIComponent(notification.id)}` }, true);
+                  onDelete(notification.id);
+                  setOpenMenu(null);
+                  onRead();
+                } catch {
+                  setOpenMenu(null);
+                  window.alert("Không thể xóa thông báo. Vui lòng thử lại.");
+                }
+              }} role="menuitem" type="button">Xóa thông báo</button>
+            </div> : null}
+          </div>
         </article>;
       })}
     </div>

@@ -31,10 +31,10 @@ class SendTextMessageRequest extends FormRequest
     {
         return [
             'client_message_id' => ['required', 'uuid'],
-            'message_type' => ['required', 'string', 'in:text'],
-            'body' => ['required', 'string', 'max:4000', 'regex:/[^\s\p{Z}]/u'],
-            /** Optional empty JSON array only. Objects (including {}), null, scalar values and non-empty arrays are rejected. Chat attachments are disabled. */
-            'file_ids' => ['sometimes', 'array', 'size:0'],
+            'message_type' => ['required', 'string', 'in:text,file'],
+            'body' => ['required_if:message_type,text', 'nullable', 'string', 'max:4000', 'regex:/[^\s\p{Z}]/u'],
+            'file_ids' => ['required_if:message_type,file', 'array', 'min:1', 'max:5'],
+            'file_ids.*' => ['required', 'integer', 'distinct', 'min:1', 'exists:files,id'],
         ];
     }
 
@@ -64,14 +64,15 @@ class SendTextMessageRequest extends FormRequest
                 ? $rawPayload->file_ids
                 : $this->input('file_ids');
 
-            if (
-                array_key_exists('file_ids', $input)
-                && $fileIds !== []
-            ) {
+            if (array_key_exists('file_ids', $input) && ! is_array($fileIds)) {
                 $validator->errors()->add(
                     'file_ids',
-                    'Chat attachments are disabled. Omit file_ids or send an empty array.',
+                    'The file_ids field must be an array.',
                 );
+            }
+
+            if (($input['message_type'] ?? null) === 'text' && is_array($fileIds) && $fileIds !== []) {
+                $validator->errors()->add('file_ids', 'File attachments require a file message.');
             }
         });
     }

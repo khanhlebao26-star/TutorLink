@@ -54,6 +54,9 @@ export interface TutorPublic {
   headline: string;
   bio?: string | null;
   experience_years: number;
+  students_taught_count?: number | null;
+  response_time_minutes?: number | null;
+  social_links?: Partial<Record<"facebook" | "instagram" | "x", string>>;
   specializations: PublicTutorSpecialization[];
   availability_rules: PublicTutorAvailabilityRule[];
   listings: Pick<PublicListing, "slug" | "title" | "delivery_mode" | "city" | "district" | "price_from_minor" | "currency" | "price_unit" | "specialization_name">[];

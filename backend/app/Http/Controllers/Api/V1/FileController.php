@@ -37,7 +37,7 @@ class FileController extends Controller
                 ->header('Cache-Control', 'private, no-store');
         }
 
-        if ($file->owner_id !== $request->user()->id) {
+        if ($file->owner_id !== $request->user()->id && ! $this->canAccessMessageAttachment($request, $file)) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -200,6 +200,9 @@ class FileController extends Controller
 
         return DB::transaction(function () use ($request, $file) {
             $isOwner = $file->owner_id === $request->user()->id;
+            if (! $isOwner && $this->canAccessMessageAttachment($request, $file)) {
+                $isOwner = true;
+            }
             if (! $isOwner && $file->purpose === 'task_attachment' && $file->visibility === 'private') {
                 $taskLink = DB::table('file_links')
                     ->where('file_id', $file->id)
@@ -252,6 +255,25 @@ class FileController extends Controller
 
             return Storage::disk($file->disk)->download($file->object_key, $file->original_name);
         });
+    }
+
+    private function canAccessMessageAttachment(Request $request, File $file): bool
+    {
+        if ($file->purpose !== 'message_attachment' || $file->visibility !== 'private') {
+            return false;
+        }
+
+        return DB::table('file_links')
+            ->join('messages', 'messages.id', '=', 'file_links.resource_id')
+            ->join('conversation_members', 'conversation_members.conversation_id', '=', 'messages.conversation_id')
+            ->join('conversations', 'conversations.id', '=', 'messages.conversation_id')
+            ->where('file_links.file_id', $file->id)
+            ->where('file_links.resource_type', 'message')
+            ->where('file_links.purpose', 'message_attachment')
+            ->where('messages.message_type', 'file')
+            ->where('conversation_members.user_id', $request->user()->id)
+            ->whereIn('conversations.status', ['active', 'cancelled'])
+            ->exists();
     }
 
     public function destroy(Request $request, File $file): JsonResponse

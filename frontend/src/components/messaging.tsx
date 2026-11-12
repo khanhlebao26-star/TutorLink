@@ -1,10 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useRef, useState, type ReactNode } from "react";
+import { useCallback, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { AppShell, useActor } from "./app-shell";
 import { Badge, Button, Field, Input } from "./ui";
-import { ApiClientError, describeApiError } from "@/lib/api/client";
+import { ApiClientError, describeApiError, request } from "@/lib/api/client";
+import { completeFile, uploadFile } from "@/lib/data/services";
+import type { FileRecord } from "@/lib/data/types";
 import { usePolling } from "@/lib/hooks/use-polling";
 import {
   conversations,
@@ -34,6 +36,35 @@ export function Messaging({ id }: { id?: number }) {
 function MessagingBody({ id }: { id?: number }) {
   const actor = useActor();
   return <MessagingSession key={actor?.id ?? "guest"} id={id}/>;
+}
+
+function MessageAttachment({ file }: { file: NonNullable<Message["attachments"]>[number] }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  async function download() {
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      const response = await request<Blob>({ url: `/files/${file.id}/download`, responseType: "blob" });
+      const href = URL.createObjectURL(response.data);
+      const anchor = document.createElement("a");
+      anchor.href = href;
+      anchor.download = file.name || `tutorlink-file-${file.id}`;
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(href), 1000);
+    } catch (reason) {
+      setError(describeApiError(reason));
+    } finally {
+      setBusy(false);
+    }
+  }
+  return <div className="message-attachment-wrap">
+    <button className="message-attachment" type="button" onClick={() => void download()} disabled={busy}>
+      <span aria-hidden="true">↧</span><span><strong>{file.name}</strong><small>{busy ? "Đang tải…" : `${(file.size_bytes / 1024).toFixed(0)} KB · Tải tệp`}</small></span>
+    </button>
+    {error ? <small role="alert" className="message-attachment-error">{error}</small> : null}
+  </div>;
 }
 
 // This state lives in the shared messages layout, so switching threads keeps the inbox.
@@ -71,7 +102,11 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
     [olderBusy, setOlderBusy] = useState(false);
   const [draft, setDraft] = useState(""),
     [sending, setSending] = useState(false),
-    [failed, setFailed] = useState<{ body: string; key: string } | null>(null);
+    [failed, setFailed] = useState<{ body: string; key: string; fileIds: number[] } | null>(null);
+  const [attachments, setAttachments] = useState<FileRecord[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const attachmentInput = useRef<HTMLInputElement>(null);
   const userId=actor?.id??null;
   function conversationTime(value: string | null) {
     if (!value) return "";
@@ -143,23 +178,56 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
       setListBusy(false);
     }
   }
-  async function send(payload: { body: string; key: string }) {
+  async function send(payload: { body: string; key: string; fileIds: number[] }) {
     if (!id || sendLock.current) return;
     sendLock.current = true;
     setSending(true);
     setError("");
     setFailed(null);
     try {
-      const m = await sendMessage(id, payload.body, payload.key);
+      const m = await sendMessage(id, payload.body, payload.key, payload.fileIds);
       setHistory((previous) => mergeMessages(previous, [m]));
       setFailed(null);
       setDraft("");
+      setAttachments([]);
     } catch (e) {
       setFailed(payload);
       setError(describeApiError(e));
     } finally {
       sendLock.current = false;
       setSending(false);
+    }
+  }
+  async function chooseAttachments(event: ChangeEvent<HTMLInputElement>) {
+    const chosen = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    if (!chosen.length) return;
+    if (attachments.length + chosen.length > 5) {
+      setError("Bạn có thể đính kèm tối đa 5 tệp trong một tin nhắn.");
+      return;
+    }
+    setError("");
+    setUploading(true);
+    try {
+      for (const file of chosen) {
+        setUploadProgress(0);
+        const uploaded = await uploadFile(file, "message_attachment", setUploadProgress);
+        const complete = await completeFile(uploaded.id);
+        setAttachments((current) => [...current, complete]);
+      }
+    } catch (reason) {
+      setError(describeApiError(reason));
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
+  }
+  async function removeAttachment(file: FileRecord) {
+    setAttachments((current) => current.filter((item) => item.id !== file.id));
+    try {
+      await request({ method: "DELETE", url: `/files/${file.id}` }, true);
+    } catch {
+      // The file remains private and unlinked if cleanup is unavailable.
     }
   }
   return (
@@ -268,7 +336,9 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
                     <div className={`message-row${own ? " own" : ""}`}>
                       {!own && <span className="chat-avatar message-peer-avatar" aria-hidden="true">{current.peer.display_name[0]}</span>}
                       <article className={`message-bubble${own ? " own" : ""}`}>
-                        <p>{m.message_type === "text" ? m.body : "Tệp từ lịch sử (không hỗ trợ trong chat hiện tại)"}</p>
+                        {m.body ? <p>{m.body}</p> : null}
+                        {m.attachments?.map((file) => <MessageAttachment file={file} key={file.id} />)}
+                        {!m.body && !m.attachments?.length ? <p>Tệp đính kèm</p> : null}
                         <time dateTime={m.created_at}>{new Date(m.created_at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}{own ? <span className="message-read-mark" aria-label="Đã gửi"> ✓</span> : null}</time>
                       </article>
                     </div>
@@ -280,7 +350,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
             </div>
             {failed && (
               <div className="failed-message" role="status">
-                <p>{failed.body}</p>
+                <p>{failed.body || "Tin nhắn có tệp đính kèm"}</p>
                 <Button
                   variant="outline"
                   disabled={sending}
@@ -305,36 +375,61 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
               className="message-composer"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (draft.trim() && !failed)
-                  void send({ body: draft, key: crypto.randomUUID() });
+                if ((draft.trim() || attachments.length) && !failed && !uploading)
+                  void send({ body: draft, key: crypto.randomUUID(), fileIds: attachments.map((file) => file.id) });
               }}
             >
-              <label className="landing-sr-only" htmlFor="message-body">
-                Nội dung tin nhắn
-              </label>
-              <textarea
-                id="message-body"
-                rows={2}
-                maxLength={4000}
-                placeholder="Nhập tin nhắn…"
-                value={draft}
-                disabled={sending || !!failed || current.status !== "active"}
-                onChange={(e) => setDraft(e.target.value)}
-              />
-              <Button
-                type="submit"
-                disabled={
-                  sending ||
-                  !!failed ||
-                  !draft.trim() ||
-                  current.status !== "active"
-                }
-                aria-label="Gửi tin nhắn"
-              >
-                <span aria-hidden="true">➤</span>
-              </Button>
+              {attachments.length ? <div className="message-composer-attachments" aria-label="Tệp đính kèm">
+                {attachments.map((file) => <span className="message-composer-attachment" key={file.id}>
+                  <span aria-hidden="true">▤</span><strong title={file.original_name ?? undefined}>{file.original_name ?? "Tệp đính kèm"}</strong>
+                  <button type="button" aria-label={`Gỡ tệp ${file.original_name ?? "đính kèm"}`} disabled={sending || !!failed} onClick={() => void removeAttachment(file)}>×</button>
+                </span>)}
+              </div> : null}
+              <div className="message-composer-controls">
+                <input
+                  ref={attachmentInput}
+                  className="message-file-input"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  multiple
+                  aria-label="Chọn tệp đính kèm"
+                  onChange={(event) => void chooseAttachments(event)}
+                />
+                <button
+                  className="message-attach-button"
+                  type="button"
+                  aria-label="Đính kèm tệp"
+                  title="Đính kèm tệp (tối đa 5 MB mỗi tệp)"
+                  disabled={sending || uploading || !!failed || current.status !== "active" || attachments.length >= 5}
+                  onClick={() => attachmentInput.current?.click()}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m20.6 11.3-8.9 8.9a5.2 5.2 0 0 1-7.4-7.4l9.5-9.5a3.5 3.5 0 1 1 4.9 5l-9.5 9.4a1.7 1.7 0 0 1-2.4-2.4l8.8-8.8" /></svg>
+                </button>
+                <label className="landing-sr-only" htmlFor="message-body">
+                  Nội dung tin nhắn
+                </label>
+                <textarea
+                  id="message-body"
+                  rows={2}
+                  maxLength={4000}
+                  placeholder={attachments.length ? "Thêm lời nhắn…" : "Nhập tin nhắn…"}
+                  value={draft}
+                  disabled={sending || uploading || !!failed || current.status !== "active"}
+                  onChange={(e) => setDraft(e.target.value)}
+                />
+                <Button
+                  type="submit"
+                  disabled={
+                    sending || uploading || !!failed || (!draft.trim() && !attachments.length) || current.status !== "active"
+                  }
+                  aria-label="Gửi tin nhắn"
+                >
+                  <span aria-hidden="true">➤</span>
+                </Button>
+              </div>
+              {uploading ? <small className="message-upload-progress" role="status">Đang tải tệp lên… {uploadProgress}%</small> : null}
             </form>
-            <small className="muted message-composer-hint">Chỉ gửi văn bản · {draft.length}/4000</small>
+            <small className="muted message-composer-hint">PDF, JPG, PNG, DOC hoặc DOCX · tối đa 5 MB mỗi tệp · {draft.length}/4000</small>
           </>
         ) : (
           id ? <div className="message-thread-loading" role="status" aria-label="Đang tải cuộc trò chuyện">

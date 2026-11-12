@@ -8,14 +8,14 @@ import { getPublicTutor, getTutorReviews, searchListings, deliveryLabels, format
 import type { PublicListing, TutorReviewCollection, TutorReviewAggregate } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { PublicAvailability } from "./public-availability";
-import { FavoriteTutorButton } from "./favorite-tutor-button";
+import { tutorProfileHighlights } from "@/lib/data/tutor-profile-demo";
 import { Badge, Button, ErrorActions, StatePanel } from "./ui";
 
 function TutorSkeleton({ className = "" }: { className?: string }) {
   return <span className={`tutor-loading-skeleton ${className}`} />;
 }
 
-type TutorProfileIconName = "experience" | "services" | "specialty" | "location" | "teaching" | "subjects" | "warmup" | "practice" | "feedback" | "next";
+type TutorProfileIconName = "experience" | "services" | "specialty" | "location" | "teaching" | "subjects" | "warmup" | "practice" | "feedback" | "next" | "clock" | "shield";
 
 function TutorProfileIcon({ name }: { name: TutorProfileIconName }) {
   const shapes: Record<TutorProfileIconName, ReactNode> = {
@@ -28,11 +28,34 @@ function TutorProfileIcon({ name }: { name: TutorProfileIconName }) {
     warmup: <><path d="M4 5h16v11H8l-4 4V5Z" /><path d="M8 9h8m-8 4h5" /></>,
     practice: <><path d="M5 3h10l4 4v14H5V3Z" /><path d="M14 3v5h5M8 12h8m-8 4h8" /></>,
     feedback: <><path d="m5 12 4 4L19 6" /><circle cx="12" cy="12" r="9" /></>,
-    next: <><path d="M7 17 17 7M7 7h10v10" /></>
+    next: <><path d="M7 17 17 7M7 7h10v10" /></>,
+    clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+    shield: <><path d="m12 3 8 3v5c0 5-8 10-8 10S4 16 4 11V6l8-3Z" /><path d="m8 11 3 3 5-5" /></>,
   };
 
   return <svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" viewBox="0 0 24 24">{shapes[name]}</svg>;
 }
+
+const socialNetworks = [
+  { key: "facebook", label: "Facebook", icon: <path d="M14 21v-8h3l.5-4H14V7c0-1 .3-2 2-2h2V1.5A23 23 0 0 0 15 1c-3 0-5 2-5 5v3H7v4h3v8Z" /> },
+  { key: "instagram", label: "Instagram", icon: <><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="17.5" cy="6.5" r="1" /></> },
+  { key: "x", label: "X", icon: <path d="M18.9 2H22l-6.8 7.8L23 22h-6.2l-4.9-7.5L5.3 22H2l7.4-8.6L1 2h6.4l4.4 6.8L18.9 2Zm-1.1 18h1.7L6.5 4H4.7l13.1 16Z" /> },
+] as const;
+
+function TutorSocialLinks({ links, name }: { links: TutorPublicSocialLinks; name: string }) {
+  return <div className="tutor-profile-socials" role="group" aria-label={`Mạng xã hội của ${name}`}>
+    {socialNetworks.map(({ key, label, icon }) => {
+      const value = links?.[key];
+      const href = value && /^https?:\/\//i.test(value) ? value : null;
+      const content = <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">{icon}</svg>;
+      return href
+        ? <a key={key} href={href} target="_blank" rel="noopener noreferrer" aria-label={`${label} của ${name}`}>{content}</a>
+        : <span key={key} aria-label={`${label} chưa được cập nhật`} aria-disabled="true" title={`${label} chưa được cập nhật`}>{content}</span>;
+    })}
+  </div>;
+}
+
+type TutorPublicSocialLinks = Partial<Record<"facebook" | "instagram" | "x", string>> | undefined;
 
 function listingCover(category?: string) {
   const value = (category ?? "").toLocaleLowerCase("vi");
@@ -135,6 +158,7 @@ export function PublicTutor({ slug, initialTab = "overview" }: { slug: string; i
   const initial = name.split(/\s+/).slice(-1)[0]?.[0]?.toLocaleUpperCase() ?? "G";
   const primarySpecialization = data.specializations[0];
   const primaryListing = data.listings[0];
+  const highlights = tutorProfileHighlights(data);
   const chatContact = primaryListing ? {
     tutorName: name,
     listingTitle: primaryListing.title,
@@ -164,27 +188,40 @@ export function PublicTutor({ slug, initialTab = "overview" }: { slug: string; i
     <section className="content-stack public-tutor-page tutor-profile-redesign">
       <div className="tutor-profile-inner">
       <nav className="public-breadcrumb tutor-profile-breadcrumb" aria-label="Đường dẫn">
-        <Link href="/marketplace">Gia sư</Link><span aria-hidden="true">›</span>
-        {primarySpecialization ? <><span>{primarySpecialization.name}</span><span aria-hidden="true">›</span></> : null}
-        <span aria-current="page">Hồ sơ gia sư</span>
+        <Link href="/">Trang chủ</Link><span aria-hidden="true">/</span>
+        <span aria-current="page">{name}</span>
       </nav>
 
       <section className="tutor-profile-hero" aria-labelledby="tutor-profile-name">
-        <div className="tutor-profile-media" aria-label={`Ảnh đại diện ${name}`}>
-          <span className="public-avatar public-avatar-large" aria-hidden="true">{initial}</span>
-          <span className="tutor-profile-media-note">Hồ sơ TutorLink</span>
+        <div className="tutor-profile-identity">
+          <div className="tutor-profile-media" role="img" aria-label={`Ảnh đại diện ${name}`}>
+            <span className="public-avatar public-avatar-large" aria-hidden="true">{initial}</span>
+            <span className="tutor-profile-avatar-verified" aria-label="Hồ sơ đã xác minh"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" /></svg></span>
+          </div>
+          <TutorSocialLinks links={data.social_links} name={name} />
         </div>
         <div className="tutor-profile-intro">
           <p className="eyebrow">HỒ SƠ GIA SƯ</p>
-          <h1 id="tutor-profile-name">{name}<span className="tutor-profile-verified" aria-label="Gia sư đã xác minh">✓</span></h1>
+          <h1 id="tutor-profile-name">{name}</h1>
           <p className="tutor-profile-headline">{data.headline || "Gia sư / Huấn luyện viên"}</p>
           {city ? <p className="tutor-profile-location"><span><TutorProfileIcon name="location" /></span>{city}</p> : null}
-          {reviews.data?.aggregate.count ? <button className="tutor-profile-rating" onClick={() => selectTab("reviews")} type="button"><span aria-hidden="true">★</span><strong>{reviews.data.aggregate.average?.toFixed(1)}</strong><small>({reviews.data.aggregate.count} đánh giá)</small></button> : reviews.loading ? <span className="tutor-profile-rating-loading">Đang tải đánh giá…</span> : null}
+          <div className="tutor-profile-highlights">
+            {reviews.loading && !reviews.data ? <span className="tutor-profile-rating-loading">Đang tải đánh giá…</span> : <button className="tutor-profile-rating" onClick={() => selectTab("reviews")} type="button"><span aria-hidden="true">★</span><strong>{reviews.data?.aggregate.average?.toFixed(1) ?? "—"}</strong><small>({reviews.data?.aggregate.count ?? 0} đánh giá)</small></button>}
+            <span className="tutor-profile-student-total"><strong>{highlights.studentsTaught === null ? "—" : new Intl.NumberFormat("vi-VN").format(highlights.studentsTaught)}</strong><small>học viên đã kèm</small></span>
+            <span className="tutor-profile-response"><TutorProfileIcon name="clock" /><small>Phản hồi <strong>{highlights.responseMinutes === null ? "chưa cập nhật" : `< ${highlights.responseMinutes} phút`}</strong></small></span>
+          </div>
         </div>
-        <div className="tutor-profile-actions">
-          <OpenChatButton peerId={data.messaging_user_id} contact={chatContact} />
-          <FavoriteTutorButton slug={data.slug} />
-        </div>
+        <aside className="tutor-profile-trust" aria-labelledby="tutor-trust-title">
+          <div className="tutor-profile-trust-top"><span><i aria-hidden="true" />Hồ sơ đã xác thực</span><small>TUTORLINK</small></div>
+          <h2 id="tutor-trust-title"><TutorProfileIcon name="shield" />Bảo chứng TutorLink Trust</h2>
+          <p>An tâm kết nối và học tập cùng gia sư đã được TutorLink xét duyệt.</p>
+          <ul>
+            <li><span aria-hidden="true">✓</span>Danh tính đã được xác minh</li>
+            <li><span aria-hidden="true">✓</span>Hồ sơ gia sư đã được xét duyệt</li>
+            <li><span aria-hidden="true">✓</span>Đồng hành cùng học viên trên TutorLink</li>
+          </ul>
+          <div className="tutor-profile-trust-footer"><span>Tiêu chuẩn gia sư TutorLink</span><strong>Đã chứng thực</strong></div>
+        </aside>
       </section>
 
       <nav className="tutor-profile-tabs" role="tablist" aria-label="Nội dung hồ sơ gia sư">
