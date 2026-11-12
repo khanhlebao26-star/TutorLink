@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { Suspense, createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { TeachingManagement } from "./teaching-management";
 import { dataMode, describeApiError, ApiClientError, request, setAuthHint } from "@/lib/api/client";
 import { getCurrentUser } from "@/lib/data/services";
+import { getMarketplaceCatalog } from "@/lib/data/marketplace";
 import { favoriteUpdateEvent, getFavoriteTutors } from "@/lib/data/favorites";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
+import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { LogoutButton } from "./logout-button";
 import { PublicFooter } from "./public-footer";
 import { FavoritesLoadingState } from "./favorites-loading-state";
@@ -149,6 +152,13 @@ function AccountMenu({ user }: { user: User }) {
             <Link href="/messages" onClick={() => setOpen(false)}>Tin nhắn</Link>
             <Link href="/notifications" onClick={() => setOpen(false)}>Thông báo</Link>
             <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt</Link>
+          </nav> : user.role === "tutor" ? <nav className="account-menu-links" aria-label="Điều hướng tài khoản gia sư">
+            <Link href="/profile" onClick={() => setOpen(false)}>Hồ sơ Tutor</Link>
+            <Link href="/me/listings" onClick={() => setOpen(false)}>Quản lý giảng dạy</Link>
+            <Link href="/me/availability" onClick={() => setOpen(false)}>Lịch khả dụng</Link>
+            <Link href="/messages" onClick={() => setOpen(false)}>Tin nhắn</Link>
+            <Link href="/reports" onClick={() => setOpen(false)}>Báo cáo của tôi</Link>
+            <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
           </nav> : <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>}
           <LogoutButton />
         </>}
@@ -161,8 +171,52 @@ function LocaleDisplay() {
   return (
     <span className="locale-display">
       <span className="locale-flag" aria-hidden="true">🇻🇳</span>
-      Tiếng Việt <span className="locale-caret" aria-hidden="true">⌄</span>
+      Tiếng Việt
     </span>
+  );
+}
+
+function ServicesNavMenu({ onNavigate }: { onNavigate: () => void }) {
+  const [open, setOpen] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const menuId = useId();
+  const loadCatalog = useCallback(() => getMarketplaceCatalog(), []);
+  const catalog = useAsyncData(loadCatalog);
+
+  return (
+    <div className={`public-nav-dropdown${open ? " is-open" : ""}`} onMouseLeave={() => setOpen(false)} onBlur={(event) => {
+      if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+    }} onKeyDown={(event) => {
+      if (event.key === "Escape" && open) {
+        setOpen(false);
+        trigger.current?.focus();
+      }
+    }}>
+      <button
+        ref={trigger}
+        className="public-nav-trigger"
+        type="button"
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((value) => !value)}
+        onMouseEnter={() => setOpen(true)}
+        onFocus={() => setOpen(true)}
+      >
+        Dịch vụ
+      </button>
+      <div className="public-nav-menu" id={menuId} role="group" aria-label="Danh mục dịch vụ">
+        <strong className="public-nav-menu-title">Khám phá theo danh mục</strong>
+        {catalog.loading ? <span className="public-nav-menu-state">Đang tải danh mục…</span> : catalog.error ? <span className="public-nav-menu-state">Chưa tải được danh mục.</span> : catalog.data?.length ? catalog.data.map((category) => (
+          <Link
+            href={`/marketplace?category=${category.id}`}
+            key={category.id}
+            onClick={() => { setOpen(false); onNavigate(); }}
+          >
+            <span>{category.name}</span><span aria-hidden="true">→</span>
+          </Link>
+        )) : <span className="public-nav-menu-state">Chưa có danh mục dịch vụ.</span>}
+      </div>
+    </div>
   );
 }
 
@@ -177,12 +231,13 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [retry, setRetry] = useState(0);
+  const freshSessionRequest = pathname.startsWith("/me/") || pathname === "/settings";
 
   useEffect(() => {
     let current = true;
     if (authFrame || mockPublicGuest) return;
 
-    const sessionRequest = pathname.startsWith("/me/") || pathname === "/settings"
+    const sessionRequest = freshSessionRequest
       ? request<ApiEnvelope<User>>({ method: "GET", url: "/me" }).then((response) => response.data.data)
       : getCurrentUser();
     sessionRequest.then((user) => {
@@ -200,7 +255,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     });
 
     return () => { current = false; };
-  }, [pathname, authFrame, mockPublicGuest, retry]);
+  }, [freshSessionRequest, authFrame, mockPublicGuest, retry]);
 
   useEffect(() => {
     const refreshAccount = () => setRetry((value) => value + 1);
@@ -316,7 +371,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
           </button>
           <nav id="public-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
             <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
-            <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dịch vụ <span className="public-nav-caret" aria-hidden="true">⌄</span></Link>
+            <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
             <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
             <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
           </nav>
@@ -357,25 +412,28 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
     );
   }
 
-  const activeRole = user?.role ?? role ?? "customer";
+  const activeRole = user?.role ?? requiredRole;
   const messagingRoute = pathname === "/messages" || pathname.startsWith("/messages/");
+  const teachingRoute = activeRole === "tutor" && (isActive(pathname, "/me/listings") || isActive(pathname, "/programs"));
   const roleNavItems = activeRole === "admin"
     ? [{ href: "/admin", label: "Duyệt hồ sơ Tutor" },{href:"/monitoring",label:"Giám sát hệ thống"}]
     : activeRole === "tutor"
-      ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Dịch vụ của tôi" }, { href: "/me/availability", label: "Lịch khả dụng" }, { href: "/marketplace", label: "Khám phá dịch vụ" }]
+      ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Quản lý giảng dạy" }, { href: "/me/availability", label: "Lịch khả dụng" }]
       : [];
-  const collaborationNav = activeRole === "admin" ? [] : [
+  const collaborationNav = !activeRole || activeRole === "admin" ? [] : activeRole === "tutor" ? [
+    { href: "/messages", label: "Tin nhắn" },
+    { href: "/reports", label: "Báo cáo của tôi" },
+  ] : [
     { href: "/programs", label: "Program của tôi" },
     { href: "/invitations", label: "Lời mời học" },
-    ...(activeRole === "customer" ? [] : [{ href: "/messages", label: "Tin nhắn" }]),
     { href: "/reports", label: "Báo cáo của tôi" },
     { href: "/notifications", label: "Thông báo" },
   ];
   const navItems = [
     ...roleNavItems,
     ...collaborationNav,
-    { href: "/settings", label: "Cài đặt tài khoản" },
-    ...(activeRole === "admin" || activeRole === "customer" ? [] : [{ href: "/support", label: "Hỗ trợ" }]),
+    ...(activeRole ? [{ href: "/settings", label: "Cài đặt tài khoản" }] : []),
+    ...(activeRole === "tutor" ? [{ href: "/support", label: "Hỗ trợ" }] : []),
   ];
 
   return (
@@ -398,7 +456,7 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         </button> : null}
         <nav id="authenticated-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
           <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
-          <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Dịch vụ <span className="public-nav-caret" aria-hidden="true">⌄</span></Link>
+          <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
           <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
           <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
         </nav>
@@ -423,14 +481,17 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         </div>
       </header>
       <div className={`app-layout${messagingRoute ? " messaging-app-layout" : ""}`}>
-        {!messagingRoute ? <aside id="app-sidebar" className={`app-sidebar${menuOpen ? " is-open" : ""}`} aria-label={`Menu ${roleLabels[activeRole]}`}>
-          <p className="sidebar-label">{roleLabels[activeRole]}</p>
+        {!messagingRoute ? <aside id="app-sidebar" className={`app-sidebar${menuOpen ? " is-open" : ""}`} aria-label={activeRole ? `Menu ${roleLabels[activeRole]}` : "Menu tài khoản"}>
+          <p className="sidebar-label">{activeRole ? roleLabels[activeRole] : "Tài khoản"}</p>
+          {!activeRole && needsLoading ? <div className="sidebar-loading" role="status" aria-label="Đang tải menu tài khoản">
+            {[0, 1, 2, 3, 4].map((item) => <span key={item} aria-hidden="true" />)}
+          </div> : null}
           <nav id="app-sidebar-navigation" className="sidebar-nav" aria-label="Điều hướng tài khoản">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                aria-current={(isActive(pathname, item.href) || (item.href === "/me/listings" && teachingRoute)) ? "page" : undefined}
                 onClick={() => setMenuOpen(false)}
               >
                 {item.label}
@@ -440,7 +501,8 @@ export function AppShell({ children, role, title = "TutorLink", mode }: AppShell
         </aside> : null}
         <main className="app-main">
           <div className="page-content">
-            {pathname !== "/profile" && !messagingRoute && title ? <div className="eyebrow">{roleLabels[activeRole]} · {title}</div> : null}
+            {pathname !== "/profile" && !messagingRoute && title ? <div className="eyebrow">{activeRole ? `${roleLabels[activeRole]} · ` : ""}{teachingRoute ? "Quản lý giảng dạy" : title}</div> : null}
+            {teachingRoute && user && !needsRole ? <Suspense><TeachingManagement userId={user.id} /></Suspense> : null}
             {protectedPage ? accessContent : children}
           </div>
         </main>

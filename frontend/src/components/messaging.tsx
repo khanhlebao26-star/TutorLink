@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { AppShell, useActor } from "./app-shell";
-import { Badge, Button, Field, Input, StatePanel } from "./ui";
+import { Badge, Button, Field, Input } from "./ui";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { usePolling } from "@/lib/hooks/use-polling";
 import {
@@ -16,19 +17,53 @@ import {
   type Message,
 } from "@/lib/data/messaging";
 import "@/app/messaging.css";
+
+export function MessagingRoute({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const match = pathname.match(/^\/messages\/(\d+)$/);
+  return <>{children}<Messaging id={match ? Number(match[1]) : undefined}/></>;
+}
+
 export function Messaging({ id }: { id?: number }) {
   return (
     <AppShell title="Tin nhắn">
-      <MessagingContent key={id ?? "list"} id={id} />
+      <MessagingBody id={id} />
     </AppShell>
   );
 }
-function MessagingContent({ id }: { id?: number }) {
-  const actor=useActor();
+function MessagingBody({ id }: { id?: number }) {
+  const actor = useActor();
+  return <MessagingSession key={actor?.id ?? "guest"} id={id}/>;
+}
+
+// This state lives in the shared messages layout, so switching threads keeps the inbox.
+function useInboxData() {
   const [items, setItems] = useState<Conversation[]>([]),
     [listCursor, setListCursor] = useState<string | null>(null),
-    [listBusy, setListBusy] = useState(false),
-    [query, setQuery] = useState("");
+    [listBusy, setListBusy] = useState(false);
+  const [listLoaded, setListLoaded] = useState(false);
+  const initialized = useRef(false);
+  const poll = useCallback(async (signal: AbortSignal) => {
+    const list = await conversations(undefined, signal);
+    if (signal.aborted) return;
+    setItems((previous) => [...list.data, ...previous.filter((item) => !list.data.some((fresh) => fresh.id === item.id))]);
+    if (!initialized.current) setListCursor(list.meta.next_cursor);
+    initialized.current = true;
+    setListLoaded(true);
+  }, []);
+  const listError = usePolling(poll);
+  return { items, setItems, listCursor, setListCursor, listBusy, setListBusy, listLoaded, listError };
+}
+
+function MessagingSession({ id }: { id?: number }) {
+  const inbox = useInboxData();
+  return <MessagingContent key={id ?? "list"} id={id} inbox={inbox}/>;
+}
+
+function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof useInboxData> }) {
+  const actor=useActor();
+  const { items, setItems, listCursor, setListCursor, listBusy, setListBusy, listLoaded, listError } = inbox;
+  const [query, setQuery] = useState("");
   const [error, setError] = useState("");
   const [current, setCurrent] = useState<Conversation | null>(null),
     [history, setHistory] = useState<Message[]>([]),
@@ -55,22 +90,11 @@ function MessagingContent({ id }: { id?: number }) {
     sendLock = useRef(false);
   const poll = useCallback(
     async (signal: AbortSignal) => {
-      const list = await conversations(undefined, signal);
-      if (signal.aborted) return;
-      setItems((previous) => [
-        ...new Map([...previous, ...list.data].map((c) => [c.id, c])).values(),
+      if (!id) return;
+      const [c, page] = await Promise.all([
+        conversation(id, signal),
+        messages(id, cursor.current ? { after: cursor.current } : {}, signal),
       ]);
-      setListCursor((c) => (initialized.current ? c : list.meta.next_cursor));
-      if (!id) {
-        initialized.current = true;
-        return;
-      }
-      const c = await conversation(id, signal);
-      const page = await messages(
-        id,
-        cursor.current ? { after: cursor.current } : {},
-        signal,
-      );
       if (signal.aborted) return;
       setCurrent(c);
       setHistory((previous) => mergeMessages(previous, page.data));
@@ -124,13 +148,14 @@ function MessagingContent({ id }: { id?: number }) {
     sendLock.current = true;
     setSending(true);
     setError("");
-    setFailed(payload);
+    setFailed(null);
     try {
       const m = await sendMessage(id, payload.body, payload.key);
       setHistory((previous) => mergeMessages(previous, [m]));
       setFailed(null);
       setDraft("");
     } catch (e) {
+      setFailed(payload);
       setError(describeApiError(e));
     } finally {
       sendLock.current = false;
@@ -153,7 +178,8 @@ function MessagingContent({ id }: { id?: number }) {
             />
           </Field>
         </div>
-        <div className="conversation-items">
+        <div className="conversation-items" aria-busy={!listLoaded && !listError}>
+          {!listLoaded && !listError ? <div className="conversation-list-loading" role="status" aria-label="Đang tải danh sách cuộc trò chuyện">{[0, 1, 2].map((item) => <div key={item} aria-hidden="true"><i/><span><b/><small/></span></div>)}</div> : null}
           {items
             .filter((c) =>
               c.peer.display_name
@@ -180,7 +206,8 @@ function MessagingContent({ id }: { id?: number }) {
                 )}
               </Link>
             ))}
-          {!items.filter((c) => c.peer.display_name.toLocaleLowerCase().includes(query.toLocaleLowerCase())).length && <div className="conversation-list-empty"><span aria-hidden="true">⌕</span><strong>{query ? "Không tìm thấy cuộc trò chuyện" : "Chưa có cuộc trò chuyện"}</strong><small>{query ? "Thử tìm bằng tên khác." : "Bắt đầu trò chuyện để kết nối với gia sư hoặc học viên."}</small></div>}
+          {listLoaded && !items.filter((c) => c.peer.display_name.toLocaleLowerCase().includes(query.toLocaleLowerCase())).length && <div className="conversation-list-empty"><span aria-hidden="true">⌕</span><strong>{query ? "Không tìm thấy cuộc trò chuyện" : "Chưa có cuộc trò chuyện"}</strong><small>{query ? "Thử tìm bằng tên khác." : "Bắt đầu trò chuyện để kết nối với gia sư hoặc học viên."}</small></div>}
+          {listError ? <p role="alert" className="field-error">{describeApiError(listError)}</p> : null}
         </div>
         {listCursor && (
           <Button
@@ -315,7 +342,11 @@ function MessagingContent({ id }: { id?: number }) {
             <div className="message-thread-loading-copy"><strong>Đang mở cuộc trò chuyện</strong><span>Tin nhắn sẽ xuất hiện tại đây trong giây lát.</span></div>
             <div className="message-thread-loading-bubble is-left" /><div className="message-thread-loading-bubble is-right" />
             <div className="message-thread-loading-composer"><span /><b>➤</b></div>
-          </div> : <StatePanel kind="empty" message="Chọn một cuộc trò chuyện để bắt đầu." />
+          </div> : <div className="message-unselected">
+            <div className="message-unselected-art" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M20 23h60a9 9 0 0 1 9 9v33a9 9 0 0 1-9 9H52L34 88V74H20a9 9 0 0 1-9-9V32a9 9 0 0 1 9-9Z"/><path d="M32 43h36M32 55h23"/></svg><span>✦</span></div>
+            <h2>Chưa chọn cuộc trò chuyện nào</h2>
+            <p>Chọn một người trong danh sách bên trái để xem tin nhắn và bắt đầu trao đổi.</p>
+          </div>
         )}
         {Boolean(error || pollingError) && (
           <div role="alert" className="field-error">

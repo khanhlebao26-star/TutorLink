@@ -1,11 +1,10 @@
 "use client";
 import { useCallback, useState } from "react";
-import { AppShell, useActor } from "./app-shell";
+import { useActor } from "./app-shell";
 import { ApiState } from "./api-state";
 import { Card, Button } from "./ui";
 import { WorkspaceFiles } from "./workspace-files";
 import { WorkspaceForm } from "./workspace-form";
-import { WorkspaceNavigation } from "./workspace-navigation";
 import {
   workspaceRead,
   type WorkspaceRow,
@@ -20,11 +19,7 @@ export function TaskWorkspace({
   programId: number;
   id: number;
 }) {
-  return (
-    <AppShell title="Bài nộp">
-      <TaskContent programId={programId} id={id} />
-    </AppShell>
-  );
+  return <TaskContent key={id} programId={programId} id={id} />;
 }
 function TaskContent({ programId, id }: { programId: number; id: number }) {
   const actor = useActor();
@@ -48,7 +43,6 @@ function TaskContent({ programId, id }: { programId: number; id: number }) {
   const terminal = d && ["completed", "cancelled"].includes(d.program.status);
   return (
     <section className="content-stack workspace-page">
-      <WorkspaceNavigation id={programId} active="tasks" />
       <h1>Bài nộp & phản hồi</h1>
       <ApiState {...result} />
       {d && (

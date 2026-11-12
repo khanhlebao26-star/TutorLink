@@ -19,6 +19,48 @@ class MarketplaceApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_publication_without_documents_follows_the_configured_requirement(): void
+    {
+        $specialization = $this->seedCatalog();
+        [, $profile] = $this->createTutor('approved');
+        $profile->verificationDocuments()->delete();
+        $listing = $this->createListing($profile, $specialization, ['status' => 'active']);
+
+        config(['tutor.verification_documents_required' => false]);
+        $this->getJson('/api/v1/listings')->assertOk()->assertJsonPath('data.0.id', $listing->id);
+        $this->getJson("/api/v1/listings/{$listing->slug}")->assertOk();
+        $this->getJson("/api/v1/tutors/{$profile->public_slug}")->assertOk();
+
+        config(['tutor.verification_documents_required' => true]);
+        $this->getJson('/api/v1/listings')->assertOk()->assertJsonCount(0, 'data');
+        $this->getJson("/api/v1/listings/{$listing->slug}")->assertNotFound();
+        $this->getJson("/api/v1/tutors/{$profile->public_slug}")->assertNotFound();
+    }
+
+    public function test_optional_documents_do_not_bypass_other_publication_requirements(): void
+    {
+        config(['tutor.verification_documents_required' => false]);
+        $specialization = $this->seedCatalog();
+        [$tutor, $profile] = $this->createTutor('submitted');
+        $profile->verificationDocuments()->delete();
+        $listing = $this->createListing($profile, $specialization, ['status' => 'active']);
+
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $profile->update(['status' => 'approved', 'suspended_at' => now()]);
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $profile->update(['suspended_at' => null]);
+        $tutor->forceFill(['email_verified_at' => null])->save();
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $tutor->forceFill(['email_verified_at' => now(), 'status' => 'suspended'])->save();
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $tutor->update(['status' => 'active']);
+        $listing->update(['status' => 'draft']);
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $listing->update(['status' => 'active']);
+        $specialization->update(['status' => 'inactive']);
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+    }
+
     public function test_pending_tutor_cannot_publish_listing(): void
     {
         $specialization = $this->seedCatalog();

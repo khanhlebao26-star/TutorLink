@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "./app-shell";
 import { ApiState } from "./api-state";
-import { Offer } from "./programs";
 import { Badge, Button, Card, StatePanel } from "./ui";
 import { describeApiError } from "@/lib/api/client";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
@@ -25,6 +24,17 @@ const statuses: Record<string, string> = {
   cancelled: "Đã hủy",
   expired: "Đã hết hạn",
 };
+function InvitationIcon({ name }: { name: "book" | "target" | "calendar" | "pin" | "clock" | "check" }) {
+  const paths = {
+    book: <><path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Z" /><path d="M12 5v15" /></>,
+    target: <><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="4" /><path d="m12 12 8-8m-4 0h4v4" /></>,
+    calendar: <><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2" /></>,
+    pin: <><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" /><circle cx="12" cy="10" r="2" /></>,
+    clock: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>,
+    check: <><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z" /><path d="m8 12 3 3 5-6" /></>,
+  };
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+}
 export function Invitations() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<string>("pending");
@@ -222,29 +232,74 @@ export function InvitationDetail({ id }: { id: number }) {
   const canRespond = result.data?.user.role === "customer";
   const pending =
     i?.status === "pending" && new Date(i.expires_at).getTime() > now;
+  const status = i?.status === "pending" && !pending ? "expired" : i?.status;
+  const offer = i?.offer_snapshot.offer;
+  const statusNote = status === "accepted"
+    ? "Lời mời đã được chấp nhận. Bạn có thể mở chương trình để theo dõi việc học."
+    : status === "rejected"
+      ? "Học viên đã từ chối lời mời này. Chương trình chưa được kích hoạt."
+      : status === "cancelled"
+        ? "Lời mời đã được hủy và không còn nhận phản hồi."
+        : status === "expired"
+          ? "Thời hạn phản hồi đã kết thúc. Tutor cần gửi lời mời mới để tiếp tục."
+          : canRespond
+            ? "Kiểm tra thông tin trước khi chấp nhận. Chương trình sẽ được kích hoạt sau khi bạn đồng ý."
+            : "Lời mời đã được gửi. Chương trình sẽ được kích hoạt khi học viên chấp nhận.";
   return (
     <AppShell title="Chi tiết lời mời">
-      <section className="content-stack workspace-page invitation-offer">
-        <Link href="/invitations">← Danh sách lời mời</Link>
+      <section className="content-stack workspace-page invitation-detail-page">
+        <Link className="invitation-detail-back" href="/invitations">← Danh sách lời mời</Link>
         <ApiState {...result} />
-        {i && (
-          <Card>
-            <Badge tone="brand">{statuses[i.status]}</Badge>
-            <h1>{i.offer_snapshot.offer.title}</h1>
-            <p className="muted">
-              Điều khoản tại thời điểm gửi · Hết hạn{" "}
-              {new Date(i.expires_at).toLocaleString("vi-VN")}
-            </p>
-            <Offer program={i.offer_snapshot.offer} />
-            {i.offer_snapshot.source_listing && (
-              <p>Dịch vụ nguồn: {i.offer_snapshot.source_listing.title}</p>
-            )}
-            {error && (
-              <p role="alert" className="field-error">
-                {error}
-              </p>
-            )}
-            <div className="button-row">
+        {i && offer && status && (
+          <>
+            <header className="invitation-detail-hero">
+              <span className="invitation-detail-art"><InvitationIcon name="book" /></span>
+              <div className="invitation-detail-heading">
+                <p className="invitations-eyebrow">LỜI MỜI THAM GIA CHƯƠNG TRÌNH</p>
+                <h1>{offer.title}</h1>
+                <p>Cùng thống nhất mục tiêu và bắt đầu hành trình học tập của bạn.</p>
+              </div>
+              <Badge tone={status === "accepted" ? "success" : status === "pending" ? "brand" : "neutral"}>
+                <span className={`invitation-detail-dot is-${status}`} aria-hidden="true" />{statuses[status]}
+              </Badge>
+            </header>
+            <div className="invitation-detail-layout">
+              <div className="invitation-detail-main">
+                <Card className="invitation-detail-card">
+                  <h2><span className="invitation-detail-icon"><InvitationIcon name="target" /></span>Mục tiêu & nội dung học</h2>
+                  <p className="invitation-detail-goal">{offer.goal || "Mục tiêu sẽ được trao đổi thêm với tutor."}</p>
+                  <dl className="invitation-detail-facts">
+                    <div><dt>Trình độ hiện tại</dt><dd>{offer.level || "Chưa thống nhất"}</dd></div>
+                    <div><dt>Hình thức học</dt><dd>{deliveryLabels[offer.delivery_mode]}</dd></div>
+                    <div><dt>Số buổi dự kiến</dt><dd>{offer.planned_session_count != null ? `${offer.planned_session_count} buổi` : "Chưa thống nhất"}</dd></div>
+                  </dl>
+                </Card>
+                <Card className="invitation-detail-card">
+                  <h2><span className="invitation-detail-icon is-blue"><InvitationIcon name="calendar" /></span>Lịch học & địa điểm</h2>
+                  <div className="invitation-detail-schedule">
+                    <div><InvitationIcon name="clock" /><div><h3>Lịch học dự kiến</h3><p>{offer.schedule_note || "Chưa thống nhất lịch học"}</p><small>Múi giờ: {offer.timezone}</small></div></div>
+                    <div><InvitationIcon name="pin" /><div><h3>Địa điểm học</h3><p>{offer.location_text || (offer.delivery_mode === "online" ? "Học trực tuyến" : "Chưa thống nhất địa điểm")}</p>{offer.meeting_url && <><h3 className="invitation-detail-meeting-label">Liên kết buổi học</h3><p>{offer.meeting_url}</p></>}</div></div>
+                  </div>
+                </Card>
+                {i.offer_snapshot.source_listing && <div className="invitation-detail-source">
+                  <span className="invitation-detail-icon"><InvitationIcon name="book" /></span>
+                  <div><small>ĐƯỢC TẠO TỪ DỊCH VỤ</small><h3>{i.offer_snapshot.source_listing.title}</h3></div>
+                </div>}
+                <div className="invitation-detail-snapshot"><InvitationIcon name="check" /><p>Thông tin trên là nội dung đã thống nhất tại thời điểm gửi lời mời. Hãy kiểm tra mục tiêu, lịch học và học phí trước khi phản hồi.</p></div>
+              </div>
+              <aside className="invitation-detail-aside" aria-label="Học phí và phản hồi lời mời">
+                <Card className="invitation-detail-card invitation-detail-decision">
+                  <p className="invitations-eyebrow">HỌC PHÍ THỎA THUẬN</p>
+                  <p className="invitation-detail-price">{new Intl.NumberFormat("vi-VN").format(offer.agreed_fee_minor)} <span>{offer.currency}</span></p>
+                  <p className="invitation-detail-unit">/ {({ session: "buổi", hour: "giờ", course: "khóa học" })[offer.fee_unit]}</p>
+                  <div className={`invitation-detail-deadline is-${status}`}>
+                    <InvitationIcon name="clock" />
+                    <div><strong>{pending ? "Phản hồi trước" : "Thời hạn phản hồi"}</strong><time dateTime={i.expires_at}>{new Date(i.expires_at).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" })}</time></div>
+                  </div>
+                  <h2>{pending ? (canRespond ? "Sẵn sàng bắt đầu?" : "Đang chờ học viên") : statuses[status]}</h2>
+                  <p className="invitation-detail-status-copy">{statusNote}</p>
+                  {error && <p role="alert" className="invitation-detail-error">{error}</p>}
+                  <div className="invitation-detail-actions" aria-busy={busy}>
               {pending &&
                 (canRespond ? (
                   <>
@@ -276,11 +331,15 @@ export function InvitationDetail({ id }: { id: number }) {
                   Mở workspace →
                 </Link>
               )}
-              <Button variant="ghost" disabled={busy} onClick={result.reload}>
-                Tải trạng thái mới nhất
-              </Button>
+                    <Button variant="ghost" disabled={busy} onClick={result.reload}>
+                      Tải trạng thái mới nhất
+                    </Button>
+                  </div>
+                </Card>
+                <p className="invitation-detail-help">Cần điều chỉnh thông tin? Hãy trao đổi lại với tutor hoặc học viên trước khi xác nhận.</p>
+              </aside>
             </div>
-          </Card>
+          </>
         )}
       </section>
     </AppShell>

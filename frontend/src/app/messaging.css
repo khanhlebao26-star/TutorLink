@@ -258,6 +258,22 @@
 .conversation-list-empty > span { align-items: center; background: #fff0f8; border-radius: 50%; color: var(--accent); display: inline-flex; font-size: 1.4rem; height: 42px; justify-content: center; width: 42px; }
 .conversation-list-empty strong { color: var(--brand); font-size: .76rem; }
 .conversation-list-empty small { font-size: .68rem; line-height: 1.5; }
+.conversation-list-loading { display: grid; gap: 14px; padding: 10px 0; }
+.conversation-list-loading > div { display: flex; align-items: center; gap: 12px; padding: 14px 12px; }
+.conversation-list-loading i, .conversation-list-loading b, .conversation-list-loading small { display: block; background: linear-gradient(100deg, #f0edf7 20%, #faf8fd 45%, #f0edf7 70%); background-size: 250% 100%; animation: inbox-loading-shimmer 1.7s ease-in-out infinite; }
+.conversation-list-loading i { flex-shrink: 0; width: 45px; height: 45px; border-radius: 50%; }
+.conversation-list-loading span { display: grid; gap: 9px; width: 65%; }
+.conversation-list-loading b { width: 72%; height: 12px; border-radius: 5px; }
+.conversation-list-loading small { width: 100%; height: 9px; border-radius: 5px; }
+.message-unselected { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-height: 500px; padding: 48px 28px; text-align: center; background: radial-gradient(ellipse at center, #faf5ff, white 65%); }
+.message-unselected-art { position: relative; display: grid; place-items: center; width: 134px; height: 134px; border-radius: 38px; background: linear-gradient(135deg, #ffedf7, #f0eaff); margin-bottom: 26px; transform: rotate(-6deg); box-shadow: 0 15px 40px #a67bc315; }
+.message-unselected-art svg { width: 88px; height: 88px; stroke: #aa63dc; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.message-unselected-art span { position: absolute; top: 4px; right: -8px; color: var(--accent); font-size: 2rem; }
+.message-unselected h2 { margin: 0 0 10px; color: var(--brand); font-size: clamp(1.1rem, 1.5vw, 1.4rem); }
+.message-unselected p { margin: 0; max-width: 370px; color: var(--muted); font-size: .875rem; line-height: 1.8; }
+@keyframes inbox-loading-shimmer { to { background-position: -200% 0; } }
+@media (max-width: 700px) { .message-unselected { min-height: 360px; } }
+@media (prefers-reduced-motion: reduce) { .conversation-list-loading i, .conversation-list-loading b, .conversation-list-loading small { animation: none; } }
 .message-thread { background: #fff; min-height: 0; }
 .message-thread > .state-panel { align-content: center; align-items: center; background: #fff; border: 0; flex: 1; justify-items: center; text-align: center; }
 .thread-heading { align-items: center; background: #fff; gap: 12px; min-height: 71px; padding: 12px 18px; }

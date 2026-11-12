@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
 import {ProgramTrust} from "./trust-workspace";
-import {WorkspaceNavigation} from "./workspace-navigation";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { ProgramOverview } from "./program-overview";
+import { Suspense, useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useListFilters } from "@/lib/hooks/use-list-filters";
+import { ProgramStudentPicker } from "./program-student-picker";
 import { useRouter } from "next/navigation";
 import { AppShell, useActor } from "./app-shell";
 import { ApiState } from "./api-state";
@@ -23,6 +25,7 @@ import {
 } from "@/lib/data/collaboration";
 import { formatListingPrice, deliveryLabels } from "@/lib/data/marketplace";
 import "@/app/workspace.css";
+import "@/app/owner-listings.css";
 export const programStatuses: Record<Program["status"], string> = {
   draft: "Bản nháp",
   active: "Đang hoạt động",
@@ -31,12 +34,11 @@ export const programStatuses: Record<Program["status"], string> = {
   cancelled: "Đã hủy",
 };
 export function Programs() {
-  return <AppShell title="Program của tôi"><ProgramsContent/></AppShell>;
+  return <AppShell title="Program của tôi"><Suspense fallback={<StatePanel kind="loading" message="Đang tải chương trình học…" />}><ProgramsContent/></Suspense></AppShell>;
 }
 function ProgramsContent() {
  const actor=useActor();
-  const [page, setPage] = useState(1),
-    [status, setStatus] = useState("all");
+  const { page, setPage, status, setStatus } = useListFilters(["all", ...Object.keys(programStatuses)]);
   const [filterLoading, setFilterLoading] = useState(false);
   const filterTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => {
@@ -63,7 +65,7 @@ function ProgramsContent() {
   const filters = [
     { value: "all", label: "Tất cả", count: programs.length },
     ...Object.entries(programStatuses)
-      .filter(([value]) => value !== "draft")
+      .filter(([value]) => actor?.role === "tutor" || value !== "draft")
       .map(([value, label]) => ({ value, label, count: statusCounts[value] ?? 0 })),
   ];
   return (
@@ -71,12 +73,12 @@ function ProgramsContent() {
       <section className="content-stack workspace-page">
         <header className="workspace-heading">
           <div>
-            <h1>Program của tôi</h1>
+            <h1>{actor?.role === "tutor" ? "Chương trình học" : "Program của tôi"}</h1>
             <p className="muted">
-              Theo dõi chương trình học và cộng tác cùng nhau.
+              {actor?.role === "tutor" ? "Tạo chương trình riêng cho học viên, gửi lời mời và theo dõi tiến độ giảng dạy." : "Theo dõi chương trình học và cộng tác cùng nhau."}
             </p>
           </div>
-          {actor?.role==="tutor"&&<Link className="button button-primary" href="/programs/new">+ Tạo Program</Link>}
+          {actor?.role==="tutor"&&<Link className="button button-primary" href="/programs/new">+ Tạo chương trình</Link>}
         </header>
         <nav className="workspace-filters program-status-filters" aria-label="Trạng thái Program">
           {filters.map(({ value, label, count }) => (
@@ -122,16 +124,16 @@ function ProgramsContent() {
             </div> : <div className="program-empty-callout">
               <span className="program-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 6.2c-2.1-1.6-5.2-2.2-9-1.7v13c3.8-.5 6.9.1 9 1.7m0-13c2.1-1.6 5.2-2.2 9-1.7v13c-3.8-.5-6.9.1-9 1.7m0-13v13"/></svg></span>
               <div>
-                <h2>{programs.length ? `Chưa có Program ${status === "all" ? "nào" : `ở trạng thái “${programStatuses[status as Program["status"]]}”`}` : "Bạn chưa đăng ký dịch vụ nào"}</h2>
-                <p>{programs.length ? "Bạn chưa đăng ký dịch vụ nào trong mục này. Thử chọn trạng thái khác để xem Program của bạn." : "Hãy kiểm tra Lời mời học. Khi bạn chấp nhận lời mời, Program sẽ xuất hiện ở đây."}</p>
+                <h2>{programs.length ? `Chưa có chương trình ${status === "all" ? "nào" : `ở trạng thái “${programStatuses[status as Program["status"]]}”`}` : actor?.role === "tutor" ? "Bạn chưa tạo chương trình học nào" : "Bạn chưa đăng ký dịch vụ nào"}</h2>
+                <p>{actor?.role === "tutor" ? (programs.length ? "Thử chọn trạng thái khác để xem các chương trình bạn đang quản lý." : "Tạo chương trình cho học viên, thống nhất lịch học và gửi lời mời để bắt đầu.") : programs.length ? "Bạn chưa đăng ký dịch vụ nào trong mục này. Thử chọn trạng thái khác để xem Program của bạn." : "Hãy kiểm tra Lời mời học. Khi bạn chấp nhận lời mời, Program sẽ xuất hiện ở đây."}</p>
               </div>
-              {!programs.length ? <Link className="button button-primary" href="/invitations">Xem lời mời Program <span aria-hidden="true">→</span></Link> : null}
+              {!programs.length ? <Link className="button button-primary" href={actor?.role === "tutor" ? "/programs/new" : "/invitations"}>{actor?.role === "tutor" ? "Tạo chương trình" : "Xem lời mời Program"} <span aria-hidden="true">→</span></Link> : null}
             </div>}
             <nav className="button-row" aria-label="Phân trang">
               <Button
                 variant="outline"
                 disabled={page === 1}
-                onClick={() => setPage((p) => p - 1)}
+                onClick={() => setPage(page - 1)}
               >
                 Trước
               </Button>
@@ -141,7 +143,7 @@ function ProgramsContent() {
               <Button
                 variant="outline"
                 disabled={page >= (result.data.meta.last_page ?? Math.max(1,Math.ceil(result.data.meta.total/result.data.meta.per_page)))}
-                onClick={() => setPage((p) => p + 1)}
+                onClick={() => setPage(page + 1)}
               >
                 Sau
               </Button>
@@ -188,9 +190,7 @@ export function ProgramDetail({ id }: { id: number }) {
     }
   }
   return (
-    <AppShell title="Workspace">
-      <section className="content-stack workspace-page">
-        <Link href="/programs">← Program của tôi</Link><WorkspaceNavigation id={id} active="overview"/>
+      <section className="content-stack workspace-page program-overview-page">
         <ApiState {...result} />
         {error && (
           <p role="alert" className="field-error">
@@ -199,68 +199,8 @@ export function ProgramDetail({ id }: { id: number }) {
         )}
         {result.data && (
           <>
-            {result.data.program.status==="completed"&&<ProgramTrust id={id}/>}<header className="workspace-heading">
-              <div>
-                <Badge tone="brand">
-                  {programStatuses[result.data.program.status]}
-                </Badge>
-                <h1>{result.data.program.title}</h1>
-              </div>
-              {result.data.program.allowed_actions.includes("edit") && (
-                <Link
-                  className="button button-outline"
-                  href={`/programs/${id}/edit`}
-                >
-                  Chỉnh sửa & gửi lời mời
-                </Link>
-              )}
-            </header>
-            <div className="workspace-columns">
-              <Card>
-                <h2>Tổng quan</h2>
-                <Offer program={result.data.program} />
-              </Card>
-              <Card>
-                <h2>Hoạt động</h2>
-                {result.data.overview ? (
-                  <>
-                    <p>
-                      Buổi tiếp theo:{" "}
-                      {result.data.overview.next_session
-                        ? new Date(
-                            result.data.overview.next_session.planned_starts_at,
-                          ).toLocaleString("vi-VN")
-                        : "Chưa có lịch"}
-                    </p>
-                    <p>
-                      Task hoàn thành:{" "}
-                      {result.data.overview.task_counts.completed}
-                    </p>
-                    <p>
-                      Đã nộp bài: {result.data.overview.task_counts.submitted}
-                    </p>
-                    <p>
-                      Tiến độ:{" "}
-                      {result.data.overview.latest_progress
-                        ? `${result.data.overview.latest_progress.value}%`
-                        : "Chưa ghi nhận"}
-                    </p>
-                    {result.data.overview.latest_announcement && (
-                      <>
-                        <h3>
-                          {result.data.overview.latest_announcement.title}
-                        </h3>
-                        <p>{result.data.overview.latest_announcement.body}</p>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <p className="muted">
-                    Workspace sẽ mở sau khi học viên chấp nhận lời mời.
-                  </p>
-                )}
-              </Card>
-            </div>
+            <ProgramOverview program={result.data.program} overview={result.data.overview} />
+            {result.data.program.status === "completed" && <ProgramTrust id={id} />}
             {result.data.program.allowed_actions.some(
               (a) => a !== "edit" && a !== "send_invitation",
             ) && (
@@ -293,7 +233,6 @@ export function ProgramDetail({ id }: { id: number }) {
           </>
         )}
       </section>
-    </AppShell>
   );
 }
 export function Offer({
@@ -366,11 +305,9 @@ export function ProgramEditor({
     [id],
   );
   const result = useAsyncData(load);
-  return (
-    <AppShell role="tutor" title="Tạo Program">
-      <section className="content-stack workspace-page">
-        <Link href="/programs">← Quay lại Program</Link>
-        <h1>{id ? "Chỉnh sửa & gửi lời mời" : "Tạo Program & gửi lời mời"}</h1>
+  const content = (
+      <section className="owner-form-page program-editor-page">
+        <Link href="/programs" className="program-editor-back">← Chương trình học</Link>
         <ApiState {...result} />
         {!result.loading &&
           !result.error &&
@@ -388,8 +325,8 @@ export function ProgramEditor({
             />
           ))}
       </section>
-    </AppShell>
   );
+  return id ? content : <AppShell role="tutor" title="Tạo Program">{content}</AppShell>;
 }
 function ProgramForm({
   existing,
@@ -478,12 +415,16 @@ function ProgramForm({
     }
   }
   return (
-    <div className="workspace-columns">
-      <Card>
-        <form className="content-stack" onSubmit={submit}>
-          <h2>Thông tin cơ bản</h2>
+    <div className="program-builder">
+      <header className="program-builder-heading">
+        <div><span className="program-builder-kicker">THIẾT KẾ HÀNH TRÌNH HỌC TẬP</span><h1>{existing ? "Chỉnh sửa chương trình học" : "Tạo chương trình học mới"}</h1><p>Thống nhất mục tiêu, lịch học và học phí để bắt đầu đồng hành cùng học viên.</p></div>
+        <span className="program-builder-state"><span aria-hidden="true">●</span> {saved ? dirty ? "Có thay đổi chưa lưu" : "Bản nháp đã lưu" : "Bản nháp mới"}</span>
+      </header>
+      <ol className="program-builder-journey" aria-label="Quy trình tạo chương trình"><li aria-current="step"><span>1</span>Thiết lập chương trình</li><li><span>2</span>Lưu bản nháp</li><li><span>3</span>Gửi lời mời học</li></ol>
+      <div className="program-builder-layout">
+        <form className="owner-form program-builder-form" onSubmit={submit}>
           {error && (
-            <div role="alert">
+            <div role="alert" className="program-builder-error">
               <p className="field-error">{describeApiError(error)}</p>
               {error.status === 409 && (
                 <p>
@@ -496,20 +437,20 @@ function ProgramForm({
               )}
             </div>
           )}
+          <fieldset className="owner-form-fields" disabled={busy}>
+          <section className="program-builder-section" aria-labelledby="program-info-heading">
+          <header><span aria-hidden="true">01</span><div><h2 id="program-info-heading">Thông tin chương trình</h2><p>Chọn học viên và xác định mục tiêu bạn sẽ cùng đạt được.</p></div></header>
+          <div className="owner-form-grid owner-form-grid-two">
           <Field
             htmlFor="program-customer"
-            label="ID học viên"
-            hint="Chọn học viên từ cuộc trò chuyện để điền sẵn."
+            label="Học viên"
+            hint={saved ? "Học viên được giữ cố định sau khi lưu chương trình." : "Chọn học viên từ các cuộc trò chuyện đang hoạt động của bạn."}
             error={error?.fieldErrors?.customer_id?.[0]}
           >
-            <Input
-              type="number"
-              required
-              min={1}
-              value={input.customer_id || ""}
-              disabled={!!saved}
-              onChange={(e) => field("customer_id", Number(e.target.value))}
-            />
+            <ProgramStudentPicker value={input.customer_id} disabled={Boolean(saved)} onChange={(studentId, listingId) => {
+              setDirty(true);
+              setInput((previous) => ({ ...previous, customer_id: studentId, source_listing_id: listingId }));
+            }}/>
           </Field>
           <Field
             htmlFor="program-title"
@@ -519,17 +460,17 @@ function ProgramForm({
             <Input
               required
               maxLength={180}
+              placeholder="Ví dụ: Lộ trình tiếng Anh giao tiếp 8 tuần"
               value={input.title}
               onChange={(e) => field("title", e.target.value)}
             />
           </Field>
+          </div>
+          <div className="program-builder-goals">
           {(
             [
               ["goal", "Mục tiêu học"],
               ["level", "Trình độ"],
-              ["schedule_note", "Ghi chú lịch học"],
-              ["location_text", "Địa điểm"],
-              ["meeting_url", "Liên kết cuộc họp"],
             ] as const
           ).map(([name, label]) => (
             <Field
@@ -538,30 +479,40 @@ function ProgramForm({
               label={label}
               error={error?.fieldErrors?.[name]?.[0]}
             >
-              <Input
+              {name === "goal" ? <textarea rows={3} value={input.goal ?? ""} placeholder="Ví dụ: Tự tin giao tiếp trong công việc sau 8 tuần…" onChange={(e) => field("goal", e.target.value)} /> : <Input
+                placeholder="Ví dụ: Mới bắt đầu, A2, nâng cao…"
                 value={input[name] ?? ""}
                 onChange={(e) => field(name, e.target.value)}
-              />
+              />}
             </Field>
           ))}
-          <div className="form-grid">
-            <Field htmlFor="program-mode" label="Hình thức">
-              <Select
-                value={input.delivery_mode}
-                onChange={(e) =>
-                  field(
-                    "delivery_mode",
-                    e.target.value as Program["delivery_mode"],
-                  )
-                }
-              >
-                {Object.entries(deliveryLabels).map(([v, l]) => (
-                  <option key={v} value={v}>
-                    {l}
-                  </option>
-                ))}
-              </Select>
+          </div>
+          </section>
+          <section className="program-builder-section" aria-labelledby="program-schedule-heading">
+          <header><span aria-hidden="true">02</span><div><h2 id="program-schedule-heading">Hình thức & lịch học</h2><p>Đề xuất thời gian và cách thức học thuận tiện cho hai bên.</p></div></header>
+          <fieldset className="owner-delivery"><legend>Hình thức học</legend><div>
+            {Object.entries(deliveryLabels).map(([value, label]) => <label key={value}>
+              <input type="radio" name="program-delivery" value={value} checked={input.delivery_mode === value} onChange={() => field("delivery_mode", value as Program["delivery_mode"])} />{label}
+            </label>)}
+          </div></fieldset>
+          <div className="owner-form-grid owner-form-grid-two">
+            <Field htmlFor="program-schedule_note" label="Lịch học dự kiến" hint="Có thể trao đổi và thống nhất thêm với học viên." error={error?.fieldErrors?.schedule_note?.[0]}>
+              <Input placeholder="Ví dụ: Thứ 2, 4, 6 · 19:00 – 20:00" value={input.schedule_note ?? ""} onChange={(e) => field("schedule_note", e.target.value)}/>
             </Field>
+            <Field htmlFor="program-timezone" label="Múi giờ" error={error?.fieldErrors?.timezone?.[0]}>
+              <Input placeholder="Asia/Ho_Chi_Minh" value={input.timezone} onChange={(e) => field("timezone", e.target.value)}/>
+            </Field>
+            <Field htmlFor="program-location_text" label="Địa điểm học" error={error?.fieldErrors?.location_text?.[0]}>
+              <Input placeholder="Địa chỉ hoặc ghi chú địa điểm học" value={input.location_text ?? ""} onChange={(e) => field("location_text", e.target.value)}/>
+            </Field>
+            <Field htmlFor="program-meeting_url" label="Liên kết lớp học" hint="Không bắt buộc. Có thể bổ sung sau." error={error?.fieldErrors?.meeting_url?.[0]}>
+              <Input placeholder="https://meet.google.com/..." value={input.meeting_url ?? ""} onChange={(e) => field("meeting_url", e.target.value)}/>
+            </Field>
+          </div>
+          </section>
+          <section className="program-builder-section" aria-labelledby="program-fees-heading">
+          <header><span aria-hidden="true">03</span><div><h2 id="program-fees-heading">Học phí & thời lượng</h2><p>Học phí sẽ được gửi cùng lời mời để học viên xem xét.</p></div></header>
+          <div className="owner-form-grid">
             <Field
               htmlFor="program-fee"
               label="Học phí (VND)"
@@ -578,7 +529,7 @@ function ProgramForm({
                 }
               />
             </Field>
-            <Field htmlFor="program-unit" label="Đơn vị">
+            <Field htmlFor="program-unit" label="Đơn vị tính" error={error?.fieldErrors?.fee_unit?.[0]}>
               <Select
                 value={input.fee_unit}
                 onChange={(e) =>
@@ -590,7 +541,7 @@ function ProgramForm({
                 <option value="course">Khóa</option>
               </Select>
             </Field>
-            <Field htmlFor="program-count" label="Số buổi dự kiến">
+            <Field htmlFor="program-count" label="Số buổi dự kiến" error={error?.fieldErrors?.planned_session_count?.[0]}>
               <Input
                 type="number"
                 min={1}
@@ -604,35 +555,41 @@ function ProgramForm({
               />
             </Field>
           </div>
+          </section>
+          </fieldset>
+          <footer className="owner-form-footer program-builder-footer">
+          <small>Lưu bản nháp trước khi gửi lời mời cho học viên.</small>
+          {!busy ? <Link className="button button-outline" href="/programs">Hủy</Link> : null}
           <Button type="submit" disabled={busy}>
-            Lưu bản nháp
+            {busy ? "Đang lưu…" : "Lưu bản nháp"}
           </Button>
+          </footer>
         </form>
-      </Card>
-      <Card className="program-summary">
-        <h2>{saved ? "Bản đã lưu" : "Tóm tắt chương trình"}</h2>
-        <Offer
-          program={{
-            ...input,
-            currency: "VND",
-            goal: input.goal ?? null,
-            level: input.level ?? null,
-            schedule_note: input.schedule_note ?? null,
-            timezone: input.timezone ?? "Asia/Ho_Chi_Minh",
-            planned_session_count: input.planned_session_count ?? null,
-            location_text: input.location_text ?? null,
-            meeting_url: input.meeting_url ?? null,
-          }}
-        />
+      <aside className="program-builder-sidebar" aria-label="Tóm tắt trước khi gửi">
+      <Card className="program-builder-summary">
+        <header><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M8 4H5a2 2 0 0 0-2 2v14h18V6a2 2 0 0 0-2-2h-3M8 3h8v5H8V3ZM7 12h10M7 16h6"/></svg></span><div><h2>Tóm tắt chương trình</h2><small>Cập nhật theo thông tin bạn nhập</small></div></header>
+        <h3>{input.title.trim() || "Chương trình học của bạn"}</h3>
+        <span className="program-builder-mode">{deliveryLabels[input.delivery_mode]}</span>
+        <div className="program-builder-price"><small>Học phí thỏa thuận</small><strong>{formatListingPrice(input.agreed_fee_minor, "VND", input.fee_unit)}</strong></div>
+        <dl>
+          <div><dt>Trình độ</dt><dd>{input.level?.trim() || "Chưa thiết lập"}</dd></div>
+          <div><dt>Số buổi</dt><dd>{input.planned_session_count ? `${input.planned_session_count} buổi` : "Chưa thiết lập"}</dd></div>
+          <div><dt>Lịch học</dt><dd>{input.schedule_note?.trim() || "Chưa thống nhất"}</dd></div>
+          <div><dt>Múi giờ</dt><dd>{input.timezone || "Chưa thiết lập"}</dd></div>
+        </dl>
+        <div className="program-builder-goal-preview"><strong>Mục tiêu đồng hành</strong><p>{input.goal?.trim() || "Mô tả điều học viên có thể đạt được sau chương trình."}</p></div>
         {saved && (
-          <>
-            <p>Lời mời sử dụng bản đã lưu. Lưu thay đổi trước khi gửi.</p>
+          <div className="program-builder-invite">
+            <p>{dirty ? "Bạn có thay đổi chưa lưu. Hãy lưu bản nháp trước khi gửi." : "Lời mời sẽ sử dụng thông tin trong bản nháp đã lưu."}</p>
             <Button disabled={busy || dirty} onClick={invite}>
               Gửi lời mời từ bản đã lưu
             </Button>
-          </>
+          </div>
         )}
       </Card>
+      <div className="program-builder-tip"><span aria-hidden="true">i</span><div><strong>Học viên sẽ nhận được gì?</strong><p>Lời mời gồm mục tiêu, lịch học và học phí bạn đã lưu. Chương trình bắt đầu khi học viên chấp nhận lời mời.</p></div></div>
+      </aside>
+      </div>
     </div>
   );
 }

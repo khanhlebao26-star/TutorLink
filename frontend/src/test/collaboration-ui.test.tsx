@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, it, vi } from "vitest";
 import type { Program, Invitation } from "@/lib/data/collaboration";
@@ -172,4 +172,65 @@ it("retries a failed text message with its original UUID and has no attachment i
   );
   expect(container.querySelector('input[type="file"]')).toBeNull();
   await waitFor(() => expect(input).toHaveValue(""));
+});
+
+it("does not show failed-message actions while a message is sending successfully", async () => {
+  const c = {
+    id: 8, status: "active", peer: { id: 2, display_name: "Tutor Anna" },
+    context_listing_id: null, unread_count: 0, last_read_message_id: null, preview: null,
+  };
+  vi.mocked(messaging.conversations).mockResolvedValue({ data: [c], meta: { has_more: false, next_cursor: null, per_page: 20 } });
+  vi.mocked(messaging.conversation).mockResolvedValue(c);
+  vi.mocked(messaging.messages).mockResolvedValue({ data: [], meta: { per_page: 20, has_more: false, next_cursor: null } });
+  let complete!: (message: Awaited<ReturnType<typeof messaging.sendMessage>>) => void;
+  vi.mocked(messaging.sendMessage).mockImplementationOnce(() => new Promise((resolve) => { complete = resolve; }));
+
+  render(<Messaging id={8}/>);
+  const input = await screen.findByLabelText("Nội dung tin nhắn");
+  await userEvent.type(input, "Hello without a warning");
+  await userEvent.click(screen.getByRole("button", { name: "Gửi tin nhắn" }));
+
+  expect(input).toBeDisabled();
+  expect(screen.queryByRole("button", { name: "Thử gửi lại" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Chỉnh sửa tin nhắn" })).not.toBeInTheDocument();
+
+  await act(async () => complete({
+    id: 10, conversation_id: 8, sender_id: 7, client_message_id: "key",
+    message_type: "text", body: "Hello without a warning", created_at: "2026-11-12T00:00:00Z",
+  }));
+  expect(screen.getByText("Hello without a warning")).toBeVisible();
+  expect(input).toHaveValue("");
+  expect(input).toBeEnabled();
+  expect(screen.queryByRole("button", { name: "Thử gửi lại" })).not.toBeInTheDocument();
+});
+
+it("shows an unselected conversation screen and inbox skeleton before the first list arrives", async () => {
+  let finish!: (page: Awaited<ReturnType<typeof messaging.conversations>>) => void;
+  vi.mocked(messaging.conversations).mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+  render(<Messaging/>);
+  expect(screen.getByRole("heading", { name: "Chưa chọn cuộc trò chuyện nào" })).toBeVisible();
+  expect(screen.getByRole("status", { name: "Đang tải danh sách cuộc trò chuyện" })).toBeVisible();
+  expect(screen.queryByText("Chưa có cuộc trò chuyện")).not.toBeInTheDocument();
+  expect(messaging.conversation).not.toHaveBeenCalled();
+  expect(messaging.messages).not.toHaveBeenCalled();
+  await act(async () => finish({ data: [], meta: { per_page: 20, has_more: false, next_cursor: null } }));
+  expect(screen.getByText("Chưa có cuộc trò chuyện")).toBeVisible();
+});
+
+it("loads a thread independently of a slow inbox and keeps the inbox when switching threads", async () => {
+  const c = { id: 8, status: "active", peer: { id: 2, display_name: "Tutor Anna" }, context_listing_id: null, unread_count: 0, last_read_message_id: null, preview: null };
+  let finish!: (page: Awaited<ReturnType<typeof messaging.conversations>>) => void;
+  vi.mocked(messaging.conversations).mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+  vi.mocked(messaging.conversation).mockImplementation(async (id) => ({ ...c, id }));
+  vi.mocked(messaging.messages).mockResolvedValue({ data: [], meta: { per_page: 20, has_more: false, next_cursor: null } });
+  const view = render(<Messaging id={8}/>);
+  await screen.findByLabelText("Nội dung tin nhắn");
+  expect(screen.getByRole("status", { name: "Đang tải danh sách cuộc trò chuyện" })).toBeVisible();
+  await act(async () => finish({ data: [c], meta: { per_page: 20, has_more: false, next_cursor: null } }));
+  expect(screen.getByRole("link", { name: /Tutor Anna/ })).toBeVisible();
+  view.rerender(<Messaging id={9}/>);
+  expect(screen.getByRole("link", { name: /Tutor Anna/ })).toBeVisible();
+  expect(screen.queryByRole("status", { name: "Đang tải danh sách cuộc trò chuyện" })).not.toBeInTheDocument();
+  expect(messaging.conversations).toHaveBeenCalledTimes(1);
+  await waitFor(() => expect(messaging.conversation).toHaveBeenCalledWith(9, expect.any(AbortSignal)));
 });

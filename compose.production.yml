@@ -1,6 +1,8 @@
 x-runtime: &runtime
   image: tutorlink-backend:${RELEASE_TAG:?Set RELEASE_TAG}
   env_file: .env.production
+  environment:
+    TUTOR_PROFILE_DOCUMENTS_REQUIRED: "true"
   init: true
   restart: unless-stopped
   stop_grace_period: 120s

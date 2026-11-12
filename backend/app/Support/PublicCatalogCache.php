@@ -22,6 +22,6 @@ class PublicCatalogCache
         $query = $request->query();
         ksort($query);
 
-        return 'marketplace:v1:'.hash('sha256', json_encode([$version, $expired, $request->path(), $query], JSON_THROW_ON_ERROR));
+        return 'marketplace:v1:'.hash('sha256', json_encode([$version, $expired, config('tutor.verification_documents_required', true), $request->path(), $query], JSON_THROW_ON_ERROR));
     }
 }

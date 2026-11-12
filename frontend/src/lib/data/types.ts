@@ -87,6 +87,17 @@ export interface AdminTutorProfile {
   verification_documents: VerificationDocument[] | null;
 }
 
+/** Metadata-only item returned for profiles waiting to be assigned to an admin. */
+export interface AdminTutorQueueItem {
+  id: number;
+  status: TutorProfileStatus;
+  submitted_at: string | null;
+  assigned_admin_id: number | null;
+  assigned_by: number | null;
+  assigned_at: string | null;
+  assignment_version: number;
+}
+
 export interface ProfileResponse {
   user: User;
   profile: CustomerProfile | TutorProfile;

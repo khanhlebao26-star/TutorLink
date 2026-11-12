@@ -3,8 +3,8 @@
 import { AppShell } from "@/components/app-shell";
 import { Badge, Button, DataTable, ErrorActions, Field, StatePanel } from "@/components/ui";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
-import { getAdminTutorProfile, getAdminTutorProfiles, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
-import type { AdminTutorProfile, TutorProfileStatus } from "@/lib/data/types";
+import { assignAdminTutorProfile, getAdminTutorProfile, getAdminTutorProfiles, getAdminTutorQueue, getCurrentUser, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
+import type { AdminTutorProfile, AdminTutorQueueItem, TutorProfileStatus } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { useCallback, useRef, useState } from "react";
 
@@ -47,6 +47,7 @@ function date(value: string | null | undefined): string {
 
 export default function AdminPage() {
   const detailRequest = useRef(0);
+  const [scope, setScope] = useState<"unassigned" | "mine">("unassigned");
   const [status, setStatus] = useState<(typeof filters)[number]>("submitted");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<AdminTutorProfile | null>(null);
@@ -56,7 +57,12 @@ export default function AdminPage() {
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const load = useCallback(() => getAdminTutorProfiles(status), [status]);
+  const [claimingId, setClaimingId] = useState<number | null>(null);
+  const [claimError, setClaimError] = useState<string | null>(null);
+  const load = useCallback(
+    async () => scope === "unassigned" ? await getAdminTutorQueue(status) : await getAdminTutorProfiles(status),
+    [scope, status],
+  );
   const { data, error, loading, reload } = useAsyncData(load);
 
   const openProfile = async (id: number) => {
@@ -111,7 +117,24 @@ export default function AdminPage() {
     }
   };
 
-  const rows = data ?? [];
+  const rows = scope === "mine" ? (data as AdminTutorProfile[] | null) ?? [] : [];
+  const queueRows = scope === "unassigned" ? (data as AdminTutorQueueItem[] | null) ?? [] : [];
+
+  const claimProfile = async (item: AdminTutorQueueItem) => {
+    setClaimingId(item.id);
+    setClaimError(null);
+    try {
+      const admin = await getCurrentUser();
+      await assignAdminTutorProfile(item.id, admin.id, item.assignment_version);
+      setScope("mine");
+      await openProfile(item.id);
+    } catch (nextError) {
+      setClaimError(describeApiError(nextError));
+      reload();
+    } finally {
+      setClaimingId(null);
+    }
+  };
 
   return (
     <AppShell role="admin" title="Admin shell">
@@ -121,7 +144,23 @@ export default function AdminPage() {
             <h1>Duyệt Tutor</h1>
             <p className="lead">Theo dõi, kiểm tra và ghi nhận quyết định đối với hồ sơ Tutor.</p>
           </div>
-          <Badge tone="warning">Backend kiểm quyền</Badge>
+        </div>
+
+        <div className="button-row" role="group" aria-label="Phạm vi hồ sơ Tutor">
+          <Button disabled={saving || claimingId !== null} variant={scope === "unassigned" ? "primary" : "secondary"} onClick={() => {
+            detailRequest.current++;
+            setSelectedId(null);
+            setDetail(null);
+            setClaimError(null);
+            setScope("unassigned");
+          }}>Chưa phân công</Button>
+          <Button disabled={saving || claimingId !== null} variant={scope === "mine" ? "primary" : "secondary"} onClick={() => {
+            detailRequest.current++;
+            setSelectedId(null);
+            setDetail(null);
+            setClaimError(null);
+            setScope("mine");
+          }}>Hồ sơ của tôi</Button>
         </div>
 
         <Field label="Lọc trạng thái" htmlFor="admin-status">
@@ -135,6 +174,7 @@ export default function AdminPage() {
               setDetailError(null);
               setReason("");
               setActionError(null);
+              setClaimError(null);
               setStatus(event.target.value as typeof status);
               setSelectedId(null);
               setDetail(null);
@@ -144,13 +184,27 @@ export default function AdminPage() {
           </select>
         </Field>
 
+        {scope === "unassigned" ? <p className="muted">Hồ sơ trong hàng đợi chưa hiển thị thông tin cá nhân. Nhận hồ sơ để đưa vào danh sách xử lý của bạn.</p> : null}
+        {claimError ? <p className="inline-error" role="alert">{claimError}</p> : null}
+
         {loading ? <StatePanel kind="loading" message="Đang tải hồ sơ…" /> : error ? (
           <StatePanel
             kind="error"
             message={error.status === 401 ? "Bạn cần đăng nhập để xem khu vực Admin." : error.status === 403 ? "Tài khoản không có permission Admin phù hợp." : error.message}
             action={<ErrorActions login={error.status === 401} onRetry={reload} />}
           />
-        ) : !rows.length ? <StatePanel kind="empty" message="Không có hồ sơ ở trạng thái này." /> : (
+        ) : scope === "unassigned" && !queueRows.length ? <StatePanel kind="empty" message="Không có hồ sơ chưa phân công ở trạng thái này." /> : scope === "mine" && !rows.length ? <StatePanel kind="empty" message="Bạn chưa có hồ sơ được phân công ở trạng thái này." /> : scope === "unassigned" ? (
+          <DataTable
+            rowKey={(row) => row.id}
+            rows={queueRows}
+            columns={[
+              { key: "id", label: "Mã hồ sơ", render: (row) => <strong>#{row.id}</strong> },
+              { key: "submitted", label: "Ngày gửi", render: (row) => date(row.submitted_at) },
+              { key: "status", label: "Trạng thái", render: (row) => <Badge tone={tone(row.status)}>{labels[row.status]}</Badge> },
+              { key: "action", label: "Thao tác", render: (row) => <Button disabled={claimingId !== null} onClick={() => claimProfile(row)}>{claimingId === row.id ? "Đang nhận…" : "Nhận hồ sơ"}</Button> },
+            ]}
+          />
+        ) : (
           <DataTable
             rowKey={(row) => row.profile.id}
             rows={rows}

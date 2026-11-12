@@ -1,2 +1,1 @@
-import {Messaging} from "@/components/messaging";
-export default function Page(){return <Messaging/>;}
+export default function Page() { return null; }

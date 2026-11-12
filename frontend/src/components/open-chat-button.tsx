@@ -36,7 +36,13 @@ export function OpenChatButton({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState<unknown>(null);
   const apiError = error instanceof ApiClientError ? error : null;
-  const errorMessage = apiError?.code === "peer_invalid"
+  const errorMessage = apiError?.code === "tutor_ineligible"
+    ? "Gia sư chưa đủ điều kiện nhận liên hệ mới. Gia sư cần hoàn tất các yêu cầu dưới đây:"
+    : apiError?.code === "account_inactive"
+      ? "Tài khoản của bạn đang bị vô hiệu hóa hoặc tạm khóa. Vui lòng liên hệ hỗ trợ."
+    : apiError?.code === "conversation_forbidden"
+      ? "Chỉ tài khoản học viên và tutor mới có thể bắt đầu cuộc trò chuyện."
+    : apiError?.code === "peer_invalid"
     ? "TutorLink chỉ hỗ trợ trò chuyện giữa Học viên và Tutor. Hãy dùng tài khoản có vai trò đối lập với gia sư để bắt đầu nhắn tin."
     : apiError?.status === 401
       ? "Phiên đăng nhập của bạn chưa sẵn sàng. Vui lòng đăng nhập để tiếp tục trò chuyện."
@@ -49,6 +55,8 @@ export function OpenChatButton({
             : "Chưa thể mở cuộc trò chuyện lúc này. Vui lòng thử lại sau.";
   const errorTitle = apiError?.code === "peer_invalid"
     ? "Tài khoản chưa đúng vai trò"
+    : apiError?.code === "tutor_ineligible"
+      ? "Gia sư chưa sẵn sàng nhận tin nhắn"
     : apiError?.status === 401
       ? "Bạn cần đăng nhập"
       : "Chưa thể bắt đầu trò chuyện";
@@ -124,7 +132,7 @@ export function OpenChatButton({
           </label>
           {error ? <aside className="open-chat-alert" role="alert">
             <span className="open-chat-alert-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 8v4m0 4h.01M10.3 3.9 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3l-7.5-13.1a2 2 0 0 0-3.4 0Z" /></svg></span>
-            <span className="open-chat-alert-copy"><strong>{errorTitle}</strong><span>{errorMessage}</span>{apiError?.status === 401 ? <Link href="/auth/login">Đăng nhập để tiếp tục <span aria-hidden="true">→</span></Link> : null}</span>
+            <span className="open-chat-alert-copy"><strong>{errorTitle}</strong><span>{errorMessage}</span>{apiError?.code === "tutor_ineligible" ? <ul>{(apiError.fieldErrors?.eligibility?.length ? apiError.fieldErrors.eligibility : ["Email gia sư đã xác minh; tài khoản hoạt động; hồ sơ được duyệt và không bị đình chỉ. Giấy tờ được duyệt nếu hệ thống yêu cầu xác minh."]).map((reason) => <li key={reason}>{reason}</li>)}</ul> : null}{apiError?.status === 401 ? <Link href="/auth/login">Đăng nhập để tiếp tục <span aria-hidden="true">→</span></Link> : null}</span>
           </aside> : null}
           <Button className="chat-compose-send" disabled={busy || !draft.trim()} onClick={send}>{busy ? "Đang gửi…" : "Gửi tin nhắn"}</Button>
         </section>

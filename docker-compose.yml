@@ -52,6 +52,8 @@ services:
       # Mail transport is configured in backend/.env.docker.
       # Do not override it here: real SMTP must work for web and workers.
       FRONTEND_URL: http://localhost:3000
+      # Local-only convenience. Set TUTOR_PROFILE_DOCUMENTS_REQUIRED=true in production.
+      TUTOR_PROFILE_DOCUMENTS_REQUIRED: ${TUTOR_PROFILE_DOCUMENTS_REQUIRED:-false}
     volumes:
       - ./backend:/var/www/html
       - ./backend/.env.docker:/var/www/html/.env:ro
@@ -110,6 +112,7 @@ services:
     environment:
       NEXT_PUBLIC_DATA_MODE: api
       NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_TUTOR_PROFILE_DOCUMENTS_REQUIRED: ${TUTOR_PROFILE_DOCUMENTS_REQUIRED:-false}
     ports:
       - "3000:3000"
     command: sh -c "npm ci && npm run dev -- --hostname 0.0.0.0"

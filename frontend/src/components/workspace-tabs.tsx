@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useCallback, useState } from "react";
-import { AppShell, useActor } from "./app-shell";
+import { useActor } from "./app-shell";
 import { ApiState } from "./api-state";
 import { Badge, Button, Card, StatePanel } from "./ui";
 import { WorkspaceForm, type FormField } from "./workspace-form";
@@ -16,7 +16,6 @@ import {
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import "@/app/workspace.css";
 import {
-  WorkspaceNavigation,
   workspaceTabs,
   type WorkspaceTab,
 } from "./workspace-navigation";
@@ -84,11 +83,7 @@ export function WorkspaceTabPage({
   id: number;
   tab: Exclude<WorkspaceTab, "overview">;
 }) {
-  return (
-    <AppShell title={workspaceTabs[tab]}>
-      <TabContent id={id} tab={tab} />
-    </AppShell>
-  );
+  return <TabContent key={`${id}:${tab}`} id={id} tab={tab} />;
 }
 function TabContent({
   id,
@@ -118,7 +113,6 @@ function TabContent({
   const base = `/programs/${id}/${paths[tab]}`;
   return (
     <section className="content-stack workspace-page">
-      <WorkspaceNavigation id={id} active={tab} />
       <h1>{workspaceTabs[tab]}</h1>
       <ApiState {...result} />
       {result.data && (

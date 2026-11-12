@@ -2,6 +2,7 @@ import { ApiClientError, dataMode, request, setAuthHint } from "../api/client";
 import { mockAdminProfiles, mockCurrentUser, mockProfile, mockTutorOnboarding, setMockRole } from "./mock";
 import type {
   AdminTutorProfile,
+  AdminTutorQueueItem,
   ApiEnvelope,
   FilePurpose,
   FileRecord,
@@ -68,8 +69,27 @@ export async function getTutorOnboarding(): Promise<TutorOnboardingData> {
 
 export async function getAdminTutorProfiles(status: TutorProfileStatus = "submitted",): Promise<AdminTutorProfile[]> {
   if (dataMode === "mock") { await delay(); return mockAdminProfiles(status); }
-  const response = await request<ApiEnvelope<AdminTutorProfile[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}` });
+  const response = await request<ApiEnvelope<AdminTutorProfile[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}&scope=mine` });
   return unwrap(response.data);
+}
+
+export async function getAdminTutorQueue(status: TutorProfileStatus = "submitted"): Promise<AdminTutorQueueItem[]> {
+  if (dataMode === "mock") { await delay(); return []; }
+  const response = await request<ApiEnvelope<AdminTutorQueueItem[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}&scope=unassigned` });
+  return unwrap(response.data);
+}
+
+export async function assignAdminTutorProfile(id: number, adminId: number, assignmentVersion: number): Promise<void> {
+  if (dataMode === "mock") { await delay(); throw new ApiClientError("Không có hồ sơ chờ phân công trong dữ liệu demo."); }
+  await request({
+    method: "PUT",
+    url: `/admin/tutor-profiles/${id}/assignment`,
+    data: {
+      assigned_admin_id: adminId,
+      assignment_version: assignmentVersion,
+      reason: "Admin nhận hồ sơ để xét duyệt.",
+    },
+  }, true);
 }
 
 export async function getAdminTutorProfile(id: number): Promise<AdminTutorProfile> {

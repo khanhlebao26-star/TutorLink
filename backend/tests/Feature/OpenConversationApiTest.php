@@ -61,6 +61,49 @@ class OpenConversationApiTest extends TestCase
         $this->assertDatabaseCount('conversation_members', 2);
     }
 
+    public function test_demo_mode_allows_approved_tutor_without_documents_to_receive_contact(): void
+    {
+        config(['tutor.verification_documents_required' => false]);
+        DB::table('verification_documents')->where('tutor_profile_id', $this->tutor->tutorProfile->id)->delete();
+
+        $this->actingAs($this->customer)->postJson('/api/v1/conversations', [
+            'peer_user_id' => $this->tutor->id,
+        ])->assertCreated();
+
+        $this->assertDatabaseCount('conversations', 1);
+        $this->assertDatabaseCount('conversation_members', 2);
+    }
+
+    public function test_required_documents_mode_explains_missing_identity_and_does_not_create_contact(): void
+    {
+        config(['tutor.verification_documents_required' => true]);
+        DB::table('verification_documents')->where('tutor_profile_id', $this->tutor->tutorProfile->id)->delete();
+
+        $this->actingAs($this->customer)->postJson('/api/v1/conversations', [
+            'peer_user_id' => $this->tutor->id,
+        ])->assertForbidden()
+            ->assertJsonPath('code', 'tutor_ineligible')
+            ->assertJsonPath('errors.eligibility.0', 'Gia sư cần có CCCD/CMND hoặc hộ chiếu đã được duyệt, còn hiệu lực và đã kiểm tra tệp thành công.');
+
+        $this->assertDatabaseCount('conversations', 0);
+    }
+
+    public function test_demo_mode_still_requires_verified_email_and_approved_unsuspended_profile(): void
+    {
+        config(['tutor.verification_documents_required' => false]);
+        $this->tutor->forceFill(['email_verified_at' => null])->save();
+        $this->tutor->tutorProfile->update(['status' => 'submitted', 'suspended_at' => now()]);
+
+        $this->actingAs($this->customer)->postJson('/api/v1/conversations', [
+            'peer_user_id' => $this->tutor->id,
+        ])->assertForbidden()
+            ->assertJsonPath('errors.eligibility.0', 'Gia sư cần xác minh email tài khoản.')
+            ->assertJsonPath('errors.eligibility.1', 'Hồ sơ gia sư cần được quản trị viên phê duyệt.')
+            ->assertJsonPath('errors.eligibility.2', 'Hồ sơ gia sư đang bị đình chỉ.');
+
+        $this->assertDatabaseCount('conversations', 0);
+    }
+
     public function test_reverse_direction_reuses_the_same_pair_and_does_not_duplicate_members(): void
     {
         $first = $this->actingAs($this->customer)

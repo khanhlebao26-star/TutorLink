@@ -21,6 +21,7 @@ type FieldErrors = Record<string, string[]>;
 
 const steps = ["Thông tin cơ bản", "Chuyên môn", "Kinh nghiệm", "Tài liệu xác minh", "Xem lại"];
 const emptyUpload: UploadState = { file: null, message: "", error: "", busy: false };
+const verificationDocumentsRequired = process.env.NEXT_PUBLIC_TUTOR_PROFILE_DOCUMENTS_REQUIRED !== "false";
 
 function statusLabel(profile: TutorProfile | null) {
   if (!profile) return "Bản nháp";
@@ -394,7 +395,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     }
 
     const documents = profile?.verification_documents;
-    if (documents !== undefined) {
+    if (verificationDocumentsRequired && documents !== undefined) {
       const validTypes = new Set(documents.filter((document) =>
         document.status !== "rejected" && document.status !== "expired" &&
         (!document.expires_at || Date.parse(document.expires_at) > Date.now()),
@@ -454,18 +455,20 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
           <div>
             <strong className="onboarding-field-label">
               {label}
-              {purpose === "avatar" ? <span className="onboarding-required"> *</span> : <span className="muted"> · Giấy tờ định danh bắt buộc</span>}
+              {purpose === "avatar" ? <span className="onboarding-required"> *</span> : <span className="muted"> · {verificationDocumentsRequired ? "Giấy tờ định danh bắt buộc" : "Không bắt buộc khi kiểm thử"}</span>}
             </strong>
             <p>
               {purpose === "avatar"
                 ? "Ảnh hồ sơ rõ mặt, JPG hoặc PNG, tối đa 5 MB (5.000.000 byte)."
-                : "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 5 MB (5.000.000 byte). Cần giấy tờ định danh và tài liệu khớp bằng cấp đã khai báo. Complete chỉ kiểm tra kỹ thuật; nội dung được duyệt riêng."}
+                : verificationDocumentsRequired
+                  ? "Tài liệu chứng minh thông tin chuyên môn, PDF/JPG/PNG/DOC/DOCX, tối đa 5 MB (5.000.000 byte). Cần giấy tờ định danh và tài liệu khớp bằng cấp đã khai báo. Complete chỉ kiểm tra kỹ thuật; nội dung được duyệt riêng."
+                  : "Bạn có thể bỏ qua khi kiểm thử. Khi đưa lên production, hồ sơ sẽ cần giấy tờ định danh và tài liệu khớp bằng cấp đã khai báo."}
             </p>
           </div>
         </div>
         {purpose === "verification_document" ? (
           <div className="onboarding-field onboarding-document-type">
-            <Field label="Loại tài liệu *" htmlFor="tutor-document_type" error={fieldError("document_type")}><Select value={documentType} disabled={locked||busy} onChange={event=>setDocumentType(event.target.value)}><option value="identity_card">CCCD / CMND</option><option value="passport">Hộ chiếu</option><option value="degree">Bằng cấp</option><option value="certificate">Chứng chỉ</option><option value="other">Khác</option></Select></Field>
+            <Field label={`Loại tài liệu${verificationDocumentsRequired ? " *" : ""}`} htmlFor="tutor-document_type" error={fieldError("document_type")}><Select value={documentType} disabled={locked||busy} onChange={event=>setDocumentType(event.target.value)}><option value="identity_card">CCCD / CMND</option><option value="passport">Hộ chiếu</option><option value="degree">Bằng cấp</option><option value="certificate">Chứng chỉ</option><option value="other">Khác</option></Select></Field>
           </div>
         ) : null}
         <input
@@ -506,6 +509,21 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
   }
 
   const selectedSpecialization = data.specializations.find((item) => String(item.id) === specializationId)?.name ?? "Chưa chọn";
+  const verificationDocuments = profile?.verification_documents ?? [];
+  const verificationDocumentTypes: Record<string, string> = {
+    identity_card: "CCCD / CMND",
+    passport: "Hộ chiếu",
+    degree: "Bằng cấp",
+    certificate: "Chứng chỉ",
+    other: "Tài liệu khác",
+  };
+  const verificationDocumentStatuses: Record<string, string> = {
+    pending: "Đang chờ duyệt",
+    active: "Đã tải lên",
+    approved: "Đã xác minh",
+    rejected: "Cần bổ sung",
+    expired: "Đã hết hạn",
+  };
 
   return (
     <div className="onboarding-layout">
@@ -541,7 +559,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         <div className="onboarding-panel-heading">
           <div>
             <h2>{step === 1 ? "Thông tin cơ bản" : step === 2 ? "Chuyên môn giảng dạy" : step === 3 ? "Kinh nghiệm giảng dạy" : step === 4 ? "Tài liệu xác minh" : "Xem lại hồ sơ"}</h2>
-            <p>{step === 1 ? "Giúp học viên hiểu rõ hơn về bạn và cách bạn giảng dạy." : step === 2 ? "Chọn chuyên môn phù hợp nhất với dịch vụ giảng dạy của bạn." : step === 3 ? "Chia sẻ số năm kinh nghiệm giảng dạy." : step === 4 ? "Tải giấy tờ định danh và tài liệu tương ứng với bằng cấp đã khai báo. File complete chỉ xác nhận kiểm tra kỹ thuật; nội dung được duyệt riêng." : "Kiểm tra thông tin trước khi gửi xét duyệt."}</p>
+            <p>{step === 1 ? "Giúp học viên hiểu rõ hơn về bạn và cách bạn giảng dạy." : step === 2 ? "Chọn chuyên môn phù hợp nhất với dịch vụ giảng dạy của bạn." : step === 3 ? "Chia sẻ số năm kinh nghiệm giảng dạy." : step === 4 ? verificationDocumentsRequired ? "Tải giấy tờ định danh và tài liệu tương ứng với bằng cấp đã khai báo. File complete chỉ xác nhận kiểm tra kỹ thuật; nội dung được duyệt riêng." : "Bạn có thể bỏ qua bước tải tài liệu để thử nghiệm. Hồ sơ vẫn cần các thông tin cơ bản, chuyên môn và ảnh đại diện." : "Kiểm tra thông tin trước khi gửi xét duyệt."}</p>
           </div>
           <div className="onboarding-heading-status">
             <Badge tone={statusTone(profile)} className={`onboarding-status-pill ${changesRequested ? "is-warning" : profile?.status === "approved" ? "is-success" : ""}`}>
@@ -581,64 +599,139 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         ) : null}
 
         {step === 3 ? (
-          <div className="onboarding-fields">
-            <div>
-              <h3>Bằng cấp / Chứng chỉ khai báo</h3>
-              <p className="muted">Mỗi loại đã khai báo cần tài liệu xác minh tương ứng.</p>
+          <div className="onboarding-experience-layout">
+            <section className="onboarding-experience-card onboarding-credentials-card" aria-labelledby="tutor-credentials-title">
+              <div className="onboarding-experience-card-heading">
+                <span className="onboarding-experience-icon" aria-hidden="true">▤</span>
+                <div>
+                  <h3 id="tutor-credentials-title">Bằng cấp &amp; chứng chỉ</h3>
+                  <p>Khai báo những văn bằng liên quan đến chuyên môn giảng dạy của bạn.</p>
+                </div>
+                <span className="onboarding-credential-count">{claims.length}</span>
+              </div>
               {claims.map((claim, index) => {
                 const nameField = `qualification_claims.${index}.name`;
                 return (
-                  <div className="button-row" key={index}>
-                    <Select aria-label={`Loại chứng nhận ${index + 1}`} disabled={locked || busy} value={claim.type}
-                      onChange={(event) => setClaims(claims.map((item, i) => i === index
-                        ? { ...item, type: event.target.value === "certificate" ? "certificate" : "degree" }
-                        : item))}>
-                      <option value="degree">Bằng cấp</option>
-                      <option value="certificate">Chứng chỉ</option>
-                    </Select>
-                    <Field label={`Tên chứng nhận ${index + 1}`} htmlFor={`tutor-${nameField}`} error={fieldError(nameField)}>
-                      <Input maxLength={160} required disabled={locked || busy} value={claim.name}
-                        onChange={(event) => {
-                          setClaims(claims.map((item, i) => i === index ? { ...item, name: event.target.value } : item));
-                          clearFieldError(nameField);
-                        }} />
-                    </Field>
-                    <Button variant="ghost" disabled={locked || busy} onClick={() => {
+                  <div className="onboarding-credential-row" key={index}>
+                    <span className="onboarding-credential-row-icon" aria-hidden="true">{claim.type === "certificate" ? "✧" : "▤"}</span>
+                    <div className="onboarding-credential-fields">
+                      <Select aria-label={`Loại chứng nhận ${index + 1}`} disabled={locked || busy} value={claim.type}
+                        onChange={(event) => setClaims(claims.map((item, i) => i === index
+                          ? { ...item, type: event.target.value === "certificate" ? "certificate" : "degree" }
+                          : item))}>
+                        <option value="degree">Bằng cấp</option>
+                        <option value="certificate">Chứng chỉ</option>
+                      </Select>
+                      <Field label={`Tên chứng nhận ${index + 1}`} htmlFor={`tutor-${nameField}`} error={fieldError(nameField)}>
+                        <Input maxLength={160} required disabled={locked || busy} value={claim.name}
+                          placeholder="Ví dụ: Cử nhân Sư phạm Toán"
+                          onChange={(event) => {
+                            setClaims(claims.map((item, i) => i === index ? { ...item, name: event.target.value } : item));
+                            clearFieldError(nameField);
+                          }} />
+                      </Field>
+                    </div>
+                    <Button variant="ghost" className="onboarding-remove-credential" type="button" aria-label={`Xóa chứng nhận ${index + 1}`} disabled={locked || busy} onClick={() => {
                       setClaims(claims.filter((_, i) => i !== index));
                       setFieldErrors((current) => Object.fromEntries(Object.entries(current).filter(([key]) => !key.startsWith("qualification_claims."))));
                     }}>Xóa</Button>
                   </div>
                 );
               })}
-              <Button variant="outline" disabled={locked || busy || claims.length >= 20}
-                onClick={() => setClaims([...claims, { type: "degree", name: "" }])}>+ Thêm bằng cấp / chứng chỉ</Button>
-            </div>
-            <div className="onboarding-field onboarding-years-field">
-              <Field label="Số năm kinh nghiệm *" htmlFor="tutor-experience_years" error={fieldError("experience_years")} hint="Nhập số năm hoàn chỉnh, từ 0 đến 80.">
-                <Input type="number" min={0} max={80} step={1} value={experienceYears} disabled={locked || busy} required aria-invalid={Boolean(fieldError("experience_years"))} onChange={(event) => { setExperienceYears(event.target.value); clearFieldError("experience_years"); }} />
-              </Field>
-            </div>
-            <div className="onboarding-info-card">
-              <span className="onboarding-info-icon" aria-hidden="true">✦</span>
-              <p>Số năm kinh nghiệm giúp học viên hiểu rõ hơn về nền tảng giảng dạy của bạn.</p>
-            </div>
+              <Button variant="outline" className="onboarding-add-credential" type="button" disabled={locked || busy || claims.length >= 20}
+                onClick={() => setClaims([...claims, { type: "degree", name: "" }])}><span aria-hidden="true">＋</span> Thêm bằng cấp hoặc chứng chỉ</Button>
+              <p className="onboarding-credential-footnote">Bạn có thể bổ sung giấy tờ xác minh ở bước tiếp theo.</p>
+            </section>
+
+            <section className="onboarding-experience-card onboarding-years-card" aria-labelledby="tutor-experience-title">
+              <div className="onboarding-experience-card-heading">
+                <span className="onboarding-experience-icon" aria-hidden="true">◷</span>
+                <div>
+                  <h3 id="tutor-experience-title">Thâm niên giảng dạy</h3>
+                  <p>Số năm kinh nghiệm thực tế của bạn.</p>
+                </div>
+              </div>
+              <div className="onboarding-field onboarding-years-field">
+                <Field label="Số năm kinh nghiệm *" htmlFor="tutor-experience_years" error={fieldError("experience_years")} hint="Nhập số năm hoàn chỉnh, từ 0 đến 80.">
+                  <Input type="number" min={0} max={80} step={1} value={experienceYears} disabled={locked || busy} required aria-invalid={Boolean(fieldError("experience_years"))} onChange={(event) => { setExperienceYears(event.target.value); clearFieldError("experience_years"); }} />
+                </Field>
+              </div>
+              <div className="onboarding-experience-note">
+                <span aria-hidden="true">✦</span>
+                <p>Kinh nghiệm giúp học viên hiểu rõ nền tảng và quá trình giảng dạy của bạn.</p>
+              </div>
+            </section>
           </div>
         ) : null}
 
         {step === 4 ? (
-          <div className="onboarding-fields">
-            {profile?.verification_documents?.map(document=><p key={document.id}>#{document.id} · {document.document_type} · {document.status}</p>)}
-            {renderUpload("verification_document", "Tài liệu xác minh")}
-            <div className="onboarding-document-summary">
-              <strong>Yêu cầu tải tệp</strong>
-              <p>Tải lên bằng cấp hoặc chứng chỉ rõ nét để người xét duyệt xác minh chuyên môn của bạn.</p>
+          <div className="onboarding-fields onboarding-document-step">
+            <section className="onboarding-document-intro" aria-labelledby="tutor-document-intro-title">
+              <span className="onboarding-document-intro-icon" aria-hidden="true">✓</span>
+              <div className="onboarding-document-intro-copy">
+                <p className="onboarding-eyebrow">XÁC MINH CHUYÊN MÔN</p>
+                <h3 id="tutor-document-intro-title">Tài liệu giúp hồ sơ thêm tin cậy</h3>
+                <p>{verificationDocumentsRequired
+                  ? "Tải giấy tờ định danh và tài liệu khớp với bằng cấp, chứng chỉ bạn đã khai báo. Bạn có thể xem trạng thái từng tài liệu ngay tại đây."
+                  : "Bạn có thể tải giấy tờ định danh và bằng cấp để hồ sơ đáng tin cậy hơn, hoặc bỏ qua bước này trong khi kiểm thử."}</p>
+              </div>
+              <div className={`onboarding-document-progress ${attachedDocument ? "is-complete" : ""}`}>
+                <span aria-hidden="true">{attachedDocument ? "✓" : "1"}</span>
+                <div><strong>{attachedDocument ? "Đã nhận tài liệu" : "Bước xác minh"}</strong><small>{attachedDocument ? "Tài liệu đã được tải lên" : "Tải lên giấy tờ đầu tiên"}</small></div>
+              </div>
+            </section>
+
+            <section className="onboarding-document-upload-section" aria-labelledby="tutor-document-upload-title">
+              <div className="onboarding-document-section-heading">
+                <div>
+                  <span className="onboarding-eyebrow">GIẤY TỜ CỦA BẠN</span>
+                  <h3 id="tutor-document-upload-title">Tải tài liệu xác minh</h3>
+                </div>
+                <span className="onboarding-document-required">{verificationDocumentsRequired ? <><span aria-hidden="true">*</span> Bắt buộc giấy tờ định danh</> : "Tùy chọn khi kiểm thử"}</span>
+              </div>
+              {renderUpload("verification_document", "Tài liệu xác minh")}
+            </section>
+
+            <div className="onboarding-document-guidance-grid">
+              <div className="onboarding-document-summary">
+                <span className="onboarding-document-guidance-icon" aria-hidden="true">▤</span>
+                <div>
+                  <strong>Định dạng được chấp nhận</strong>
+                  <p>PDF, JPG, PNG, DOC hoặc DOCX. Kích thước tối đa 5 MB cho mỗi tệp.</p>
+                </div>
+              </div>
+              <div className={`onboarding-avatar-summary ${attachedAvatar ? "is-ready" : "is-missing"}`}>
+                <span className="onboarding-document-guidance-icon" aria-hidden="true">{attachedAvatar ? "✓" : "!"}</span>
+                <div className="onboarding-avatar-summary-copy">
+                  <strong role="status">{uploads.avatar.busy ? uploads.avatar.message : attachedAvatar ? "Ảnh đại diện đã sẵn sàng" : "Bạn chưa tải ảnh đại diện"}</strong>
+                  <p>{attachedAvatar ? "Ảnh đại diện đã được gắn vào hồ sơ của bạn." : "Hồ sơ cần có ảnh đại diện trước khi gửi xét duyệt."}</p>
+                  {!attachedAvatar ? <Button variant="ghost" className="onboarding-link-button" type="button" disabled={busy} onClick={() => setStep(1)}>Quay lại thêm ảnh đại diện <span aria-hidden="true">→</span></Button> : null}
+                  {uploads.avatar.error ? <span className="onboarding-field-error" role="alert">{uploads.avatar.error}</span> : null}
+                  {!attachedAvatar && (uploads.avatar.file || queuedAvatar) && uploads.avatar.error ? <Button variant="ghost" className="onboarding-link-button" type="button" disabled={busy || locked} onClick={() => void retryUpload("avatar")}>Thử tải ảnh lại</Button> : null}
+                </div>
+              </div>
             </div>
-            <div className="onboarding-avatar-summary">
-              <span role="status">{uploads.avatar.busy ? uploads.avatar.message : attachedAvatar ? "✓ Ảnh đại diện đã gắn" : "Ảnh đại diện còn thiếu"}</span>
-              {!attachedAvatar ? <Button variant="ghost" className="onboarding-link-button" type="button" disabled={busy} onClick={() => setStep(1)}>Quay lại bước ảnh đại diện</Button> : null}
-              {uploads.avatar.error ? <span className="onboarding-field-error" role="alert">{uploads.avatar.error}</span> : null}
-              {!attachedAvatar && (uploads.avatar.file || queuedAvatar) && uploads.avatar.error ? <Button variant="ghost" className="onboarding-link-button" type="button" disabled={busy || locked} onClick={() => void retryUpload("avatar")}>Thử tải ảnh lại</Button> : null}
-            </div>
+
+            {verificationDocuments.length ? (
+              <section className="onboarding-document-list" aria-labelledby="tutor-document-list-title">
+                <div className="onboarding-document-section-heading">
+                  <div><span className="onboarding-eyebrow">HỒ SƠ CỦA BẠN</span><h3 id="tutor-document-list-title">Tài liệu đã gửi</h3></div>
+                  <span className="onboarding-document-count">{verificationDocuments.length} tài liệu</span>
+                </div>
+                <ul>
+                  {verificationDocuments.map((document) => (
+                    <li className="onboarding-document-row" key={document.id}>
+                      <span className="onboarding-document-row-icon" aria-hidden="true">▤</span>
+                      <div className="onboarding-document-row-copy">
+                        <strong>{document.original_name || verificationDocumentTypes[document.document_type] || document.document_type}</strong>
+                        <span>{verificationDocumentTypes[document.document_type] || document.document_type}</span>
+                      </div>
+                      <span className={`onboarding-document-status is-${document.status}`} role="status">{verificationDocumentStatuses[document.status] || document.status}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
           </div>
         ) : null}
 
