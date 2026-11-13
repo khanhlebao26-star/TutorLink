@@ -104,14 +104,30 @@ function AccountSettingsForm({ initialUser }: { initialUser: User }) {
   </div>;
 }
 
+function AdminAccountDetails({ user }: { user: User }) {
+  return <div className="settings-content-stack">
+    <section className="card settings-admin-account" aria-labelledby="admin-account-heading">
+      <div className="settings-card-heading"><h2 id="admin-account-heading">Thông tin tài khoản quản trị</h2><p className="muted">Thông tin nhận diện quản trị viên trong hoạt động xét duyệt và xử lý báo cáo.</p></div>
+      <dl className="settings-admin-details">
+        <div><dt>Họ và tên</dt><dd>{user.full_name}</dd></div>
+        <div><dt>Email</dt><dd>{user.email}</dd></div>
+        <div><dt>Vai trò tài khoản</dt><dd>{roleLabels[user.role]}</dd></div>
+        <div><dt>Trạng thái tài khoản</dt><dd>{statusLabels[user.status]}</dd></div>
+      </dl>
+    </section>
+    <section className="card settings-admin-security" aria-labelledby="admin-security-heading"><div><h2 id="admin-security-heading">Bảo mật tài khoản</h2><p className="muted">Cập nhật mật khẩu đăng nhập của bạn.</p></div><Link className="button button-outline" href="/settings/password">Đổi mật khẩu</Link></section>
+    <section className="card settings-logout" aria-label="Đăng xuất"><span className="settings-logout-icon" aria-hidden="true">↪</span><div><h2>Đăng xuất</h2><p className="muted">Đăng xuất khỏi tài khoản trên thiết bị này.</p></div><LogoutButton /></section>
+  </div>;
+}
+
 export default function SettingsPage() {
   const load = useCallback(async () => (await request<ApiEnvelope<User>>({ method: "GET", url: "/me" })).data.data, []);
   const { data, error, loading, reload } = useAsyncData(load);
   return <AppShell title="">
     <section className="content-stack settings-page">
       <nav className="settings-breadcrumb" aria-label="Đường dẫn"><Link href="/">Trang chủ</Link><span aria-hidden="true">/</span><span>Cài đặt</span><span aria-hidden="true">/</span><strong>Cài đặt tài khoản</strong></nav>
-      <header className="settings-page-heading"><h1>Cài đặt tài khoản</h1><p className="muted">Quản lý thông tin cá nhân của bạn.</p></header>
-      {loading ? <StatePanel kind="loading" message="Đang tải thông tin tài khoản…" /> : error ? <StatePanel kind="error" message={describeApiError(error)} action={<ErrorActions login={[401, 419].includes(error.status ?? 0)} onRetry={reload} />} /> : data ? <AccountSettingsForm key={data.id} initialUser={data} /> : null}
+      <header className="settings-page-heading"><h1>Cài đặt tài khoản</h1><p className="muted">{data?.role === "admin" ? "Xem thông tin tài khoản và quản lý bảo mật." : "Quản lý thông tin cá nhân của bạn."}</p></header>
+      {loading ? <StatePanel kind="loading" message="Đang tải thông tin tài khoản…" /> : error ? <StatePanel kind="error" message={describeApiError(error)} action={<ErrorActions login={[401, 419].includes(error.status ?? 0)} onRetry={reload} />} /> : data ? data.role === "admin" ? <AdminAccountDetails user={data} /> : <AccountSettingsForm key={data.id} initialUser={data} /> : null}
     </section>
   </AppShell>;
 }

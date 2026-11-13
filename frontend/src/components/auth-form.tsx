@@ -285,7 +285,14 @@ export function AuthForm({ mode, initialRole = "customer" }: { mode: "login" | "
       </fieldset>
 
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
-      {message ? <div><p className="inline-success" role="status">{message}</p><Link href={`/auth/verify-email?email=${encodeURIComponent(email)}`}>Mở trang xác minh email →</Link></div> : null}
+      {message ? <div className="auth-registration-success">
+        <p className="inline-success" role="status">{message}</p>
+        <Link className="auth-verify-email-button" href={`/auth/verify-email?email=${encodeURIComponent(email)}`}>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 6.5h17v11h-17z" /><path d="m4 7 8 6 8-6" /></svg>
+          <span>Mở trang xác minh email</span>
+          <span className="auth-verify-email-arrow" aria-hidden="true">→</span>
+        </Link>
+      </div> : null}
       <Button type="submit" disabled={formBusy}>
         {submitting ? "Đang xử lý…" : mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
       </Button>

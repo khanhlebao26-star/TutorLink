@@ -770,6 +770,54 @@
   color: #126f72;
 }
 
+.auth-registration-success {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-verify-email-button {
+  align-items: center;
+  background: #fff7fc;
+  border: 1px solid #ffc4e3;
+  border-radius: 12px;
+  color: #d81783;
+  display: flex;
+  font-size: .9rem;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: center;
+  min-height: 44px;
+  padding: 9px 14px;
+  text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+
+.auth-verify-email-button svg {
+  height: 18px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 18px;
+}
+
+.auth-verify-email-button:hover {
+  background: #ffedf7;
+  border-color: #f5289e;
+  color: #ba1670;
+  transform: translateY(-1px);
+}
+
+.auth-verify-email-button:focus-visible {
+  outline: 3px solid rgba(245, 40, 158, .25);
+  outline-offset: 2px;
+}
+
+.auth-verify-email-arrow {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 .auth-card-support .button {
   border-radius: 8px;
   min-height: 48px;

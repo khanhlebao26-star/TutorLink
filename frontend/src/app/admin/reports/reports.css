@@ -1,0 +1,22 @@
+.admin-reports-page { display: grid; gap: 24px; }
+.admin-reports-heading h1 { font-size: clamp(1.7rem, 2.2vw, 2.2rem); margin: 0 0 8px; }
+.admin-reports-heading p { color: var(--muted); font-size: .92rem; line-height: 1.7; margin: 0; }
+.admin-report-item { gap: 14px; }
+.admin-report-detail-header { align-items: flex-start; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; padding-bottom: 24px; }
+.admin-report-eyebrow { color: var(--accent-dark); font-size: .78rem; font-weight: 700; }
+.admin-report-detail-header h2 { font-size: 1.4rem; margin: 10px 0; }
+.admin-report-detail-header p { color: var(--muted); font-size: .79rem; margin: 0; }
+.admin-reports-page .tutor-review-section h3 { font-size: 1rem; margin: 0 0 16px; }
+.admin-reports-page .tutor-review-section>p { font-size: .9rem; line-height: 1.8; margin: 0; }
+.admin-report-evidence-heading { align-items: center; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; margin-bottom: 18px; }
+.admin-report-evidence-heading h3 { margin: 0 !important; }
+.admin-report-evidence-heading .button { font-size: .8rem; }
+.admin-report-evidence { display: grid; gap: 16px; }
+.admin-report-resource, .admin-report-evidence blockquote { background: #f8f7fc; border: 1px solid #eeedf5; border-radius: 10px; margin: 0; padding: 16px; }
+.admin-report-evidence p { font-size: .86rem; line-height: 1.85; margin: 6px 0 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.admin-report-evidence small { color: var(--muted); font-size: .74rem; }
+.admin-report-files { display: grid; gap: 12px; list-style: none; margin: 0; padding: 0; }
+.admin-report-files li { align-items: center; border: 1px solid var(--line); border-radius: 10px; display: flex; flex-wrap: wrap; font-size: .85rem; gap: 12px; justify-content: space-between; padding: 14px; }
+.admin-report-files li>span { min-width: 0; overflow-wrap: anywhere; }
+.admin-report-files .button { font-size: .76rem; }
+.admin-report-evidence summary { cursor: pointer; font-size: .85rem; font-weight: 650; }

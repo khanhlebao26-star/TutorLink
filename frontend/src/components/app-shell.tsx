@@ -176,7 +176,10 @@ function AccountMenu({ user }: { user: User }) {
             <Link href="/reports" onClick={() => setOpen(false)}>Báo cáo của tôi</Link>
             <Link href="/support" onClick={() => setOpen(false)}>Hỗ trợ</Link>
             <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
-          </nav> : <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>}
+          </nav> : <nav className="account-menu-links" aria-label="Điều hướng tài khoản quản trị">
+            <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
+            <Link href="/settings/password" onClick={() => setOpen(false)}>Đổi mật khẩu</Link>
+          </nav>}
           <LogoutButton />
         </>}
       </div>
@@ -291,7 +294,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
 
   const requiredRole: Role | undefined = pathname.startsWith("/me/")
     ? role ?? "tutor"
-    : (pathname === "/admin" || pathname === "/monitoring")
+    : (isActive(pathname, "/admin") || pathname === "/monitoring")
     ? role ?? "admin"
     : pathname === "/profile"
       ? role ?? "tutor"
@@ -335,11 +338,11 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   }, [user?.id, user?.role]);
   useEffect(() => {
     let current = true;
+    if (!user || user.role === "admin") {
+      setFavoriteCount(0);
+      return () => { current = false; };
+    }
     const loadFavorites = () => {
-      if (!user) {
-        setFavoriteCount(0);
-        return;
-      }
       getFavoriteTutors()
         .then((favorites) => { if (current) setFavoriteCount(favorites.length); })
         .catch(() => { if (current) setFavoriteCount(0); });
@@ -350,7 +353,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
       current = false;
       window.removeEventListener(favoriteUpdateEvent, loadFavorites);
     };
-  }, [user?.id, pathname]);
+  }, [user?.id, user?.role, pathname]);
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
   const protectedPage = Boolean(requiredRole) || isActive(pathname, "/settings") || ["/programs", "/invitations", "/messages", "/reports", "/notifications", "/favorites", "/learning-profile"].some(prefix => isActive(pathname, prefix));
   const invitationDetailRoute = /^\/invitations\/\d+$/.test(pathname);
@@ -471,7 +474,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   const tutorSidebarRoute = activeRole === "tutor" && (isActive(pathname, "/settings") || pathname === "/reports");
   const hideTutorSidebar = activeRole === "tutor" && !tutorSidebarRoute;
   const roleNavItems = activeRole === "admin"
-    ? [{ href: "/admin", label: "Duyệt hồ sơ Tutor" },{href:"/monitoring",label:"Giám sát hệ thống"}]
+    ? [{ href: "/admin/dashboard", label: "Dashboard quản trị" }, { href: "/admin", label: "Duyệt hồ sơ Tutor" }, { href: "/admin/reports", label: "Quản lý báo cáo" }, { href: "/monitoring", label: "Giám sát hệ thống" }]
     : activeRole === "tutor"
       ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Quản lý giảng dạy" }]
       : activeRole === "customer" ? [{ href: "/learning-profile", label: "Hồ sơ học tập" }] : [];
@@ -523,14 +526,16 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
           </form>
           <LocaleDisplay />
           {user ? <>
-            <Link className="public-header-messages" href="/messages" aria-label="Tin nhắn" title="Tin nhắn">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.8-3.3A7.5 7.5 0 1 1 20 11.5Z" /><path d="M8.5 11.5h7m-7 3h4" /></svg>
-              {unreadMessages > 0 ? <span className="public-favorite-count" aria-label={`${unreadMessages} tin nhắn chưa đọc`}>{unreadMessages > 50 ? "50+" : unreadMessages}</span> : null}
-            </Link>
-            <Link className="public-header-favorite" href="/favorites" aria-label={`Yêu thích${favoriteCount ? `, ${favoriteCount} hồ sơ đã lưu` : ""}`} title="Yêu thích">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z" /></svg>
-              {favoriteCount > 0 ? <span className="public-favorite-count">{favoriteCount > 99 ? "99+" : favoriteCount}</span> : null}
-            </Link>
+            {user.role !== "admin" ? <>
+              <Link className="public-header-messages" href="/messages" aria-label="Tin nhắn" title="Tin nhắn">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.8-3.3A7.5 7.5 0 1 1 20 11.5Z" /><path d="M8.5 11.5h7m-7 3h4" /></svg>
+                {unreadMessages > 0 ? <span className="public-favorite-count" aria-label={`${unreadMessages} tin nhắn chưa đọc`}>{unreadMessages > 50 ? "50+" : unreadMessages}</span> : null}
+              </Link>
+              <Link className="public-header-favorite" href="/favorites" aria-label={`Yêu thích${favoriteCount ? `, ${favoriteCount} hồ sơ đã lưu` : ""}`} title="Yêu thích">
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z" /></svg>
+                {favoriteCount > 0 ? <span className="public-favorite-count">{favoriteCount > 99 ? "99+" : favoriteCount}</span> : null}
+              </Link>
+            </> : null}
             <Link className="public-header-notifications" href="/notifications" aria-label="Thông báo" title="Thông báo">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" /></svg>
               {unreadNotifications > 0 ? <span className="public-notification-dot" aria-label={`${unreadNotifications} thông báo chưa đọc`} /> : null}
@@ -550,7 +555,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
               <Link
                 key={item.href}
                 href={item.href}
-                aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                aria-current={(item.href === "/admin" ? pathname === "/admin" : isActive(pathname, item.href)) ? "page" : undefined}
                 onClick={() => setMenuOpen(false)}
               >
                 {item.label}

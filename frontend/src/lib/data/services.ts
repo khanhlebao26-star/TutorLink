@@ -84,6 +84,19 @@ export async function getAdminTutorQueue(status: TutorProfileStatus = "submitted
   return unwrap(response.data);
 }
 
+export async function getAdminTutorReviewPage(scope: "unassigned" | "mine", status: TutorProfileStatus, page: number) {
+  const perPage = 10;
+  if (dataMode === "mock") {
+    const items = scope === "mine" ? await getAdminTutorProfiles(status) : await getAdminTutorQueue(status);
+    return { items: items.slice((page - 1) * perPage, page * perPage), total: items.length, page, perPage };
+  }
+  const response = await request<ApiEnvelope<Array<AdminTutorProfile | AdminTutorQueueItem>>>({
+    method: "GET",
+    url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}&scope=${scope}&page=${page}&per_page=${perPage}`,
+  });
+  return { items: response.data.data, total: Number(response.data.meta?.total ?? 0), page, perPage };
+}
+
 export async function assignAdminTutorProfile(id: number, adminId: number, assignmentVersion: number): Promise<void> {
   if (dataMode === "mock") { await delay(); throw new ApiClientError("Không có hồ sơ chờ phân công trong dữ liệu demo."); }
   await request({
