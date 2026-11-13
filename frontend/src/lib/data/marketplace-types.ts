@@ -1,5 +1,5 @@
 // B3 integration proposal. A3 must confirm these additions before API acceptance.
-import type { CatalogCategory, DeliveryMode, Listing, ListingStatus, PaginationMeta } from "./types";
+import type { CatalogCategory, DeliveryMode, Listing, ListingStatus, PaginationMeta } from "@/lib/data/types";
 
 export type MarketplaceStatus = ListingStatus;
 export type PriceUnit = "hour" | "session" | "course";
@@ -82,4 +82,4 @@ export interface TutorReviewCollection {
   meta: PaginationMeta;
   aggregate: TutorReviewAggregate;
 }
-export type { CatalogCategory, DeliveryMode, PaginationMeta };
+export type { CatalogCategory,DeliveryMode,PaginationMeta };

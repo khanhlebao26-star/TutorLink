@@ -1,6 +1,6 @@
-import { request } from "../api/client";
-import type { ApiEnvelope } from "./types";
-import type { Collection } from "./workspace";
+import { request } from "@/lib/api/client";
+import type { ApiEnvelope } from "@/lib/data/types";
+import type { Collection } from "@/lib/data/workspace";
 
 export interface ReportQueueItem {
   id: number;

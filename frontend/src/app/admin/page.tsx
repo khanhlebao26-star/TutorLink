@@ -1,14 +1,14 @@
 "use client";
 
-import { AppShell } from "@/components/app-shell";
-import { VerificationDocumentPreview } from "@/components/verification-document-preview";
-import { Badge, Button, ErrorActions, Field, StatePanel } from "@/components/ui";
+import "@/app/admin/admin.css";
+import { VerificationDocumentPreview } from "@/components/admin/verification-document-preview";
+import { AppShell } from "@/components/layout/app-shell";
+import { Badge, Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { assignAdminTutorProfile, getAdminTutorProfile, getAdminTutorReviewPage, getCurrentUser, getSpecializations, performAdminAccountAction, performAdminTutorAction, type AdminAction } from "@/lib/data/services";
 import type { AdminTutorProfile, AdminTutorQueueItem, TutorProfileStatus, VerificationDocument } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { useCallback, useRef, useState } from "react";
-import "./admin.css";
 
 const labels: Record<TutorProfileStatus, string> = {
   draft: "Bản nháp", submitted: "Đang chờ", changes_requested: "Cần bổ sung",

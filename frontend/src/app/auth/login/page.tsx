@@ -1,7 +1,7 @@
+import { AuthForm } from "@/components/auth/auth-form";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { AppShell } from "@/components/layout/app-shell";
 import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import { AuthForm } from "@/components/auth-form";
-import { AuthLayout } from "@/components/auth-layout";
 
 export default function LoginPage() {
   return (

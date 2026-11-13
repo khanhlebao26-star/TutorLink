@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import { ProgramWorkspaceShell } from "@/components/programs/program-workspace-shell";
 import { notFound } from "next/navigation";
-import { ProgramWorkspaceShell } from "@/components/program-workspace-shell";
+import type { ReactNode } from "react";
 
 export default async function ProgramLayout({ children, params }: { children: ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;

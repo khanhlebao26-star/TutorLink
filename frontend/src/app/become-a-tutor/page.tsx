@@ -1,7 +1,7 @@
+import { AppShell } from "@/components/layout/app-shell";
+import { TutorCommunityStories } from "@/components/marketing/tutor-community-stories";
 import Image from "next/image";
 import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import { TutorCommunityStories } from "@/components/tutor-community-stories";
 
 const tutorRegistration = "/auth/register?role=tutor";
 

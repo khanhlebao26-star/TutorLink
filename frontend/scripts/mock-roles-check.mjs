@@ -28,8 +28,8 @@ class ApiClientError extends Error {
   constructor(message, options) { super(message); Object.assign(this, options); }
 }
 const services = load("../src/lib/data/services.ts", {
-  "./mock": mock,
-  "../api/client": {
+  "@/lib/data/mock": mock,
+  "@/lib/api/client": {
     ApiClientError, dataMode: "mock", setAuthHint() {},
     request() { assert.fail("Mock mode must not call the API"); },
   },

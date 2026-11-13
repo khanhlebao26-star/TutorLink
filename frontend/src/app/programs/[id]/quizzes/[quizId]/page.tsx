@@ -1,5 +1,5 @@
+import { QuizDetailPage } from "@/components/programs/program-quizzes";
 import { notFound } from "next/navigation";
-import { QuizDetailPage } from "@/components/program-quizzes";
 
 export default async function Page({ params }: { params: Promise<{ id: string; quizId: string }> }) {
   const { id, quizId } = await params;

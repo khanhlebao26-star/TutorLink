@@ -1,6 +1,6 @@
-import { AppShell } from "@/components/app-shell";
-import { ListingDetail } from "@/components/listing-detail";
-import "@/app/public-detail.css";
+import { AppShell } from "@/components/layout/app-shell";
+import { ListingDetail } from "@/components/marketplace/listing-detail";
+import "@/styles/public-detail.css";
 
 export default async function MarketplaceListingPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

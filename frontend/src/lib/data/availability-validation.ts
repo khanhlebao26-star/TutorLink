@@ -1,4 +1,4 @@
-import type { Availability } from "./marketplace-types";
+import type { Availability } from "@/lib/data/marketplace-types";
 
 export const weekdayLabels = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"];
 export function validateAvailability(value: Availability): Record<string, string[]> {

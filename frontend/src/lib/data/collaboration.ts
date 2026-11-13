@@ -1,4 +1,4 @@
-import { request } from "../api/client";
+import { request } from "@/lib/api/client";
 
 export interface Page<T> {
   data: T[];

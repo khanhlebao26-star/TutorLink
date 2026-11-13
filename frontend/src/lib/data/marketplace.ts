@@ -1,6 +1,6 @@
-import { ApiClientError, request } from "../api/client";
-import type { Availability, AvailabilityRule, CatalogCategory, ListingInput, ListingQuery, OwnerListing, OwnerListingAction, OwnerListingCollection, OwnerListingStatusFilter, PublicListing, PublicListingCollection, ReportableTutorCollection, TutorPublic, TutorReviewCollection } from "./marketplace-types";
-import type { ApiEnvelope } from "./types";
+import { ApiClientError, request } from "@/lib/api/client";
+import type { Availability, AvailabilityRule, CatalogCategory, ListingInput, ListingQuery, OwnerListing, OwnerListingAction, OwnerListingCollection, OwnerListingStatusFilter, PublicListing, PublicListingCollection, ReportableTutorCollection, TutorPublic, TutorReviewCollection } from "@/lib/data/marketplace-types";
+import type { ApiEnvelope } from "@/lib/data/types";
 
 const ownerListingStatuses = ["draft", "active", "inactive", "cancelled"] as const;
 const ownerListingActions = ["edit", "publish", "pause", "archive"] as const satisfies readonly OwnerListingAction[];

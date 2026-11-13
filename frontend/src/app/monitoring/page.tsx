@@ -1,8 +1,8 @@
 "use client";
 
-import { AppShell } from "@/components/app-shell";
-import { Card } from "@/components/ui";
-import "./monitoring.css";
+import "@/app/monitoring/monitoring.css";
+import { AppShell } from "@/components/layout/app-shell";
+import { Card } from "@/components/shared/ui";
 
 function hostDashboard() {
   const value = process.env.NEXT_PUBLIC_HOST_DASHBOARD_URL;

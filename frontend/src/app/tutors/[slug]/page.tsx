@@ -1,6 +1,6 @@
-import { AppShell } from "@/components/app-shell";
-import { PublicTutor } from "@/components/public-tutor";
-import "@/app/public-detail.css";
+import { AppShell } from "@/components/layout/app-shell";
+import { PublicTutor } from "@/components/tutors/public-tutor";
+import "@/styles/public-detail.css";
 
 export default async function PublicTutorPage({
   params,

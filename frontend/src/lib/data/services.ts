@@ -1,5 +1,5 @@
-import { ApiClientError, dataMode, request, setAuthHint } from "../api/client";
-import { mockAdminProfiles, mockCurrentUser, mockProfile, mockTutorOnboarding, setMockRole } from "./mock";
+import { ApiClientError, dataMode, request, setAuthHint } from "@/lib/api/client";
+import { mockAdminProfiles, mockCurrentUser, mockProfile, mockTutorOnboarding, setMockRole } from "@/lib/data/mock";
 import type {
   AdminTutorProfile,
   AdminTutorQueueItem,
@@ -15,7 +15,7 @@ import type {
   TutorProfileStatus,
   User,
   VerificationDocument
-} from "./types";
+} from "@/lib/data/types";
 export const MAX_UPLOAD_BYTES = 5_000_000;
 
 const unwrap = <T>(value: ApiEnvelope<T> | T): T =>

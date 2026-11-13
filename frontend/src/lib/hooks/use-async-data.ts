@@ -1,7 +1,7 @@
 "use client";
 
+import { ApiClientError } from "@/lib/api/client";
 import { useCallback, useEffect, useState } from "react";
-import { ApiClientError } from "../api/client";
 
 export function useAsyncData<T>(loader: () => Promise<T>) {
   const [attempt, setAttempt] = useState(0);

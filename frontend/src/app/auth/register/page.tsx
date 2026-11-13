@@ -1,6 +1,6 @@
-import { AppShell } from "@/components/app-shell";
-import { AuthForm } from "@/components/auth-form";
-import { AuthLayout } from "@/components/auth-layout";
+import { AuthForm } from "@/components/auth/auth-form";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { AppShell } from "@/components/layout/app-shell";
 
 export default async function RegisterPage({
   searchParams,

@@ -1,4 +1,4 @@
-import { request } from "../api/client";
+import { request } from "@/lib/api/client";
 export interface WorkspaceRow {
   id: number;
   program_id?: number;
@@ -84,4 +84,14 @@ export function localTimestamp(value?: string) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
     .slice(0, -1);
+}
+
+export async function readAllWorkspaceRows(path: string) {
+  const first = await workspaceRead<Collection<WorkspaceRow>>(path, { page: 1, per_page: 50 });
+  const lastPage = first.meta?.last_page ?? 1;
+  if (lastPage <= 1) return first.data;
+  const rest = await Promise.all(Array.from({ length: lastPage - 1 }, (_, index) =>
+    workspaceRead<Collection<WorkspaceRow>>(path, { page: index + 2, per_page: 50 }),
+  ));
+  return [...first.data, ...rest.flatMap((page) => page.data)];
 }

@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback } from "react";
 import { getMarketplaceCatalog } from "@/lib/data/marketplace";
 import type { CatalogCategory } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import Link from "next/link";
+import { useCallback } from "react";
 
 type CatalogTone = "education" | "fitness" | "sports";
 

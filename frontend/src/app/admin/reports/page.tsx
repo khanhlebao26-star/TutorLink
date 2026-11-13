@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import { AppShell, useActor } from "@/components/app-shell";
-import { Badge, Button, ErrorActions, Field, StatePanel } from "@/components/ui";
+import "@/app/admin/admin.css";
+import "@/app/admin/reports/reports.css";
+import { AppShell, useActor } from "@/components/layout/app-shell";
+import { Badge, Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui";
 import { ApiClientError, describeApiError, request } from "@/lib/api/client";
 import { claimReport, decideReport, getAdminReport, getAdminReports, getReportEvidence, reportReasonLabels, reportResourceLabels, reportStatusLabels, type AdminReport, type ReportEvidence, type ReportQueueItem } from "@/lib/data/admin-reports";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "../admin.css";
-import "./reports.css";
+import { useCallback, useRef, useState } from "react";
 
 function formatDate(value?: string | null) {
   return value && !Number.isNaN(new Date(value).getTime()) ? new Intl.DateTimeFormat("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value)) : "Chưa có thông tin";

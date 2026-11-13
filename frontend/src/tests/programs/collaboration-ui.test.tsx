@@ -1,0 +1,237 @@
+import { Messaging } from "@/components/messaging/messaging";
+import { InvitationDetail } from "@/components/programs/invitations";
+import { ProgramDetail } from "@/components/programs/program-detail";
+import { ProgramEditor } from "@/components/programs/program-editor";
+import { ApiClientError } from "@/lib/api/client";
+import type { Invitation, Program } from "@/lib/data/collaboration";
+import * as collaboration from "@/lib/data/collaboration";
+import * as messaging from "@/lib/data/messaging";
+import * as services from "@/lib/data/services";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, expect, it, vi } from "vitest";
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push }),
+  usePathname: () => "/programs",
+}));
+vi.mock("@/components/layout/app-shell", () => ({
+  useActor:()=>({id:7,role:"customer"}),
+  AppShell: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+vi.mock("@/lib/data/collaboration", async (original) => ({
+  ...(await original<typeof import("@/lib/data/collaboration")>()),
+  getProgram: vi.fn(),
+  getOverview: vi.fn(),
+  editProgram: vi.fn(),
+  getInvitation: vi.fn(),
+  decideInvitation: vi.fn(),
+}));
+vi.mock("@/lib/data/messaging", async (original) => ({
+  ...(await original<typeof import("@/lib/data/messaging")>()),
+  conversations: vi.fn(),
+  conversation: vi.fn(),
+  messages: vi.fn(),
+  markRead: vi.fn(),
+  sendMessage: vi.fn(),
+}));
+vi.mock("@/lib/data/services", () => ({ getCurrentUser: vi.fn() }));
+const program: Program = {
+  id: 3,
+  customer_id: 7,
+  source_listing_id: null,
+  title: "English",
+  goal: "Confidence",
+  level: "A2",
+  delivery_mode: "online",
+  agreed_fee_minor: 300000,
+  currency: "VND",
+  fee_unit: "session",
+  timezone: "Asia/Ho_Chi_Minh",
+  location_text: null,
+  meeting_url: null,
+  schedule_note: null,
+  planned_session_count: 8,
+  status: "draft",
+  version: 4,
+  allowed_actions: ["edit", "send_invitation"],
+};
+beforeEach(() => {
+  vi.clearAllMocks();
+  Object.defineProperty(document, "visibilityState", {
+    configurable: true,
+    value: "visible",
+  });
+  Object.defineProperty(navigator, "onLine", {
+    configurable: true,
+    value: true,
+  });
+  vi.mocked(services.getCurrentUser).mockResolvedValue({
+    id: 7,
+    role: "customer",
+  } as never);
+});
+it("keeps the draft after a stale edit and sends the loaded version", async () => {
+  vi.mocked(collaboration.getProgram).mockResolvedValue(program);
+  vi.mocked(collaboration.editProgram).mockRejectedValue(
+    new ApiClientError("Version conflict", { status: 409 }),
+  );
+  render(<ProgramEditor id={3} />);
+  const input = await screen.findByLabelText("Tên chương trình học");
+  await userEvent.clear(input);
+  await userEvent.type(input, "My revised title");
+  await userEvent.click(screen.getByRole("button", { name: "Lưu bản nháp" }));
+  expect(await screen.findByText("Version conflict")).toBeVisible();
+  expect(input).toHaveValue("My revised title");
+  expect(collaboration.editProgram).toHaveBeenCalledWith(
+    3,
+    expect.objectContaining({ title: "My revised title" }),
+    4,
+  );
+  expect(
+    screen.getByRole("button", { name: "Gửi lời mời từ bản đã lưu" }),
+  ).toBeDisabled();
+});
+it("does not fetch workspace summary for a draft", async () => {
+  vi.mocked(collaboration.getProgram).mockResolvedValue(program);
+  render(<ProgramDetail id={3} />);
+  await screen.findByText(
+    "Workspace sẽ mở sau khi học viên chấp nhận lời mời.",
+  );
+  expect(collaboration.getOverview).not.toHaveBeenCalled();
+});
+it("accepts the invitation snapshot and enters the resulting workspace", async () => {
+  vi.mocked(collaboration.getInvitation).mockResolvedValue({
+    id: 5,
+    program_id: 3,
+    status: "pending",
+    expires_at: "2099-01-01T00:00:00Z",
+    offer_snapshot: {
+      target_customer_id: 7,
+      program_id: 3,
+      offer: program,
+      source_listing: null,
+    },
+  } as Invitation);
+  vi.mocked(collaboration.decideInvitation).mockResolvedValue();
+  render(<InvitationDetail id={5} />);
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Chấp nhận lời mời" }),
+  );
+  expect(collaboration.decideInvitation).toHaveBeenCalledWith(
+    5,
+    "accept",
+    expect.any(String),
+  );
+  expect(push).toHaveBeenCalledWith("/programs/3");
+});
+it("retries a failed text message with its original UUID and has no attachment input", async () => {
+  const c = {
+    id: 8,
+    status: "active",
+    peer: { id: 2, display_name: "Tutor Anna" },
+    context_listing_id: null,
+    unread_count: 1,
+    last_read_message_id: null,
+    preview: null,
+  };
+  vi.mocked(messaging.conversations).mockResolvedValue({
+    data: [c],
+    meta: { has_more: false, next_cursor: null, per_page: 20 },
+  });
+  vi.mocked(messaging.conversation).mockResolvedValue(c);
+  vi.mocked(messaging.messages).mockResolvedValue({
+    data: [],
+    meta: {
+      per_page: 20,
+      has_more: false,
+      next_cursor: null,
+      polling_cursor: "initial",
+    },
+  });
+  vi.mocked(messaging.sendMessage)
+    .mockRejectedValueOnce(new ApiClientError("Network failed"))
+    .mockResolvedValueOnce({
+      id: 10,
+      conversation_id: 8,
+      sender_id: 7,
+      client_message_id: "key",
+      message_type: "text",
+      body: "Hello",
+      created_at: "2026-11-05T00:00:00Z",
+    });
+  const { container } = render(<Messaging id={8} />);
+  const input = await screen.findByLabelText("Nội dung tin nhắn");
+  await userEvent.type(input, "Hello");
+  await userEvent.click(screen.getByRole("button", { name: "Gửi tin nhắn" }));
+  await userEvent.click(
+    await screen.findByRole("button", { name: "Thử gửi lại" }),
+  );
+  await waitFor(() => expect(messaging.sendMessage).toHaveBeenCalledTimes(2));
+  expect(vi.mocked(messaging.sendMessage).mock.calls[0]).toEqual(
+    vi.mocked(messaging.sendMessage).mock.calls[1],
+  );
+  expect(container.querySelector('input[type="file"]')).toBeNull();
+  await waitFor(() => expect(input).toHaveValue(""));
+});
+
+it("does not show failed-message actions while a message is sending successfully", async () => {
+  const c = {
+    id: 8, status: "active", peer: { id: 2, display_name: "Tutor Anna" },
+    context_listing_id: null, unread_count: 0, last_read_message_id: null, preview: null,
+  };
+  vi.mocked(messaging.conversations).mockResolvedValue({ data: [c], meta: { has_more: false, next_cursor: null, per_page: 20 } });
+  vi.mocked(messaging.conversation).mockResolvedValue(c);
+  vi.mocked(messaging.messages).mockResolvedValue({ data: [], meta: { per_page: 20, has_more: false, next_cursor: null } });
+  let complete!: (message: Awaited<ReturnType<typeof messaging.sendMessage>>) => void;
+  vi.mocked(messaging.sendMessage).mockImplementationOnce(() => new Promise((resolve) => { complete = resolve; }));
+
+  render(<Messaging id={8}/>);
+  const input = await screen.findByLabelText("Nội dung tin nhắn");
+  await userEvent.type(input, "Hello without a warning");
+  await userEvent.click(screen.getByRole("button", { name: "Gửi tin nhắn" }));
+
+  expect(input).toBeDisabled();
+  expect(screen.queryByRole("button", { name: "Thử gửi lại" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Chỉnh sửa tin nhắn" })).not.toBeInTheDocument();
+
+  await act(async () => complete({
+    id: 10, conversation_id: 8, sender_id: 7, client_message_id: "key",
+    message_type: "text", body: "Hello without a warning", created_at: "2026-11-12T00:00:00Z",
+  }));
+  expect(screen.getByText("Hello without a warning")).toBeVisible();
+  expect(input).toHaveValue("");
+  expect(input).toBeEnabled();
+  expect(screen.queryByRole("button", { name: "Thử gửi lại" })).not.toBeInTheDocument();
+});
+
+it("shows an unselected conversation screen and inbox skeleton before the first list arrives", async () => {
+  let finish!: (page: Awaited<ReturnType<typeof messaging.conversations>>) => void;
+  vi.mocked(messaging.conversations).mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+  render(<Messaging/>);
+  expect(screen.getByRole("heading", { name: "Chưa chọn cuộc trò chuyện nào" })).toBeVisible();
+  expect(screen.getByRole("status", { name: "Đang tải danh sách cuộc trò chuyện" })).toBeVisible();
+  expect(screen.queryByText("Chưa có cuộc trò chuyện")).not.toBeInTheDocument();
+  expect(messaging.conversation).not.toHaveBeenCalled();
+  expect(messaging.messages).not.toHaveBeenCalled();
+  await act(async () => finish({ data: [], meta: { per_page: 20, has_more: false, next_cursor: null } }));
+  expect(screen.getByText("Chưa có cuộc trò chuyện")).toBeVisible();
+});
+
+it("loads a thread independently of a slow inbox and keeps the inbox when switching threads", async () => {
+  const c = { id: 8, status: "active", peer: { id: 2, display_name: "Tutor Anna" }, context_listing_id: null, unread_count: 0, last_read_message_id: null, preview: null };
+  let finish!: (page: Awaited<ReturnType<typeof messaging.conversations>>) => void;
+  vi.mocked(messaging.conversations).mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+  vi.mocked(messaging.conversation).mockImplementation(async (id) => ({ ...c, id }));
+  vi.mocked(messaging.messages).mockResolvedValue({ data: [], meta: { per_page: 20, has_more: false, next_cursor: null } });
+  const view = render(<Messaging id={8}/>);
+  await screen.findByLabelText("Nội dung tin nhắn");
+  expect(screen.getByRole("status", { name: "Đang tải danh sách cuộc trò chuyện" })).toBeVisible();
+  await act(async () => finish({ data: [c], meta: { per_page: 20, has_more: false, next_cursor: null } }));
+  expect(screen.getByRole("link", { name: /Tutor Anna/ })).toBeVisible();
+  view.rerender(<Messaging id={9}/>);
+  expect(screen.getByRole("link", { name: /Tutor Anna/ })).toBeVisible();
+  expect(screen.queryByRole("status", { name: "Đang tải danh sách cuộc trò chuyện" })).not.toBeInTheDocument();
+  expect(messaging.conversations).toHaveBeenCalledTimes(1);
+  await waitFor(() => expect(messaging.conversation).toHaveBeenCalledWith(9, expect.any(AbortSignal)));
+});

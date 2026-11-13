@@ -1,9 +1,9 @@
+import "@/app/globals.css";
+import { MockRoleSwitcher } from "@/components/layout/mock-role-switcher";
+import { SessionHintProvider } from "@/components/layout/session-hint";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
-import { SessionHintProvider } from "@/components/session-hint";
-import { MockRoleSwitcher } from "@/components/mock-role-switcher";
-import "./globals.css";
 
 export const metadata: Metadata = {
   title: "TutorLink",

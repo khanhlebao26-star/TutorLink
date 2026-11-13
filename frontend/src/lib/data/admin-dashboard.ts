@@ -1,5 +1,5 @@
-import { request } from "../api/client";
-import type { ApiEnvelope } from "./types";
+import { request } from "@/lib/api/client";
+import type { ApiEnvelope } from "@/lib/data/types";
 
 export type DashboardCounts = Record<string, number>;
 export type DashboardQueues = { mine?: DashboardCounts; unassigned?: DashboardCounts };

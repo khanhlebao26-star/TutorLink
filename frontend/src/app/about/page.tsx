@@ -1,6 +1,6 @@
+import "@/app/about/about.css";
+import { AppShell } from "@/components/layout/app-shell";
 import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import "./about.css";
 
 const principles = [
   {

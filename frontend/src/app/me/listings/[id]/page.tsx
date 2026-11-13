@@ -1,5 +1,5 @@
+import { OwnerListingDetail } from "@/components/marketplace/owner-listings";
 import { notFound } from "next/navigation";
-import { OwnerListingDetail } from "@/components/owner-listings";
 
 export default async function OwnerListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

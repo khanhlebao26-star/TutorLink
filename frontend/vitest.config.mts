@@ -6,12 +6,12 @@ export default defineConfig({
   test: {
     exclude: ["**/node_modules/**", "**/.next*/**", "e2e/**"],
     environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts"],
+    setupFiles: ["./src/tests/setup.ts"],
     restoreMocks: true,
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/test/**", "src/**/*.test.*"],
+      exclude: ["src/tests/**", "src/**/*.test.*"],
       reporter: ["text", "json-summary", "lcov", "html"],
     },
   },

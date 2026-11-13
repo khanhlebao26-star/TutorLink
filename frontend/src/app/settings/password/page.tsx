@@ -1,11 +1,11 @@
 "use client";
 
+import "@/app/settings/settings.css";
+import { AppShell } from "@/components/layout/app-shell";
+import { Button, Field } from "@/components/shared/ui";
+import { ApiClientError, describeApiError, request } from "@/lib/api/client";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import { AppShell } from "@/components/app-shell";
-import { Button, Field } from "@/components/ui";
-import { ApiClientError, describeApiError, request } from "@/lib/api/client";
-import "../settings.css";
 
 type PasswordField = "current_password" | "password" | "password_confirmation";
 

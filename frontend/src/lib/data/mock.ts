@@ -1,4 +1,4 @@
-import type { AdminTutorProfile, CustomerProfile, ProfileResponse, Role, TutorOnboardingData, TutorProfile, User } from "./types";
+import type { AdminTutorProfile, CustomerProfile, ProfileResponse, Role, TutorOnboardingData, TutorProfile, User } from "@/lib/data/types";
 
 const mockRoleKey = "tutorlink-mock-role";
 

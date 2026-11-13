@@ -1,8 +1,8 @@
+import { AppShell } from "@/components/layout/app-shell";
+import { MarketplaceSearch } from "@/components/marketplace/marketplace-search";
+import { StatePanel } from "@/components/shared/ui";
+import "@/styles/marketplace.css";
 import { Suspense } from "react";
-import { AppShell } from "@/components/app-shell";
-import { MarketplaceSearch } from "@/components/marketplace-search";
-import { StatePanel } from "@/components/ui";
-import "../marketplace.css";
 
 export default function MarketplacePage() {
   return <AppShell mode="public" title="Khám phá dịch vụ">

@@ -1,10 +1,10 @@
+import { CatalogLinks } from "@/app/become-a-tutor/catalog-links";
+import { AppShell } from "@/components/layout/app-shell";
+import { FeaturedServices } from "@/components/marketing/featured-services";
+import { FeaturedTutors } from "@/components/marketing/featured-tutors";
+import { StudentTestimonials } from "@/components/marketing/student-testimonials";
 import Image from "next/image";
 import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import { FeaturedServices } from "@/components/featured-services";
-import { FeaturedTutors } from "@/components/featured-tutors";
-import { StudentTestimonials } from "@/components/student-testimonials";
-import { CatalogLinks } from "./become-a-tutor/catalog-links";
 
 const learningSteps = [
   { number: "1", icon: "search", title: "Tìm dịch vụ", text: "Khám phá các dịch vụ phù hợp với mục tiêu của bạn." },

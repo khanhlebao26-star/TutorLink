@@ -1,15 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { AppShell } from "@/components/app-shell";
-import { Button, ErrorActions, Field, StatePanel } from "@/components/ui";
-import { Programs } from "@/components/programs";
-import { Invitations } from "@/components/invitations";
-import { useActor } from "@/components/app-shell";
+import "@/app/learning-profile/learning-profile.css";
+import { AppShell, useActor } from "@/components/layout/app-shell";
+import { Invitations } from "@/components/programs/invitations";
+import { Programs } from "@/components/programs/program-list";
+import { Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui";
 import { describeApiError, request } from "@/lib/api/client";
 import type { ApiEnvelope } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "./learning-profile.css";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 interface LearningProfile {
   subjects_of_interest: string | null;

@@ -1,6 +1,6 @@
 "use client";
+import { ApiClientError } from "@/lib/api/client";
 import { useEffect, useState } from "react";
-import { ApiClientError } from "../api/client";
 /** One request at a time; hidden/offline requests are aborted and never rescheduled until visible/online. */
 export function usePolling(
   task: (signal: AbortSignal) => Promise<void>,

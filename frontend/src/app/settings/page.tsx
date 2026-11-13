@@ -1,14 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import { Button, ErrorActions, Field, StatePanel } from "@/components/ui";
+import "@/app/settings/settings.css";
+import { LogoutButton } from "@/components/auth/logout-button";
+import { AppShell } from "@/components/layout/app-shell";
+import { Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui";
 import { ApiClientError, describeApiError, request } from "@/lib/api/client";
 import type { ApiEnvelope, Role, User, UserStatus } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import Link from "next/link";
 import { useCallback, useRef, useState, type FormEvent } from "react";
-import { LogoutButton } from "@/components/logout-button";
-import "./settings.css";
 
 const roleLabels: Record<Role, string> = { customer: "Học viên", tutor: "Gia sư / Coach", admin: "Quản trị viên" };
 const statusLabels: Record<UserStatus, string> = {

@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import { Button, ErrorActions, StatePanel } from "@/components/ui";
+import "@/app/admin/dashboard/dashboard.css";
+import { AppShell } from "@/components/layout/app-shell";
+import { Button, ErrorActions, StatePanel } from "@/components/shared/ui";
 import { describeApiError } from "@/lib/api/client";
 import { getAdminDashboard, type DashboardQueues } from "@/lib/data/admin-dashboard";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "./dashboard.css";
+import Link from "next/link";
 
 const number = (value: number) => new Intl.NumberFormat("vi-VN").format(value);
 const profileStatuses = { submitted: "Đang chờ duyệt", changes_requested: "Cần bổ sung", approved: "Đã phê duyệt", rejected: "Đã từ chối", suspended: "Đã tạm ngưng" };

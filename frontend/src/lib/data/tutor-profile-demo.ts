@@ -1,4 +1,4 @@
-import type { TutorPublic } from "./marketplace-types";
+import type { TutorPublic } from "@/lib/data/marketplace-types";
 
 // Presentation fixtures keyed by the listings in LocalFeaturedDemoSeeder.
 // Public tutors without a demo listing keep the values supplied by the API.
