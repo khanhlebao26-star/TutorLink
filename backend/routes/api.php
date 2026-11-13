@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\ConversationController;
 use App\Http\Controllers\Api\V1\ConversationRealtimeController;
+use App\Http\Controllers\Api\V1\CustomerLearningProfileController;
 use App\Http\Controllers\Api\V1\FeeRecordController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\FileController;
@@ -44,6 +45,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/admin/reviews/{review}', [ReviewController::class, 'detail'])->whereNumber('review');
         Route::get('/me/reports', [ReportController::class, 'mine']);
         Route::get('/me/reports/{report}', [ReportController::class, 'ownDetail'])->whereNumber('report');
+        Route::get('/me/learning-profile', [CustomerLearningProfileController::class, 'show']);
+        Route::put('/me/learning-profile', [CustomerLearningProfileController::class, 'update']);
         Route::get('/admin/reports', [ReportController::class, 'index']);
         Route::get('/admin/reports/{report}', [ReportController::class, 'show'])->whereNumber('report');
         Route::get('/admin/reports/{report}/evidence', [ReportController::class, 'evidence'])->whereNumber('report');
@@ -247,6 +250,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/listings', [ListingController::class, 'index']);
     Route::get('/listings/{slug}', [ListingController::class, 'show']);
 
+    Route::get('/tutors', [PublicTutorController::class, 'index']);
     Route::get('/tutors/{slug}', [
         PublicTutorController::class,
         'show',

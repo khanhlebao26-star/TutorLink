@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { AppShell } from "./app-shell";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { AppShell, useActor } from "./app-shell";
 import { ApiState } from "./api-state";
 import { Button, Card, StatePanel } from "./ui";
-import { WorkspaceForm } from "./workspace-form";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import { workspaceRead, type Collection } from "@/lib/data/workspace";
+import { completeFile, uploadFile } from "@/lib/data/services";
+import { searchListings, searchReportableTutors } from "@/lib/data/marketplace";
+import { describeApiError } from "@/lib/api/client";
+import { retryIdentity, workspaceRead, workspaceWrite, type Collection } from "@/lib/data/workspace";
 import "@/app/reports.css";
 
 interface Report {
@@ -27,6 +29,7 @@ const resourceLabels: Record<string, string> = {
   review: "Đánh giá",
   listing: "Dịch vụ",
   tutor_profile: "Hồ sơ gia sư",
+  system: "Hệ thống TutorLink",
 };
 
 const reasonLabels: Record<string, string> = {
@@ -36,6 +39,10 @@ const reasonLabels: Record<string, string> = {
   fraud_suspected: "Nghi ngờ gian lận",
   misleading_information: "Thông tin sai lệch",
   privacy_violation: "Vi phạm quyền riêng tư",
+  bug_report: "Báo lỗi kỹ thuật",
+  feature_request: "Góp ý chức năng",
+  performance_issue: "Vấn đề hiệu năng",
+  usability_issue: "Khó sử dụng",
   other: "Lý do khác",
 };
 
@@ -72,11 +79,13 @@ function ReportRowsLoading() {
   </div>;
 }
 
-export function ReportsPage({ programId }: { programId?: number }) {
-  return <AppShell title=""><ReportsContent programId={programId} /></AppShell>;
+export function ReportsPage() {
+  return <AppShell title=""><ReportsContent /></AppShell>;
 }
 
-function ReportsContent({ programId }: { programId?: number }) {
+function ReportsContent() {
+  const actor = useActor();
+  const audienceLabel = actor?.role === "tutor" ? "Gia sư" : "Học viên";
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -107,18 +116,11 @@ function ReportsContent({ programId }: { programId?: number }) {
   }, [query, reports, statusFilter]);
   const lastPage = result.data?.meta?.last_page ?? Math.max(1, Math.ceil(total / 50));
 
-  const reportFields = [
-    { name: "resource_type", label: "Đối tượng cần báo cáo", required: true, options: resourceLabels },
-    { name: "resource_id", label: "Mã đối tượng", type: "number" as const, min: 1, required: true },
-    { name: "reason_code", label: "Lý do báo cáo", required: true, options: reasonLabels },
-    { name: "description", label: "Mô tả chi tiết", type: "textarea" as const, required: true, maxLength: 2000 },
-  ];
-
   return (
     <section className="reports-page">
       <div className="reports-heading">
         <div>
-          <p className="reports-eyebrow"><span /> Học viên · Báo cáo của tôi</p>
+          <p className="reports-eyebrow"><span /> {audienceLabel} · Báo cáo của tôi</p>
           <h1>Báo cáo của tôi</h1>
           <p className="reports-subtitle">Theo dõi các vấn đề bạn đã gửi và cập nhật kết quả xử lý.</p>
         </div>
@@ -155,7 +157,7 @@ function ReportsContent({ programId }: { programId?: number }) {
             <label className="reports-search">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.2 4.2"/></svg>
               <span className="reports-sr-only">Tìm báo cáo</span>
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo mã, đối tượng…" />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo mã báo cáo, đối tượng hoặc lý do…" />
             </label>
             <label className="reports-status-filter">
               <span className="reports-sr-only">Lọc trạng thái</span>
@@ -176,7 +178,6 @@ function ReportsContent({ programId }: { programId?: number }) {
             <span className="reports-empty-icon" aria-hidden="true">◎</span>
             <h3>{reports.length === 0 ? "Bạn chưa gửi báo cáo nào" : "Không tìm thấy báo cáo phù hợp"}</h3>
             <p>{reports.length === 0 ? "Nếu gặp nội dung hoặc hành vi cần được xem xét, bạn có thể gửi báo cáo để đội ngũ TutorLink hỗ trợ." : "Thử đổi từ khóa hoặc trạng thái lọc."}</p>
-            {reports.length === 0 ? <Button variant="outline" onClick={() => setFormOpen(true)}>Gửi báo cáo đầu tiên</Button> : null}
           </div>
         )}
 
@@ -190,7 +191,7 @@ function ReportsContent({ programId }: { programId?: number }) {
                   <h3>Báo cáo #{report.id}</h3>
                   <span className={`report-status is-${statusTone(report.status)}`}><i />{statusLabels[report.status] ?? "Đang cập nhật"}</span>
                 </div>
-                <p className="report-row-target">{resourceLabels[report.resource_type] ?? report.resource_type} <span>·</span> Mã #{report.resource_id}</p>
+                <p className="report-row-target">{resourceLabels[report.resource_type] ?? report.resource_type}</p>
                 <div className="report-row-meta"><span>{reasonLabels[report.reason_code] ?? report.reason_code}</span><span>{formatDate(report.created_at)}</span></div>
                 {expanded ? <div className="report-detail">
                   <div><strong>Mô tả vấn đề</strong><p>{report.description || "Không có mô tả bổ sung."}</p></div>
@@ -225,15 +226,214 @@ function ReportsContent({ programId }: { programId?: number }) {
             <div><p className="reports-eyebrow"><span /> Hỗ trợ cộng đồng</p><h2 id="reports-dialog-title">Gửi báo cáo</h2><p>Mô tả vấn đề để đội ngũ TutorLink có thể xem xét.</p></div>
             <button className="reports-dialog-close" type="button" aria-label="Đóng" onClick={() => setFormOpen(false)}>×</button>
           </div>
-          <WorkspaceForm
-            url="/reports"
-            fields={reportFields}
-            initial={programId ? { resource_type: "program", resource_id: programId } : {}}
-            label="Gửi báo cáo"
-            onSaved={() => { setFormOpen(false); setPage(1); result.reload(); }}
-          />
+          <ReportSubmissionForm onSaved={() => { setFormOpen(false); setPage(1); result.reload(); }} />
         </section>
       </div> : null}
     </section>
   );
+}
+
+type ReportTargetType = "listing" | "tutor_profile" | "system";
+type ReportReason = { code: string; label: string };
+type EvidenceFile = { file: File; preview: string };
+
+const reasonsByTarget: Record<ReportTargetType, ReportReason[]> = {
+  listing: [
+    { code: "spam", label: "Dịch vụ spam hoặc quảng cáo gây hiểu nhầm" },
+    { code: "misleading_information", label: "Thông tin, học phí hoặc cam kết sai lệch" },
+    { code: "inappropriate_content", label: "Nội dung hoặc hình ảnh không phù hợp" },
+    { code: "fraud_suspected", label: "Có dấu hiệu lừa đảo" },
+    { code: "privacy_violation", label: "Vi phạm quyền riêng tư" },
+    { code: "other", label: "Lý do khác" },
+  ],
+  tutor_profile: [
+    { code: "harassment", label: "Có hành vi quấy rối hoặc không phù hợp" },
+    { code: "misleading_information", label: "Thông tin hồ sơ hoặc bằng cấp sai lệch" },
+    { code: "inappropriate_content", label: "Nội dung hoặc hình ảnh không phù hợp" },
+    { code: "fraud_suspected", label: "Có dấu hiệu lừa đảo" },
+    { code: "privacy_violation", label: "Vi phạm quyền riêng tư" },
+    { code: "other", label: "Lý do khác" },
+  ],
+  system: [
+    { code: "bug_report", label: "Báo lỗi / chức năng không hoạt động" },
+    { code: "feature_request", label: "Đề xuất chức năng mới hoặc cải tiến" },
+    { code: "performance_issue", label: "Trang chậm hoặc gặp vấn đề hiệu năng" },
+    { code: "usability_issue", label: "Khó tìm hoặc khó sử dụng một chức năng" },
+    { code: "other", label: "Góp ý hoặc vấn đề khác" },
+  ],
+};
+
+function ReportSubmissionForm({ onSaved }: { onSaved: () => void }) {
+  const actor = useActor();
+  const canUploadEvidence = Boolean(actor?.email_verified_at);
+  const [targetType, setTargetType] = useState<ReportTargetType>("listing");
+  const [targetId, setTargetId] = useState("");
+  const [targetSearch, setTargetSearch] = useState("");
+  const [tutorQuery, setTutorQuery] = useState("");
+  const [reasonCode, setReasonCode] = useState("");
+  const [description, setDescription] = useState("");
+  const [evidence, setEvidence] = useState<EvidenceFile[]>([]);
+  const evidenceRef = useRef<EvidenceFile[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const receipt = useRef<{ payload: string; key: string } | null>(null);
+  const evidenceInput = useRef<HTMLInputElement>(null);
+  evidenceRef.current = evidence;
+  useEffect(() => () => evidenceRef.current.forEach((item) => URL.revokeObjectURL(item.preview)), []);
+  const loadListings = useCallback(() => searchListings({ per_page: 50 }), []);
+  const listingsResult = useAsyncData(loadListings);
+  const listings = listingsResult.data?.data ?? [];
+  useEffect(() => {
+    const timer = window.setTimeout(() => setTutorQuery(targetType === "tutor_profile" ? targetSearch.trim() : ""), 250);
+    return () => window.clearTimeout(timer);
+  }, [targetSearch, targetType]);
+  const loadTutors = useCallback(() => searchReportableTutors({ q: tutorQuery || undefined, per_page: 50 }), [tutorQuery]);
+  const tutorsResult = useAsyncData(loadTutors);
+  const tutors = tutorsResult.data?.data ?? [];
+  const selectedReasons = reasonsByTarget[targetType];
+
+  const options = useMemo(() => targetType === "listing"
+    ? listings.map((listing) => ({ id: listing.id, label: listing.title, subtitle: listing.tutor_name ? `Gia sư: ${listing.tutor_name}` : listing.specialization_name || "Dịch vụ TutorLink" }))
+    : targetType === "tutor_profile" ? tutors
+      .filter((tutor) => !(actor?.role === "tutor" && actor.profile?.id === tutor.id))
+      .map((tutor) => ({ id: tutor.id, label: tutor.name, subtitle: tutor.specializations.join(" · ") || tutor.headline }))
+      : [{ id: 1, label: "Hệ thống TutorLink", subtitle: "Góp ý chức năng, báo lỗi hoặc vấn đề khi sử dụng" }],
+  [actor?.profile?.id, actor?.role, listings, targetType, tutors]);
+  const visibleOptions = options.filter((option) => `${option.label} ${option.subtitle}`.toLocaleLowerCase("vi").includes(targetSearch.trim().toLocaleLowerCase("vi")));
+  const selectedOption = options.find((option) => String(option.id) === targetId);
+
+  function changeTargetType(next: ReportTargetType) {
+    setTargetType(next);
+    setTargetId(next === "system" ? "1" : "");
+    setTargetSearch("");
+    setReasonCode("");
+  }
+
+  function addEvidence(files: FileList | null) {
+    if (!files) return;
+    setError("");
+    const incoming = [...files];
+    const remaining = Math.max(0, 3 - evidence.length);
+    const valid: EvidenceFile[] = [];
+    for (const file of incoming.slice(0, remaining)) {
+      if (!/^image\/(jpeg|png)$/.test(file.type)) {
+        setError("Bằng chứng chỉ nhận ảnh JPG hoặc PNG.");
+        continue;
+      }
+      if (file.size <= 0 || file.size > 5_000_000) {
+        setError("Mỗi ảnh cần có dung lượng từ 1 byte đến 5 MB.");
+        continue;
+      }
+      valid.push({ file, preview: URL.createObjectURL(file) });
+    }
+    setEvidence((current) => [...current, ...valid].slice(0, 3));
+    if (incoming.length > remaining) setError("Bạn có thể đính kèm tối đa 3 ảnh.");
+    if (evidenceInput.current) evidenceInput.current.value = "";
+  }
+
+  function removeEvidence(index: number) {
+    setEvidence((current) => {
+      const removed = current[index];
+      if (removed) URL.revokeObjectURL(removed.preview);
+      return current.filter((_, itemIndex) => itemIndex !== index);
+    });
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    const selectedId = targetType === "system" ? 1 : Number(targetId);
+    if (!Number.isSafeInteger(selectedId) || selectedId < 1) {
+      setError("Hãy chọn một dịch vụ, gia sư hoặc Hệ thống TutorLink.");
+      return;
+    }
+    if (!reasonCode) {
+      setError("Hãy chọn lý do báo cáo phù hợp.");
+      return;
+    }
+    if (!description.trim()) {
+      setError("Hãy mô tả chi tiết vấn đề để đội ngũ có thể xem xét.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const fileIds: number[] = [];
+      for (let index = 0; index < evidence.length; index += 1) {
+        setUploadProgress(Math.round((index / Math.max(1, evidence.length)) * 100));
+        const uploaded = await uploadFile(evidence[index].file, "report_evidence");
+        const complete = await completeFile(uploaded.id);
+        if (!complete.complete || complete.scan_status !== "clean") throw new Error(`Ảnh “${evidence[index].file.name}” chưa vượt qua bước kiểm tra kỹ thuật.`);
+        fileIds.push(complete.id);
+      }
+      setUploadProgress(100);
+      const payload = { resource_type: targetType, resource_id: selectedId, reason_code: reasonCode, description: description.trim(), file_ids: fileIds };
+      receipt.current = retryIdentity(receipt.current, payload);
+      await workspaceWrite("/reports", "POST", payload, receipt.current.key);
+      evidence.forEach((item) => URL.revokeObjectURL(item.preview));
+      onSaved();
+    } catch (reason: unknown) {
+      setError(describeApiError(reason, "Không thể gửi báo cáo. Vui lòng thử lại."));
+    } finally {
+      setBusy(false);
+      setUploadProgress(null);
+    }
+  }
+
+  return <form className="report-form" onSubmit={submit}>
+    <div className="report-form-field">
+      <span className="report-form-label">Bạn muốn báo cáo</span>
+      <div className="report-target-tabs" role="group" aria-label="Loại đối tượng báo cáo">
+        <button type="button" className={targetType === "listing" ? "is-active" : ""} onClick={() => changeTargetType("listing")}>Một dịch vụ</button>
+        <button type="button" className={targetType === "tutor_profile" ? "is-active" : ""} onClick={() => changeTargetType("tutor_profile")}>Một gia sư</button>
+        <button type="button" className={targetType === "system" ? "is-active" : ""} onClick={() => changeTargetType("system")}>Hệ thống</button>
+      </div>
+      <p className="report-form-hint">{targetType === "system" ? "Dùng để báo lỗi, góp ý chức năng hoặc phản ánh trải nghiệm trên TutorLink." : "Chọn trực tiếp từ danh sách; TutorLink sẽ tự nhận diện mục bạn chọn."}</p>
+    </div>
+
+    {targetType !== "system" ? <div className="report-form-field">
+      <label className="report-form-label" htmlFor="report-target-search">{targetType === "listing" ? "Dịch vụ cần báo cáo" : "Gia sư cần báo cáo"}</label>
+      <input id="report-target-search" className="input" value={targetSearch} onChange={(event) => setTargetSearch(event.target.value)} placeholder={targetType === "listing" ? "Tìm theo tên dịch vụ hoặc gia sư…" : "Tìm theo tên gia sư hoặc môn dạy…"} />
+      <div className="report-target-options" role="listbox" aria-label={targetType === "listing" ? "Danh sách dịch vụ" : "Danh sách gia sư"}>
+        {(targetType === "listing" ? listingsResult.loading : tutorsResult.loading) ? <p className="report-options-message">Đang tải danh sách {targetType === "listing" ? "dịch vụ" : "gia sư"}…</p> : null}
+        {(targetType === "listing" ? listingsResult.error : tutorsResult.error) ? <p className="report-options-message is-error">{describeApiError(targetType === "listing" ? listingsResult.error : tutorsResult.error, "Không thể tải danh sách.")} <button type="button" onClick={targetType === "listing" ? listingsResult.reload : tutorsResult.reload}>Thử lại</button></p> : null}
+        {!(targetType === "listing" ? listingsResult.loading : tutorsResult.loading) && !(targetType === "listing" ? listingsResult.error : tutorsResult.error) && visibleOptions.length === 0 ? <p className="report-options-message">Không tìm thấy mục phù hợp.</p> : null}
+        {visibleOptions.map((option) => <button type="button" role="option" aria-selected={targetId === String(option.id)} className={`report-target-option${targetId === String(option.id) ? " is-selected" : ""}`} key={`${targetType}-${option.id}`} onClick={() => setTargetId(String(option.id))}>
+          <span className="report-target-option-mark" aria-hidden="true">{targetId === String(option.id) ? "✓" : targetType === "listing" ? "▤" : "♙"}</span>
+          <span><strong>{option.label}</strong><small>{option.subtitle}</small></span>
+        </button>)}
+      </div>
+      {selectedOption ? <div className="report-target-selected"><span>Đã chọn</span><strong>{selectedOption.label}</strong><small>{selectedOption.subtitle}</small><button type="button" onClick={() => setTargetId("")}>Bỏ chọn</button></div> : null}
+    </div> : null}
+
+    <div className="report-form-field">
+      <label className="report-form-label" htmlFor="report-reason">Lý do báo cáo</label>
+      <select id="report-reason" className="select" value={reasonCode} onChange={(event) => setReasonCode(event.target.value)} required>
+        <option value="">Chọn lý do phù hợp…</option>
+        {selectedReasons.map((reason) => <option value={reason.code} key={reason.code}>{reason.label}</option>)}
+      </select>
+      <p className="report-form-hint">{targetType === "system" ? "Chọn nhóm phù hợp để đội ngũ chuyển phản ánh đến đúng bộ phận." : `Các lý do được gợi ý riêng cho ${targetType === "listing" ? "dịch vụ" : "hồ sơ gia sư"}.`}</p>
+    </div>
+
+    <div className="report-form-field">
+      <span className="report-form-label">Ảnh bằng chứng <small>(không bắt buộc)</small></span>
+      <button type="button" className="report-evidence-picker" onClick={() => evidenceInput.current?.click()} disabled={busy || evidence.length >= 3 || !canUploadEvidence}>
+        <span aria-hidden="true">＋</span><strong>Tải ảnh lên</strong><small>JPG hoặc PNG · tối đa 5 MB/ảnh · tối đa 3 ảnh</small>
+      </button>
+      <input ref={evidenceInput} className="reports-sr-only" type="file" accept="image/jpeg,image/png" multiple onChange={(event) => addEvidence(event.currentTarget.files)} />
+      {!canUploadEvidence ? <p className="report-form-hint">Bạn cần xác minh email để tải ảnh bằng chứng. Bạn vẫn có thể gửi báo cáo bằng mô tả chi tiết.</p> : null}
+      {evidence.length ? <div className="report-evidence-list">{evidence.map((item, index) => <div className="report-evidence-item" key={`${item.file.name}-${index}`}>
+        <img src={item.preview} alt={`Ảnh bằng chứng ${index + 1}`} /><span title={item.file.name}>{item.file.name}</span><button type="button" aria-label={`Xóa ${item.file.name}`} onClick={() => removeEvidence(index)} disabled={busy}>×</button>
+      </div>)}</div> : null}
+      {uploadProgress !== null ? <p className="report-form-hint">Đang tải và kiểm tra ảnh… {uploadProgress}%</p> : null}
+    </div>
+
+    <div className="report-form-field">
+      <label className="report-form-label" htmlFor="report-description">Mô tả chi tiết</label>
+      <textarea id="report-description" className="input" value={description} onChange={(event) => setDescription(event.target.value)} maxLength={2000} required placeholder={targetType === "system" && reasonCode === "bug_report" ? "Mô tả các bước dẫn đến lỗi, kết quả thực tế và kết quả bạn mong đợi…" : targetType === "system" && reasonCode === "feature_request" ? "Mô tả nhu cầu của bạn và chức năng/cải tiến sẽ giúp ích như thế nào…" : targetType === "system" && reasonCode === "performance_issue" ? "Cho biết trang hoặc thao tác bị chậm, thời điểm xảy ra và thiết bị/trình duyệt đang dùng…" : "Mô tả điều đã xảy ra, thời gian và thông tin giúp chúng tôi xác minh…"} />
+      <p className="report-form-hint">Không đưa mật khẩu hoặc thông tin thanh toán vào nội dung báo cáo. {description.length}/2000</p>
+    </div>
+    {error ? <p className="report-form-error" role="alert">{error}</p> : null}
+    <Button type="submit" disabled={busy || (targetType === "listing" ? listingsResult.loading : targetType === "tutor_profile" ? tutorsResult.loading : false) || !targetId}>{busy ? "Đang gửi báo cáo…" : "Gửi báo cáo"}</Button>
+  </form>;
 }

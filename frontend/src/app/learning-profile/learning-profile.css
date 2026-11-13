@@ -1,0 +1,28 @@
+.learning-profile-page { display: grid; gap: 24px; margin: 0 auto; max-width: 1240px; width: 100%; }
+.learning-profile-header { margin-bottom: 0; width: 100%; }
+.tutor-profile-tabs.learning-profile-tabs { gap: clamp(18px, 4vw, 50px); }
+.tutor-profile-tabs.learning-profile-tabs button { background: transparent; border: 0; border-bottom: 3px solid transparent; color: #63718d; cursor: pointer; flex: 0 0 auto; font: inherit; font-size: .9rem; font-weight: 700; margin-bottom: -1px; padding: 16px 2px 13px; }
+.tutor-profile-tabs.learning-profile-tabs button:hover { color: var(--accent-dark); }
+.tutor-profile-tabs.learning-profile-tabs button.is-active { border-bottom-color: var(--accent); color: var(--accent-dark); }
+.learning-profile-tab-panel { min-height: 240px; }
+.learning-profile-section-title { align-items: end; display: flex; justify-content: space-between; margin: 4px 0 16px; }
+.learning-profile-section-title h2 { font-size: 1.35rem; margin: 0 0 4px; }
+.learning-profile-section-title p { color: var(--muted); margin: 0; }
+.learning-profile-form { gap: 20px; padding: clamp(20px, 4vw, 34px); }
+.learning-profile-section-heading { align-items: flex-start; border-bottom: 1px solid var(--line); display: flex; gap: 13px; padding-bottom: 16px; }
+.learning-profile-section-heading > span { align-items: center; background: var(--accent-soft); border-radius: 12px; color: var(--accent); display: flex; flex: 0 0 42px; height: 42px; justify-content: center; }
+.learning-profile-section-heading h2 { font-size: 1.15rem; margin: 0 0 4px; }
+.learning-profile-section-heading p { color: var(--muted); font-size: .84rem; margin: 0; }
+.learning-profile-form textarea { min-height: 112px; resize: vertical; }
+.learning-profile-location { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
+.learning-profile-privacy { align-items: flex-start; background: #f8f7fc; border: 1px solid #e8e6f1; border-radius: 10px; color: var(--muted); display: flex; gap: 10px; padding: 12px 14px; }
+.learning-profile-privacy > span { color: var(--accent); }
+.learning-profile-privacy p { font-size: .8rem; line-height: 1.5; margin: 0; }
+.learning-profile-privacy strong { color: var(--brand); }
+@media (max-width: 760px) { .learning-profile-page { gap: 18px; } }
+@media (max-width: 640px) {
+  .learning-profile-location { grid-template-columns: 1fr; }
+  .tutor-profile-identity { align-items: center; }
+  .tutor-profile-tabs.learning-profile-tabs { gap: 18px; }
+  .tutor-profile-tabs.learning-profile-tabs button { font-size: .78rem; }
+}

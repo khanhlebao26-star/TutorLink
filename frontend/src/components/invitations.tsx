@@ -35,7 +35,7 @@ function InvitationIcon({ name }: { name: "book" | "target" | "calendar" | "pin"
   };
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
-export function Invitations() {
+export function Invitations({ embedded = false, onAccepted }: { embedded?: boolean; onAccepted?: () => void } = {}) {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<string>("pending");
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -74,7 +74,8 @@ export function Invitations() {
     try {
       await decideInvitation(invitation.id, action, actionKey.current);
       actionKey.current = null;
-      if (action === "accept") router.push(`/programs/${invitation.program_id}`);
+      if (action === "accept" && embedded) { onAccepted?.(); result.reload(); }
+      else if (action === "accept") router.push(`/programs/${invitation.program_id}`);
       else result.reload();
     } catch (error) {
       setActionError(describeApiError(error));
@@ -82,9 +83,8 @@ export function Invitations() {
       setBusy(false);
     }
   }
-  return (
-    <AppShell title="Lời mời học">
-      <section className="content-stack workspace-page invitations-page">
+  const content = (
+      <section className={`content-stack workspace-page invitations-page${embedded ? " invitations-embedded" : ""}`}>
         <header className="workspace-heading invitations-heading">
           <div>
             <p className="invitations-eyebrow">KHỞI ĐẦU HÀNH TRÌNH HỌC TẬP</p>
@@ -140,8 +140,8 @@ export function Invitations() {
           </>
         )}
       </section>
-    </AppShell>
   );
+  return embedded ? content : <AppShell title="Lời mời học">{content}</AppShell>;
 }
 
 function InvitationPreview({
@@ -246,9 +246,9 @@ export function InvitationDetail({ id }: { id: number }) {
             ? "Kiểm tra thông tin trước khi chấp nhận. Chương trình sẽ được kích hoạt sau khi bạn đồng ý."
             : "Lời mời đã được gửi. Chương trình sẽ được kích hoạt khi học viên chấp nhận.";
   return (
-    <AppShell title="Chi tiết lời mời">
+    <AppShell title="Chi tiết lời mời" hideSidebar>
       <section className="content-stack workspace-page invitation-detail-page">
-        <Link className="invitation-detail-back" href="/invitations">← Danh sách lời mời</Link>
+        <Link className="invitation-detail-back" href="/learning-profile?tab=invitations">← Danh sách lời mời</Link>
         <ApiState {...result} />
         {i && offer && status && (
           <>

@@ -33,8 +33,9 @@ export const programStatuses: Record<Program["status"], string> = {
   completed: "Hoàn thành",
   cancelled: "Đã hủy",
 };
-export function Programs() {
-  return <AppShell title="Program của tôi"><Suspense fallback={<StatePanel kind="loading" message="Đang tải chương trình học…" />}><ProgramsContent/></Suspense></AppShell>;
+export function Programs({ embedded = false }: { embedded?: boolean }) {
+  const content = <Suspense fallback={<StatePanel kind="loading" message="Đang tải chương trình học…" />}><ProgramsContent /></Suspense>;
+  return embedded ? content : <AppShell title="Program của tôi">{content}</AppShell>;
 }
 function ProgramsContent() {
  const actor=useActor();
@@ -65,7 +66,7 @@ function ProgramsContent() {
   const filters = [
     { value: "all", label: "Tất cả", count: programs.length },
     ...Object.entries(programStatuses)
-      .filter(([value]) => actor?.role === "tutor" || value !== "draft")
+      .filter(([value]) => value !== "draft")
       .map(([value, label]) => ({ value, label, count: statusCounts[value] ?? 0 })),
   ];
   return (

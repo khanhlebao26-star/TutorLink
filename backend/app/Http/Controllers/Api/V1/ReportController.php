@@ -33,20 +33,46 @@ class ReportController extends Controller
     #[Response(429, description: 'Report quota reached; Retry-After gives seconds to retry.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
     public function store(Request $request, TrustWorkflow $flow): JsonResponse
     {
-        $flow->fields($request, ['resource_type', 'resource_id', 'reason_code', 'description']);
+        $flow->fields($request, ['resource_type', 'resource_id', 'reason_code', 'description', 'file_ids']);
         $data = $request->validate([
-            'resource_type' => 'required|in:tutor_profile,listing,message,program,review',
-            'resource_id' => 'required|integer:strict|min:1|max:9007199254740991',
-            'reason_code' => 'required|in:spam,harassment,inappropriate_content,fraud_suspected,misleading_information,privacy_violation,other',
+            'resource_type' => 'required|in:tutor_profile,listing,system,message,program,review',
+            'resource_id' => 'required_unless:resource_type,system|integer:strict|min:1|max:9007199254740991',
+            'reason_code' => 'required|in:spam,harassment,inappropriate_content,fraud_suspected,misleading_information,privacy_violation,bug_report,feature_request,performance_issue,usability_issue,other',
             'description' => ['required_if:reason_code,other', 'nullable', 'string', 'max:2000', 'regex:/\S/u'],
+            'file_ids' => 'sometimes|array|max:3',
+            'file_ids.*' => 'required|integer:strict|min:1|distinct',
         ]);
-        $payload = [...$data, 'description' => $data['description'] ?? null];
+        if (in_array($data['resource_type'], ['listing', 'tutor_profile', 'system'], true)) {
+            $allowedReasons = match ($data['resource_type']) {
+                'listing' => ['spam', 'inappropriate_content', 'fraud_suspected', 'misleading_information', 'privacy_violation', 'other'],
+                'tutor_profile' => ['harassment', 'inappropriate_content', 'fraud_suspected', 'misleading_information', 'privacy_violation', 'other'],
+                default => ['bug_report', 'feature_request', 'performance_issue', 'usability_issue', 'other'],
+            };
+            if (! in_array($data['reason_code'], $allowedReasons, true)) {
+                $flow->fail($request, 422, 'invalid_report_reason', 'The selected reason does not apply to this report target.');
+            }
+        }
+        $data['resource_id'] ??= 1;
+        $payload = [...$data, 'description' => $data['description'] ?? null, 'file_ids' => array_values($data['file_ids'] ?? [])];
 
         return DB::transaction(function () use ($request, $flow, $payload): JsonResponse {
             $actor = $flow->lockActor($request);
             abort_unless(in_array($actor->role, ['customer', 'tutor'], true), 403);
             if (! $this->canReport($request, $payload['resource_type'], $payload['resource_id'])) {
                 $flow->fail($request, 404, 'resource_not_found', 'Resource not found.');
+            }
+            $files = collect();
+            if ($payload['file_ids'] !== []) {
+                $files = DB::table('files')->whereIn('id', $payload['file_ids'])->orderBy('id')->lockForUpdate()->get();
+                if ($files->count() !== count($payload['file_ids']) || $files->contains(fn ($file) =>
+                    (int) $file->owner_id !== (int) $actor->id
+                    || $file->purpose !== 'report_evidence'
+                    || $file->visibility !== 'private'
+                    || $file->scan_status !== 'clean'
+                    || ! in_array(strtolower(pathinfo($file->original_name ?? '', PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png'], true)
+                )) {
+                    $flow->fail($request, 422, 'report_evidence_invalid', 'Evidence must be a completed JPG or PNG uploaded by the reporter.');
+                }
             }
             if ($snapshot = $flow->replay($request, $payload)) {
                 return response()->json($snapshot);
@@ -69,6 +95,15 @@ class ReportController extends Controller
                 'reason' => $payload['reason_code'], 'details' => $payload['description'], 'status' => 'open',
                 'created_at' => now('UTC'), 'updated_at' => now('UTC'),
             ]);
+            foreach ($files as $file) {
+                DB::table('file_links')->insert([
+                    'file_id' => $file->id,
+                    'resource_type' => 'report',
+                    'resource_id' => $id,
+                    'purpose' => 'report_evidence',
+                    'created_at' => now('UTC'),
+                ]);
+            }
             $flow->audit($request, 'report.create', 'report', $id, null, ['status' => 'open']);
             $result = ['data' => $flow->reportData(DB::table('reports')->find($id))];
             $flow->receipt($request, $payload, $result);
@@ -79,6 +114,9 @@ class ReportController extends Controller
 
     private function canReport(Request $request, string $type, int $id): bool
     {
+        if ($type === 'system') {
+            return $id === 1;
+        }
         if ($type === 'program') {
             return Program::visibleTo($request->user())->whereKey($id)->exists();
         }

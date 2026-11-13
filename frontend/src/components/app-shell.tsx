@@ -168,9 +168,9 @@ function AccountMenu({ user }: { user: User }) {
         {open && <>
           <strong>{user.full_name}</strong>
           {user.role === "customer" ? <nav className="account-menu-links" aria-label="Điều hướng tài khoản học viên">
-            <Link href="/invitations" onClick={() => setOpen(false)}>Lời mời học</Link>
+            <Link href="/learning-profile" onClick={() => setOpen(false)}>Hồ sơ học tập</Link>
             <Link href="/reports" onClick={() => setOpen(false)}>Báo cáo của tôi</Link>
-            <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt</Link>
+            <Link href="/settings/password" onClick={() => setOpen(false)}>Cài đặt</Link>
           </nav> : user.role === "tutor" ? <nav className="account-menu-links" aria-label="Điều hướng tài khoản gia sư">
             <Link href="/profile" onClick={() => setOpen(false)}>Hồ sơ của tôi</Link>
             <Link href="/reports" onClick={() => setOpen(false)}>Báo cáo của tôi</Link>
@@ -352,7 +352,8 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
     };
   }, [user?.id, pathname]);
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
-  const protectedPage = Boolean(requiredRole) || isActive(pathname, "/settings") || ["/programs", "/invitations", "/messages", "/reports", "/notifications", "/favorites"].some(prefix => isActive(pathname, prefix));
+  const protectedPage = Boolean(requiredRole) || isActive(pathname, "/settings") || ["/programs", "/invitations", "/messages", "/reports", "/notifications", "/favorites", "/learning-profile"].some(prefix => isActive(pathname, prefix));
+  const invitationDetailRoute = /^\/invitations\/\d+$/.test(pathname);
   const needsLogin = protectedPage && session.status === "guest";
   const needsSessionError = protectedPage && session.status === "error";
   const needsRole = Boolean(protectedPage && user && roleMismatch);
@@ -365,7 +366,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
     (session.status === "error" && !sessionHint));
 
   const accessContent = needsLoading ? (
-    isActive(pathname, "/notifications") ? <ActorContext.Provider value={null}>{children}</ActorContext.Provider> : isActive(pathname, "/messages") ? <MessagingLoadingState /> : isActive(pathname, "/favorites") ? <FavoritesLoadingState /> : isActive(pathname, "/reports") ? <ReportsLoadingState /> : <StatePanel kind="loading" message="Đang xác minh phiên đăng nhập…" />
+    isActive(pathname, "/notifications") || invitationDetailRoute ? <ActorContext.Provider value={null}>{children}</ActorContext.Provider> : isActive(pathname, "/messages") ? <MessagingLoadingState /> : isActive(pathname, "/favorites") ? <FavoritesLoadingState /> : isActive(pathname, "/reports") ? <ReportsLoadingState /> : <StatePanel kind="loading" message="Đang xác minh phiên đăng nhập…" />
   ) : needsLogin ? (
     <section className="card access-state">
       <p className="eyebrow">Khu vực tài khoản</p>
@@ -465,19 +466,18 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
 
   const activeRole = user?.role ?? requiredRole;
   const messagingRoute = pathname === "/messages" || pathname.startsWith("/messages/");
-  const tutorWorkspace = activeRole === "tutor" && (pathname === "/profile" || isActive(pathname, "/me/listings") || isActive(pathname, "/me/availability") || isActive(pathname, "/programs"));
+  const learningProfileRoute = activeRole === "customer" && pathname === "/learning-profile";
+  const tutorWorkspace = activeRole === "tutor" && (pathname === "/profile" || isActive(pathname, "/me/listings") || isActive(pathname, "/me/availability") || pathname === "/programs");
   const tutorSidebarRoute = activeRole === "tutor" && (isActive(pathname, "/settings") || pathname === "/reports");
   const hideTutorSidebar = activeRole === "tutor" && !tutorSidebarRoute;
   const roleNavItems = activeRole === "admin"
     ? [{ href: "/admin", label: "Duyệt hồ sơ Tutor" },{href:"/monitoring",label:"Giám sát hệ thống"}]
     : activeRole === "tutor"
       ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Quản lý giảng dạy" }]
-      : [];
+      : activeRole === "customer" ? [{ href: "/learning-profile", label: "Hồ sơ học tập" }] : [];
   const collaborationNav = !activeRole || activeRole === "admin" ? [] : activeRole === "tutor" ? [
     { href: "/reports", label: "Báo cáo của tôi" },
   ] : [
-    { href: "/programs", label: "Program của tôi" },
-    { href: "/invitations", label: "Lời mời học" },
     { href: "/reports", label: "Báo cáo của tôi" },
   ];
   const navItems = activeRole === "tutor" && tutorSidebarRoute ? [
@@ -492,7 +492,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   ];
 
   return (
-      <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}${messagingRoute ? " messaging-shell" : ""}${hideSidebar || hideTutorSidebar ? " sidebar-hidden-shell" : ""}${tutorWorkspace ? " tutor-workspace-shell" : ""}`}>
+      <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}${messagingRoute ? " messaging-shell" : ""}${hideSidebar || hideTutorSidebar ? " sidebar-hidden-shell" : ""}${tutorWorkspace ? " tutor-workspace-shell" : ""}${learningProfileRoute ? " learning-profile-shell" : ""}`}>
       <header className="topbar public-topbar authenticated-public-topbar">
         <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
           <BrandMark />
@@ -561,7 +561,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
         <main className="app-main">
           <div className="page-content">
             {tutorWorkspace && user && !needsRole ? <TutorWorkspaceProfile user={user} pathname={pathname} /> : null}
-            {pathname !== "/profile" && !messagingRoute && !tutorWorkspace && title ? <div className="eyebrow">{activeRole ? `${roleLabels[activeRole]} · ` : ""}{title}</div> : null}
+            {pathname !== "/profile" && pathname !== "/learning-profile" && !messagingRoute && !tutorWorkspace && title ? <div className="eyebrow">{activeRole ? `${roleLabels[activeRole]} · ` : ""}{title}</div> : null}
             {protectedPage ? accessContent : children}
           </div>
         </main>

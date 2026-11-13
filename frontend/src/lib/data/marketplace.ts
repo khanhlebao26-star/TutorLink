@@ -1,5 +1,5 @@
 import { ApiClientError, request } from "../api/client";
-import type { Availability, AvailabilityRule, CatalogCategory, ListingInput, ListingQuery, OwnerListing, OwnerListingAction, OwnerListingCollection, OwnerListingStatusFilter, PublicListing, PublicListingCollection, TutorPublic, TutorReviewCollection } from "./marketplace-types";
+import type { Availability, AvailabilityRule, CatalogCategory, ListingInput, ListingQuery, OwnerListing, OwnerListingAction, OwnerListingCollection, OwnerListingStatusFilter, PublicListing, PublicListingCollection, ReportableTutorCollection, TutorPublic, TutorReviewCollection } from "./marketplace-types";
 import type { ApiEnvelope } from "./types";
 
 const ownerListingStatuses = ["draft", "active", "inactive", "cancelled"] as const;
@@ -21,6 +21,14 @@ export async function searchListings(params: ListingQuery): Promise<PublicListin
   requirePagination(response.data);
   if (!Array.isArray(response.data.data)) throw new ApiClientError("Máy chủ chưa trả danh sách dịch vụ hợp lệ.");
   response.data.data.forEach(requirePublicListing);
+  return response.data;
+}
+export async function searchReportableTutors(params: { q?: string; page?: number; per_page?: number } = {}): Promise<ReportableTutorCollection> {
+  const response = await request<ReportableTutorCollection>({ method: "GET", url: "/tutors", params });
+  requirePagination(response.data);
+  if (!Array.isArray(response.data.data) || response.data.data.some((tutor) => !tutor || !Number.isSafeInteger(tutor.id) || typeof tutor.name !== "string" || typeof tutor.headline !== "string" || !Array.isArray(tutor.specializations))) {
+    throw new ApiClientError("Máy chủ chưa trả danh sách gia sư hợp lệ.");
+  }
   return response.data;
 }
 function requirePagination(value: { meta?: { total?: number; current_page?: number; per_page?: number } }) {

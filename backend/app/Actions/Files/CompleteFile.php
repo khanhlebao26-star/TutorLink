@@ -204,6 +204,7 @@ class CompleteFile
                 'profile_document',
                 'message_attachment',
                 'announcement_attachment',
+                'report_evidence',
             ],
             (int) config('file-validation.max_bytes', 5_000_000),
         );
@@ -263,6 +264,10 @@ class CompleteFile
             && $mime === $file->mime_type
             && (
                 $file->purpose !== 'avatar'
+                || in_array($extension, ['jpg', 'jpeg', 'png'], true)
+            )
+            && (
+                $file->purpose !== 'report_evidence'
                 || in_array($extension, ['jpg', 'jpeg', 'png'], true)
             );
     }

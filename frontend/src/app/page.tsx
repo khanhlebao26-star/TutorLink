@@ -63,7 +63,7 @@ export default function Home() {
               </div>
               <div className="landing-student-rating" aria-label="Đánh giá 4,9 trên 5 từ hơn 2.000 học viên">
                 <div className="landing-student-avatars" aria-hidden="true"><span>M</span><span>T</span><span>L</span></div>
-                <span><strong>4.9/5</strong><small>từ hơn 2.000 học viên</small></span>
+                <span><strong><i aria-hidden="true">★</i> 4.9/5</strong><small>từ hơn 2.000 học viên</small></span>
               </div>
             </div>
             <div className="landing-hero-art">

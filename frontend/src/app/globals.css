@@ -360,6 +360,7 @@ textarea { min-height: 96px; resize: vertical; }
 .app-main .page-content { margin: 0; max-width: none; min-width: 0; padding: 20px clamp(16px, 2vw, 32px) 48px; width: 100%; }
 .profile-shell .app-main .page-content { padding: 20px 15px 48px; }
 .tutor-workspace-shell .app-main .page-content { margin: 0 auto; max-width: 1240px; padding: 24px clamp(16px, 3vw, 40px) 56px; }
+.learning-profile-shell .app-main .page-content { margin: 0 auto; max-width: 1320px; padding: 24px clamp(16px, 3vw, 40px) 56px; }
 .tutor-workspace-profile { background: #fff; border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 14px 36px rgba(20, 35, 79, .06); margin: 0 auto 26px; overflow: hidden; }
 .tutor-profile-cover { background: radial-gradient(ellipse at 18% 20%, rgba(255,255,255,.65), transparent 30%), linear-gradient(120deg, #f9ddec 0%, #f2e9ff 48%, #dfeaff 100%); height: clamp(130px, 18vw, 220px); position: relative; }
 .tutor-profile-cover::after { background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.3) 35% 58%, transparent 58%); content: ""; inset: 0; position: absolute; }
@@ -375,6 +376,7 @@ textarea { min-height: 96px; resize: vertical; }
 .tutor-profile-tabs a[aria-current="page"] { border-bottom-color: var(--accent); color: var(--accent-dark); }
 @media (max-width: 640px) {
   .tutor-workspace-shell .app-main .page-content { padding: 14px 12px 36px; }
+  .learning-profile-shell .app-main .page-content { padding: 14px 12px 36px; }
   .tutor-profile-cover { height: 130px; }
   .tutor-profile-identity { align-items: center; gap: 12px; min-height: 95px; padding: 0 14px 12px; }
   .tutor-profile-avatar { border-width: 4px; flex-basis: 90px; font-size: 1.6rem; height: 90px; margin-top: -38px; }

@@ -203,6 +203,9 @@ class FileController extends Controller
             if (! $isOwner && $this->canAccessMessageAttachment($request, $file)) {
                 $isOwner = true;
             }
+            if (! $isOwner && $this->canAccessReportEvidence($request, $file)) {
+                $isOwner = true;
+            }
             if (! $isOwner && $file->purpose === 'task_attachment' && $file->visibility === 'private') {
                 $taskLink = DB::table('file_links')
                     ->where('file_id', $file->id)
@@ -273,6 +276,24 @@ class FileController extends Controller
             ->where('messages.message_type', 'file')
             ->where('conversation_members.user_id', $request->user()->id)
             ->whereIn('conversations.status', ['active', 'cancelled'])
+            ->exists();
+    }
+
+    private function canAccessReportEvidence(Request $request, File $file): bool
+    {
+        $actor = $request->user();
+        if ($file->purpose !== 'report_evidence' || $file->visibility !== 'private'
+            || $actor->role !== 'admin' || ! $actor->hasPermission('admin.reports.view')) {
+            return false;
+        }
+
+        return DB::table('file_links')
+            ->join('reports', 'reports.id', '=', 'file_links.resource_id')
+            ->where('file_links.file_id', $file->id)
+            ->where('file_links.resource_type', 'report')
+            ->where('file_links.purpose', 'report_evidence')
+            ->where('reports.assigned_admin_id', $actor->id)
+            ->where('reports.status', 'open')
             ->exists();
     }
 

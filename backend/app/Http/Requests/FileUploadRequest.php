@@ -19,14 +19,14 @@ class FileUploadRequest extends FormRequest
     {
         $maxBytes = (int) config('file-validation.max_bytes', 5_000_000);
 
-        $mimeRule = $this->input('purpose') === 'avatar'
+        $mimeRule = in_array($this->input('purpose'), ['avatar', 'report_evidence'], true)
             ? 'mimes:jpg,jpeg,png'
             : 'mimes:pdf,jpg,jpeg,png,doc,docx';
 
         return [
             /**
              * Non-empty file, maximum 5,000,000 bytes (5 MB decimal), for every supported purpose.
-             * Avatar: JPG/JPEG/PNG; documents: PDF/JPG/JPEG/PNG/DOC/DOCX.
+             * Avatar and report evidence: JPG/JPEG/PNG; documents: PDF/JPG/JPEG/PNG/DOC/DOCX.
              * Upload creates a pending file; complete performs technical validation, not an antivirus scan.
              */
             'file' => [
@@ -57,7 +57,7 @@ class FileUploadRequest extends FormRequest
             'purpose' => [
                 'required',
                 'string',
-                'in:avatar,verification_document,task_attachment,profile_document,message_attachment,announcement_attachment',
+                'in:avatar,verification_document,task_attachment,profile_document,message_attachment,announcement_attachment,report_evidence',
             ],
         ];
     }

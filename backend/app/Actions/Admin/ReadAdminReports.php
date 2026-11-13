@@ -80,30 +80,44 @@ class ReadAdminReports
 
             return ['resource_type' => 'message', 'messages' => $earlier->concat([(object) ['id' => $message->id, 'body' => $message->body, 'created_at' => $message->created_at]])->concat($later)->map(fn ($m) => ['id' => (int) $m->id, 'body' => $m->body, 'created_at' => CarbonImmutable::parse($m->created_at)->utc()->toISOString()])->values()->all()];
         }
-        [$table, $fields] = match ($report->resource_type) {
-            'program' => ['programs', ['id', 'status', 'version']],
-            'listing' => ['service_listings', ['id', 'title', 'description', 'status']],
-            'tutor_profile' => ['tutor_profiles', ['id', 'headline', 'bio', 'status']],
-            'review' => ['reviews', ['id', 'rating', 'comment', 'visibility']],
-            default => [null, []],
-        };
-        if ($table === null) {
-            return null;
+        if ($report->resource_type === 'system') {
+            $row = (object) ['id' => 1, 'name' => 'Hệ thống TutorLink'];
+            $history = collect();
+        } else {
+            [$table, $fields] = match ($report->resource_type) {
+                'program' => ['programs', ['id', 'status', 'version']],
+                'listing' => ['service_listings', ['id', 'title', 'description', 'status']],
+                'tutor_profile' => ['tutor_profiles', ['id', 'headline', 'bio', 'status']],
+                'review' => ['reviews', ['id', 'rating', 'comment', 'visibility']],
+                default => [null, []],
+            };
+            if ($table === null) {
+                return null;
+            }
+            if (in_array($report->resource_type, ['listing', 'tutor_profile'], true) && ! $this->canReport($request, $report->resource_type, (int) $report->resource_id)) {
+                return null;
+            }
+            $row = DB::table($table)->where('id', $report->resource_id)->first($fields);
+            if (! $row) {
+                return null;
+            }
+            $history = DB::table('audit_logs')->where('resource_type', $report->resource_type)
+                ->where('resource_id', $report->resource_id)
+                ->whereIn('action', ['review.hide', 'review.restore', 'listing.hide', 'listing.restore'])
+                ->orderByDesc('id')->limit(20)->get(['id', 'action', 'reason', 'created_at']);
         }
-        if (in_array($report->resource_type, ['listing', 'tutor_profile'], true) && ! $this->canReport($request, $report->resource_type, (int) $report->resource_id)) {
-            return null;
-        }
-        $row = DB::table($table)->where('id', $report->resource_id)->first($fields);
 
-        if (! $row) {
-            return null;
-        }
-        $history = DB::table('audit_logs')->where('resource_type', $report->resource_type)
-            ->where('resource_id', $report->resource_id)
-            ->whereIn('action', ['review.hide', 'review.restore', 'listing.hide', 'listing.restore'])
-            ->orderByDesc('id')->limit(20)->get(['id', 'action', 'reason', 'created_at']);
+        $attachments = DB::table('file_links')
+            ->join('files', 'files.id', '=', 'file_links.file_id')
+            ->where('file_links.resource_type', 'report')
+            ->where('file_links.resource_id', $report->id)
+            ->where('file_links.purpose', 'report_evidence')
+            ->orderBy('file_links.id')
+            ->get(['files.id', 'files.original_name', 'files.mime_type', 'files.size_bytes'])
+            ->map(fn ($file) => ['id' => (int) $file->id, 'name' => $file->original_name, 'mime_type' => $file->mime_type, 'size_bytes' => (int) $file->size_bytes])
+            ->all();
 
-        return ['resource_type' => $report->resource_type, 'resource' => (array) $row, 'moderation_history' => $history->all()];
+        return ['resource_type' => $report->resource_type, 'resource' => (array) $row, 'moderation_history' => $history->all(), 'attachments' => $attachments];
     }
 
     private function canReport(Request $request, string $type, int $id): bool

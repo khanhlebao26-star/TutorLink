@@ -21,6 +21,7 @@
 .landing-student-rating { align-items: center; color: #7180a4; display: flex; font-size: .68rem; gap: 11px; margin-top: 17px; }
 .landing-student-rating > span, .landing-student-rating strong, .landing-student-rating small { display: block; }
 .landing-student-rating strong { color: var(--brand); font-size: .73rem; line-height: 1.3; }
+.landing-student-rating strong i { color: #f7b928; font-style: normal; margin-right: 2px; }
 .landing-student-rating small { font-size: .67rem; line-height: 1.35; }
 .landing-student-avatars { display: flex; padding-left: 1px; }
 .landing-student-avatars span { align-items: center; border: 2px solid #fff; border-radius: 50%; color: #fff; display: inline-flex; font-size: .52rem; font-weight: 800; height: 30px; justify-content: center; margin-left: -4px; width: 30px; }

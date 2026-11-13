@@ -63,6 +63,8 @@ export interface TutorPublic {
   avatar: null;
   listings_meta: { page: number; per_page: 10; has_more: boolean; next_page: number | null };
 }
+export interface ReportableTutor { id: number; name: string; headline: string; specializations: string[] }
+export interface ReportableTutorCollection { data: ReportableTutor[]; meta: PaginationMeta }
 export interface VisibleReview {
   id: number;
   author_name: string;

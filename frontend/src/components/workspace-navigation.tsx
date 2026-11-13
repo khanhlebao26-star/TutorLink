@@ -17,10 +17,10 @@ export function WorkspaceNavigation({
   active: WorkspaceTab;
 }) {
   return (
-    <nav className="workspace-filters" aria-label="Các tab workspace">
+    <nav className="program-workspace-links" aria-label="Các tab workspace">
       {Object.entries(workspaceTabs).map(([key, label]) => (
         <Link
-          className={`button button-${active === key ? "primary" : "ghost"}`}
+          className={`program-workspace-link${active === key ? " is-active" : ""}`}
           aria-current={active === key ? "page" : undefined}
           key={key}
           href={

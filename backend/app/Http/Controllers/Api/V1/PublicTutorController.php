@@ -6,10 +6,47 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\PublicTutorResource;
 use App\Models\TutorProfile;
 use Dedoc\Scramble\Attributes\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PublicTutorController extends Controller
 {
+    /** Search visible public tutor profiles for report target selection. */
+    #[Response(200, type: 'array{data:list<array{id:int,name:string,headline:string,specializations:list<string>}>,meta:array{current_page:int,per_page:int,total:int}}')]
+    public function index(Request $request): JsonResponse
+    {
+        $filters = $request->validate([
+            'q' => ['sometimes', 'string', 'max:120'],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:50'],
+        ]);
+        $query = TutorProfile::query()
+            ->select(['id', 'user_id', 'headline'])
+            ->visiblePublic()
+            ->with(['user:id,full_name', 'specializations:id,name']);
+
+        if (! empty($filters['q'])) {
+            $term = $filters['q'];
+            $query->where(function ($query) use ($term): void {
+                $query->whereLike('headline', "%{$term}%")
+                    ->orWhereHas('user', fn ($user) => $user->whereLike('full_name', "%{$term}%"))
+                    ->orWhereHas('specializations', fn ($specialization) => $specialization->whereLike('name', "%{$term}%"));
+            });
+        }
+
+        $profiles = $query->orderBy('id')->paginate($filters['per_page'] ?? 50);
+
+        return response()->json([
+            'data' => collect($profiles->items())->map(fn (TutorProfile $profile) => [
+                'id' => (int) $profile->id,
+                'name' => $profile->user?->full_name ?? 'Gia sư TutorLink',
+                'headline' => $profile->headline,
+                'specializations' => $profile->specializations->pluck('name')->values()->all(),
+            ])->values(),
+            'meta' => ['current_page' => $profiles->currentPage(), 'per_page' => $profiles->perPage(), 'total' => $profiles->total()],
+        ]);
+    }
+
     /** Public Tutor with a bounded page of Listing cards. */
     #[Response(200, type: 'array{data:array{slug:?string,messaging_user_id:int,name:string,headline:string,bio:?string,experience_years:int,specializations:list<array{id:int,name:string,slug:string,subcategory:?string,category:?string}>,availability_rules:list<array{weekday:int,start_time:string,end_time:string,timezone:string}>,avatar:null,listings:list<array{slug:string,title:string,delivery_mode:string,city:?string,district:?string,price_from_minor:int,currency:string,price_unit:string,specialization_name:?string}>,listings_meta:array{page:int,per_page:int,has_more:bool,next_page:?int}}}')]
     public function show(Request $request, string $slug): PublicTutorResource
