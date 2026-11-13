@@ -178,7 +178,7 @@ function InvitationPreview({
           <div><dt>▢ <span>Tên chương trình</span></dt><dd>{offer.title}</dd></div>
           <div><dt>☆ <span>Mục tiêu</span></dt><dd>{offer.goal || "Chưa có thông tin"}</dd></div>
           <div><dt>♙ <span>Hình thức học</span></dt><dd>{deliveryLabels[offer.delivery_mode]}</dd></div>
-          <div><dt>⌖ <span>Địa điểm / Ghi chú</span></dt><dd>{offer.location_text || offer.meeting_url || "Trao đổi sau khi chấp nhận"}</dd></div>
+          <div><dt>⌖ <span>Địa điểm / Đường dẫn tham gia</span></dt><dd>{offer.location_text || offer.meeting_url || "Trao đổi sau khi chấp nhận"}</dd></div>
           <div><dt>▦ <span>Lịch học</span></dt><dd>{offer.schedule_note || "Hai bên sẽ thống nhất sau"}{offer.timezone ? ` (${offer.timezone})` : ""}</dd></div>
           <div><dt>☆ <span>Học phí thỏa thuận</span></dt><dd>{formatListingPrice(offer.agreed_fee_minor, offer.currency, offer.fee_unit)}</dd></div>
           <div><dt>◷ <span>Lời mời hết hạn</span></dt><dd>{new Date(invitation.expires_at).toLocaleString("vi-VN")}{pending ? <strong className="invitation-expiry">Còn thời hạn</strong> : null}</dd></div>
@@ -278,7 +278,7 @@ export function InvitationDetail({ id }: { id: number }) {
                   <h2><span className="invitation-detail-icon is-blue"><InvitationIcon name="calendar" /></span>Lịch học & địa điểm</h2>
                   <div className="invitation-detail-schedule">
                     <div><InvitationIcon name="clock" /><div><h3>Lịch học dự kiến</h3><p>{offer.schedule_note || "Chưa thống nhất lịch học"}</p><small>Múi giờ: {offer.timezone}</small></div></div>
-                    <div><InvitationIcon name="pin" /><div><h3>Địa điểm học</h3><p>{offer.location_text || (offer.delivery_mode === "online" ? "Học trực tuyến" : "Chưa thống nhất địa điểm")}</p>{offer.meeting_url && <><h3 className="invitation-detail-meeting-label">Liên kết buổi học</h3><p>{offer.meeting_url}</p></>}</div></div>
+                    <div><InvitationIcon name="pin" /><div><h3>Địa điểm học</h3><p>{offer.location_text || (offer.delivery_mode === "online" ? "Học trực tuyến" : "Chưa thống nhất địa điểm")}</p>{offer.meeting_url && <><h3 className="invitation-detail-meeting-label">Đường dẫn tham gia buổi học</h3><p>{offer.meeting_url}</p></>}</div></div>
                   </div>
                 </Card>
                 {i.offer_snapshot.source_listing && <div className="invitation-detail-source">

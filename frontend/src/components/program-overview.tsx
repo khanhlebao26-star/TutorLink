@@ -20,8 +20,8 @@ const labels: Record<Program["status"], string> = { draft: "Bản nháp", active
 
 export function ProgramOverview({ program: p, overview: o }: { program: Program; overview: Overview | null }) {
   const totalTasks = o ? o.task_counts.todo + o.task_counts.in_progress + o.task_counts.submitted + o.task_counts.completed : 0;
+  const taskProgress = totalTasks > 0 && o ? Math.round(o.task_counts.completed / totalTasks * 100) : null;
   const nextSession = o?.next_session;
-  const progress = o?.latest_progress;
   return (
     <div className="program-overview">
       <header className="program-overview-hero">
@@ -46,7 +46,7 @@ export function ProgramOverview({ program: p, overview: o }: { program: Program;
         </Link>
         <Link className="program-overview-stat" href={`/programs/${p.id}/progress`}>
           <span className="program-overview-icon is-purple"><OverviewIcon name="chart" /></span>
-          <div><span>Tiến độ mới nhất</span><strong>{progress ? `${progress.value}%` : "—"}<small>{progress ? "Đã ghi nhận" : "Chưa ghi nhận"}</small></strong></div><b aria-hidden="true">↗</b>
+          <div><span>Tiến độ bài tập</span><strong>{taskProgress !== null ? `${taskProgress}%` : "—"}<small>{taskProgress !== null ? `${o?.task_counts.completed} / ${totalTasks} bài hoàn thành` : "Chưa có bài tập"}</small></strong></div><b aria-hidden="true">↗</b>
         </Link>
       </div>
 
@@ -63,11 +63,11 @@ export function ProgramOverview({ program: p, overview: o }: { program: Program;
           </Card>
           <Card className="program-overview-card">
             <div className="program-overview-card-heading"><h2><span className="program-overview-icon is-purple"><OverviewIcon name="chart" /></span>Hành trình tiến bộ</h2><Link href={`/programs/${p.id}/progress`}>Xem tiến độ →</Link></div>
-            {progress ? <>
-              <div className="program-overview-progress-label"><span>Tiến độ được ghi nhận gần nhất</span><strong>{progress.value}%</strong></div>
-              <progress className="program-overview-progress" value={progress.value} max={100} aria-label="Tiến độ chương trình" />
-              <p className="program-overview-progress-note">{progress.note || "Tiếp tục theo dõi các cập nhật trong tab Tiến độ."}</p>
-            </> : <div className="program-overview-empty"><span className="program-overview-icon is-purple"><OverviewIcon name="chart" /></span><div><h3>Hành trình của bạn bắt đầu từ đây</h3><p>Tiến độ sẽ xuất hiện khi tutor cập nhật kết quả học tập của bạn.</p></div></div>}
+            {taskProgress !== null ? <>
+              <div className="program-overview-progress-label"><span>Bài tập đã được gia sư duyệt</span><strong>{taskProgress}%</strong></div>
+              <progress className="program-overview-progress" value={taskProgress} max={100} aria-label="Tiến độ bài tập" />
+              <p className="program-overview-progress-note">Đã hoàn thành {o?.task_counts.completed} trên {totalTasks} bài tập. Buổi học được theo dõi riêng trong tab Tiến độ.</p>
+            </> : <div className="program-overview-empty"><span className="program-overview-icon is-purple"><OverviewIcon name="chart" /></span><div><h3>Chưa có bài tập để tính tiến độ</h3><p>Tiến độ sẽ tự cập nhật khi gia sư giao bài và duyệt bài nộp.</p></div></div>}
           </Card>
           <Card className="program-overview-card">
             <div className="program-overview-card-heading"><h2>Thông báo mới nhất</h2><Link href={`/programs/${p.id}/announcements`}>Xem tất cả →</Link></div>
@@ -84,12 +84,12 @@ export function ProgramOverview({ program: p, overview: o }: { program: Program;
             <h2>Lịch học đã thống nhất</h2>
             <p>{p.schedule_note || "Chưa thống nhất lịch học."}</p>
             <small>Múi giờ: {p.timezone}</small>
-            <dl><div><dt>Địa điểm</dt><dd>{p.location_text || (p.delivery_mode === "online" ? "Trực tuyến" : "Chưa thống nhất")}</dd></div>{p.meeting_url && <div><dt>Liên kết buổi học</dt><dd>{p.meeting_url}</dd></div>}</dl>
+            <dl><div><dt>Địa điểm</dt><dd>{p.location_text || (p.delivery_mode === "online" ? "Trực tuyến" : "Chưa thống nhất")}</dd></div>{p.meeting_url && <div><dt>Đường dẫn tham gia buổi học</dt><dd>{p.meeting_url}</dd></div>}</dl>
           </Card>
           <Card className="program-overview-card program-overview-fee">
             <p className="program-overview-kicker">HỌC PHÍ THỎA THUẬN</p>
             <strong>{formatListingPrice(p.agreed_fee_minor, p.currency, p.fee_unit)}</strong>
-            <Link href={`/programs/${p.id}/fees`}>Theo dõi học phí <span aria-hidden="true">→</span></Link>
+            <small>Thông tin học phí đã thống nhất cho chương trình này.</small>
           </Card>
         </aside>
       </div>

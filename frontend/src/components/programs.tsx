@@ -286,7 +286,7 @@ export function Offer({
         <dd>{p.planned_session_count ?? "Chưa thống nhất"}</dd>
       </div>
       <div>
-        <dt>Địa điểm / Liên kết</dt>
+        <dt>Địa điểm / Đường dẫn tham gia</dt>
         <dd>{p.location_text || p.meeting_url || "Chưa thống nhất"}</dd>
       </div>
     </dl>
@@ -506,8 +506,8 @@ function ProgramForm({
             <Field htmlFor="program-location_text" label="Địa điểm học" error={error?.fieldErrors?.location_text?.[0]}>
               <Input placeholder="Địa chỉ hoặc ghi chú địa điểm học" value={input.location_text ?? ""} onChange={(e) => field("location_text", e.target.value)}/>
             </Field>
-            <Field htmlFor="program-meeting_url" label="Liên kết lớp học" hint="Không bắt buộc. Có thể bổ sung sau." error={error?.fieldErrors?.meeting_url?.[0]}>
-              <Input placeholder="https://meet.google.com/..." value={input.meeting_url ?? ""} onChange={(e) => field("meeting_url", e.target.value)}/>
+            <Field htmlFor="program-meeting_url" label="Đường dẫn tham gia buổi học" hint="Dán đường dẫn từ Google Meet, Zoom hoặc ứng dụng bạn dùng. Có thể để trống nếu chưa có." error={error?.fieldErrors?.meeting_url?.[0]}>
+              <Input placeholder="Dán link buổi học tại đây" value={input.meeting_url ?? ""} onChange={(e) => field("meeting_url", e.target.value)}/>
             </Field>
           </div>
           </section>

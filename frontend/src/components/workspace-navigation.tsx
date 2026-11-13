@@ -4,6 +4,7 @@ export const workspaceTabs = {
   overview: "Tổng quan",
   sessions: "Buổi học",
   tasks: "Bài tập",
+  quizzes: "Bài kiểm tra",
   progress: "Tiến độ",
   announcements: "Thông báo",
   fees: "Học phí",
@@ -18,7 +19,7 @@ export function WorkspaceNavigation({
 }) {
   return (
     <nav className="program-workspace-links" aria-label="Các tab workspace">
-      {Object.entries(workspaceTabs).map(([key, label]) => (
+      {Object.entries(workspaceTabs).filter(([key]) => key !== "fees").map(([key, label]) => (
         <Link
           className={`program-workspace-link${active === key ? " is-active" : ""}`}
           aria-current={active === key ? "page" : undefined}

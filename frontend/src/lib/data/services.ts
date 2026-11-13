@@ -23,6 +23,11 @@ const unwrap = <T>(value: ApiEnvelope<T> | T): T =>
     ? (value as ApiEnvelope<T>).data
     : value as T;
 const delay = () => new Promise((resolve) => setTimeout(resolve, 220));
+const notifyAccountUpdated = () => {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("tutorlink-account-updated"));
+  }
+};
 
 export async function getProfile(role: "customer" | "tutor"): Promise<ProfileResponse> {
   if (dataMode === "mock") {
@@ -151,11 +156,13 @@ export async function login(email: string, password: string, remember = false): 
     await delay();
     const user = mockCurrentUser();
     setAuthHint(true);
+    notifyAccountUpdated();
     return user;
   }
   const response = await request<ApiEnvelope<User>>({ method: "POST", url: "/auth/login", data: { email, password, remember } }, true);
   const user = unwrap(response.data);
   setAuthHint(true);
+  notifyAccountUpdated();
   return user;
 }
 

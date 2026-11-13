@@ -7,9 +7,11 @@ import { Button } from "./ui";
 export function WorkspaceUpload({
   onComplete,
   onBusy,
+  label = "Đính kèm bài nộp",
 }: {
   onComplete: (id: number) => void;
   onBusy: (busy: boolean) => void;
+  label?: string;
 }) {
   const [busy, setBusy] = useState(false),
     [percent, setPercent] = useState(0),
@@ -43,9 +45,9 @@ export function WorkspaceUpload({
     }
   }
   return (
-    <div>
-      <label>
-        Đính kèm bài nộp (tối đa 5.000.000 byte)
+    <div className="workspace-upload-control">
+      <label className="workspace-upload-label">
+        {label} (mỗi tệp tối đa 5 MB)
         <input
           type="file"
           disabled={busy}

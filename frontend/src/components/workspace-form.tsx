@@ -11,6 +11,7 @@ import { Button, Field, Input, Select } from "./ui";
 export interface FormField {
   name: string;
   label: string;
+  hint?: string;
   type?: "text" | "number" | "datetime-local" | "month" | "textarea";
   required?: boolean;
   min?: number;
@@ -27,8 +28,10 @@ export function WorkspaceForm({
   label,
   onSaved,
   fileUpload = false,
+  fileUploadLabel,
 }: {
   fileUpload?: boolean;
+  fileUploadLabel?: string;
   url: string;
   method?: "POST" | "PATCH" | "PUT";
   fields?: FormField[];
@@ -44,6 +47,8 @@ export function WorkspaceForm({
     [error, setError] = useState<ApiClientError | null>(null);
   const lock = useRef(false),
     receipt = useRef<{ payload: string; key: string } | null>(null);
+  const existingFileCount = Array.isArray(fixed.file_ids) ? fixed.file_ids.length : 0;
+  const totalFileCount = existingFileCount + fileIds.length;
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (uploadBusy || lock.current || error?.status === 409) return;
@@ -113,6 +118,7 @@ export function WorkspaceForm({
             htmlFor={`${url}-${f.name}`}
             label={f.label}
             error={error?.fieldErrors?.[f.name]?.[0]}
+            hint={f.hint}
           >
             {f.options ? (
               <Select
@@ -163,15 +169,16 @@ export function WorkspaceForm({
           </Field>
         ))}
       </fieldset>
-      {fileUpload && fileIds.length < 5 && (
+      {fileUpload && totalFileCount < 5 && (
         <WorkspaceUpload
+          label={fileUploadLabel}
           onBusy={setUploadBusy}
           onComplete={(id) => setFileIds((ids) => [...new Set([...ids, id])])}
         />
       )}{" "}
-      {fileIds.length > 0 && (
+      {totalFileCount > 0 && (
         <p role="status">
-          Đã gắn {fileIds.length} file hoàn tất kiểm tra kỹ thuật.
+          Đã đính kèm {totalFileCount}/5 tệp.
         </p>
       )}
       {error && (

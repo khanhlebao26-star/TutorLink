@@ -6,6 +6,7 @@ export interface WorkspaceRow {
   title?: string;
   body?: string;
   description?: string;
+  due_at?: string | null;
   status?: string;
   state?: string;
   value?: number;
@@ -21,6 +22,9 @@ export interface WorkspaceRow {
   meeting_url?: string;
   assigned_to?: number;
   author_id?: number;
+  published_at?: string | null;
+  created_at?: string | null;
+  files?: Array<{ id: number; complete?: boolean }>;
   actual?: { id: number; status: string } | null;
   current_submission_id?: number | null;
   submission_version?: number;
