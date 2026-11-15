@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorActions, StatePanel } from "@/components/shared/ui";
-import { getTutorReviews, searchListings } from "@/lib/data/marketplace";
+import { getFeaturedListingCandidates, getTutorReviews } from "@/lib/data/marketplace";
 import type { PublicListing, TutorReviewAggregate } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
@@ -60,7 +60,7 @@ function pickFeatured(listings: PublicListing[]) {
 }
 
 async function loadFeaturedServices(): Promise<FeaturedService[]> {
-  const response = await searchListings({ sort: "newest", per_page: 50 });
+  const response = await getFeaturedListingCandidates();
   const listings = pickFeatured(response.data);
 
   return Promise.all(listings.map(async (listing) => {

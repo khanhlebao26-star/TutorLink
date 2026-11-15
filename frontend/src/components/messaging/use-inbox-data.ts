@@ -1,6 +1,6 @@
 "use client";
 import { conversations, type Conversation } from "@/lib/data/messaging";
-import { usePolling } from "@/lib/hooks/use-polling";
+import { INBOX_POLL_INTERVAL_MS, usePolling } from "@/lib/hooks/use-polling";
 import { useCallback, useRef, useState } from "react";
 
 // This state lives in the shared messages layout, so switching threads keeps the inbox.
@@ -18,7 +18,7 @@ export function useInboxData() {
     initialized.current = true;
     setListLoaded(true);
   }, []);
-  const listError = usePolling(poll);
+  const listError = usePolling(poll, INBOX_POLL_INTERVAL_MS);
   return { items, setItems, listCursor, setListCursor, listBusy, setListBusy, listLoaded, listError };
 }
 

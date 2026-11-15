@@ -1,4 +1,5 @@
 import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
+import { AUTH_HINT_COOKIE } from "@/lib/auth-navigation";
 
 type ApiErrorBody = {
   code?: string;
@@ -28,11 +29,9 @@ if (configuredMode !== "mock" && configuredMode !== "api") {
 }
 export const dataMode = configuredMode as "mock" | "api";
 
-const authHintCookie = "tutorlink-auth";
-
 export function setAuthHint(authenticated: boolean) {
   if (typeof document === "undefined") return;
-  document.cookie = `${authHintCookie}=${authenticated ? "1" : "0"}; Path=/; SameSite=Lax`;
+  document.cookie = `${AUTH_HINT_COOKIE}=${authenticated ? "1" : "0"}; Path=/; SameSite=Lax`;
   window.dispatchEvent(
     new CustomEvent<boolean>("tutorlink-session-hint", {
       detail: authenticated,

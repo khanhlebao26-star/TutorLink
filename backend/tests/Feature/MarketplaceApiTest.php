@@ -540,6 +540,48 @@ class MarketplaceApiTest extends TestCase
             ->assertJsonPath('meta.total', 3);
     }
 
+    public function test_deep_listing_page_preserves_exact_total_visibility_and_price_tie_breaking(): void
+    {
+        $specialization = $this->seedCatalog();
+        [, $profile] = $this->createTutor('approved');
+        $listing = $this->createListing($profile, $specialization, [
+            'status' => 'active',
+            'title' => 'Algebra',
+        ]);
+        $template = (array) DB::table('service_listings')->where('id', $listing->id)->first();
+        unset($template['id']);
+        for ($batch = 0; $batch < 20; $batch++) {
+            $rows = [];
+            for ($position = 0; $position < 1000; $position++) {
+                $rows[] = array_replace($template, ['slug' => "algebra-{$batch}-{$position}"]);
+            }
+
+            DB::table('service_listings')->insert($rows);
+        }
+        $last = ServiceListing::query()->where('slug', 'algebra-19-999')->firstOrFail();
+        $this->createListing($profile, $specialization, ['status' => 'draft', 'title' => 'Algebra']);
+        $this->createListing($profile, $specialization, ['status' => 'active', 'title' => 'Geometry']);
+        $url = '/api/v1/listings?q=algebra&price_unit=session&per_page=20';
+
+        $this->getJson($url.'&page=1001&sort=price_asc')
+            ->assertOk()->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $last->id)
+            ->assertJsonPath('data.0.tutor_slug', $profile->public_slug)
+            ->assertJsonPath('meta.current_page', 1001)
+            ->assertJsonPath('meta.per_page', 20)
+            ->assertJsonPath('meta.total', 20001);
+
+        $this->getJson($url.'&page=1001&sort=price_desc')
+            ->assertOk()->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $listing->id)
+            ->assertJsonPath('meta.total', 20001);
+
+        $this->getJson($url.'&page=1002')
+            ->assertOk()->assertJsonCount(0, 'data')
+            ->assertJsonPath('meta.current_page', 1002)
+            ->assertJsonPath('meta.total', 20001);
+    }
+
     public function test_price_filter_does_not_mix_price_units(): void
     {
         $specialization = $this->seedCatalog();

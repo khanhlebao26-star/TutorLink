@@ -82,7 +82,11 @@ function PasswordField({
   );
 }
 
-export function AuthForm({ mode, initialRole = "customer" }: { mode: "login" | "register"; initialRole?: RegisterRole }) {
+export function AuthForm({ mode, initialRole = "customer", returnTo }: {
+  mode: "login" | "register";
+  initialRole?: RegisterRole;
+  returnTo?: string;
+}) {
   const router = useRouter();
   const submittingRef = useRef(false);
   const [fullName, setFullName] = useState("");
@@ -126,7 +130,8 @@ export function AuthForm({ mode, initialRole = "customer" }: { mode: "login" | "
       if (mode === "login") {
         await login(email, password, remember);
         const user = await getCurrentUser();
-        router.push(user.role === "admin" ? "/admin" : user.role === "tutor" ? "/profile" : "/marketplace");
+        const home = user.role === "admin" ? "/admin" : user.role === "tutor" ? "/profile" : "/marketplace";
+        router.push(returnTo ?? home);
         return;
       }
 

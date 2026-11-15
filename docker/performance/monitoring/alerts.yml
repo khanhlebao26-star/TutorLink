@@ -1,0 +1,54 @@
+groups:
+  - name: tutorlink-benchmark
+    rules:
+      - record: tutorlink:api_requests_per_second:30s
+        expr: sum(rate(caddy_http_request_duration_seconds_count{server="benchmark_api",handler="reverse_proxy"}[30s]))
+      - record: tutorlink:api_p95_seconds:30s
+        expr: histogram_quantile(0.95, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{server="benchmark_api",handler="reverse_proxy"}[30s])))
+      - record: tutorlink:api_5xx_ratio:30s
+        expr: (sum(rate(caddy_http_request_duration_seconds_count{server="benchmark_api",handler="reverse_proxy",code=~"5.."}[30s])) or vector(0)) / clamp_min(tutorlink:api_requests_per_second:30s, 1)
+      - alert: TutorLinkApiHighLatency
+        expr: tutorlink:api_p95_seconds:30s > 0.3 and tutorlink:api_requests_per_second:30s >= 5
+        for: 10s
+        annotations:
+          summary: Laravel ingress p95 exceeds 300 ms
+      - alert: TutorLinkApiHighErrors
+        expr: tutorlink:api_5xx_ratio:30s > 0.01 and tutorlink:api_requests_per_second:30s >= 5
+        for: 10s
+        annotations:
+          summary: Laravel ingress 5xx ratio exceeds 1%
+      - alert: TutorLinkFpmUnavailable
+        expr: tutorlink_fpm_up == 0
+        for: 10s
+        annotations:
+          summary: PHP-FPM status is unavailable on {{ $labels.upstream }}
+      - alert: TutorLinkFpmQueue
+        expr: tutorlink_fpm_listen_queue > 0
+        for: 10s
+        annotations:
+          summary: PHP-FPM requests are waiting on {{ $labels.upstream }}
+      - alert: TutorLinkDatabaseUnavailable
+        expr: tutorlink_db_up == 0
+        for: 10s
+        annotations:
+          summary: PostgreSQL statistics query failed
+      - alert: TutorLinkDatabaseConnectionsHigh
+        expr: tutorlink_db_client_connections / tutorlink_db_connection_limit > 0.8
+        for: 10s
+        annotations:
+          summary: PostgreSQL connections exceed 80% of the configured limit
+      - alert: TutorLinkOutboxDelayed
+        expr: tutorlink_db_oldest_outbox_seconds > 60
+        for: 10s
+        annotations:
+          summary: Oldest pending outbox event is more than 60 seconds old
+      - alert: TutorLinkFailedJobs
+        expr: tutorlink_db_failed_outbox + tutorlink_db_failed_jobs > 0
+        for: 10s
+        annotations:
+          summary: An unresolved outbox event or a failed job needs review
+      - alert: TutorLinkMetricsUnavailable
+        expr: up{job=~"caddy|runtime"} == 0
+        for: 10s
+        annotations:
+          summary: Prometheus cannot scrape {{ $labels.job }}

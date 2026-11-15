@@ -8,6 +8,7 @@ import { ApiClientError, dataMode, describeApiError, request, setAuthHint } from
 import { favoriteUpdateEvent, getFavoriteTutors } from "@/lib/data/favorites";
 import { getCurrentUser } from "@/lib/data/services";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
+import { useUnreadMessages } from "@/lib/hooks/use-unread-messages";
 import "@/styles/landing.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -47,7 +48,6 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   const mockPublicGuest = publicMode && dataMode === "mock" && !sessionHint;
   const [session, setSession] = useState<Session>(() => cachedSession ?? { status: "loading" });
   const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [unreadMessages, setUnreadMessages] = useState(0);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -99,6 +99,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
         ? role ?? "tutor"
         : role;
   const user = !authFrame && !mockPublicGuest && session.status === "authenticated" ? session.user : null;
+  const unreadMessages = useUnreadMessages(user?.role === "customer" || user?.role === "tutor" ? user.id : null);
   useEffect(() => {
     let current = true;
     if (!user) {
@@ -114,27 +115,6 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
       });
     return () => { current = false; };
   }, [user?.id, pathname]);
-  useEffect(() => {
-    let current = true;
-    if (!user || !["customer", "tutor"].includes(user.role)) {
-      setUnreadMessages(0);
-      return;
-    }
-    const refreshUnreadMessages = () => {
-      if (document.visibilityState === "hidden") return;
-      request<ApiEnvelope<{ count: number }>>({ method: "GET", url: "/conversations/unread-count" })
-        .then((response) => { if (current) setUnreadMessages(response.data.data.count); })
-        .catch(() => { if (current) setUnreadMessages(0); });
-    };
-    refreshUnreadMessages();
-    const interval = window.setInterval(refreshUnreadMessages, 5000);
-    document.addEventListener("visibilitychange", refreshUnreadMessages);
-    return () => {
-      current = false;
-      window.clearInterval(interval);
-      document.removeEventListener("visibilitychange", refreshUnreadMessages);
-    };
-  }, [user?.id, user?.role]);
   useEffect(() => {
     let current = true;
     if (!user || user.role === "admin") {

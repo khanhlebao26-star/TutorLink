@@ -9,14 +9,19 @@ use App\Http\Resources\ListingResource;
 use App\Models\ServiceListing;
 use App\Models\Specialization;
 use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class ListingController extends Controller
 {
+    private const DEEP_PAGE_MIN_OFFSET = 20000;
+
     public function index(Request $request): JsonResponse
     {
         $filters = $request->validate([
@@ -145,17 +150,70 @@ class ListingController extends Controller
             default => $query->latest('id'),
         };
 
-        $perPage = $filters['per_page'] ?? 20;
-        $listings = $query->paginate($perPage);
+        $perPage = (int) ($filters['per_page'] ?? 20);
+        $page = Paginator::resolveCurrentPage();
+        $offset = min($page - 1, intdiv(PHP_INT_MAX, $perPage)) * $perPage;
+
+        if ($offset >= self::DEEP_PAGE_MIN_OFFSET) {
+            [$listings, $total] = $this->deepPage($query, $offset, $perPage, $sort);
+        } else {
+            $result = $query->paginate($perPage, page: $page);
+            $listings = $result->getCollection();
+            $total = $result->total();
+        }
 
         return response()->json([
-            'data' => ListingResource::collection($listings->items()),
+            'data' => ListingResource::collection($listings),
             'meta' => [
-                'current_page' => $listings->currentPage(),
-                'per_page' => $listings->perPage(),
-                'total' => $listings->total(),
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
             ],
         ]);
+    }
+
+    /**
+     * @param  Builder<ServiceListing>  $query
+     * @return array{Collection<int, ServiceListing>, int}
+     */
+    private function deepPage(Builder $query, int $offset, int $perPage, string $sort): array
+    {
+        $matching = (clone $query)->reorder()->select('service_listings.id');
+        if ($sort !== 'newest') {
+            $matching->addSelect('service_listings.price_from_minor');
+        }
+
+        $order = match ($sort) {
+            'price_asc' => 'page.price_from_minor ASC, page.id ASC',
+            'price_desc' => 'page.price_from_minor DESC, page.id DESC',
+            default => 'page.id DESC',
+        };
+        $matchingSql = $matching->toSql();
+        // The count and the page share a narrow scan. The count row also covers empty pages.
+        $rows = $matching->getQuery()->getConnection()->select(<<<SQL
+            WITH matching AS MATERIALIZED ({$matchingSql}),
+            page AS (
+                SELECT * FROM matching AS page ORDER BY {$order} LIMIT ? OFFSET ?
+            )
+            SELECT total.match_count, service_listings.*
+            FROM (SELECT count(*) AS match_count FROM matching) AS total
+            LEFT JOIN page ON true
+            LEFT JOIN service_listings ON service_listings.id = page.id
+            ORDER BY {$order}
+            SQL, [...$matching->getBindings(), $perPage, $offset]);
+
+        $total = (int) $rows[0]->match_count;
+        $attributes = [];
+        foreach ($rows as $row) {
+            if ($row->id !== null) {
+                unset($row->match_count);
+                $attributes[] = (array) $row;
+            }
+        }
+        $listings = $query->hydrate($attributes);
+        $listings->load($query->getEagerLoads());
+
+        return [$listings, $total];
     }
 
     #[OpenApiResponse(status: 404, description: 'The Listing is not found or no longer publicly visible.', type: 'array{code:string,message:string,request_id:string,errors:array<string,mixed>}')]

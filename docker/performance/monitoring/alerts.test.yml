@@ -1,0 +1,23 @@
+rule_files:
+  - alerts.yml
+evaluation_interval: 5s
+
+tests:
+  - interval: 5s
+    input_series:
+      - series: 'tutorlink_db_client_connections{instance="runtime-metrics:9400",job="runtime"}'
+        values: '79 81+0x4'
+      - series: 'tutorlink_db_connection_limit{instance="runtime-metrics:9400",job="runtime"}'
+        values: '100+0x5'
+    alert_rule_test:
+      - eval_time: 10s
+        alertname: TutorLinkDatabaseConnectionsHigh
+        exp_alerts: []
+      - eval_time: 15s
+        alertname: TutorLinkDatabaseConnectionsHigh
+        exp_alerts:
+          - exp_labels:
+              instance: runtime-metrics:9400
+              job: runtime
+            exp_annotations:
+              summary: PostgreSQL connections exceed 80% of the configured limit

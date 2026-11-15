@@ -1,0 +1,23 @@
+services:
+  runtime-metrics:
+    image: tutorlink-capacity-image:local
+    entrypoint: [php, -S, '0.0.0.0:9400', /monitoring/exporter.php]
+    environment:
+      PERF_MONITOR_PASSWORD: ${PERF_MONITOR_PASSWORD:-}
+      PERF_MONITOR_UPSTREAMS: ${PERF_MONITOR_UPSTREAMS:-app:9000}
+      PGCONNECT_TIMEOUT: '2'
+    volumes:
+      - ./monitoring/exporter.php:/monitoring/exporter.php:ro
+      - ./resources.sql:/monitoring/resources.sql:ro
+    networks: [benchmark]
+
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=24h
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    networks: [benchmark]

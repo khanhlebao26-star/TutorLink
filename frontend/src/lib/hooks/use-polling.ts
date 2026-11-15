@@ -1,26 +1,43 @@
 "use client";
 import { ApiClientError } from "@/lib/api/client";
 import { useEffect, useState } from "react";
+
+export const INBOX_POLL_INTERVAL_MS = 15_000;
+const retryDelays = [5_000, 10_000, 20_000, 30_000];
+const maxTimeout = 2_147_483_647;
+
 /** One request at a time; hidden/offline requests are aborted and never rescheduled until visible/online. */
 export function usePolling(
   task: (signal: AbortSignal) => Promise<void>,
   interval = 10000,
+  enabled = true,
 ) {
   const [error, setError] = useState<unknown>(null);
   useEffect(() => {
+    if (!enabled) return;
+
     let disposed = false,
       timer: ReturnType<typeof setTimeout> | undefined,
       controller: AbortController | null = null,
       failures = 0,
+      retryAt = 0,
       halted = false;
     const available = () =>
       document.visibilityState !== "hidden" && navigator.onLine;
+    let wasAvailable = available();
     const clear = () => {
-      if (timer) clearTimeout(timer);
+      if (timer !== undefined) clearTimeout(timer);
       timer = undefined;
     };
     const run = async () => {
       if (disposed || !available() || controller || halted) return;
+      const retryDelay = retryAt - Date.now();
+      if (retryDelay > 0) {
+        timer = setTimeout(run, Math.min(retryDelay, maxTimeout));
+        return;
+      }
+
+      retryAt = 0;
       controller = new AbortController();
       const active = controller;
       let delay = interval;
@@ -33,24 +50,38 @@ export function usePolling(
       } catch (e) {
         if (!disposed && !active.signal.aborted) {
           setError(e);
+          delay = retryDelays[Math.min(failures, retryDelays.length - 1)];
           failures++;
-          delay = Math.min(120000, interval * 2 ** failures);
           if (e instanceof ApiClientError) {
             halted = [401, 403, 404].includes(e.status ?? 0);
-            if (e.retryAfter) delay = Math.max(delay, e.retryAfter * 1000);
+            const retryAfter = e.retryAfter;
+            if (retryAfter !== undefined && Number.isFinite(retryAfter) && retryAfter > 0) {
+              delay = Math.max(delay, retryAfter * 1000);
+            }
           }
+          retryAt = Date.now() + delay;
         }
       } finally {
-        if (controller === active) controller = null;
-        if (!disposed && !active.signal.aborted && available() && !halted)
-          timer = setTimeout(run, delay);
+        controller = null;
+        if (!disposed && available() && !halted) {
+          if (active.signal.aborted) {
+            void run();
+          } else {
+            timer = setTimeout(run, Math.min(delay, maxTimeout));
+          }
+        }
       }
     };
     const change = () => {
+      const isAvailable = available();
+      if (isAvailable === wasAvailable) return;
+      wasAvailable = isAvailable;
       clear();
-      controller?.abort();
-      controller = null;
-      if (available() && !halted) void run();
+      if (isAvailable) {
+        void run();
+      } else {
+        controller?.abort();
+      }
     };
     document.addEventListener("visibilitychange", change);
     window.addEventListener("online", change);
@@ -64,6 +95,6 @@ export function usePolling(
       window.removeEventListener("online", change);
       window.removeEventListener("offline", change);
     };
-  }, [task, interval]);
-  return error;
+  }, [task, interval, enabled]);
+  return enabled ? error : null;
 }

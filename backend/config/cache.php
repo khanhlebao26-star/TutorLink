@@ -19,6 +19,8 @@ return [
 
     'default' => env('CACHE_STORE', 'database'),
 
+    'marketplace_store' => env('MARKETPLACE_CACHE_STORE') ?: null,
+
     /*
     |--------------------------------------------------------------------------
     | Cache Stores

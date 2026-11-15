@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -78,8 +79,11 @@ it('isolates cache generations across rollback and safely falls back when cache 
     $this->getJson($url)->assertJsonPath('data.title', 'Uncommitted title');
     DB::rollBack();
     $this->getJson($url)->assertJsonPath('data.title', 'English conversation');
-    Cache::shouldReceive('get')->once()->andThrow(new RuntimeException('cache offline'));
-    Cache::shouldReceive('put')->once()->andThrow(new RuntimeException('cache offline'));
+    config(['cache.marketplace_store' => 'redis']);
+    $cache = Mockery::mock(Repository::class);
+    $cache->shouldReceive('get')->once()->andThrow(new RuntimeException('cache offline'));
+    $cache->shouldNotReceive('put');
+    Cache::shouldReceive('store')->once()->with('redis')->andReturn($cache);
     $this->getJson($url)->assertOk()->assertHeader('X-Marketplace-Cache', 'BYPASS')->assertJsonPath('data.title', 'English conversation');
 });
 

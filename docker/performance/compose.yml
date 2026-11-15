@@ -1,0 +1,133 @@
+name: tutorlink-capacity
+
+x-app: &app
+  image: tutorlink-capacity-image:local
+  environment: &runtime
+    APP_ENV: production
+    APP_DEBUG: "false"
+    APP_KEY: ${PERF_APP_KEY:?Generate a disposable APP_KEY}
+    APP_URL: http://proxy:8080
+    FRONTEND_URL: http://benchmark.test
+    LOG_CHANNEL: stderr
+    LOG_LEVEL: warning
+    DB_CONNECTION: pgsql
+    DB_HOST: db
+    DB_DATABASE: tutorlink_capacity
+    DB_USERNAME: capacity_runner
+    DB_PASSWORD: ${PERF_DB_PASSWORD:?Generate a disposable database password}
+    CACHE_STORE: database
+    SESSION_DRIVER: database
+    SESSION_COOKIE: tutorlink-capacity-session
+    SESSION_SECURE_COOKIE: "false"
+    SANCTUM_STATEFUL_DOMAINS: benchmark.test
+    QUEUE_CONNECTION: database
+    BROADCAST_CONNECTION: "null"
+    MAIL_MAILER: array
+    TELESCOPE_ENABLED: ${PERF_TELESCOPE:-false}
+    PULSE_ENABLED: "true"
+    MONITORING_ALERTS_ENABLED: "false"
+    TUTOR_PROFILE_DOCUMENTS_REQUIRED: "true"
+  networks: [benchmark]
+  volumes:
+    - private-files:/var/www/html/storage/app/private
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:16-alpine
+    command: [postgres, -c, shared_preload_libraries=pg_stat_statements, -c, track_io_timing=on]
+    environment:
+      POSTGRES_DB: tutorlink_capacity
+      POSTGRES_USER: capacity_runner
+      POSTGRES_PASSWORD: ${PERF_DB_PASSWORD:?Generate a disposable database password}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD, pg_isready, -U, capacity_runner, -d, tutorlink_capacity]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    networks: [benchmark]
+  app: &api
+    <<: *app
+    image: ${PERF_APP_IMAGE:-tutorlink-capacity-image:local}
+    environment:
+      <<: *runtime
+      MARKETPLACE_CACHE_STORE: ${PERF_MARKETPLACE_CACHE_STORE:-database}
+      REDIS_HOST: redis
+      REDIS_PERSISTENT: "true"
+      REDIS_MAX_RETRIES: "0"
+      REDIS_CACHE_CONNECT_TIMEOUT: "0.1"
+      REDIS_CACHE_READ_TIMEOUT: "0.1"
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.production
+      target: app
+    healthcheck:
+      test: [CMD, php, -r, '$$s = @fsockopen("127.0.0.1", 9000, $$e, $$m, 2); exit(is_resource($$s) ? 0 : 1);']
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - ./fpm.conf:/usr/local/etc/php-fpm.d/zzzz-capacity.conf:ro
+      - private-files:/var/www/html/storage/app/private
+  app-replica:
+    <<: *api
+    profiles: [replicas]
+  proxy:
+    image: tutorlink-capacity-proxy:local
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile.production
+      target: proxy
+    environment:
+      PERF_FPM_UPSTREAMS: ${PERF_FPM_UPSTREAMS:-app:9000}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [benchmark]
+  fixtures:
+    <<: *app
+    environment:
+      <<: *runtime
+      PERF_LISTINGS: ${PERF_LISTINGS:-100000}
+    profiles: [tools]
+    volumes:
+      - ./seed.php:/benchmark/seed.php:ro
+      - ../../backend/tests/Support/ProgramApiFixtures.php:/benchmark/ProgramApiFixtures.php:ro
+      - fixtures:/var/www/html/storage/app/private
+  worker:
+    <<: *app
+    command: [php, artisan, 'outbox:work', '--sleep=2', '--limit=100']
+  load:
+    image: node:22-bookworm-slim
+    command: [sleep, infinity]
+    volumes:
+      - ./load.mjs:/benchmark/load.mjs:ro
+      - fixtures:/fixtures:ro
+    depends_on:
+      - proxy
+    networks: [benchmark]
+  redis:
+    image: redis:7.4-alpine
+    profiles: [redis]
+    command: [redis-server, --save, "", --appendonly, "no", --maxmemory, 64mb, --maxmemory-policy, allkeys-lru]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    networks: [benchmark]
+
+networks:
+  benchmark:
+    internal: true
+
+volumes:
+  database:
+  fixtures:
+  private-files:

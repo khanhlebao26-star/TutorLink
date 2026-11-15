@@ -22,20 +22,28 @@ class MarketplaceCacheControl
             return $response;
         }
         $key = null;
+        $cache = null;
         try {
             $key = app(PublicCatalogCache::class)->key($request);
-            $cached = $key === null ? null : Cache::get($key);
-            if (is_array($cached) && isset($cached['body'])) {
-                return response($cached['body'], 200, $this->headers('HIT'));
+            if ($key !== null) {
+                $cache = Cache::store(config('cache.marketplace_store'));
+                $cached = $cache->get($key);
+                if (is_array($cached) && isset($cached['body'])) {
+                    return response($cached['body'], 200, $this->headers('HIT'));
+                }
             }
         } catch (Throwable) {
             // Cache is optional. Database/authorization errors in the endpoint still fail closed.
+            $cache = null;
+            $key = null;
         }
         $response = $next($request);
         if ($response->getStatusCode() === 200 && str_contains((string) $response->headers->get('Content-Type'), 'application/json')) {
-            if ($key !== null) {
+            if ($cache !== null && $key !== null) {
                 try {
-                    Cache::put($key, ['body' => $response->getContent()], PublicCatalogCache::TTL_SECONDS);
+                    if (! $cache->put($key, ['body' => $response->getContent()], PublicCatalogCache::TTL_SECONDS)) {
+                        $key = null;
+                    }
                 } catch (Throwable) {
                     $key = null;
                 }

@@ -59,7 +59,14 @@ it("uses Retry-After backoff and stops on lost permission", async () => {
   const { result } = renderHook(() => usePolling(task, 1000));
   await act(async () => {});
   await act(async () => {
-    await vi.advanceTimersByTimeAsync(9999);
+    Object.defineProperty(document, "visibilityState", { value: "hidden" });
+    document.dispatchEvent(new Event("visibilitychange"));
+    await vi.advanceTimersByTimeAsync(1000);
+    Object.defineProperty(document, "visibilityState", { value: "visible" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(8999);
   });
   expect(task).toHaveBeenCalledTimes(1);
   await act(async () => {
@@ -71,4 +78,57 @@ it("uses Retry-After backoff and stops on lost permission", async () => {
     await vi.advanceTimersByTimeAsync(60000);
   });
   expect(task).toHaveBeenCalledTimes(2);
+});
+
+it("paces requests from completion and ignores duplicate availability events", async () => {
+  let complete!: () => void;
+  const task = vi.fn().mockImplementationOnce(
+    () => new Promise<void>((resolve) => { complete = resolve; }),
+  ).mockResolvedValue(undefined);
+  renderHook(() => usePolling(task, 15_000));
+
+  await act(async () => {
+    window.dispatchEvent(new Event("online"));
+    document.dispatchEvent(new Event("visibilitychange"));
+    await vi.advanceTimersByTimeAsync(30_000);
+  });
+  expect(task).toHaveBeenCalledTimes(1);
+
+  await act(async () => { complete(); });
+  await act(async () => { await vi.advanceTimersByTimeAsync(14_999); });
+  expect(task).toHaveBeenCalledTimes(1);
+  await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+  expect(task).toHaveBeenCalledTimes(2);
+});
+
+it("waits for canceled work to settle before restarting on a quick tab switch", async () => {
+  let complete!: () => void;
+  const task = vi.fn<(signal: AbortSignal) => Promise<void>>().mockImplementationOnce(
+    () => new Promise<void>((resolve) => { complete = resolve; }),
+  ).mockResolvedValue(undefined);
+  renderHook(() => usePolling(task, 15_000));
+
+  await act(async () => {
+    Object.defineProperty(document, "visibilityState", { value: "hidden" });
+    document.dispatchEvent(new Event("visibilitychange"));
+    Object.defineProperty(document, "visibilityState", { value: "visible" });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  expect(task.mock.calls[0][0].aborted).toBe(true);
+  expect(task).toHaveBeenCalledTimes(1);
+
+  await act(async () => { complete(); });
+  expect(task).toHaveBeenCalledTimes(2);
+});
+
+it("backs off at 5, 10, 20, then at most 30 seconds for transient failures", async () => {
+  const task = vi.fn().mockRejectedValue(new Error("Unavailable"));
+  renderHook(() => usePolling(task, 15_000));
+
+  for (const [index, delay] of [5000, 10000, 20000, 30000, 30000].entries()) {
+    await act(async () => { await vi.advanceTimersByTimeAsync(delay - 1); });
+    expect(task).toHaveBeenCalledTimes(index + 1);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1); });
+    expect(task).toHaveBeenCalledTimes(index + 2);
+  }
 });

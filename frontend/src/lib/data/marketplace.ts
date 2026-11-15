@@ -6,13 +6,39 @@ const ownerListingStatuses = ["draft", "active", "inactive", "cancelled"] as con
 const ownerListingActions = ["edit", "publish", "pause", "archive"] as const satisfies readonly OwnerListingAction[];
 const reviewRatings = ["1", "2", "3", "4", "5"] as const;
 
+// Share pending public reads within a browser. A later read still asks Laravel for fresh data.
+function sharePendingPublicRead<Args extends unknown[], Result>(
+  load: (...args: Args) => Promise<Result>,
+  keyFor: (...args: Args) => string,
+) {
+  const pending = new Map<string, Promise<Result>>();
+  return (...args: Args): Promise<Result> => {
+    if (typeof window === "undefined") return load(...args);
+
+    const key = keyFor(...args);
+    const existing = pending.get(key);
+    if (existing) return existing;
+
+    const current = load(...args).finally(() => pending.delete(key));
+    pending.set(key, current);
+    return current;
+  };
+}
+
 // Marketplace always calls the backend; legacy auth preview mode cannot supply Listing data.
-export async function getMarketplaceCatalog(): Promise<CatalogCategory[]> {
+async function loadMarketplaceCatalog(): Promise<CatalogCategory[]> {
   const response = await request<ApiEnvelope<CatalogCategory[]>>({ method: "GET", url: "/catalog/categories" });
   return response.data.data.filter((category) => category.status === "active").map((category) => ({ ...category,
     subcategories: category.subcategories.filter((subcategory) => subcategory.status === "active").map((subcategory) => ({ ...subcategory, specializations: subcategory.specializations.filter((item) => item.status === "active") })),
   }));
 }
+export const getMarketplaceCatalog = sharePendingPublicRead(loadMarketplaceCatalog, () => "");
+
+export const getFeaturedListingCandidates = sharePendingPublicRead(
+  () => searchListings({ sort: "newest", per_page: 50 }),
+  () => "",
+);
+
 export async function searchListings(params: ListingQuery): Promise<PublicListingCollection> {
   if ((params.min_price !== undefined || params.max_price !== undefined || params.sort?.startsWith("price_")) && !params.price_unit) {
     throw new ApiClientError("Chọn đơn vị phí trước khi lọc hoặc sắp xếp theo giá.", { status: 422, fieldErrors: { price_unit: ["Vui lòng chọn đơn vị phí."] } });
@@ -83,7 +109,7 @@ export async function getPublicTutor(slug: string, listingsPage = 1): Promise<Tu
   const response = await request<ApiEnvelope<TutorPublic>>({ method: "GET", url: `/tutors/${encodeURIComponent(slug)}`, params: { listings_page: listingsPage } });
   return response.data.data;
 }
-export async function getTutorReviews(slug: string, page = 1): Promise<TutorReviewCollection> {
+async function loadTutorReviews(slug: string, page = 1): Promise<TutorReviewCollection> {
   const response = await request<TutorReviewCollection>({
     method: "GET",
     url: `/tutors/${encodeURIComponent(slug)}/reviews`,
@@ -103,6 +129,10 @@ export async function getTutorReviews(slug: string, page = 1): Promise<TutorRevi
   }
   return response.data;
 }
+export const getTutorReviews = sharePendingPublicRead(
+  loadTutorReviews,
+  (slug: string, page = 1) => JSON.stringify([slug, page]),
+);
 function requireOwnerListing(value: OwnerListing) {
   if (!value || !ownerListingStatuses.includes(value.status as (typeof ownerListingStatuses)[number]) ||
       !Array.isArray(value.allowed_actions) || value.allowed_actions.some((action) => !ownerListingActions.includes(action))) {

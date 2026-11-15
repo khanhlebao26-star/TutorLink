@@ -19,6 +19,16 @@ it("logs in with session cookies then routes according to the returned role",asy
  vi.mocked(services.login).mockResolvedValue(undefined as never);vi.mocked(services.getCurrentUser).mockResolvedValue({role:"tutor"} as never);
  render(<AuthForm mode="login"/>);await userEvent.type(screen.getByLabelText("Email"),"test@example.test");await userEvent.type(screen.getByLabelText("Mật khẩu"),"test-password");await userEvent.click(screen.getByRole("button",{name:"Đăng nhập"}));expect(push).toHaveBeenCalledWith("/profile");
 });
+it("returns to the requested page after verifying the new session", async () => {
+  vi.mocked(services.login).mockResolvedValue(undefined as never);
+  vi.mocked(services.getCurrentUser).mockResolvedValue({ role: "customer" } as never);
+  const destination = "/programs/7/sessions?page=2";
+  render(<AuthForm mode="login" returnTo={destination} />);
+  await userEvent.type(screen.getByLabelText("Email"), "test@example.test");
+  await userEvent.type(screen.getByLabelText("Mật khẩu"), "test-password");
+  await userEvent.click(screen.getByRole("button", { name: "Đăng nhập" }));
+  expect(push).toHaveBeenCalledWith(destination);
+});
 const profile:TutorProfile={id:1,user_id:2,specialization_id:1,avatar_file_id:4,verification_document_file_id:5,headline:"Approved headline",bio:"Bio",experience_years:3,status:"approved",revision:{id:2,revision_no:1,status:"changes_requested",version:7,payload:{headline:"Revision headline",bio:"New bio"},review_reason:"Add detail"}};
 function data(p:TutorProfile):TutorOnboardingData{return {profile:p,user:{id:2,role:"tutor",status:"active",full_name:"Tutor Anna",email:"tutor@example.test",email_verified_at:"2026-01-01T00:00:00Z"},specializations:[{id:1,subcategory_id:1,name:"English",slug:"english",status:"active"}]};}
 it("shows revision content for resubmission and uses the current revision version",async()=>{
