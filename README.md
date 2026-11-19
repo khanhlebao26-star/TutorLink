@@ -1,227 +1,321 @@
-# TutorLink
+<div align="center">
+  <img src="frontend/src/app/icon.svg" alt="TutorLink logo" width="88" height="88" />
+  <h1>TutorLink</h1>
+  <p><strong>A learning platform that connects tutors and learners and supports program and learning progress management.</strong></p>
+  <p>
+    <img src="https://img.shields.io/badge/Backend-Laravel-071A4C?style=for-the-badge" alt="Backend: Laravel" />
+    <img src="https://img.shields.io/badge/Frontend-Next.js-FF0A99?style=for-the-badge" alt="Frontend: Next.js" />
+    <img src="https://img.shields.io/badge/Database-PostgreSQL-071A4C?style=for-the-badge" alt="Database: PostgreSQL" />
+  </p>
+</div>
 
-**Nền tảng kết nối người dạy và học viên, quản lý chương trình học và quá trình học tập.**
+TutorLink uses Laravel for its API and business logic, Next.js for its web application, and PostgreSQL for persistent data. The platform supports three roles: Learner, Tutor, and Administrator.
 
-Đồ án môn **Laravel** · Giảng viên **Nguyen Huu Quyen** · Lớp **23CSE**
+## Project Information
 
-<!-- Bổ sung tên nhóm, họ tên và MSSV thành viên trước khi nộp. -->
+| Item | Details |
+| --- | --- |
+| Course | Laravel |
+| Instructor | Nguyen Huu Quyen |
+| Class | 23CSE |
+| Team | To be added |
+| Members | Add each member's full name and student ID |
+| Web palette | Navy `#071A4C`, pink `#FF0A99`, and lavender `#F8F7FF` ([source tokens](frontend/src/styles/base.css)) |
 
-TutorLink sử dụng Laravel cho API và nghiệp vụ, Next.js cho ứng dụng web, PostgreSQL cho dữ liệu. Dự án triển khai theo ba vai trò: Học viên, Gia sư và Quản trị viên.
+## Table of Contents
 
-## Mục lục
+1. [Project Overview](#1-project-overview)
+2. [Core Features](#2-core-features)
+3. [Technology Stack and Architecture](#3-technology-stack-and-architecture)
+4. [Local Setup](#4-local-setup)
+5. [Testing and API Documentation](#5-testing-and-api-documentation)
+6. [Performance Optimization](#6-performance-optimization)
+7. [Measurements and Limitations](#7-measurements-and-limitations)
+8. [Future Optimization Work](#8-future-optimization-work)
+9. [Documentation and References](#9-documentation-and-references)
 
-- [1. Giới thiệu và phạm vi](#1-giới-thiệu-và-phạm-vi)
-- [2. Chức năng chính](#2-chức-năng-chính)
-- [3. Công nghệ và kiến trúc](#3-công-nghệ-và-kiến-trúc)
-- [4. Cài đặt và chạy local](#4-cài-đặt-và-chạy-local)
-- [5. Kiểm thử và tài liệu API](#5-kiểm-thử-và-tài-liệu-api)
-- [6. Performance Optimization](#6-performance-optimization)
-- [7. Kết quả đo và giới hạn](#7-kết-quả-đo-và-giới-hạn)
-- [8. Hướng tối ưu tiếp theo](#8-hướng-tối-ưu-tiếp-theo)
-- [9. Tài liệu và nguồn tham khảo](#9-tài-liệu-và-nguồn-tham-khảo)
+## 1. Project Overview
 
-## 1. Giới thiệu và phạm vi
+TutorLink helps learners find tutors, discuss learning needs, create learning programs, and track progress in one workspace. Tutors can offer services in academic subjects, languages, fitness, and other skills.
 
-TutorLink hỗ trợ tìm kiếm người dạy, trao đổi nhu cầu, thiết lập chương trình học và theo dõi việc học trong một không gian chung. Người dạy có thể cung cấp dịch vụ trong các lĩnh vực học tập, ngôn ngữ, thể chất và kỹ năng.
+The main workflow is: **Tutor profile → review and approval → service listing → discussion → program creation → invitation → sessions and assignments → progress and reviews.**
 
-Luồng nghiệp vụ chính: **Hồ sơ gia sư → xét duyệt → đăng dịch vụ → trao đổi → tạo chương trình → gửi/chấp nhận lời mời → buổi học và bài tập → tiến độ và đánh giá.**
+Availability shown on a profile is for reference. Programs are activated through invitations; the platform does not currently provide automatic booking or online payment processing. Tuition fees are recorded and tracked as program data.
 
-Lịch rảnh trên hồ sơ là thông tin tham khảo. Chương trình được kích hoạt qua lời mời; hệ thống chưa cung cấp đặt lịch tự động hay cổng thanh toán trực tuyến. Học phí hiện là nghiệp vụ ghi nhận khoản phí và trạng thái thanh toán.
+## 2. Core Features
 
-## 2. Chức năng chính
+### Learners
 
-### Học viên
+- Register, verify email, sign in, reset passwords, and manage learning profiles.
+- Search services by keyword, subject, delivery mode, city, and price; save favorite tutors.
+- Send messages and files, respond to invitations, and participate in learning programs.
+- View sessions, complete assignments and quizzes, track progress, read class announcements, and submit eligible reviews.
 
-- Đăng ký, xác minh email, đăng nhập, đặt lại mật khẩu và quản lý hồ sơ học tập.
-- Tìm dịch vụ theo từ khóa, chuyên môn, hình thức học, thành phố và mức phí; lưu gia sư yêu thích.
-- Nhắn tin, gửi tệp, phản hồi lời mời và tham gia chương trình học.
-- Xem buổi học, thực hiện bài tập/quiz, theo dõi tiến độ, thông báo lớp và gửi đánh giá khi đủ điều kiện.
+### Tutors
 
-### Gia sư
+- Complete a profile, submit verification documents, and track the review process.
+- Manage service listings, availability, learning programs, and invitations.
+- Manage sessions, assignments, submissions, feedback, quizzes, and learner progress.
+- Record fees, publish announcements, and communicate with learners.
 
-- Hoàn thiện hồ sơ, gửi tài liệu xác minh và theo dõi xét duyệt.
-- Quản lý dịch vụ, lịch rảnh, chương trình học và lời mời.
-- Quản lý buổi học, bài tập, bài nộp, phản hồi, quiz và tiến độ học viên.
-- Ghi nhận học phí, đăng thông báo và trao đổi với học viên.
+### Administrators
 
-### Quản trị viên
+- View dashboards within their assigned permissions; assign reviewers and review profiles or documents.
+- Handle reports, moderate reviews, and inspect audit records within their access scope.
+- Monitor the outbox, background jobs, and configured operational tools.
 
-- Xem dashboard theo quyền được cấp; phân công và xét duyệt hồ sơ/tài liệu.
-- Xử lý báo cáo, kiểm duyệt đánh giá và tra cứu audit theo phạm vi quyền.
-- Theo dõi outbox, công việc nền và công cụ giám sát khi được cấu hình.
+See the [frontend README](frontend/README.md) for API integration, static content, and demo data. A registered route alone does not mean that every workflow has been accepted or fully verified.
 
-Phạm vi tích hợp API, nội dung tĩnh và dữ liệu minh họa được ghi riêng trong [README frontend](frontend/README.md#trạng-thái-tích-hợp). Sự tồn tại của route không tự chứng nhận mọi yêu cầu nghiệp vụ đã nghiệm thu.
+## 3. Technology Stack and Architecture
 
-## 3. Công nghệ và kiến trúc
+- **Backend:** PHP 8.3, Laravel 13, Sanctum, Fortify, Reverb, and Filament 5 for the Laravel admin panel.
+- **Frontend:** Next.js 16, React 19, TypeScript, and Tailwind CSS.
+- **Data:** PostgreSQL 16. The production sample configuration uses the database for cache, sessions, and queues.
+- **Backend deployment:** Docker Compose, Caddy, PHP-FPM, and OPcache; workers and the scheduler run as separate processes.
+- **Testing and API contract:** Pest/PHPUnit, a dedicated PostgreSQL test database, Vitest, Playwright, Scramble/OpenAPI, and GitHub Actions.
+- **Observability:** Telescope, Pulse, and Prometheus tooling for benchmark environments.
 
-- **Backend:** PHP 8.3, Laravel 13; Sanctum, Fortify, Reverb; Filament 5 cho khu vực quản trị Laravel.
-- **Frontend:** Next.js 16, React 19, TypeScript, Tailwind CSS.
-- **Dữ liệu:** PostgreSQL 16; cấu hình production mẫu dùng database cho cache, session và queue.
-- **Triển khai backend:** Docker Compose, Caddy, PHP-FPM, OPcache; worker và scheduler chạy thành các tiến trình riêng.
-- **Kiểm thử và hợp đồng API:** Pest/PHPUnit, PostgreSQL test riêng, Vitest, Playwright, Scramble/OpenAPI, GitHub Actions.
-- **Quan sát:** Telescope, Pulse và bộ thử nghiệm Prometheus trong môi trường benchmark.
+In local development, Next.js calls the Laravel API under `/api/v1`. Laravel owns authentication, authorization, validation, and business transactions. In the production backend configuration, Caddy forwards HTTP requests to PHP-FPM and WebSocket traffic to Reverb. The frontend is deployed separately; `compose.production.yml` does not currently include a Next.js service.
 
-Trong local, Next.js gọi API Laravel tại `/api/v1`. Laravel chịu trách nhiệm xác thực, phân quyền, kiểm tra dữ liệu và giao dịch nghiệp vụ. Trong cấu hình production backend, Caddy chuyển HTTP tới PHP-FPM và WebSocket tới Reverb. Frontend cần được triển khai riêng; `compose.production.yml` hiện chưa có service Next.js.
-
-```text
+~~~text
 TutorLink/
-├── backend/                 Laravel API, actions, policies, migrations, tests
-├── frontend/                Next.js, API client, components, tests
-├── docs/                    Product, domain, API và các báo cáo bàn giao
-├── docker/performance/      Bộ đo tải, đối chiếu dữ liệu và giám sát thử
-├── docker-compose.yml       Môi trường phát triển local
-├── compose.workers.yml      Outbox worker, Slack worker và scheduler local
-├── compose.testing.yml      PostgreSQL và backend test cô lập
-└── compose.production.yml   Bộ triển khai backend production
-```
+├── backend/                 Laravel API, actions, policies, migrations, and tests
+├── frontend/                Next.js application, API client, components, and tests
+├── docs/                    Product, domain, API, and handover documentation
+├── docker/performance/      Load tests, data reconciliation, and monitoring tools
+├── docker-compose.yml       Local development environment
+├── compose.workers.yml      Local outbox, Slack workers, and scheduler
+├── compose.testing.yml      Isolated PostgreSQL and backend test environment
+└── compose.production.yml   Backend production deployment
+~~~
 
-## 4. Cài đặt và chạy local
+## 4. Local Setup
 
-Yêu cầu Docker có Docker Compose và Git. Chạy các lệnh từ thư mục gốc repository.
+You need Git and Docker Compose. Run the commands from the repository root.
 
-```sh
+~~~sh
 git clone https://github.com/khanhlebao26-star/TutorLink.git
 cd TutorLink
 cp backend/.env.docker.example backend/.env.docker
 docker compose build backend
 docker compose run --rm --no-deps backend php artisan key:generate --show
-```
+~~~
 
-Lệnh cuối in khóa Laravel. Điền khóa vào `APP_KEY` trong `backend/.env.docker`; đặt `LOCAL_ADMIN_EMAIL` và `LOCAL_ADMIN_PASSWORD` cho tài khoản quản trị local. Nếu đã có tệp cấu hình, giữ tệp hiện có. Cấu hình Compose local cung cấp thông tin kết nối PostgreSQL cho container.
+The final command prints a Laravel key. Set it as `APP_KEY` in `backend/.env.docker`, and configure `LOCAL_ADMIN_EMAIL` and `LOCAL_ADMIN_PASSWORD` for a local administrator account. Keep an existing environment file if you have already configured one. The local Compose configuration provides PostgreSQL connection settings to the container.
 
-```sh
+~~~sh
 docker compose up -d --build
 docker compose exec backend php artisan migrate
 docker compose exec backend php artisan db:seed
 docker compose -f docker-compose.yml -f compose.workers.yml up -d
-```
+~~~
 
-`DatabaseSeeder` nạp catalog và tài khoản admin local đã cấu hình. Nó không tự tạo toàn bộ dữ liệu demo chương trình học. `FrontendDemoSeeder` dành cho database test được bảo vệ, không dùng để seed database local thông thường.
+`DatabaseSeeder` loads catalog data and the configured local administrator account. It does not create a complete set of demo learning programs. `FrontendDemoSeeder` is intended for a protected test database and should not be used to seed a regular local database.
 
-- Ứng dụng web: [localhost:3000](http://localhost:3000).
-- API: [localhost:8000/api/v1](http://localhost:8000/api/v1).
-- Mailpit xem thư local: [localhost:8025](http://localhost:8025).
-- pgAdmin local: [localhost:5050](http://localhost:5050).
+- Web application: [localhost:3000](http://localhost:3000)
+- API: [localhost:8000/api/v1](http://localhost:8000/api/v1)
+- Mailpit for local email: [localhost:8025](http://localhost:8025)
+- Local pgAdmin: [localhost:5050](http://localhost:5050)
 
-Xem chi tiết tại [README backend](backend/README.md) và [README frontend](frontend/README.md). Panel Filament cần cấu hình `ADMIN_PANEL_ENABLED` và quyền phù hợp. Cấu hình production, HTTPS và secrets phải dùng môi trường riêng.
+For more details, see the [backend README](backend/README.md) and [frontend README](frontend/README.md). The Filament panel requires `ADMIN_PANEL_ENABLED` and a suitable account permission. Production settings, HTTPS, and secrets must be configured separately.
 
-## 5. Kiểm thử và tài liệu API
+## 5. Testing and API Documentation
 
-Backend sử dụng PostgreSQL test riêng, có kiểm tra danh tính database trước khi tạo lại schema và nạp fixture:
+The backend uses a dedicated PostgreSQL test database. The test runner checks the database identity before rebuilding its schema and loading fixtures:
 
-```sh
+~~~sh
 docker compose -p tutorlink-tests -f compose.testing.yml run --build --rm backend-test php scripts/test-suite.php
 docker compose -p tutorlink-tests -f compose.testing.yml down
-```
+~~~
 
-Kiểm tra frontend với Node.js 22, chạy trong thư mục `frontend/`:
+To check the frontend with Node.js 22, run these commands from `frontend/`:
 
-```sh
+~~~sh
 npm ci
 npm run lint
 npm run typecheck
 npm test
 npm run build
-```
+~~~
 
-[OpenAPI đã xuất](docs/api/openapi.json) hiện có **139 thao tác** tại revision được rà soát ngày 19/11/2026. Xem [quy trình tạo và kiểm tra hợp đồng](docs/api/README.md). [API Route Catalog](<docs/Architecture & Technical Design/API Route Catalog.md>) phân biệt route đã đăng ký và route dự kiến.
+The [generated OpenAPI document](docs/api/openapi.json) contains **139 operations** at the revision reviewed on November 19, 2026. See the [API contract guide](docs/api/README.md) for the export and validation process. The [API Route Catalog](<docs/Architecture & Technical Design/API Route Catalog.md>) distinguishes registered routes from planned routes.
 
-Kết quả kiểm thử phải gắn với revision và môi trường thực hiện. Các báo cáo bàn giao là bằng chứng lịch sử; README không gắn nhãn toàn bộ test hiện tại đã pass khi chưa chạy lại.
+Test results should be tied to the revision and environment where they were run. Handover reports are historical evidence; this README does not imply that the entire test suite has been rerun on every later revision.
 
 ## 6. Performance Optimization
 
-Phần này ghi **cơ chế đã có trong mã TutorLink**. Các đề xuất chưa triển khai nằm riêng ở mục 8. [Bản ghi tối ưu server](docs/handover/TutorLink-server-optimization-2026-11-19.md) giải thích từng cơ chế, vị trí mã và giới hạn kiểm chứng.
+This section documents mechanisms present in TutorLink's source code. Proposed work is listed separately in [Section 8](#8-future-optimization-work). The [server optimization report](docs/handover/TutorLink-server-optimization-2026-11-19.md) provides additional implementation details, evidence, and limitations.
 
-### 6.1. Giảm truy vấn quan hệ lặp
+### 6.1. Eager Loading, Selected Columns, and Bounded Results
 
-Marketplace tải trước hồ sơ gia sư, người dùng và cây chuyên môn bằng eager loading, đồng thời chỉ lấy các cột cần cho quan hệ. API giới hạn tối đa 50 dịch vụ mỗi trang. Cách này tránh truy vấn từng quan hệ riêng cho từng item khi tạo response.
+Marketplace queries eager-load tutor, user, and catalog relationships and select only the required relationship columns. The API caps each page at 50 listings. This prevents each result row from triggering separate relationship queries and bounds the number of records in a response.
 
-**Mã:** [ListingController](backend/app/Http/Controllers/Api/V1/ListingController.php), [CatalogController](backend/app/Http/Controllers/Api/V1/CatalogController.php).
+**Source:** [ListingController](backend/app/Http/Controllers/Api/V1/ListingController.php), [CatalogController](backend/app/Http/Controllers/Api/V1/CatalogController.php).
 
-### 6.2. Cache response marketplace công khai
+### 6.2. Conditional Caching for Public Marketplace Responses
 
-Middleware cache JSON thành công cho các route public được cho phép, với TTL 60 giây. Request có Cookie/Authorization hoặc dữ liệu cá nhân đi theo nhánh `private, no-store`.
+Middleware caches successful JSON responses for allow-listed public routes for 60 seconds. Requests containing cookies or authorization headers, or associated with a user, follow a `private, no-store` path.
 
-Cache key kết hợp đường dẫn, bộ lọc, generation và mốc tài liệu xác minh hết hạn. Trigger PostgreSQL đổi generation cùng giao dịch ghi để các thay đổi liên quan làm cache cũ mất hiệu lực. Generation và mốc hết hạn được đọc trong cùng một câu SQL.
+The cache key includes the path, filters, a generation number, and the expiry time of approved verification documents. PostgreSQL triggers update the generation in the same transaction as relevant writes, invalidating older cache keys. The generation and expiry are read in one SQL statement.
 
-**Giới hạn:** cache HIT vẫn phải đọc PostgreSQL để kiểm version; đây chưa phải đường đọc hoàn toàn không truy vấn DB. Redis đã được thử cho payload cache trong benchmark, chưa là service mặc định của bộ production.
+**Limitation:** A cache hit still queries PostgreSQL for the current generation. Redis was tested for cache payloads in a benchmark, but it is not the default cache-payload store in the production Compose configuration.
 
-**Mã:** [MarketplaceCacheControl](backend/app/Http/Middleware/MarketplaceCacheControl.php), [PublicCatalogCache](backend/app/Support/PublicCatalogCache.php), [migration invalidation](backend/database/migrations/2026_11_03_135735_create_marketplace_cache_versions.php).
+**Source:** [MarketplaceCacheControl](backend/app/Http/Middleware/MarketplaceCacheControl.php), [PublicCatalogCache](backend/app/Support/PublicCatalogCache.php), [cache invalidation migration](backend/database/migrations/2026_11_03_135735_create_marketplace_cache_versions.php).
 
-### 6.3. Chỉ mục tìm kiếm và truy vấn trang sâu
+### 6.3. Search Indexing and Deep Pagination
 
-Migration tạo GIN index với `pg_trgm` trên tiêu đề/mô tả của dịch vụ active, VND để hỗ trợ tìm chuỗi con. Index được tạo concurrent. Khi offset từ 20.000, controller dùng tập ID phù hợp trong CTE để chia sẻ phần lọc giữa lấy trang và đếm tổng, sau đó tải quan hệ.
+A migration creates a concurrent GIN index using `pg_trgm` over active listing titles and descriptions for substring search. For offsets of 20,000 or more, the controller uses a CTE to share the matching ID set between page retrieval and the exact total count before loading relationships.
 
-**Giới hạn:** vẫn giữ exact total và OFFSET; chi phí chưa biến thành hằng số. Lợi ích phụ thuộc dữ liệu, từ khóa, độ chọn lọc và execution plan.
+**Limitation:** Exact totals and `OFFSET` pagination still have a cost. Benefits depend on the dataset, search term, selectivity, and execution plan.
 
-**Mã:** [migration GIN](backend/database/migrations/2026_11_14_154208_add_active_listing_text_search_index.php), [ListingController](backend/app/Http/Controllers/Api/V1/ListingController.php).
+**Source:** [GIN index migration](backend/database/migrations/2026_11_14_154208_add_active_listing_text_search_index.php), [ListingController](backend/app/Http/Controllers/Api/V1/ListingController.php).
 
-### 6.4. Tổng hợp số liệu tại database
+### 6.4. Database-Side Aggregation
 
-Dashboard admin dùng `GROUP BY` và `COUNT` để tổng hợp số lượng theo trạng thái, có lọc phạm vi và quyền trước khi trả dữ liệu. Cách này không cần tải tất cả bản ghi về PHP để tự đếm. Dashboard vẫn có nhiều truy vấn theo nhóm quyền và hai truy vấn đếm outbox riêng.
+The administrator dashboard uses SQL `GROUP BY` and `COUNT` to summarize records by status, applying actor scope and permissions before returning data. This avoids loading every record into PHP just to count it. The dashboard still performs separate queries for different resource groups and two queries for outbox counts.
 
-**Mã:** [ReadAdminDashboard](backend/app/Actions/Admin/ReadAdminDashboard.php).
+**Source:** [ReadAdminDashboard](backend/app/Actions/Admin/ReadAdminDashboard.php).
 
-### 6.5. Xử lý thông báo và tích hợp ở tiến trình nền
+### 6.5. Outbox and Background Workers
 
-Outbox lưu sự kiện cùng giao dịch nghiệp vụ; worker xử lý số lượng giới hạn, dùng `FOR UPDATE SKIP LOCKED`, retry và cơ chế chống tạo thông báo trùng. Broadcast và Slack có worker queue riêng, scheduler chạy riêng. Những công việc này được tách khỏi luồng xử lý HTTP chính.
+The outbox stores events within the business transaction. Workers process bounded batches using `FOR UPDATE SKIP LOCKED`, retry failed work, and prevent duplicate notifications. Broadcast and Slack jobs use separate workers; the scheduler runs separately from HTTP requests.
 
-**Giới hạn:** email xác minh và quên mật khẩu còn gửi theo luồng đồng bộ; không mô tả toàn bộ email đã được queue.
+**Limitation:** Email verification and password-reset messages are still sent synchronously; not all email delivery is queued.
 
-**Mã:** [ProcessNotificationOutbox](backend/app/Console/Commands/ProcessNotificationOutbox.php), [WorkNotificationOutbox](backend/app/Console/Commands/WorkNotificationOutbox.php), [production Compose](compose.production.yml).
+**Source:** [ProcessNotificationOutbox](backend/app/Console/Commands/ProcessNotificationOutbox.php), [WorkNotificationOutbox](backend/app/Console/Commands/WorkNotificationOutbox.php), [production Compose configuration](compose.production.yml).
 
-### 6.6. Tối ưu runtime production
+### 6.6. Production Runtime Configuration
 
-Image backend production cài dependency `--no-dev`, tạo autoloader tối ưu và bật OPcache. Khi khởi động, entrypoint cache config, route và view. Caddy nén zstd/gzip; worker chạy riêng với chính sách restart. Đây là cơ chế trong cấu hình triển khai, không phải bằng chứng về công suất production.
+The production backend image installs dependencies with `--no-dev`, generates an optimized autoloader, and enables OPcache. At startup, the entrypoint caches configuration, routes, and views. Caddy enables zstd/gzip compression, while background workers run as separate processes with restart policies. These are deployment mechanisms, not proof of production capacity.
 
-**Mã:** [Dockerfile.production](backend/Dockerfile.production), [entrypoint](backend/docker/production/entrypoint.sh), [php.ini](backend/docker/production/php.ini), [Caddyfile](backend/docker/production/Caddyfile).
+**Source:** [production Dockerfile](backend/Dockerfile.production), [entrypoint](backend/docker/production/entrypoint.sh), [PHP configuration](backend/docker/production/php.ini), [Caddyfile](backend/docker/production/Caddyfile).
 
-### 6.7. Giảm số lần gọi API lặp
+### 6.7. Avoiding Duplicate API Requests
 
-API client marketplace gộp các request giống nhau đang chờ. Polling dừng khi tab ẩn/offline, không chạy chồng lượt và có backoff. Badge tin nhắn dùng endpoint unread-count riêng, chu kỳ 15 giây; chat dùng chu kỳ mặc định 10 giây. Đây là tối ưu lượng request gửi tới server, không phải thay đổi thiết kế giao diện.
+The marketplace client shares identical public reads that are already in progress. Polling pauses when a tab is hidden or offline, prevents overlapping polls, and uses backoff. The message badge uses a dedicated unread-count endpoint every 15 seconds; chat polling uses a 10-second default interval. These mechanisms reduce repeated requests to the server without changing the visual design.
 
-**Mã:** [marketplace client](frontend/src/lib/data/marketplace.ts), [use-polling](frontend/src/lib/hooks/use-polling.ts), [use-unread-messages](frontend/src/lib/hooks/use-unread-messages.ts).
+**Source:** [marketplace client](frontend/src/lib/data/marketplace.ts), [use-polling](frontend/src/lib/hooks/use-polling.ts), [use-unread-messages](frontend/src/lib/hooks/use-unread-messages.ts).
 
-### 6.8. Gộp dữ liệu thẻ trang chủ trong một response
+### 6.8. One Compact Response for Homepage Cards
 
-`GET /listings?include=tutor_card` bổ sung headline, kinh nghiệm và thống kê rating công khai. Hai khu vực dịch vụ/gia sư nổi bật dùng chung request ứng viên, không gọi thêm profile hoặc danh sách review cho từng thẻ. Rating được aggregate theo nhóm, dùng cùng điều kiện hiển thị với API reviews. Request mặc định không nhận dữ liệu mở rộng. Hiện vẫn chọn nội dung từ tối đa 50 ứng viên; chưa tuyên bố giảm payload hoặc latency theo phần trăm.
+`GET /listings?include=tutor_card` can include a tutor headline, years of experience, and public review counts and average. The homepage's featured-service and featured-tutor sections share the same in-flight candidate request and no longer fetch a profile or review list for each card. The rating aggregate uses the same visibility rules as the public reviews API. The optional field does not change the default listing response.
 
-**Kiểm chứng:** component test render cả hai khu vực với **1 request dữ liệu**, không gọi profile/reviews; backend test kiểm aggregate theo nhóm và tutor bị đình chỉ không xuất hiện.
+The homepage still chooses cards from up to 50 candidate listings. This change reduces follow-up requests; no payload-size or latency reduction percentage has been measured.
 
-### 6.9. Workspace tải theo nhu cầu và giữ nội dung khi làm mới
+**Source:** [ListingController](backend/app/Http/Controllers/Api/V1/ListingController.php), [ListingResource](backend/app/Http/Resources/ListingResource.php), [marketplace data module](frontend/src/lib/data/marketplace.ts), [featured services](frontend/src/components/marketing/featured-services.tsx), [featured tutors](frontend/src/components/marketing/featured-tutors.tsx).
 
-Tasks lọc/sắp xếp tại backend và chỉ tải **5 bài/trang**. Bộ đếm trạng thái vẫn phản ánh toàn Program; file đính kèm của trang được lấy bằng một query nhóm. Progress lấy `task_counts` và `completed_session_count` từ Overview thay vì tải toàn bộ lịch sử Tasks/Sessions.
+### 6.9. Paginated Workspace Data and Summary Counts
 
-Khi làm mới cùng nguồn dữ liệu sau thao tác, FE giữ nội dung và hiển thị trạng thái cập nhật. Đổi nguồn/phạm vi, logout hoặc lỗi quyền sẽ không giữ nội dung cũ. Workspace truyền AbortSignal xuống các lượt đọc để hủy khi không còn cần; API client đặt timeout mặc định 15 giây cho GET/HEAD, không tự gửi lại lệnh ghi.
+Tasks can be filtered and sorted by the backend and are loaded five per page by the frontend. Status counts cover the authorized Program regardless of the selected page or filter. File links for the current page are fetched in one grouped query rather than one query per task.
 
-**Kiểm chứng:** test Tasks với tổng 1.000 bài xác nhận chỉ một lượt gọi trang 5 item; test Progress xác nhận không gọi lịch sử Tasks/Sessions; hook test kiểm giữ nội dung khi refresh, lỗi quyền và loại bỏ kết quả scope cũ.
+The Progress tab reads task and completed-session counts from the Program Overview endpoint instead of fetching the full task and session history. Progress records remain separately paginated.
 
-## 7. Kết quả đo và giới hạn
+**Source:** [TaskController](backend/app/Http/Controllers/Api/V1/TaskController.php), [ProgramOverviewController](backend/app/Http/Controllers/Api/V1/ProgramOverviewController.php), [workspace data module](frontend/src/lib/data/workspace.ts), [workspace page](frontend/src/components/programs/workspace-tab-page.tsx), [progress dashboard](frontend/src/components/programs/progress/progress-dashboard.tsx).
 
-**Kiểm tra triển khai 19/11/2026 (working tree local):** các nhóm backend đạt **852 test / 7.568 assertions** trên PostgreSQL test cô lập; frontend đạt **85/85 test**, typecheck, lint các file thay đổi và production build. OpenAPI được tạo lại từ code, giữ 139 operations. Các test xác nhận giảm fan-out, phân trang, aggregate và vòng đời tải dữ liệu; chưa phải phép đo latency/RPS mới hay chứng nhận triển khai production.
+### 6.10. Refresh, Cancellation, and Read Timeouts
 
-Báo cáo [hiệu năng 14–15/11/2026](docs/handover/TutorLink-performance-audit-2026-11-14.md) lưu các thử nghiệm local với dữ liệu tổng hợp. Lượt mixed **100 RPS trong 600 giây** nhận thành công 60.000 request, đạt **99,99 RPS**, p95 **55 ms**, p99 **199 ms**, không lỗi và không lượt bị bỏ. Đối chiếu 3.001 Session, gồm fixture smoke, nhất quán với biên nhận và audit.
+When data is refreshed from the same source after an action, the frontend keeps the current content visible and shows an updating state. A changed data source or scope, logout, or authorization error clears the old result. Workspace reads pass an `AbortSignal` so requests can be cancelled when no longer needed. GET and HEAD requests have a 15-second default timeout; callers can override it, and write requests are not automatically retried.
 
-Máy phát tải và ứng dụng dùng chung tài nguyên Docker. Các thử nghiệm tải cao hơn chưa đạt mục tiêu; **chưa nghiệm thu 1.000 request thành công/giây trong 60 phút hoặc production capacity**. Kết quả 100 RPS cũng chưa chứng minh toàn bộ hành trình người dùng, mọi API hoặc tải đồng thời của ứng dụng Next.js.
+**Source:** [use-async-data](frontend/src/lib/hooks/use-async-data.ts), [API client](frontend/src/lib/api/client.ts), [API state component](frontend/src/components/shared/api-state.tsx).
 
-Bộ đo và điều kiện nghiệm thu: [docker/performance](docker/performance/README.md).
+### 6.11. Representative Code Samples
 
-## 8. Hướng tối ưu tiếp theo
+The snippets below are shortened excerpts from TutorLink's implementation. Follow the linked source files for complete validation, authorization, and response handling.
 
-Các mục dưới đây là **đề xuất**, chưa được tính là thành quả đã triển khai:
+#### Aggregate review data for a page of listings
 
-1. Queue email xác minh/đặt lại mật khẩu với worker nghe đúng queue, retry và kiểm tra hạn token.
-2. Tách chính sách cache catalog ít thay đổi khỏi cache dữ liệu marketplace biến động; bổ sung chống nhiều request cùng dựng lại một key hết hạn.
-3. Đo chi phí generation lookup và phạm vi invalidation; chỉ thay đổi sau khi bảo đảm ẩn dịch vụ, đình chỉ và hết hạn tài liệu vẫn có hiệu lực đúng lúc.
-4. Gộp hai truy vấn đếm outbox nếu profiling cho thấy đáng kể; chỉ cache số liệu dashboard sau khi xác định độ trễ dữ liệu và phạm vi quyền chấp nhận được.
-5. Đo plan tìm kiếm, tài nguyên và hàng đợi PHP-FPM trên staging với máy phát tải riêng; điều chỉnh theo số liệu.
-6. Tích hợp Reverb ở frontend cho chat/badge, có reconnect/resync và polling dự phòng. Workspace Tasks/Progress đã chuyển sang phân trang/tổng hợp tại mục 6.9.
+**File:** [ListingController.php](backend/app/Http/Controllers/Api/V1/ListingController.php)
 
-Không chuyển session sang Redis chỉ bằng đổi biến môi trường: cơ chế realtime hiện yêu cầu database session. Không bỏ khóa, version, audit hoặc idempotency để đổi lấy tốc độ.
+~~~php
+if (($filters['include'] ?? null) === 'tutor_card') {
+    $ratings = PublicTutorReviewController::visibleReviews(
+        $listings->pluck('tutor_profile_id')->unique()->all()
+    )
+        ->selectRaw('reviews.tutor_profile_id, COUNT(*) AS total, AVG(reviews.rating) AS average')
+        ->groupBy('reviews.tutor_profile_id')
+        ->get()
+        ->keyBy('tutor_profile_id');
 
-## 9. Tài liệu và nguồn tham khảo
+    foreach ($listings as $listing) {
+        $rating = $ratings->get($listing->tutor_profile_id);
+        $listing->setAttribute('tutor_card', [
+            'headline' => $listing->tutorProfile?->headline,
+            'experience_years' => (int) ($listing->tutorProfile?->experience_years ?? 0),
+            'rating_count' => (int) ($rating->total ?? 0),
+            'rating_average' => $rating ? round((float) $rating->average, 2) : null,
+        ]);
+    }
+}
+~~~
 
-- [Mục lục tài liệu TutorLink](docs/README.md).
-- [Bản ghi tối ưu server và đối chiếu tham khảo](docs/handover/TutorLink-server-optimization-2026-11-19.md).
-- [Báo cáo kiểm thử và đo hiệu năng đã lưu](docs/handover/TutorLink-performance-audit-2026-11-14.md).
-- [Daily Vocabulary](https://github.com/AkioCkist/daily_vocabulary/tree/3c0ea06ccaebda687c662fa14245afcb0829a5c6): tham khảo cách bố trí README và cách trình bày vấn đề, giải pháp, bằng chứng tối ưu. Công nghệ, cơ chế và kết quả của TutorLink được đối chiếu từ chính mã nguồn dự án; không sử dụng số liệu của repo tham khảo làm kết quả TutorLink.
+This calculates review aggregates for the current page as a grouped query instead of issuing a separate reviews request for each homepage card.
+
+#### Paginate tasks and batch-load their file links
+
+**File:** [TaskController.php](backend/app/Http/Controllers/Api/V1/TaskController.php)
+
+~~~php
+$tasks = $query->paginate($page['per_page'], ['*'], 'page', $page['page']);
+$fileIds = DB::table('file_links')
+    ->where('resource_type', 'task')
+    ->whereIn('resource_id', $tasks->getCollection()->pluck('id'))
+    ->get()
+    ->groupBy('resource_id');
+
+$response = $this->paginated(
+    $tasks,
+    fn ($task) => $this->taskData(
+        $task,
+        ($fileIds->get($task->id) ?? collect())->pluck('file_id')->all()
+    )
+);
+~~~
+
+The page limit and authorization checks are applied before this excerpt. The grouped lookup replaces per-task file-link reads on this list endpoint.
+
+#### Apply a bounded timeout to read requests
+
+**File:** [client.ts](frontend/src/lib/api/client.ts)
+
+~~~ts
+export async function request<T>(config: AxiosRequestConfig, requiresCsrf = false) {
+  if (requiresCsrf) await initializeCsrf();
+  const method = (config.method ?? "GET").toUpperCase();
+  return api.request<T>({
+    ...(method === "GET" || method === "HEAD" ? { timeout: 15_000 } : {}),
+    ...config,
+  });
+}
+~~~
+
+The timeout applies to reads by default. Explicit caller configuration can override it, while this code does not automatically retry mutations.
+
+## 7. Measurements and Limitations
+
+**Implementation checks on November 19, 2026 (local working tree):** backend suites passed **852 tests / 7,568 assertions** against an isolated PostgreSQL test database; the frontend passed **85/85 tests**, typecheck, lint for changed files, and a production build. OpenAPI was regenerated from the source code and retained 139 operations. These checks cover request fan-out, pagination, aggregation, and data-loading lifecycle behavior; they are not new latency/RPS measurements or a production deployment acceptance.
+
+The [November 14–15, 2026 performance report](docs/handover/TutorLink-performance-audit-2026-11-14.md) contains earlier local synthetic-load experiments. A mixed workload offered at **100 RPS for 600 seconds** completed 60,000 requests, with **99.99 successful RPS**, p95 **55 ms**, p99 **199 ms**, no errors, and no dropped requests. Reconciliation of 3,001 Sessions, including a smoke fixture, matched receipts and audit records.
+
+The load generator and application shared Docker resources. Higher offered-load trials did not meet their targets. **The project has not passed a 1,000 successful requests/second for 60 minutes acceptance test or a production-capacity test.** The 100-RPS result also does not prove end-to-end performance across every API or the Next.js application.
+
+See [docker/performance](docker/performance/README.md) for the benchmark tools and acceptance conditions.
+
+## 8. Future Optimization Work
+
+The following items are proposals and are not reported as completed work:
+
+1. Queue email verification and password-reset delivery; ensure the producer and worker use the same queue, with retries and token-expiry checks.
+2. Separate cache policies for slowly changing catalog data and frequently changing marketplace data; consider protection against many requests rebuilding an expired key at once.
+3. Measure cache-generation lookup and invalidation costs. Preserve immediate effects for hidden listings, suspended tutors, and expired verification documents.
+4. Combine the two outbox-count queries if profiling shows a meaningful cost; cache dashboard metrics only after defining acceptable data freshness and permission scope.
+5. Measure query plans, resource usage, and PHP-FPM queues on representative staging with an independent load generator before tuning process sizing.
+6. Integrate Reverb into the frontend for chat and unread badges, with reconnect/resynchronization and polling fallback.
+
+Do not switch sessions to Redis by changing an environment variable alone: realtime session-channel checks currently depend on database sessions. Do not remove version checks, audit records, or idempotency safeguards for speed.
+
+## 9. Documentation and References
+
+- [TutorLink documentation index](docs/README.md)
+- [TutorLink server optimization report](docs/handover/TutorLink-server-optimization-2026-11-19.md)
+- [Previously recorded performance audit](docs/handover/TutorLink-performance-audit-2026-11-14.md)
+- [Daily Vocabulary reference repository](https://github.com/AkioCkist/daily_vocabulary/tree/3c0ea06ccaebda687c662fa14245afcb0829a5c6): consulted for README organization and the presentation of problems, solutions, code locations, and evidence. Optimization mechanisms and results in this README are based on TutorLink's own source and measurements.
