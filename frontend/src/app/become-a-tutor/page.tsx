@@ -1,5 +1,4 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { TutorCommunityStories } from "@/components/marketing/tutor-community-stories";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -59,7 +58,6 @@ export default function BecomeATutorPage() {
             <div className="landing-art-halo" aria-hidden="true" />
             <Image className="landing-hero-person" src="/figma/auth/student-man.png" alt="Người dạy đang làm việc bên máy tính" width={784} height={858} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 45vw, 500px" priority />
             <div className="landing-art-note"><span className="landing-note-icon" aria-hidden="true">✓</span><span><strong>Chủ động xây dựng hồ sơ</strong><small>Chuyên môn · dịch vụ · lịch dạy</small></span></div>
-            <div className="landing-art-trust"><strong>+24</strong><small>học viên tháng này</small></div>
           </div>
         </div>
       </section>
@@ -104,8 +102,6 @@ export default function BecomeATutorPage() {
             <div className="tutor-career-portrait tutor-career-portrait-man">
               <Image src="/figma/auth/student-man.png" alt="Coach đang làm việc bên máy tính" fill sizes="(max-width: 700px) 70vw, 320px" />
             </div>
-            <div className="tutor-career-rating"><strong>4.9 <span aria-hidden="true">★</span></strong><small>từ 126 đánh giá</small></div>
-            <div className="tutor-career-income"><span aria-hidden="true">↗</span><small>Thu nhập tháng này<strong>12.850.000đ</strong></small></div>
           </div>
           <div className="tutor-career-copy">
             <p className="landing-eyebrow">PHÁT TRIỂN SỰ NGHIỆP</p>
@@ -121,8 +117,6 @@ export default function BecomeATutorPage() {
           </div>
         </div>
       </section>
-
-      <TutorCommunityStories />
 
       <section className="landing-section landing-inner landing-faq tutor-faq" id="faq" aria-labelledby="tutor-faq-title">
         <div className="landing-faq-intro">

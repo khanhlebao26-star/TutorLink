@@ -21,7 +21,6 @@ it("matches account routes and leaves public pages, login, APIs and assets outsi
 });
 
 it("redirects a known guest without caching the redirect and preserves the requested URL", () => {
-  vi.stubEnv("NEXT_PUBLIC_DATA_MODE", "api");
   const destination = "/programs/7/sessions?date=2026-11-15";
   const request = new NextRequest(origin + destination, { headers: { Cookie: `${AUTH_HINT_COOKIE}=0` } });
   const response = proxy(request);
@@ -34,8 +33,7 @@ it("redirects a known guest without caching the redirect and preserves the reque
   expect(redirect.searchParams.get("next")).toBe(destination);
 });
 
-it("allows the page to verify a possible session and skips mock mode and form submissions", () => {
-  vi.stubEnv("NEXT_PUBLIC_DATA_MODE", "api");
+it("allows the page to verify a possible session and skips form submissions", () => {
   const route = origin + "/profile";
   expect(getRedirectUrl(proxy(new NextRequest(route)))).toBeNull();
   expect(getRedirectUrl(proxy(new NextRequest(route, { headers: { Cookie: `${AUTH_HINT_COOKIE}=1` } })))).toBeNull();
@@ -43,8 +41,12 @@ it("allows the page to verify a possible session and skips mock mode and form su
   const guestHeaders = { Cookie: `${AUTH_HINT_COOKIE}=0` };
   expect(getRedirectUrl(proxy(new NextRequest(route, { method: "POST", headers: guestHeaders })))).toBeNull();
 
+});
+
+it("does not let a legacy mock setting bypass the guest redirect", () => {
   vi.stubEnv("NEXT_PUBLIC_DATA_MODE", "mock");
-  expect(getRedirectUrl(proxy(new NextRequest(route, { headers: guestHeaders })))).toBeNull();
+  const request = new NextRequest(origin + "/profile", { headers: { Cookie: `${AUTH_HINT_COOKIE}=0` } });
+  expect(new URL(getRedirectUrl(proxy(request))!).pathname).toBe("/auth/login");
 });
 
 it("accepts local destinations and rejects external, malformed and recursive login redirects", () => {

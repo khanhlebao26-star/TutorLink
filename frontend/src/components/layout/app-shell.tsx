@@ -4,7 +4,7 @@ import { FavoritesLoadingState } from "@/components/favorites/favorites-loading-
 import { PublicFooter } from "@/components/layout/public-footer";
 import { useSessionHint } from "@/components/layout/session-hint";
 import { Button, StatePanel } from "@/components/shared/ui";
-import { ApiClientError, dataMode, describeApiError, request, setAuthHint } from "@/lib/api/client";
+import { ApiClientError, describeApiError, request, setAuthHint } from "@/lib/api/client";
 import { favoriteUpdateEvent, getFavoriteTutors } from "@/lib/data/favorites";
 import { getCurrentUser } from "@/lib/data/services";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
@@ -45,7 +45,6 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   const authFrame = mode === "auth" || pathname.startsWith("/auth/");
   const publicMode = mode === "public" || authFrame;
   const sessionHint = useSessionHint();
-  const mockPublicGuest = publicMode && dataMode === "mock" && !sessionHint;
   const [session, setSession] = useState<Session>(() => cachedSession ?? { status: "loading" });
   const [notifications, setNotifications] = useState<{ userId: number; count: number } | null>(null);
   const [favoritesCount, setFavoritesCount] = useState<{ userId: number; count: number } | null>(null);
@@ -55,7 +54,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
 
   useEffect(() => {
     let current = true;
-    if (authFrame || mockPublicGuest) return;
+    if (authFrame) return;
 
     const sessionRequest = freshSessionRequest
       ? request<ApiEnvelope<User>>({ method: "GET", url: "/me" }).then((response) => response.data.data)
@@ -79,7 +78,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
     });
 
     return () => { current = false; };
-  }, [freshSessionRequest, authFrame, mockPublicGuest, retry]);
+  }, [freshSessionRequest, authFrame, retry]);
 
   useEffect(() => {
     const refreshAccount = () => {
@@ -98,7 +97,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
       : pathname === "/profile"
         ? role ?? "tutor"
         : role;
-  const user = !authFrame && !mockPublicGuest && session.status === "authenticated" ? session.user : null;
+  const user = !authFrame && session.status === "authenticated" ? session.user : null;
   const userId = user?.id;
   const favoritesUserId = user?.role === "admin" ? undefined : userId;
   const unreadNotifications = notifications && notifications.userId === userId ? notifications.count : 0;
@@ -142,7 +141,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   // Rendering the public shell for this intermediate state causes a full
   // header/sidebar replacement as soon as the session request resolves.
   const showPublicFrame = publicMode || (!user && !protectedPage && !sessionHint);
-  const showGuestActions = !user && (authFrame || mockPublicGuest || session.status === "guest" ||
+  const showGuestActions = !user && (authFrame || session.status === "guest" ||
     (session.status === "error" && !sessionHint));
 
   const accessContent = needsLoading ? (

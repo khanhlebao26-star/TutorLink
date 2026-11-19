@@ -64,7 +64,7 @@ Availability shown on a profile is for reference. Programs are activated through
 - Handle reports, moderate reviews, and inspect audit records within their access scope.
 - Monitor the outbox, background jobs, and configured operational tools.
 
-See the [frontend README](frontend/README.md) for API integration, static content, and demo data. A registered route alone does not mean that every workflow has been accepted or fully verified.
+See the [frontend README](frontend/README.md) for API integration, static content, and test fixtures. A registered route alone does not mean that every workflow has been accepted or fully verified.
 
 ## 3. Technology Stack and Architecture
 
@@ -111,6 +111,8 @@ docker compose -f docker-compose.yml -f compose.workers.yml up -d
 ~~~
 
 `DatabaseSeeder` loads catalog data and the configured local administrator account. It does not create a complete set of demo learning programs. `FrontendDemoSeeder` is intended for a protected test database and should not be used to seed a regular local database.
+
+The frontend uses the Laravel API exclusively. Preview role switching and hard-coded tutor statistics have been removed. Test fixtures remain available for automated checks and are excluded from the production image; deployment does not import a local database or local uploads.
 
 - Web application: [localhost:3000](http://localhost:3000)
 - API: [localhost:8000/api/v1](http://localhost:8000/api/v1)
@@ -336,6 +338,8 @@ Local production-browser checks completed 18/18 ready pages after the fix; basel
 **Deployment target:** Vercel frontend + Docker Compose backend on a VPS. Environment templates, cookie/domain validation, independent coverage gates, a local CPU/RAM/disk/network dashboard, alert-delivery proof, 404/500 recovery and structured server logging are prepared. See the [deployment preparation and evidence report](docs/handover/TutorLink-deploy-readiness-2026-11-19.md) for configuration, reproduction steps and pending VPS checks.
 
 ## 7. Measurements and Limitations
+
+**Production cleanup checks on November 19, 2026:** all 148 frontend tests passed with **72.24% line coverage**; lint, typecheck and production build passed. Runtime mock branches, sample testimonials and fabricated statistics were removed. The backend app/proxy production images built successfully; config, route and Blade caches compiled with test seeders and development files excluded. These checks do not replace a live VPS deployment test.
 
 **Deployment-preparation checks:** frontend line coverage **71.03%** (baseline 40.60%); backend line coverage **90.39%** from 857 guarded tests / 7,585 assertions. The unchanged frontend source glob includes the new runtime files; branch/function coverage is reported separately. Local lint, typecheck, coverage gate and production build passed. Cloud CI and actual VPS deployment remain pending.
 

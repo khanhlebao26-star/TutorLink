@@ -1,5 +1,4 @@
 import "@/app/globals.css";
-import { MockRoleSwitcher } from "@/components/layout/mock-role-switcher";
 import { SessionHintProvider } from "@/components/layout/session-hint";
 import { AUTH_HINT_COOKIE } from "@/lib/auth-navigation";
 import type { Metadata } from "next";
@@ -18,7 +17,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="vi">
       <body>
         <SessionHintProvider authenticated={authenticated}>
-          <MockRoleSwitcher />
           {children}
         </SessionHintProvider>
       </body>

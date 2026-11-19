@@ -27,6 +27,18 @@ it('renders a public tutor and switches between service, review and schedule vie
  for(const tab of ['Dịch vụ','Đánh giá','Lịch khả dụng']){const buttons=screen.queryAllByRole('button',{name:new RegExp(tab)});if(buttons.length)await userEvent.click(buttons[0]);}
  expect(api.getPublicTutor).toHaveBeenCalledWith('anna',1);expect(api.getTutorReviews).toHaveBeenCalledWith('anna',1);
 });
+it('does not invent profile statistics for a former demo listing',async()=>{
+ vi.mocked(api.getPublicTutor).mockResolvedValue({...tutor,listings:[{...listing,slug:'demo-featured-math-online'}]});
+ const view=render(<PublicTutor slug="anna"/>);await screen.findByRole('heading',{name:'Anna Tutor'});
+ expect(view.container.querySelector('.tutor-profile-student-total strong')).toHaveTextContent('—');
+ expect(view.container.querySelector('.tutor-profile-response strong')).toHaveTextContent('chưa cập nhật');
+});
+it('displays profile statistics supplied by the API, including zero students',async()=>{
+ vi.mocked(api.getPublicTutor).mockResolvedValue({...tutor,students_taught_count:0,response_time_minutes:30});
+ const view=render(<PublicTutor slug="anna"/>);await screen.findByRole('heading',{name:'Anna Tutor'});
+ expect(view.container.querySelector('.tutor-profile-student-total strong')).toHaveTextContent('0');
+ expect(view.container.querySelector('.tutor-profile-response strong')).toHaveTextContent('< 30 phút');
+});
 it.each([401,403,404,429,500])('does not display a tutor after API error %s',async(status)=>{
  vi.mocked(api.getPublicTutor).mockRejectedValue(new ApiClientError('Denied',{status}));render(<PublicTutor slug="anna"/>);await screen.findByRole('alert');expect(screen.queryByRole('heading',{name:'Anna Tutor'})).not.toBeInTheDocument();
 });

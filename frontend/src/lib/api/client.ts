@@ -21,14 +21,6 @@ const apiBaseUrl = configuredUrl.endsWith(versionedSuffix)
   ? configuredUrl
   : `${configuredUrl}${versionedSuffix}`;
 
-const configuredMode = (
-  process.env.NEXT_PUBLIC_DATA_MODE ?? "api"
-).toLowerCase();
-if (configuredMode !== "mock" && configuredMode !== "api") {
-  throw new Error("NEXT_PUBLIC_DATA_MODE must be either mock or api");
-}
-export const dataMode = configuredMode as "mock" | "api";
-
 export function setAuthHint(authenticated: boolean) {
   if (typeof document === "undefined") return;
   document.cookie = `${AUTH_HINT_COOKIE}=${authenticated ? "1" : "0"}; Path=/; SameSite=Lax`;

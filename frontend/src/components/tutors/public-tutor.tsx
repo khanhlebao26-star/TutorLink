@@ -5,7 +5,6 @@ import { Badge, Button, ErrorActions, StatePanel } from "@/components/shared/ui"
 import { PublicAvailability } from "@/components/tutors/public-availability";
 import { deliveryLabels, formatListingPrice, getPublicTutor, getTutorReviews, searchListings } from "@/lib/data/marketplace";
 import type { PublicListing, TutorReviewAggregate, TutorReviewCollection } from "@/lib/data/marketplace-types";
-import { tutorProfileHighlights } from "@/lib/data/tutor-profile-demo";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
 import Link from "next/link";
@@ -158,7 +157,10 @@ export function PublicTutor({ slug, initialTab = "overview" }: { slug: string; i
   const initial = name.split(/\s+/).slice(-1)[0]?.[0]?.toLocaleUpperCase() ?? "G";
   const primarySpecialization = data.specializations[0];
   const primaryListing = data.listings[0];
-  const highlights = tutorProfileHighlights(data);
+  const highlights = {
+    studentsTaught: data.students_taught_count ?? null,
+    responseMinutes: data.response_time_minutes ?? null,
+  };
   const chatContact = primaryListing ? {
     tutorName: name,
     listingTitle: primaryListing.title,

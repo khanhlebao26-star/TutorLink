@@ -45,9 +45,6 @@
 }
 
 * { box-sizing: border-box; }
-.mock-preview-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 10px 20px; background: #fff4d6; color: #553900; border-bottom: 1px solid #e8cf91; font-size: 14px; }
-.mock-preview-bar select { width: auto; padding: 6px 10px; border: 1px solid #b59859; border-radius: 6px; background: #fff; color: #553900; }
-.mock-preview-bar a { text-decoration: underline; }
 html { min-width: 320px; }
 body {
   margin: 0;

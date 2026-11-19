@@ -7,7 +7,6 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "check:mock-roles": "node scripts/mock-roles-check.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

@@ -3,7 +3,6 @@ import { AppShell } from "@/components/layout/app-shell";
 import { FeaturedServices } from "@/components/marketing/featured-services";
 import { FeaturedListingProvider } from "@/components/marketing/featured-listing-provider";
 import { DeferredFeaturedTutors } from "@/components/marketing/deferred-featured-tutors";
-import { StudentTestimonials } from "@/components/marketing/student-testimonials";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -18,13 +17,6 @@ const platformFeatures = [
   { icon: "plan", title: "Lộ trình rõ ràng", text: "Mục tiêu, nội dung và tiến độ được thống nhất ngay từ đầu." },
   { icon: "flexible", title: "Kết nối linh hoạt", text: "Học trực tuyến hoặc trực tiếp theo thời gian phù hợp với bạn." },
   { icon: "support", title: "Luôn được hỗ trợ", text: "Đội ngũ TutorLink sẵn sàng đồng hành trong suốt chương trình." },
-];
-
-const platformStats = [
-  { value: "10.000+", label: "Người học" },
-  { value: "1.200+", label: "Tutor & Coach" },
-  { value: "4.9/5", label: "Điểm hài lòng" },
-  { value: "96%", label: "Đạt mục tiêu" },
 ];
 
 function SectionIntro({ eyebrow, title, text, id }: { eyebrow: string; title: string; text?: string; id?: string }) {
@@ -62,17 +54,11 @@ export default function Home() {
                 <Link className="button button-primary" href="/marketplace" prefetch={true}>Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
                 <Link className="button button-secondary" href="/become-a-tutor">Tôi muốn giảng dạy</Link>
               </div>
-              <div className="landing-student-rating" aria-label="Đánh giá 4,9 trên 5 từ hơn 2.000 học viên">
-                <div className="landing-student-avatars" aria-hidden="true"><span>M</span><span>T</span><span>L</span></div>
-                <span><strong><i aria-hidden="true">★</i> 4.9/5</strong><small>từ hơn 2.000 học viên</small></span>
-              </div>
             </div>
             <div className="landing-hero-art">
               <div className="landing-art-halo" aria-hidden="true" />
               <span className="landing-hero-sparks" aria-hidden="true"><i /><i /><i /></span>
               <Image className="landing-hero-person" src="/figma/auth/student-woman.png" alt="Học viên đang học trực tuyến bên máy tính" width={707} height={734} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 45vw, 500px" priority />
-              <div className="landing-art-rating"><strong>4.9 <span aria-hidden="true">★</span></strong><small>Đánh giá trung bình</small></div>
-              <div className="landing-art-trust"><strong>10K+</strong><small>Người học tin tưởng</small></div>
             </div>
           </div>
           <CatalogLinks />
@@ -114,15 +100,10 @@ export default function Home() {
               </article>)}
             </div>
           </div>
-          <div className="landing-stats-bar" aria-label="Thống kê TutorLink">
-            {platformStats.map((stat) => <div className="landing-stat" key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}
-          </div>
         </div>
       </section>
 
       <DeferredFeaturedTutors />
-
-      <StudentTestimonials />
 
       <section className="landing-final-cta landing-inner" aria-label="Bắt đầu với TutorLink">
         <div>
