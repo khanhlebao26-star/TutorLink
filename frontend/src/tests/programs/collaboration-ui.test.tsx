@@ -125,7 +125,7 @@ it("accepts the invitation snapshot and enters the resulting workspace", async (
   );
   expect(push).toHaveBeenCalledWith("/programs/3");
 });
-it("retries a failed text message with its original UUID and has no attachment input", async () => {
+it("retries a failed text message with its original UUID without attaching any files", async () => {
   const c = {
     id: 8,
     status: "active",
@@ -160,7 +160,7 @@ it("retries a failed text message with its original UUID and has no attachment i
       body: "Hello",
       created_at: "2026-11-05T00:00:00Z",
     });
-  const { container } = render(<Messaging id={8} />);
+  render(<Messaging id={8} />);
   const input = await screen.findByLabelText("Nội dung tin nhắn");
   await userEvent.type(input, "Hello");
   await userEvent.click(screen.getByRole("button", { name: "Gửi tin nhắn" }));
@@ -171,7 +171,7 @@ it("retries a failed text message with its original UUID and has no attachment i
   expect(vi.mocked(messaging.sendMessage).mock.calls[0]).toEqual(
     vi.mocked(messaging.sendMessage).mock.calls[1],
   );
-  expect(container.querySelector('input[type="file"]')).toBeNull();
+  expect(vi.mocked(messaging.sendMessage).mock.calls[0][3]).toEqual([]);
   await waitFor(() => expect(input).toHaveValue(""));
 });
 

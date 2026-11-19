@@ -7,7 +7,7 @@ import { deliveryLabels, formatListingPrice, getPublicTutor, getTutorReviews } f
 import type { TutorPublic, TutorReviewAggregate } from "@/lib/data/marketplace-types";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 type FavoriteCardData = FavoriteTutor & {
   profile?: TutorPublic;
@@ -79,40 +79,49 @@ function FavoriteTutorCard({ tutor, removing, onRemove }: { tutor: FavoriteCardD
   </article>;
 }
 
+async function loadFavorites() {
+  const favorites = await getFavoriteTutors();
+  return Promise.all(favorites.map(async (favorite): Promise<FavoriteCardData> => {
+    const [profileResult, reviewResult] = await Promise.allSettled([
+      getPublicTutor(favorite.slug),
+      getTutorReviews(favorite.slug),
+    ]);
+    return {
+      ...favorite,
+      profile: profileResult.status === "fulfilled" ? profileResult.value : undefined,
+      rating: reviewResult.status === "fulfilled" ? reviewResult.value.aggregate : null,
+    };
+  }));
+}
+
 export function FavoritesList() {
   const [items, setItems] = useState<FavoriteCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [removing, setRemoving] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setError("");
-    try {
-      const favorites = await getFavoriteTutors();
-      const enriched = await Promise.all(favorites.map(async (favorite): Promise<FavoriteCardData> => {
-        const [profileResult, reviewResult] = await Promise.allSettled([
-          getPublicTutor(favorite.slug),
-          getTutorReviews(favorite.slug),
-        ]);
-        return {
-          ...favorite,
-          profile: profileResult.status === "fulfilled" ? profileResult.value : undefined,
-          rating: reviewResult.status === "fulfilled" ? reviewResult.value.aggregate : null,
-        };
-      }));
-      setItems(enriched);
-    } catch (reason) {
-      setError(describeApiError(reason, "Chưa thể tải danh sách yêu thích."));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    void load();
+    let generation = 0;
+    function load() {
+      const request = ++generation;
+      loadFavorites().then((items) => {
+        if (request !== generation) return;
+        setItems(items);
+        setError("");
+        setLoading(false);
+      }, (reason) => {
+        if (request !== generation) return;
+        setError(describeApiError(reason, "Chưa thể tải danh sách yêu thích."));
+        setLoading(false);
+      });
+    }
+    load();
     window.addEventListener(favoriteUpdateEvent, load);
-    return () => window.removeEventListener(favoriteUpdateEvent, load);
-  }, [load]);
+    return () => {
+      generation++;
+      window.removeEventListener(favoriteUpdateEvent, load);
+    };
+  }, []);
 
   async function remove(slug: string) {
     setRemoving(slug);

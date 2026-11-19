@@ -47,8 +47,8 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   const sessionHint = useSessionHint();
   const mockPublicGuest = publicMode && dataMode === "mock" && !sessionHint;
   const [session, setSession] = useState<Session>(() => cachedSession ?? { status: "loading" });
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [favoriteCount, setFavoriteCount] = useState(0);
+  const [notifications, setNotifications] = useState<{ userId: number; count: number } | null>(null);
+  const [favoritesCount, setFavoritesCount] = useState<{ userId: number; count: number } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [retry, setRetry] = useState(0);
   const freshSessionRequest = pathname.startsWith("/me/") || pathname.startsWith("/settings");
@@ -99,32 +99,30 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
         ? role ?? "tutor"
         : role;
   const user = !authFrame && !mockPublicGuest && session.status === "authenticated" ? session.user : null;
+  const userId = user?.id;
+  const favoritesUserId = user?.role === "admin" ? undefined : userId;
+  const unreadNotifications = notifications && notifications.userId === userId ? notifications.count : 0;
+  const favoriteCount = favoritesCount && favoritesCount.userId === favoritesUserId ? favoritesCount.count : 0;
   const unreadMessages = useUnreadMessages(user?.role === "customer" || user?.role === "tutor" ? user.id : null);
   useEffect(() => {
     let current = true;
-    if (!user) {
-      setUnreadNotifications(0);
-      return;
-    }
+    if (userId === undefined) return;
     request<ApiEnvelope<{ count: number }>>({ method: "GET", url: "/notifications/unread-count" })
       .then((response) => {
-        if (current) setUnreadNotifications(response.data.data.count);
+        if (current) setNotifications({ userId, count: response.data.data.count });
       })
       .catch(() => {
-        if (current) setUnreadNotifications(0);
+        if (current) setNotifications({ userId, count: 0 });
       });
     return () => { current = false; };
-  }, [user?.id, pathname]);
+  }, [userId, pathname]);
   useEffect(() => {
     let current = true;
-    if (!user || user.role === "admin") {
-      setFavoriteCount(0);
-      return () => { current = false; };
-    }
+    if (favoritesUserId === undefined) return;
     const loadFavorites = () => {
       getFavoriteTutors()
-        .then((favorites) => { if (current) setFavoriteCount(favorites.length); })
-        .catch(() => { if (current) setFavoriteCount(0); });
+        .then((favorites) => { if (current) setFavoritesCount({ userId: favoritesUserId, count: favorites.length }); })
+        .catch(() => { if (current) setFavoritesCount({ userId: favoritesUserId, count: 0 }); });
     };
     loadFavorites();
     window.addEventListener(favoriteUpdateEvent, loadFavorites);
@@ -132,7 +130,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
       current = false;
       window.removeEventListener(favoriteUpdateEvent, loadFavorites);
     };
-  }, [user?.id, user?.role, pathname]);
+  }, [favoritesUserId, pathname]);
   const roleMismatch = Boolean(user && requiredRole && user.role !== requiredRole);
   const protectedPage = Boolean(requiredRole) || isActive(pathname, "/settings") || ["/programs", "/invitations", "/messages", "/reports", "/notifications", "/favorites", "/learning-profile"].some(prefix => isActive(pathname, prefix));
   const invitationDetailRoute = /^\/invitations\/\d+$/.test(pathname);

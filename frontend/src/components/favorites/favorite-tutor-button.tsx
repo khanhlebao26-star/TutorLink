@@ -4,34 +4,28 @@ import { useActor } from "@/components/layout/app-shell";
 import { describeApiError } from "@/lib/api/client";
 import { addFavoriteTutor, announceFavoriteUpdate, getFavoriteTutors, removeFavoriteTutor } from "@/lib/data/favorites";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function FavoriteTutorButton({ slug }: { slug: string }) {
   const user = useActor();
+  if (!user) return <Link href="/auth/login" className="listing-secondary-action"><span aria-hidden="true">♡</span><span>Yêu thích</span></Link>;
+  return <SavedTutorButton key={`${user.id}:${slug}`} slug={slug} />;
+}
+
+function SavedTutorButton({ slug }: { slug: string }) {
   const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(Boolean(user));
+  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const refresh = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      setSaved(false);
-      return;
-    }
-    try {
-      const favorites = await getFavoriteTutors();
-      setSaved(favorites.some((tutor) => tutor.slug === slug));
-    } catch {
-      setSaved(false);
-    } finally {
-      setLoading(false);
-    }
-  }, [slug, user]);
-
-  useEffect(() => { void refresh(); }, [refresh]);
-
-  if (!user) return <Link href="/auth/login" className="listing-secondary-action"><span aria-hidden="true">♡</span><span>Yêu thích</span></Link>;
+  useEffect(() => {
+    let current = true;
+    getFavoriteTutors()
+      .then((favorites) => { if (current) setSaved(favorites.some((tutor) => tutor.slug === slug)); })
+      .finally(() => { if (current) setLoading(false); })
+      .catch(() => { /* A failed lookup leaves the button unsaved. */ });
+    return () => { current = false; };
+  }, [slug]);
 
   async function toggleFavorite() {
     if (busy || loading) return;

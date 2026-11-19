@@ -109,17 +109,18 @@ function SimilarServices({ services, loading, error }: { services: RelatedListin
 export function ListingDetail({ slug }: { slug: string }) {
   const load = useCallback(() => getPublicListing(slug), [slug]);
   const { data, error, loading, reload } = useAsyncData(load);
+  const tutorSlug = data?.tutor_slug;
   const tutorLoad = useCallback(async (): Promise<DetailExtra | null> => {
-    if (!data?.tutor_slug) return null;
+    if (!tutorSlug) return null;
     const [tutorResult, reviewResult] = await Promise.allSettled([
-      getPublicTutor(data.tutor_slug),
-      getTutorReviews(data.tutor_slug),
+      getPublicTutor(tutorSlug),
+      getTutorReviews(tutorSlug),
     ]);
     return {
       tutor: tutorResult.status === "fulfilled" ? tutorResult.value : null,
       reviews: reviewResult.status === "fulfilled" ? reviewResult.value : null,
     };
-  }, [data?.tutor_slug]);
+  }, [tutorSlug]);
   const extra = useAsyncData(tutorLoad);
   const relatedLoad = useCallback(async (): Promise<RelatedListing[]> => {
     if (!data) return [];
@@ -144,7 +145,7 @@ export function ListingDetail({ slug }: { slug: string }) {
         return { listing, rating: null, reviewCount: 0 };
       }
     }));
-  }, [data?.slug, data?.category_name, data?.subcategory_name, data?.specialization_name]);
+  }, [data]);
   const related = useAsyncData(relatedLoad);
 
   if (loading) return <ListingDetailLoading />;

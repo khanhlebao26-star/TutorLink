@@ -8,8 +8,9 @@ import { getProgram } from "@/lib/data/collaboration";
 import { retryIdentity, workspaceRead, workspaceWrite, type Collection } from "@/lib/data/workspace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import "@/styles/programs.css";
+import { useCurrentTime } from "@/lib/hooks/use-current-time";
 import Link from "next/link";
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useRef, useState, type FormEvent } from "react";
 
 type QuizSummary = {
   id: number;
@@ -77,7 +78,7 @@ function QuizBuilderDialog({ id, programTitle, onClose, onSaved }: { id: number;
   const [nextKey, setNextKey] = useState(2);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const receipt = useState(() => ({ current: null as { payload: string; key: string } | null }))[0];
+  const receipt = useRef<{ payload: string; key: string } | null>(null);
   function updateQuestion(key: number, update: Partial<DraftQuestion>) {
     setQuestions((items) => items.map((item) => item.key === key ? { ...item, ...update } : item));
   }
@@ -148,7 +149,8 @@ export function QuizDetailPage({ programId, quizId }: { programId: number; quizI
   const owner = actor?.role === "tutor";
   const completed = !owner && !!d?.quiz.attempt;
   const studentCompleted = !!d?.quiz.attempt;
-  const expired = !!d?.quiz.due_at && new Date(d.quiz.due_at).getTime() < Date.now();
+  const now = useCurrentTime();
+  const expired = !!d?.quiz.due_at && new Date(d.quiz.due_at).getTime() < now;
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!d || busy || completed) return;

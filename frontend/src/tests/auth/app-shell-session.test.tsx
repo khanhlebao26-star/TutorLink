@@ -1,5 +1,3 @@
-import { AppShell } from "@/components/layout/app-shell";
-import { ProgramWorkspaceShell } from "@/components/programs/program-workspace-shell";
 import { getCurrentUser } from "@/lib/data/services";
 import type { User } from "@/lib/data/types";
 import { act, render, screen, within } from "@testing-library/react";
@@ -23,7 +21,13 @@ vi.mock("@/lib/api/client", async (original) => ({
   setAuthHint: vi.fn(),
 }));
 
-beforeEach(() => {
+let AppShell: typeof import("@/components/layout/app-shell").AppShell;
+let ProgramWorkspaceShell: typeof import("@/components/programs/program-workspace-shell").ProgramWorkspaceShell;
+
+beforeEach(async () => {
+  vi.resetModules();
+  ({ AppShell } = await import("@/components/layout/app-shell"));
+  ({ ProgramWorkspaceShell } = await import("@/components/programs/program-workspace-shell"));
   vi.clearAllMocks();
   navigation.pathname = "/programs";
 });
@@ -42,16 +46,14 @@ it.each(["tutor", "customer"] as const)("waits for the session before showing th
     resolveSession({ id: 62, full_name: "Tài khoản thử", role, status: "active" } as User);
   });
 
-  const label = role === "tutor" ? "Gia sư" : "Học viên";
-  const resolvedSidebar = screen.getByRole("complementary", { name: `Menu ${label}` });
-  expect(screen.getByText(`${label} · ${role === "tutor" ? "Quản lý giảng dạy" : "Program của tôi"}`)).toBeVisible();
   expect(screen.getByText("Nội dung Program")).toBeVisible();
-  expect(within(resolvedSidebar).queryByRole("status")).not.toBeInTheDocument();
+  expect(screen.queryByRole("status", { name: "Đang tải menu tài khoản" })).toBeNull();
   if (role === "tutor") {
-    expect(within(resolvedSidebar).getByRole("link", { name: "Hồ sơ Tutor" })).toBeVisible();
-    expect(within(resolvedSidebar).queryByRole("link", { name: "Lời mời học" })).not.toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "Khu vực gia sư" });
+    expect(within(nav).getByRole("link", { name: "Chương trình học" })).toHaveAttribute("aria-current", "page");
   } else {
-    expect(within(resolvedSidebar).getByRole("link", { name: "Lời mời học" })).toBeVisible();
+    const menu = screen.getByRole("complementary", { name: "Menu Học viên" });
+    expect(within(menu).getByRole("link", { name: "Hồ sơ học tập" })).toHaveAttribute("href", "/learning-profile");
   }
 });
 
@@ -59,14 +61,14 @@ it.each(["customer", "tutor"] as const)("keeps the %s account menu and session w
   vi.mocked(getCurrentUser).mockResolvedValue({ id: 62, full_name: "Tài khoản thử", role, status: "active" } as User);
   navigation.pathname = "/programs/9";
   const view = render(<ProgramWorkspaceShell id={9}><p>Nội dung tổng quan</p></ProgramWorkspaceShell>);
-  const sidebar = await screen.findByRole("complementary", { name: `Menu ${role === "tutor" ? "Gia sư" : "Học viên"}` });
+  const sidebar = await screen.findByRole("complementary", { name: "Điều hướng Workspace" });
   const accountHeader = screen.getByRole("banner");
   const tabs = screen.getByRole("navigation", { name: "Các tab workspace" });
   expect(within(tabs).getByRole("link", { name: "Tổng quan" })).toHaveAttribute("aria-current", "page");
 
   navigation.pathname = "/programs/9/sessions";
   view.rerender(<ProgramWorkspaceShell id={9}><p>Nội dung buổi học</p></ProgramWorkspaceShell>);
-  expect(screen.getByRole("complementary", { name: `Menu ${role === "tutor" ? "Gia sư" : "Học viên"}` })).toBe(sidebar);
+  expect(screen.getByRole("complementary", { name: "Điều hướng Workspace" })).toBe(sidebar);
   expect(screen.getByRole("banner")).toBe(accountHeader);
   expect(screen.queryByRole("status", { name: "Đang tải menu tài khoản" })).not.toBeInTheDocument();
   expect(screen.getByText("Nội dung buổi học")).toBeVisible();
@@ -75,7 +77,7 @@ it.each(["customer", "tutor"] as const)("keeps the %s account menu and session w
 
   navigation.pathname = "/programs/9/tasks";
   view.rerender(<ProgramWorkspaceShell id={9}><p>Nội dung bài tập</p></ProgramWorkspaceShell>);
-  expect(screen.getByRole("complementary", { name: `Menu ${role === "tutor" ? "Gia sư" : "Học viên"}` })).toBe(sidebar);
+  expect(screen.getByRole("complementary", { name: "Điều hướng Workspace" })).toBe(sidebar);
   expect(within(tabs).getByRole("link", { name: "Bài tập" })).toHaveAttribute("aria-current", "page");
   expect(getCurrentUser).toHaveBeenCalledTimes(1);
 });

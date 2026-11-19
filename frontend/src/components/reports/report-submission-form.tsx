@@ -8,7 +8,8 @@ import { completeFile, uploadFile } from "@/lib/data/services";
 import { retryIdentity, workspaceWrite } from "@/lib/data/workspace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import "@/styles/reports.css";
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
 type ReportTargetType = "listing" | "tutor_profile" | "system";
 type ReportReason = { code: string; label: string };
@@ -56,7 +57,7 @@ export function ReportSubmissionForm({ onSaved }: { onSaved: () => void }) {
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const receipt = useRef<{ payload: string; key: string } | null>(null);
   const evidenceInput = useRef<HTMLInputElement>(null);
-  evidenceRef.current = evidence;
+  useEffect(() => { evidenceRef.current = evidence; }, [evidence]);
   useEffect(() => () => evidenceRef.current.forEach((item) => URL.revokeObjectURL(item.preview)), []);
   const loadListings = useCallback(() => searchListings({ per_page: 50 }), []);
   const listingsResult = useAsyncData(loadListings);
@@ -70,13 +71,12 @@ export function ReportSubmissionForm({ onSaved }: { onSaved: () => void }) {
   const tutors = tutorsResult.data?.data ?? [];
   const selectedReasons = reasonsByTarget[targetType];
 
-  const options = useMemo(() => targetType === "listing"
+  const options = targetType === "listing"
     ? listings.map((listing) => ({ id: listing.id, label: listing.title, subtitle: listing.tutor_name ? `Gia sư: ${listing.tutor_name}` : listing.specialization_name || "Dịch vụ TutorLink" }))
     : targetType === "tutor_profile" ? tutors
       .filter((tutor) => !(actor?.role === "tutor" && actor.profile?.id === tutor.id))
       .map((tutor) => ({ id: tutor.id, label: tutor.name, subtitle: tutor.specializations.join(" · ") || tutor.headline }))
-      : [{ id: 1, label: "Hệ thống TutorLink", subtitle: "Góp ý chức năng, báo lỗi hoặc vấn đề khi sử dụng" }],
-    [actor?.profile?.id, actor?.role, listings, targetType, tutors]);
+      : [{ id: 1, label: "Hệ thống TutorLink", subtitle: "Góp ý chức năng, báo lỗi hoặc vấn đề khi sử dụng" }];
   const visibleOptions = options.filter((option) => `${option.label} ${option.subtitle}`.toLocaleLowerCase("vi").includes(targetSearch.trim().toLocaleLowerCase("vi")));
   const selectedOption = options.find((option) => String(option.id) === targetId);
 
@@ -200,7 +200,7 @@ export function ReportSubmissionForm({ onSaved }: { onSaved: () => void }) {
       <input ref={evidenceInput} className="reports-sr-only" type="file" accept="image/jpeg,image/png" multiple onChange={(event) => addEvidence(event.currentTarget.files)} />
       {!canUploadEvidence ? <p className="report-form-hint">Bạn cần xác minh email để tải ảnh bằng chứng. Bạn vẫn có thể gửi báo cáo bằng mô tả chi tiết.</p> : null}
       {evidence.length ? <div className="report-evidence-list">{evidence.map((item, index) => <div className="report-evidence-item" key={`${item.file.name}-${index}`}>
-        <img src={item.preview} alt={`Ảnh bằng chứng ${index + 1}`} /><span title={item.file.name}>{item.file.name}</span><button type="button" aria-label={`Xóa ${item.file.name}`} onClick={() => removeEvidence(index)} disabled={busy}>×</button>
+        <Image unoptimized width={100} height={100} src={item.preview} alt={`Ảnh bằng chứng ${index + 1}`} /><span title={item.file.name}>{item.file.name}</span><button type="button" aria-label={`Xóa ${item.file.name}`} onClick={() => removeEvidence(index)} disabled={busy}>×</button>
       </div>)}</div> : null}
       {uploadProgress !== null ? <p className="report-form-hint">Đang tải và kiểm tra ảnh… {uploadProgress}%</p> : null}
     </div>

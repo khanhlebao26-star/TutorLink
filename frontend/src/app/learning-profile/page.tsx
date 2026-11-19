@@ -8,7 +8,8 @@ import { Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui"
 import { describeApiError, request } from "@/lib/api/client";
 import type { ApiEnvelope } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useState, type FormEvent } from "react";
 
 interface LearningProfile {
   subjects_of_interest: string | null;
@@ -93,13 +94,9 @@ export default function LearningProfilePage() {
 
 function LearningProfileContent() {
   const actor = useActor();
-  const [activeTab, setActiveTab] = useState<"profile" | "programs" | "invitations">("profile");
-  useEffect(() => {
-    const tab = new URLSearchParams(window.location.search).get("tab");
-    if (tab === "programs" || tab === "invitations") setActiveTab(tab);
-  }, []);
+  const tabParam = useSearchParams().get("tab");
+  const activeTab = tabParam === "programs" || tabParam === "invitations" ? tabParam : "profile";
   function selectTab(tab: "profile" | "programs" | "invitations") {
-    setActiveTab(tab);
     const url = new URL(window.location.href);
     if (tab === "profile") url.searchParams.delete("tab");
     else url.searchParams.set("tab", tab);

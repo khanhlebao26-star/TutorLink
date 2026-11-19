@@ -33,7 +33,7 @@ class SendTextMessageRequest extends FormRequest
             'client_message_id' => ['required', 'uuid'],
             'message_type' => ['required', 'string', 'in:text,file'],
             'body' => ['required_if:message_type,text', 'nullable', 'string', 'max:4000', 'regex:/[^\s\p{Z}]/u'],
-            'file_ids' => ['required_if:message_type,file', 'array', 'min:1', 'max:5'],
+            'file_ids' => ['required_if:message_type,file', 'array', 'max:5'],
             'file_ids.*' => ['required', 'integer', 'distinct', 'min:1', 'exists:files,id'],
         ];
     }

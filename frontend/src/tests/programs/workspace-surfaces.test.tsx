@@ -4,6 +4,7 @@ import { WorkspaceTabPage } from "@/components/programs/workspace-tab-page";
 import { ApiClientError } from "@/lib/api/client";
 import { getProgram } from "@/lib/data/collaboration";
 import { workspaceRead } from "@/lib/data/workspace";
+import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, expect, it, vi } from "vitest";
 vi.mock("@/components/layout/app-shell", () => ({
@@ -39,14 +40,15 @@ it("Paused allows existing Session complete/cancel but no create or edit", async
     meta: { last_page: 1 },
   } as never);
   render(<WorkspaceTabPage id={8} tab="sessions" />);
-  await screen.findByRole("heading", { name: "Planned lesson" });
+  await userEvent.click(await screen.findByRole("button", { name: /Planned lesson/ }));
+  await userEvent.click(screen.getByText("Thao tác khác"));
   expect(
     screen.getByRole("button", { name: "Hoàn thành buổi học" }),
   ).toBeEnabled();
   expect(screen.getByRole("button", { name: "Hủy lịch học" })).toBeEnabled();
-  expect(screen.queryByText("Tạo mới", { exact: true })).toBeNull();
+  expect(screen.queryByRole("button", { name: /Lên lịch vào/ })).toBeNull();
   expect(screen.queryByText("Chỉnh sửa lịch", { exact: true })).toBeNull();
-  expect(screen.getByText("Chưa có buổi học thực tế")).toBeVisible();
+  expect(screen.queryByText("Kết quả")).toBeNull();
 });
 it("terminal Program never exposes Session mutations", async () => {
   vi.mocked(getProgram).mockResolvedValue({
@@ -68,7 +70,8 @@ it("terminal Program never exposes Session mutations", async () => {
     meta: { last_page: 1 },
   } as never);
   render(<WorkspaceTabPage id={8} tab="sessions" />);
-  await screen.findByText("Actual #91 · completed");
+  await userEvent.click(await screen.findByRole("button", { name: /Finished lesson/ }));
+  expect(screen.getByText("Kết quả").nextElementSibling).toHaveTextContent("Đã hoàn thành");
   expect(
     screen.queryByRole("button", { name: "Hoàn thành buổi học" }),
   ).toBeNull();
@@ -94,7 +97,7 @@ it.each([
 
   await screen.findByRole("heading", { name: "Class update" });
   expect(workspaceRead).toHaveBeenCalledWith("/programs/8/announcements", { page: 1, state: queryState });
-  const publish = screen.queryByRole("button", { name: "Đăng thông báo" });
+  const publish = screen.queryByRole("button", { name: "Đăng cho học viên" });
   if (role === "tutor") expect(publish).toBeEnabled();
   else expect(publish).toBeNull();
 });

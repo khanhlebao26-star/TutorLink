@@ -1,4 +1,5 @@
 "use client";
+import { useCurrentTime } from "@/lib/hooks/use-current-time";
 import { AppShell } from "@/components/layout/app-shell";
 import { ApiState } from "@/components/shared/api-state";
 import { Badge, Button, Card, StatePanel } from "@/components/shared/ui";
@@ -16,7 +17,7 @@ import { useAsyncData } from "@/lib/hooks/use-async-data";
 import "@/styles/programs.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 const statuses: Record<string, string> = {
   pending: "Chờ phản hồi",
   accepted: "Đã chấp nhận",
@@ -157,7 +158,8 @@ function InvitationPreview({
 }) {
   const offer = invitation.offer_snapshot.offer;
   const sourceListing = invitation.offer_snapshot.source_listing;
-  const pending = invitation.status === "pending" && new Date(invitation.expires_at).getTime() > Date.now();
+  const now = useCurrentTime();
+  const pending = invitation.status === "pending" && new Date(invitation.expires_at).getTime() > now;
   return (
     <article className="invitation-preview">
       <header className="invitation-tutor-header">
@@ -190,11 +192,7 @@ function InvitationPreview({
   );
 }
 export function InvitationDetail({ id }: { id: number }) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const now = useCurrentTime();
   const router = useRouter();
   const load = useCallback(
     async () => ({

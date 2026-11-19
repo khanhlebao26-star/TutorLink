@@ -95,7 +95,7 @@ function ReportsContent() {
     [page],
   );
   const result = useAsyncData(load);
-  const reports = result.data?.data ?? [];
+  const reports = useMemo(() => result.data?.data ?? [], [result.data]);
   const total = result.data?.meta?.total ?? reports.length;
   const openCount = reports.filter((report) => !["resolved", "dismissed"].includes(report.status)).length;
   const closedCount = reports.filter((report) => ["resolved", "dismissed"].includes(report.status)).length;

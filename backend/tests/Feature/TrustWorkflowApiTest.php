@@ -224,7 +224,7 @@ it('does not expose private Listing or Profile content after the resource loses 
     if ($type === 'listing') {
         DB::table('service_listings')->where('id', $id)->update(['status' => 'active']);
     }
-    $report = $this->actingAs($customer, 'web')->postJson('/api/v1/reports', ['resource_type' => $type, 'resource_id' => $id, 'reason_code' => 'spam'], ['Idempotency-Key' => (string) Str::uuid()])->assertCreated()->json('data.id');
+    $report = $this->actingAs($customer, 'web')->postJson('/api/v1/reports', ['resource_type' => $type, 'resource_id' => $id, 'reason_code' => 'misleading_information'], ['Idempotency-Key' => (string) Str::uuid()])->assertCreated()->json('data.id');
     DB::table('reports')->where('id', $report)->update(['assigned_admin_id' => $admin->id]);
     $response = $this->actingAs($admin, 'web')->getJson("/api/v1/admin/reports/{$report}/evidence")->assertOk()->assertJsonPath('data.resource.id', $id);
     expect($response->getContent())->not->toContain('object_key', 'date_of_birth', 'email');
