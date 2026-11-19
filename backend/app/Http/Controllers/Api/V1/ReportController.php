@@ -64,8 +64,7 @@ class ReportController extends Controller
             $files = collect();
             if ($payload['file_ids'] !== []) {
                 $files = DB::table('files')->whereIn('id', $payload['file_ids'])->orderBy('id')->lockForUpdate()->get();
-                if ($files->count() !== count($payload['file_ids']) || $files->contains(fn ($file) =>
-                    (int) $file->owner_id !== (int) $actor->id
+                if ($files->count() !== count($payload['file_ids']) || $files->contains(fn ($file) => (int) $file->owner_id !== (int) $actor->id
                     || $file->purpose !== 'report_evidence'
                     || $file->visibility !== 'private'
                     || $file->scan_status !== 'clean'
