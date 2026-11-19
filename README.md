@@ -18,9 +18,9 @@ TutorLink uses Laravel for its API and business logic, Next.js for its web appli
 | Course | Laravel |
 | Instructor | Nguyen Huu Quyen |
 | Class | 23CSE |
-| Team | To be added |
-| Members | Add each member's full name and student ID |
-| Web palette | Navy `#071A4C`, pink `#FF0A99`, and lavender `#F8F7FF` ([source tokens](frontend/src/styles/base.css)) |
+| Team | TutorLink |
+| Members | Dung, Khanh, Hoang |
+
 
 ## Table of Contents
 
