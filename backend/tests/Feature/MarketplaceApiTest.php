@@ -19,6 +19,26 @@ class MarketplaceApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_compact_tutor_cards_preserve_public_visibility_and_bound_review_queries(): void
+    {
+        config(['tutor.verification_documents_required' => false]);
+        $specialization = $this->seedCatalog();
+        [, $profile] = $this->createTutor('approved');
+        $listing = $this->createListing($profile, $specialization, ['status' => 'active']);
+        DB::enableQueryLog();
+        $this->getJson('/api/v1/listings?include=tutor_card')->assertOk()
+            ->assertJsonPath('data.0.id', $listing->id)
+            ->assertJsonPath('data.0.tutor_card.rating_count', 0)
+            ->assertJsonPath('data.0.tutor_card.rating_average', null);
+        $queries = collect(DB::getQueryLog())->filter(fn ($query) => str_contains($query['query'], 'AVG(reviews.rating)'));
+        $this->assertCount(1, $queries);
+        DB::disableQueryLog();
+        $this->getJson('/api/v1/listings')->assertJsonMissingPath('data.0.tutor_card');
+        $this->getJson('/api/v1/listings?include=private')->assertUnprocessable();
+        $profile->update(['suspended_at' => now()]);
+        $this->getJson('/api/v1/listings?include=tutor_card')->assertOk()->assertJsonCount(0, 'data');
+    }
+
     public function test_publication_without_documents_follows_the_configured_requirement(): void
     {
         $specialization = $this->seedCatalog();

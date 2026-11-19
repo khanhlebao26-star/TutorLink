@@ -59,6 +59,7 @@ export interface Invitation {
   };
 }
 export interface Overview {
+  completed_session_count: number;
   next_session: {
     id: number;
     title?: string;
@@ -79,8 +80,8 @@ export async function listPrograms(page = 1): Promise<Page<Program>> {
   return (await request<Page<Program>>({ url: "/programs", params: { page } }))
     .data;
 }
-export async function getProgram(id: number): Promise<Program> {
-  return (await request<{ data: Program }>({ url: `/programs/${id}` })).data
+export async function getProgram(id: number, signal?: AbortSignal): Promise<Program> {
+  return (await request<{ data: Program }>({ url: `/programs/${id}`, signal })).data
     .data;
 }
 export async function createProgram(input: ProgramInput): Promise<Program> {
@@ -107,9 +108,9 @@ export async function editProgram(
     )
   ).data.data;
 }
-export async function getOverview(id: number): Promise<Overview> {
+export async function getOverview(id: number, signal?: AbortSignal): Promise<Overview> {
   return (
-    await request<{ data: Overview }>({ url: `/programs/${id}/overview` })
+    await request<{ data: Overview }>({ url: `/programs/${id}/overview`, signal })
   ).data.data;
 }
 export async function sendInvitation(

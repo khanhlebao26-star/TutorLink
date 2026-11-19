@@ -11525,6 +11525,14 @@
                             "minimum": 1,
                             "maximum": 50
                         }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Optional tutor_card: compact public headline, experience and visible review aggregate for each listing.",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -14247,6 +14255,9 @@
                                                         }
                                                     ]
                                                 },
+                                                "completed_session_count": {
+                                                    "type": "integer"
+                                                },
                                                 "task_counts": {
                                                     "type": "object",
                                                     "properties": {
@@ -14469,6 +14480,7 @@
                                             },
                                             "required": [
                                                 "next_session",
+                                                "completed_session_count",
                                                 "task_counts",
                                                 "latest_progress",
                                                 "latest_announcement",
@@ -22087,11 +22099,27 @@
                             "type": "integer",
                             "default": 20
                         }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Optional workspace filter: all (non-cancelled), grading, not-submitted, completed.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Optional ordering: due (null deadlines last) or newest. Default ascending id.",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Tasks ordered by ascending id for the visible Program.",
+                        "description": "Paginated Tasks; default ascending id, optional workspace filters and sorting.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -22176,13 +22204,41 @@
                                                 },
                                                 "last_page": {
                                                     "type": "integer"
+                                                },
+                                                "status_counts": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "todo": {
+                                                            "type": "integer"
+                                                        },
+                                                        "in_progress": {
+                                                            "type": "integer"
+                                                        },
+                                                        "submitted": {
+                                                            "type": "integer"
+                                                        },
+                                                        "completed": {
+                                                            "type": "integer"
+                                                        },
+                                                        "cancelled": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "todo",
+                                                        "in_progress",
+                                                        "submitted",
+                                                        "completed",
+                                                        "cancelled"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "current_page",
                                                 "per_page",
                                                 "total",
-                                                "last_page"
+                                                "last_page",
+                                                "status_counts"
                                             ]
                                         }
                                     },
@@ -22196,6 +22252,41 @@
                     },
                     "404": {
                         "description": "Program does not exist or is outside the actor scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Pagination query is invalid.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -22266,41 +22357,6 @@
                     },
                     "403": {
                         "description": "The actor account is inactive.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "request_id": {
-                                            "type": "string"
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "code",
-                                        "message",
-                                        "request_id"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Pagination query is invalid.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -26669,6 +26725,35 @@
                 "properties": {
                     "id": {
                         "type": "integer"
+                    },
+                    "tutor_card": {
+                        "type": "object",
+                        "properties": {
+                            "headline": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "experience_years": {
+                                "type": "integer"
+                            },
+                            "rating_count": {
+                                "type": "integer"
+                            },
+                            "rating_average": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "headline",
+                            "experience_years",
+                            "rating_count",
+                            "rating_average"
+                        ]
                     },
                     "tutor_profile_id": {
                         "type": "integer"

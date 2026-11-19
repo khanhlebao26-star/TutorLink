@@ -3,10 +3,12 @@ import { ErrorActions, StatePanel } from "@/components/shared/ui";
 import { describeApiError, type ApiClientError } from "@/lib/api/client";
 export function ApiState({
   loading,
+  refreshing,
   error,
   reload,
 }: {
   loading: boolean;
+  refreshing?: boolean;
   error: ApiClientError | null;
   reload: () => void;
 }) {
@@ -19,5 +21,5 @@ export function ApiState({
         action={<ErrorActions login={error.status === 401} onRetry={reload} />}
       />
     );
-  return null;
+  return refreshing ? <p role="status" className="muted">Đang cập nhật dữ liệu…</p> : null;
 }

@@ -99,7 +99,8 @@ export function toApiClientError(error: unknown): ApiClientError {
   const response = axiosError.response;
   const body = response?.data;
   const normalized = new ApiClientError(
-    body?.message ??
+    (["ECONNABORTED", "ETIMEDOUT"].includes(axiosError.code ?? "") ? "Máy chủ phản hồi chậm. Vui lòng thử lại." : undefined) ??
+      body?.message ??
       body?.error?.message ??
       (axiosError.message || "Không thể kết nối tới máy chủ."),
     {
@@ -168,5 +169,6 @@ export async function request<T>(
   requiresCsrf = false,
 ) {
   if (requiresCsrf) await initializeCsrf();
-  return api.request<T>(config);
+  const method = (config.method ?? "GET").toUpperCase();
+  return api.request<T>({ ...(method === "GET" || method === "HEAD" ? { timeout: 15_000 } : {}), ...config });
 }

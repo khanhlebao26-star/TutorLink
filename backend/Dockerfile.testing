@@ -31,6 +31,8 @@ RUN composer install \
 
 COPY . .
 
+RUN mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions bootstrap/cache
+
 RUN APP_ENV=testing APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= php artisan package:discover --ansi
 
 RUN mkdir -p storage/framework/cache \

@@ -35,7 +35,7 @@ async function loadMarketplaceCatalog(): Promise<CatalogCategory[]> {
 export const getMarketplaceCatalog = sharePendingPublicRead(loadMarketplaceCatalog, () => "");
 
 export const getFeaturedListingCandidates = sharePendingPublicRead(
-  () => searchListings({ sort: "newest", per_page: 50 }),
+  () => searchListings({ sort: "newest", per_page: 50, include: "tutor_card" }),
   () => "",
 );
 

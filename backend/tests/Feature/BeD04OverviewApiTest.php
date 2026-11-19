@@ -75,7 +75,8 @@ class BeD04OverviewApiTest extends TestCase
             $response->assertOk();
 
             $data = $response->json('data');
-            $this->assertSame(['next_session', 'task_counts', 'latest_progress', 'latest_announcement', 'capabilities'], array_keys($data));
+            $this->assertSame(1, $data['completed_session_count']);
+            $this->assertSame(['next_session', 'task_counts', 'completed_session_count', 'latest_progress', 'latest_announcement', 'capabilities'], array_keys($data));
             $this->assertSame(min($insertedSessionIds[0], $insertedSessionIds[1]), $data['next_session']['id']);
             $this->assertSame('D04 Overview Earlier future tie', $data['next_session']['title']);
             $this->assertSame(1, $data['next_session']['version']);
@@ -149,6 +150,7 @@ class BeD04OverviewApiTest extends TestCase
         $ownerResponse->assertOk()->assertExactJson([
             'data' => [
                 'next_session' => null,
+                'completed_session_count' => 0,
                 'task_counts' => ['todo' => 0, 'in_progress' => 0, 'submitted' => 0, 'completed' => 0, 'cancelled' => 0],
                 'latest_progress' => null,
                 'latest_announcement' => null,

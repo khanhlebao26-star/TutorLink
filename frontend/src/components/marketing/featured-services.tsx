@@ -1,14 +1,14 @@
 "use client";
 
 import { ErrorActions, StatePanel } from "@/components/shared/ui";
-import { getFeaturedListingCandidates, getTutorReviews } from "@/lib/data/marketplace";
+import { getFeaturedListingCandidates } from "@/lib/data/marketplace";
 import type { PublicListing, TutorReviewAggregate } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback } from "react";
 
-type FeaturedService = PublicListing & { reviewAggregate: TutorReviewAggregate | null };
+type FeaturedService = PublicListing & { reviewAggregate: Pick<TutorReviewAggregate, "average" | "count"> | null };
 type CoverTone = "education" | "fitness" | "sports";
 
 const coverByTone: Record<CoverTone, string> = {
@@ -63,15 +63,8 @@ async function loadFeaturedServices(): Promise<FeaturedService[]> {
   const response = await getFeaturedListingCandidates();
   const listings = pickFeatured(response.data);
 
-  return Promise.all(listings.map(async (listing) => {
-    if (!listing.tutor_slug) return { ...listing, reviewAggregate: null };
-    try {
-      const reviews = await getTutorReviews(listing.tutor_slug, 1);
-      return { ...listing, reviewAggregate: reviews.aggregate };
-    } catch {
-      return { ...listing, reviewAggregate: null };
-    }
-  }));
+  return listings.map((listing) => ({ ...listing, reviewAggregate: listing.tutor_card
+    ? { count: listing.tutor_card.rating_count, average: listing.tutor_card.rating_average } : null }));
 }
 
 function FeaturedCard({ listing }: { listing: FeaturedService }) {

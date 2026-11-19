@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorActions, StatePanel } from "@/components/shared/ui";
-import { getFeaturedListingCandidates, getPublicTutor, getTutorReviews } from "@/lib/data/marketplace";
+import { getFeaturedListingCandidates } from "@/lib/data/marketplace";
 import type { PublicListing, TutorPublic, TutorReviewAggregate } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
@@ -10,8 +10,8 @@ import { useCallback } from "react";
 
 type Companion = {
   listing: PublicListing;
-  profile: TutorPublic | null;
-  rating: TutorReviewAggregate | null;
+  profile: Pick<TutorPublic, "slug" | "name" | "headline" | "experience_years"> | null;
+  rating: Pick<TutorReviewAggregate, "average" | "count"> | null;
 };
 type CompanionTone = "education" | "fitness" | "sports";
 
@@ -63,15 +63,10 @@ async function loadCompanions(): Promise<Companion[]> {
   const response = await getFeaturedListingCandidates();
   const listings = selectCompanions(response.data);
 
-  return Promise.all(listings.map(async (listing) => {
-    const profilePromise = listing.tutor_slug
-      ? getPublicTutor(listing.tutor_slug).catch(() => null)
-      : Promise.resolve(null);
-    const reviewsPromise = listing.tutor_slug
-      ? getTutorReviews(listing.tutor_slug, 1).then((result) => result.aggregate).catch(() => null)
-      : Promise.resolve(null);
-    const [profile, rating] = await Promise.all([profilePromise, reviewsPromise]);
-    return { listing, profile, rating };
+  return listings.map((listing) => ({ listing,
+    profile: listing.tutor_card && listing.tutor_slug ? { slug: listing.tutor_slug, name: listing.tutor_name ?? null,
+      headline: listing.tutor_card.headline ?? "", experience_years: listing.tutor_card.experience_years } : null,
+    rating: listing.tutor_card ? { count: listing.tutor_card.rating_count, average: listing.tutor_card.rating_average } : null,
   }));
 }
 

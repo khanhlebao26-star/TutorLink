@@ -35,6 +35,7 @@ export interface WorkspaceRow {
 export interface Collection<T> {
   data: T[];
   meta?: {
+    status_counts?: Record<string, number>;
     current_page?: number;
     last_page?: number;
     total?: number;
@@ -44,8 +45,9 @@ export interface Collection<T> {
 export async function workspaceRead<T>(
   url: string,
   params?: Record<string, string | number>,
+  signal?: AbortSignal,
 ) {
-  return (await request<T>({ url, params })).data;
+  return (await request<T>({ url, params, signal })).data;
 }
 export async function workspaceWrite(
   url: string,

@@ -2,7 +2,7 @@ import { useActor } from "@/components/layout/app-shell";
 import { Notifications } from "@/components/notifications/notifications";
 import { WorkspaceTabPage } from "@/components/programs/workspace-tab-page";
 import { ApiClientError } from "@/lib/api/client";
-import { getProgram } from "@/lib/data/collaboration";
+import { getProgram, getOverview } from "@/lib/data/collaboration";
 import { workspaceRead } from "@/lib/data/workspace";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
@@ -11,7 +11,7 @@ vi.mock("@/components/layout/app-shell", () => ({
   AppShell: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   useActor: vi.fn(),
 }));
-vi.mock("@/lib/data/collaboration", () => ({ getProgram: vi.fn() }));
+vi.mock("@/lib/data/collaboration", () => ({ getProgram: vi.fn(), getOverview: vi.fn() }));
 vi.mock("@/lib/data/workspace", async (original) => ({
   ...(await original<typeof import("@/lib/data/workspace")>()),
   workspaceRead: vi.fn(),
@@ -96,7 +96,7 @@ it.each([
   render(<WorkspaceTabPage id={8} tab="announcements" />);
 
   await screen.findByRole("heading", { name: "Class update" });
-  expect(workspaceRead).toHaveBeenCalledWith("/programs/8/announcements", { page: 1, state: queryState });
+  expect(workspaceRead).toHaveBeenCalledWith("/programs/8/announcements", { page: 1, state: queryState }, expect.any(AbortSignal));
   const publish = screen.queryByRole("button", { name: "Đăng cho học viên" });
   if (role === "tutor") expect(publish).toBeEnabled();
   else expect(publish).toBeNull();
@@ -110,4 +110,29 @@ it("lost notification access produces a forbidden state without a content link",
     await screen.findByText(/Bạn không có quyền thực hiện thao tác này/),
   ).toBeVisible();
   expect(screen.queryByRole("link", { name: "Mở nội dung →" })).toBeNull();
+});
+
+
+it("loads bounded task pages and uses server counters for filters", async () => {
+  vi.mocked(getProgram).mockResolvedValue({ id: 8, title: "Lessons", status: "active", allowed_actions: [] } as never);
+  vi.mocked(workspaceRead).mockResolvedValue({ data: [{ id: 12, title: "Only visible task", status: "todo", version: 1 }],
+    meta: { total: 1000, last_page: 200, per_page: 5, status_counts: { todo: 900, submitted: 100 } } } as never);
+  render(<WorkspaceTabPage id={8} tab="tasks" />);
+  await screen.findByRole("heading", { name: "Only visible task" });
+  expect(workspaceRead).toHaveBeenCalledTimes(1);
+  expect(workspaceRead).toHaveBeenCalledWith("/programs/8/tasks", { page: 1, per_page: 5, filter: "all", sort: "due" }, expect.any(AbortSignal));
+  await userEvent.click(screen.getByRole("button", { name: "Sau" }));
+  await screen.findByText("Trang 2");
+  expect(workspaceRead).toHaveBeenLastCalledWith("/programs/8/tasks", { page: 2, per_page: 5, filter: "all", sort: "due" }, expect.any(AbortSignal));
+});
+
+it("loads progress counters without fetching task or session histories", async () => {
+  vi.mocked(getProgram).mockResolvedValue({ id: 8, title: "Lessons", planned_session_count: 10, status: "active", allowed_actions: [] } as never);
+  vi.mocked(getOverview).mockResolvedValue({ task_counts: { todo: 500, completed: 500 }, completed_session_count: 5 } as never);
+  vi.mocked(workspaceRead).mockResolvedValue({ data: [], meta: { last_page: 1 } } as never);
+  render(<WorkspaceTabPage id={8} tab="progress" />);
+  await screen.findByText("TIẾN ĐỘ TỰ ĐỘNG");
+  expect(workspaceRead).toHaveBeenCalledTimes(1);
+  expect(workspaceRead).toHaveBeenCalledWith("/programs/8/progress-records", { page: 1 }, expect.any(AbortSignal));
+  expect(screen.getAllByText("50%")).toHaveLength(2);
 });

@@ -4,7 +4,7 @@ import { useActor } from "@/components/layout/app-shell";
 import { ProgressDashboard } from "@/components/programs/progress/progress-dashboard";
 import { SessionCalendar } from "@/components/programs/sessions/session-calendar";
 import { TaskCreateDialog } from "@/components/programs/tasks/task-create-dialog";
-import { taskDueLabel, taskDueTimestamp, taskListStatus } from "@/components/programs/tasks/task-list-utils";
+import { taskDueLabel, taskListStatus } from "@/components/programs/tasks/task-list-utils";
 import { WorkspaceFiles } from "@/components/programs/workspace-files";
 import { WorkspaceForm } from "@/components/programs/workspace-form";
 import { body, reason, taskFields, title } from "@/components/programs/workspace-form-fields";
@@ -14,11 +14,10 @@ import {
 } from "@/components/programs/workspace-navigation";
 import { ApiState } from "@/components/shared/api-state";
 import { Badge, Button, Card, StatePanel } from "@/components/shared/ui";
-import { getProgram } from "@/lib/data/collaboration";
+import { getProgram, getOverview } from "@/lib/data/collaboration";
 import {
   feeLabel,
   localTimestamp,
-  readAllWorkspaceRows,
   workspaceRead,
   type Collection,
   type WorkspaceRow,
@@ -64,22 +63,19 @@ function TabContent({
   const [taskFilter, setTaskFilter] = useState("all");
   const [taskSort, setTaskSort] = useState("due");
   const announcementState = actor?.role === "tutor" ? "all" : "published";
-  const dataPage = tab === "tasks" ? 1 : page;
+  const taskPageSize = 5;
   const load = useCallback(
-    async () => {
-      const [program, rows] = await Promise.all([getProgram(id), tab === "tasks"
-        ? readAllWorkspaceRows(`/programs/${id}/tasks`).then((data) => ({ data }))
-        : workspaceRead<Collection<WorkspaceRow>>(
-          `/programs/${id}/${paths[tab]}`,
-          tab === "announcements" ? { page: dataPage, state: announcementState } : { page: dataPage },
-        )]);
-      const activity = tab === "progress" ? await Promise.all([
-        readAllWorkspaceRows(`/programs/${id}/tasks`),
-        readAllWorkspaceRows(`/programs/${id}/sessions`),
-      ]) : null;
-      return { program, rows, activity };
+    async (signal: AbortSignal) => {
+      const [program, rows, summary] = await Promise.all([
+        getProgram(id, signal),
+        workspaceRead<Collection<WorkspaceRow>>(`/programs/${id}/${paths[tab]}`,
+          tab === "tasks" ? { page, per_page: taskPageSize, filter: taskFilter, sort: taskSort }
+            : tab === "announcements" ? { page, state: announcementState } : { page }, signal),
+        tab === "progress" ? getOverview(id, signal) : Promise.resolve(null),
+      ]);
+      return { program, rows, summary };
     },
-    [id, tab, dataPage, announcementState],
+    [id, tab, page, taskFilter, taskSort, announcementState],
   );
   const result = useAsyncData(load);
   const sessionRows = tab === "sessions" ? result.data?.rows.data ?? [] : [];
@@ -88,23 +84,15 @@ function TabContent({
   const paused = result.data?.program.status === "paused";
   const writable = owner && (active || paused);
   const base = `/programs/${id}/${paths[tab]}`;
-  const allTasks = tab === "tasks" ? result.data?.rows.data ?? [] : [];
-  const currentTasks = allTasks.filter((row) => row.status !== "cancelled");
-  const submittedTasks = currentTasks.filter((row) => row.status === "submitted").length;
-  const completedTasks = currentTasks.filter((row) => row.status === "completed").length;
-  const ongoingTasks = currentTasks.filter((row) => ["todo", "in_progress"].includes(row.status ?? "")).length;
-  const filteredTasks = currentTasks.filter((row) => {
-    if (taskFilter === "grading") return row.status === "submitted";
-    if (taskFilter === "not-submitted") return ["todo", "in_progress"].includes(row.status ?? "");
-    if (taskFilter === "completed") return row.status === "completed";
-    return true;
-  }).sort((a, b) => taskSort === "newest"
-    ? (new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime())
-    : taskDueTimestamp(a) - taskDueTimestamp(b));
-  const taskPageSize = 5;
-  const taskLastPage = Math.max(1, Math.ceil(filteredTasks.length / taskPageSize));
-  const visibleTasks = filteredTasks.slice((page - 1) * taskPageSize, page * taskPageSize);
   const serverRows = result.data?.rows as Collection<WorkspaceRow> | undefined;
+  const counts = serverRows?.meta?.status_counts ?? {};
+  const currentTasks = result.data?.rows.data ?? [];
+  const taskTotal = ["todo", "in_progress", "submitted", "completed"].reduce((sum, status) => sum + (counts[status] ?? 0), 0);
+  const submittedTasks = counts.submitted ?? 0;
+  const completedTasks = counts.completed ?? 0;
+  const ongoingTasks = (counts.todo ?? 0) + (counts.in_progress ?? 0);
+  const taskLastPage = serverRows?.meta?.last_page ?? 1;
+  const visibleTasks = currentTasks;
   return (
     <section className={`content-stack workspace-page${tab === "sessions" ? " session-workspace-page" : ""}`}>
       <h1>{tab === "tasks" ? "Bài tập & Nhiệm vụ" : workspaceTabs[tab]}</h1>
@@ -118,7 +106,7 @@ function TabContent({
           {tab === "tasks" ? <>
             <div className="workspace-task-toolbar">
               <div className="workspace-task-filters" role="tablist" aria-label="Lọc bài tập">
-                {[["all", "Tất cả", currentTasks.length], ["grading", "Chờ chấm điểm", submittedTasks], ["not-submitted", "Chưa nộp", ongoingTasks], ["completed", "Hoàn thành", completedTasks]].map(([key, label, count]) => <button key={key} type="button" role="tab" aria-selected={taskFilter === key} className={taskFilter === key ? "is-active" : ""} onClick={() => { setTaskFilter(String(key)); setPage(1); }}>{label}<span>{count}</span></button>)}
+                {[["all", "Tất cả", taskTotal], ["grading", "Chờ chấm điểm", submittedTasks], ["not-submitted", "Chưa nộp", ongoingTasks], ["completed", "Hoàn thành", completedTasks]].map(([key, label, count]) => <button key={key} type="button" role="tab" aria-selected={taskFilter === key} className={taskFilter === key ? "is-active" : ""} onClick={() => { setTaskFilter(String(key)); setPage(1); }}>{label}<span>{count}</span></button>)}
               </div>
               <label className="workspace-task-sort">Sắp xếp theo
                 <select value={taskSort} onChange={(event) => { setTaskSort(event.target.value); setPage(1); }}>
@@ -150,7 +138,7 @@ function TabContent({
               </details>
             </Card>
           )}
-          {tab === "sessions" ? <SessionCalendar id={id} rows={sessionRows} active={active} writable={writable} canCreate={owner && active} onSaved={result.reload} /> : tab === "progress" ? <ProgressDashboard id={id} program={result.data.program} tasks={result.data.activity?.[0] ?? []} sessions={result.data.activity?.[1] ?? []} notes={result.data.rows.data} canWrite={owner && (active || paused)} onSaved={result.reload} /> : !(tab === "tasks" ? currentTasks.length : result.data.rows.data.length) ? (
+          {tab === "sessions" ? <SessionCalendar id={id} rows={sessionRows} active={active} writable={writable} canCreate={owner && active} onSaved={result.reload} /> : tab === "progress" ? <ProgressDashboard id={id} program={result.data.program} tasks={[]} sessions={[]} summary={result.data.summary ?? undefined} notes={result.data.rows.data} canWrite={owner && (active || paused)} onSaved={result.reload} /> : !(tab === "tasks" ? currentTasks.length : result.data.rows.data.length) ? (
             <StatePanel kind="empty" message={tab === "tasks" ? owner ? "Chưa giao bài tập nào. Hãy tạo bài tập để học viên biết cần làm gì và khi nào cần nộp." : "Bạn chưa có bài tập nào cần làm. Bài tập gia sư giao sẽ xuất hiện tại đây." : tab === "announcements" ? actor?.role === "tutor" ? "Chưa có thông báo nào. Soạn bản nháp rồi đăng để học viên nhận được cập nhật." : "Chưa có thông báo từ gia sư. Các cập nhật của chương trình sẽ xuất hiện tại đây." : "Chưa có dữ liệu trong tab này."} />
           ) : tab === "tasks" && !visibleTasks.length ? <StatePanel kind="empty" message="Không có bài tập nào trong mục này." /> : (tab === "tasks" ? visibleTasks : result.data.rows.data).map((row) => (
             tab === "tasks" ? <Card key={`${row.id}-${row.version}`} className="workspace-task-list-card">
@@ -266,7 +254,7 @@ function TabContent({
               )}
             </Card>
           ))}
-          {tab === "tasks" ? <p className="workspace-task-result-count">Hiển thị {(page - 1) * taskPageSize + (visibleTasks.length ? 1 : 0)}–{Math.min(page * taskPageSize, filteredTasks.length)} trong {filteredTasks.length} bài tập</p> : null}
+          {tab === "tasks" ? <p className="workspace-task-result-count">Hiển thị {(page - 1) * taskPageSize + (visibleTasks.length ? 1 : 0)}–{Math.min(page * taskPageSize, serverRows?.meta?.total ?? 0)} trong {serverRows?.meta?.total ?? 0} bài tập</p> : null}
           <div className="button-row">
             <Button
               variant="outline"

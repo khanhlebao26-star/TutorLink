@@ -745,3 +745,31 @@ it('backfills a legacy submission into version one and the task current pointer'
         DB::purge('issue74_backfill');
     }
 });
+
+it('filters and sorts task pages with whole-program counters and batched attachments', function () {
+    $tutor = ProgramApiFixtures::eligibleTutor();
+    $customer = TestActors::customer();
+    $program = ProgramApiFixtures::draft($tutor, $customer, ['status' => 'active']);
+    ProgramApiFixtures::addMember($program, $customer, 'customer');
+    $this->actingAs($tutor, 'web');
+    $ids = [];
+    foreach (range(1, 12) as $i) {
+        $ids[] = $this->postJson("/api/v1/programs/{$program}/tasks", [
+            'title' => "Task {$i}", 'assigned_to' => $customer->id,
+            'due_at' => now()->addDays(13 - $i)->toISOString(),
+        ])->assertCreated()->json('data.id');
+    }
+    DB::table('tasks')->where('id', $ids[0])->update(['status' => 'cancelled']);
+    DB::table('tasks')->where('id', $ids[1])->update(['status' => 'submitted']);
+    DB::enableQueryLog();
+    $this->getJson("/api/v1/programs/{$program}/tasks?filter=all&sort=due&per_page=5")
+        ->assertOk()->assertJsonCount(5, 'data')->assertJsonPath('data.0.id', $ids[11])
+        ->assertJsonPath('meta.total', 11)->assertJsonPath('meta.last_page', 3)
+        ->assertJsonPath('meta.status_counts.todo', 10)->assertJsonPath('meta.status_counts.submitted', 1);
+    expect(collect(DB::getQueryLog())->filter(fn ($query) => str_contains($query['query'], '"file_links"')))->toHaveCount(1);
+    DB::disableQueryLog();
+    $this->getJson("/api/v1/programs/{$program}/tasks?filter=grading&sort=newest")
+        ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $ids[1]);
+    $this->getJson("/api/v1/programs/{$program}/tasks?filter=invalid")->assertUnprocessable();
+    $this->actingAs(TestActors::customer(), 'web')->getJson("/api/v1/programs/{$program}/tasks?filter=all")->assertNotFound();
+});

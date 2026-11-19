@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateListingRequest;
 use App\Http\Resources\ListingResource;
 use App\Models\ServiceListing;
 use App\Models\Specialization;
+use Dedoc\Scramble\Attributes\QueryParameter;
 use Dedoc\Scramble\Attributes\Response as OpenApiResponse;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,9 +23,11 @@ class ListingController extends Controller
 {
     private const DEEP_PAGE_MIN_OFFSET = 20000;
 
+    #[QueryParameter('include', 'Optional tutor_card: compact public headline, experience and visible review aggregate for each listing.', type: 'string')]
     public function index(Request $request): JsonResponse
     {
         $filters = $request->validate([
+            'include' => ['sometimes', Rule::in(['tutor_card'])],
             'q' => ['sometimes', 'string', 'max:120'],
             'category_id' => ['sometimes', 'integer', 'exists:categories,id'],
             'subcategory_id' => ['sometimes', 'integer', 'exists:subcategories,id'],
@@ -54,7 +57,7 @@ class ListingController extends Controller
 
         $query = ServiceListing::query()
             ->with([
-                'tutorProfile:id,user_id,public_slug',
+                'tutorProfile:id,user_id,public_slug,headline,experience_years',
                 'tutorProfile.user:id,full_name',
                 'specialization:id,subcategory_id,name',
                 'specialization.subcategory:id,category_id,name',
@@ -160,6 +163,21 @@ class ListingController extends Controller
             $result = $query->paginate($perPage, page: $page);
             $listings = $result->getCollection();
             $total = $result->total();
+        }
+
+        if (($filters['include'] ?? null) === 'tutor_card') {
+            $ratings = PublicTutorReviewController::visibleReviews($listings->pluck('tutor_profile_id')->unique()->all())
+                ->selectRaw('reviews.tutor_profile_id, COUNT(*) AS total, AVG(reviews.rating) AS average')
+                ->groupBy('reviews.tutor_profile_id')->get()->keyBy('tutor_profile_id');
+            foreach ($listings as $listing) {
+                $rating = $ratings->get($listing->tutor_profile_id);
+                $listing->setAttribute('tutor_card', [
+                    'headline' => $listing->tutorProfile?->headline,
+                    'experience_years' => (int) ($listing->tutorProfile?->experience_years ?? 0),
+                    'rating_count' => (int) ($rating->total ?? 0),
+                    'rating_average' => $rating ? round((float) $rating->average, 2) : null,
+                ]);
+            }
         }
 
         return response()->json([

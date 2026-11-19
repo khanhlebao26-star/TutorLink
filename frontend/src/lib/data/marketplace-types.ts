@@ -7,6 +7,7 @@ export type OwnerListingAction = "edit" | "publish" | "pause" | "archive";
 export type OwnerListingStatusFilter = MarketplaceStatus | "all";
 export interface PublicListing extends Omit<Listing, "status"> {
   status: "active";
+  tutor_card?: { headline: string | null; experience_years: number; rating_count: number; rating_average: number | null };
   tutor_slug: string | null;
   tutor_name?: string | null;
   category_name?: string;
@@ -34,7 +35,7 @@ export interface OwnerListingCollection {
   };
 }
 export interface ListingQuery {
-  q?: string; category_id?: number; subcategory_id?: number; specialization_id?: number;
+  include?: "tutor_card"; q?: string; category_id?: number; subcategory_id?: number; specialization_id?: number;
   delivery_mode?: DeliveryMode; city?: string; min_price?: number; max_price?: number;
   price_unit?: PriceUnit; sort?: "newest" | "price_asc" | "price_desc"; page?: number; per_page?: number;
 }

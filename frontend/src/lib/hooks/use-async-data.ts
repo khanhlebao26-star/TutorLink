@@ -3,7 +3,7 @@
 import { ApiClientError } from "@/lib/api/client";
 import { useCallback, useEffect, useState } from "react";
 
-export function useAsyncData<T>(loader: () => Promise<T>) {
+export function useAsyncData<T>(loader: (signal: AbortSignal) => Promise<T>) {
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{
     loader: typeof loader;
@@ -14,17 +14,28 @@ export function useAsyncData<T>(loader: () => Promise<T>) {
   const reload = useCallback(() => setAttempt((value) => value + 1), []);
 
   useEffect(() => {
-    let active = true;
-    loader()
+    const controller = new AbortController();
+    const resetSession = (event: Event) => {
+      if (!(event as CustomEvent<boolean>).detail) {
+        controller.abort();
+        setResult(null);
+      }
+    };
+    window.addEventListener("tutorlink-session-hint", resetSession);
+    loader(controller.signal)
       .then((data) => {
-        if (active) setResult({ loader, attempt, data, error: null });
+        if (!controller.signal.aborted) setResult({ loader, attempt, data, error: null });
       })
       .catch((reason: unknown) => {
-        if (active) setResult({ loader, attempt, data: null, error: reason instanceof ApiClientError ? reason : new ApiClientError("Đã xảy ra lỗi không xác định.") });
+        if (!controller.signal.aborted) setResult({ loader, attempt, data: null, error: reason instanceof ApiClientError ? reason : new ApiClientError("Đã xảy ra lỗi không xác định.") });
       });
-    return () => { active = false; };
+    return () => {
+      controller.abort();
+      window.removeEventListener("tutorlink-session-hint", resetSession);
+    };
   }, [attempt, loader]);
 
-  const current = result?.loader === loader && result.attempt === attempt ? result : null;
-  return { data: current?.data ?? null, error: current?.error ?? null, loading: current === null, reload };
+  const current = result?.loader === loader && (result.attempt === attempt || result.data !== null) ? result : null;
+  return { data: current?.data ?? null, error: current?.error ?? null, loading: current === null,
+    refreshing: current !== null && current.attempt !== attempt, reload };
 }

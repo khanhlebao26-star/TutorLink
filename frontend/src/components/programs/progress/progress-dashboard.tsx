@@ -17,12 +17,13 @@ function ActivityProgress({ title, done, total, explanation }: { title: string; 
   </Card>;
 }
 
-export function ProgressDashboard({ id, program, tasks, sessions, notes, canWrite, onSaved }: { id: number; program: { title: string; planned_session_count: number | null }; tasks: WorkspaceRow[]; sessions: WorkspaceRow[]; notes: WorkspaceRow[]; canWrite: boolean; onSaved: () => void }) {
+export function ProgressDashboard({ id, program, tasks, sessions, notes, canWrite, onSaved, summary }: { summary?: { task_counts: Record<string, number>; completed_session_count: number }; id: number; program: { title: string; planned_session_count: number | null }; tasks: WorkspaceRow[]; sessions: WorkspaceRow[]; notes: WorkspaceRow[]; canWrite: boolean; onSaved: () => void }) {
   const liveTasks = tasks.filter((task) => task.status !== "cancelled");
-  const completedTasks = liveTasks.filter((task) => task.status === "completed").length;
-  const completedSessions = sessions.filter((session) => session.status === "completed").length;
+  const taskTotal = summary ? ["todo", "in_progress", "submitted", "completed"].reduce((sum, status) => sum + (summary.task_counts[status] ?? 0), 0) : liveTasks.length;
+  const completedTasks = summary?.task_counts.completed ?? liveTasks.filter((task) => task.status === "completed").length;
+  const completedSessions = summary?.completed_session_count ?? sessions.filter((session) => session.status === "completed").length;
   const tutorNotes = notes.filter((row) => row.note?.trim());
-  const taskPercent = liveTasks.length ? Math.round(completedTasks / liveTasks.length * 100) : null;
+  const taskPercent = taskTotal ? Math.round(completedTasks / taskTotal * 100) : null;
   const sessionPercent = program.planned_session_count ? Math.round(completedSessions / program.planned_session_count * 100) : null;
   const availablePercents = [taskPercent, sessionPercent].filter((value): value is number => value !== null);
   const noteSnapshot = availablePercents.length ? Math.round(availablePercents.reduce((sum, value) => sum + value, 0) / availablePercents.length) : 0;
@@ -30,7 +31,7 @@ export function ProgressDashboard({ id, program, tasks, sessions, notes, canWrit
     <div className="activity-progress-intro"><span>TIẾN ĐỘ TỰ ĐỘNG</span><h2>{program.title}</h2><p>Tiến độ được cập nhật khi buổi học hoàn thành hoặc gia sư duyệt bài tập. Các chỉ số được hiển thị riêng, không gộp thành một điểm chung.</p></div>
     <div className="activity-progress-grid">
       <ActivityProgress title="Buổi học" done={completedSessions} total={program.planned_session_count} explanation="Tính theo số buổi đã hoàn thành trên tổng số buổi đã thống nhất." />
-      <ActivityProgress title="Bài tập" done={completedTasks} total={liveTasks.length} explanation="Tính theo số bài gia sư đã duyệt trên tổng số bài tập đang áp dụng." />
+      <ActivityProgress title="Bài tập" done={completedTasks} total={taskTotal} explanation="Tính theo số bài gia sư đã duyệt trên tổng số bài tập đang áp dụng." />
     </div>
     <Card className="activity-progress-note-card">
       <div><h2>Nhận xét của gia sư</h2><p>Nhận xét giúp bạn hiểu rõ hơn về kỹ năng và mục tiêu học tập.</p></div>
