@@ -1,0 +1,6 @@
+{
+  "http_status": 500,
+  "has_request_id": true,
+  "server_error_logged": true,
+  "response_hides_database_details": true
+}

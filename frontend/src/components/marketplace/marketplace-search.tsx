@@ -68,14 +68,14 @@ export function MarketplaceSearch() {
   const url = searchParams.toString();
   const query = useMemo(() => readListingQuery(new URLSearchParams(url)), [url]);
   const catalogLoad = useCallback(() => getMarketplaceCatalog(), []);
-  const catalog = useAsyncData(catalogLoad);
+  const catalog = useAsyncData(catalogLoad, false);
   const listingLoad = useCallback(() => {
     if (query.min_price !== undefined && query.max_price !== undefined && query.min_price > query.max_price) {
       return Promise.reject(new ApiClientError("Phí tối đa phải lớn hơn hoặc bằng phí tối thiểu."));
     }
     return searchListings(query);
   }, [query]);
-  const results = useAsyncData(listingLoad);
+  const results = useAsyncData(listingLoad, false);
   const formRef = useRef<HTMLFormElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const category = catalog.data?.find((item) => item.id === query.category_id);

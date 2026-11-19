@@ -3,7 +3,7 @@
 import { ApiClientError } from "@/lib/api/client";
 import { useCallback, useEffect, useState } from "react";
 
-export function useAsyncData<T>(loader: (signal: AbortSignal) => Promise<T>) {
+export function useAsyncData<T>(loader: (signal: AbortSignal) => Promise<T>, sessionScoped = true) {
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{
     loader: typeof loader;
@@ -16,7 +16,7 @@ export function useAsyncData<T>(loader: (signal: AbortSignal) => Promise<T>) {
   useEffect(() => {
     const controller = new AbortController();
     const resetSession = (event: Event) => {
-      if (!(event as CustomEvent<boolean>).detail) {
+      if (sessionScoped && !(event as CustomEvent<boolean>).detail) {
         controller.abort();
         setResult(null);
       }
@@ -33,7 +33,7 @@ export function useAsyncData<T>(loader: (signal: AbortSignal) => Promise<T>) {
       controller.abort();
       window.removeEventListener("tutorlink-session-hint", resetSession);
     };
-  }, [attempt, loader]);
+  }, [attempt, loader, sessionScoped]);
 
   const current = result?.loader === loader && (result.attempt === attempt || result.data !== null) ? result : null;
   return { data: current?.data ?? null, error: current?.error ?? null, loading: current === null,

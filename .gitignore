@@ -54,3 +54,7 @@ AGENTS.md
 graphify-out
 
 outputs
+
+# Python helper caches
+**/__pycache__/
+**/*.pyc

@@ -1,7 +1,8 @@
 import { CatalogLinks } from "@/app/become-a-tutor/catalog-links";
 import { AppShell } from "@/components/layout/app-shell";
 import { FeaturedServices } from "@/components/marketing/featured-services";
-import { FeaturedTutors } from "@/components/marketing/featured-tutors";
+import { FeaturedListingProvider } from "@/components/marketing/featured-listing-provider";
+import { DeferredFeaturedTutors } from "@/components/marketing/deferred-featured-tutors";
 import { StudentTestimonials } from "@/components/marketing/student-testimonials";
 import Image from "next/image";
 import Link from "next/link";
@@ -49,7 +50,7 @@ function WhyIcon({ name }: { name: string }) {
 
 export default function Home() {
   return <AppShell mode="public" title="TutorLink">
-    <div className="marketing-page">
+    <FeaturedListingProvider><div className="marketing-page">
       <section className="landing-hero">
         <div className="landing-inner landing-hero-container">
           <div className="landing-hero-grid">
@@ -58,7 +59,7 @@ export default function Home() {
               <h1>Kết nối đúng người,<br /><span>phát triển đúng mục tiêu.</span></h1>
               <p className="landing-lead">Khám phá dịch vụ, tìm hiểu hồ sơ người dạy và chọn người đồng hành phù hợp với điều bạn muốn đạt được.</p>
               <div className="landing-actions">
-                <Link className="button button-primary" href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
+                <Link className="button button-primary" href="/marketplace" prefetch={true}>Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
                 <Link className="button button-secondary" href="/become-a-tutor">Tôi muốn giảng dạy</Link>
               </div>
               <div className="landing-student-rating" aria-label="Đánh giá 4,9 trên 5 từ hơn 2.000 học viên">
@@ -69,7 +70,7 @@ export default function Home() {
             <div className="landing-hero-art">
               <div className="landing-art-halo" aria-hidden="true" />
               <span className="landing-hero-sparks" aria-hidden="true"><i /><i /><i /></span>
-              <Image className="landing-hero-person" src="/figma/auth/student-woman.png" alt="Học viên đang học trực tuyến bên máy tính" width={707} height={734} priority />
+              <Image className="landing-hero-person" src="/figma/auth/student-woman.png" alt="Học viên đang học trực tuyến bên máy tính" width={707} height={734} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 45vw, 500px" priority />
               <div className="landing-art-rating"><strong>4.9 <span aria-hidden="true">★</span></strong><small>Đánh giá trung bình</small></div>
               <div className="landing-art-trust"><strong>10K+</strong><small>Người học tin tưởng</small></div>
             </div>
@@ -119,7 +120,7 @@ export default function Home() {
         </div>
       </section>
 
-      <FeaturedTutors />
+      <DeferredFeaturedTutors />
 
       <StudentTestimonials />
 
@@ -130,10 +131,10 @@ export default function Home() {
           <p>Khám phá dịch vụ và chọn bước tiếp theo theo cách của bạn.</p>
         </div>
         <div className="landing-cta-actions">
-          <Link className="button landing-cta-light" href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
+          <Link className="button landing-cta-light" href="/marketplace" prefetch={true}>Khám phá dịch vụ <span aria-hidden="true">→</span></Link>
           <Link className="button landing-cta-quiet" href="/auth/register">Tạo tài khoản</Link>
         </div>
       </section>
-    </div>
+    </div></FeaturedListingProvider>
   </AppShell>;
 }

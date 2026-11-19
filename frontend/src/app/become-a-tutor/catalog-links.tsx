@@ -29,7 +29,7 @@ function CategoryIcon({ tone }: { tone: CatalogTone }) {
 
 export function CatalogLinks() {
   const loadCatalog = useCallback(() => getMarketplaceCatalog(), []);
-  const catalog = useAsyncData(loadCatalog);
+  const catalog = useAsyncData(loadCatalog, false);
 
   if (catalog.loading) return <div className="landing-hero-catalog landing-hero-catalog-loading" role="status" aria-label="Đang tải danh mục dịch vụ">
     <div className="landing-catalog-loading-head"><span className="landing-catalog-spinner" aria-hidden="true" /><span>Đang tải danh mục phù hợp với bạn…</span></div>

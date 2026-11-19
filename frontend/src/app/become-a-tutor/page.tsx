@@ -57,7 +57,7 @@ export default function BecomeATutorPage() {
           </div>
           <div className="landing-hero-art tutor-hero-art">
             <div className="landing-art-halo" aria-hidden="true" />
-            <Image className="landing-hero-person" src="/figma/auth/student-man.png" alt="Người dạy đang làm việc bên máy tính" width={784} height={858} priority />
+            <Image className="landing-hero-person" src="/figma/auth/student-man.png" alt="Người dạy đang làm việc bên máy tính" width={784} height={858} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 45vw, 500px" priority />
             <div className="landing-art-note"><span className="landing-note-icon" aria-hidden="true">✓</span><span><strong>Chủ động xây dựng hồ sơ</strong><small>Chuyên môn · dịch vụ · lịch dạy</small></span></div>
             <div className="landing-art-trust"><strong>+24</strong><small>học viên tháng này</small></div>
           </div>

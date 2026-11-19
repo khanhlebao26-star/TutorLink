@@ -1,0 +1,13 @@
+# Disposable benchmark only; never combine with compose.production.yml.
+services:
+  proxy:
+    networks: [benchmark, browser-edge]
+    ports:
+      - '127.0.0.1:18000:8080'
+  app:
+    environment:
+      FRONTEND_URL: http://localhost:3110
+      SANCTUM_STATEFUL_DOMAINS: localhost:3110,benchmark.test
+networks:
+  browser-edge:
+    internal: false

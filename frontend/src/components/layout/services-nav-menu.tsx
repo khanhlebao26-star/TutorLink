@@ -11,7 +11,7 @@ export function ServicesNavMenu({ onNavigate }: { onNavigate: () => void }) {
   const trigger = useRef<HTMLButtonElement>(null);
   const menuId = useId();
   const loadCatalog = useCallback(() => getMarketplaceCatalog(), []);
-  const catalog = useAsyncData(loadCatalog);
+  const catalog = useAsyncData(loadCatalog, false);
 
   return (
     <div className={`public-nav-dropdown${open ? " is-open" : ""}`} onMouseLeave={() => setOpen(false)} onBlur={(event) => {

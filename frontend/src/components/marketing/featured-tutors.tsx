@@ -1,7 +1,7 @@
 "use client";
 
 import { ErrorActions, StatePanel } from "@/components/shared/ui";
-import { getFeaturedListingCandidates } from "@/lib/data/marketplace";
+import { useFeaturedListings } from "@/components/marketing/featured-listing-provider";
 import type { PublicListing, TutorPublic, TutorReviewAggregate } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
@@ -59,8 +59,8 @@ function selectCompanions(listings: PublicListing[]) {
   }).slice(0, 3);
 }
 
-async function loadCompanions(): Promise<Companion[]> {
-  const response = await getFeaturedListingCandidates();
+async function loadCompanions(getCandidates: ReturnType<typeof useFeaturedListings>): Promise<Companion[]> {
+  const response = await getCandidates();
   const listings = selectCompanions(response.data);
 
   return listings.map((listing) => ({ listing,
@@ -99,8 +99,9 @@ function CompanionSkeleton() {
 }
 
 export function FeaturedTutors() {
-  const load = useCallback(() => loadCompanions(), []);
-  const result = useAsyncData(load);
+  const getCandidates = useFeaturedListings();
+  const load = useCallback(() => loadCompanions(getCandidates), [getCandidates]);
+  const result = useAsyncData(load, false);
 
   return <section className="landing-companions landing-inner" aria-labelledby="landing-companions-title" aria-busy={result.loading}>
     <div className="landing-section-intro">

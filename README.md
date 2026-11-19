@@ -192,7 +192,7 @@ The production backend image installs dependencies with `--no-dev`, generates an
 
 ### 6.7. Avoiding Duplicate API Requests
 
-The marketplace client shares identical public reads that are already in progress. Polling pauses when a tab is hidden or offline, prevents overlapping polls, and uses backoff. The message badge uses a dedicated unread-count endpoint every 15 seconds; the open conversation subscribes to its session-scoped Reverb channel. Events trigger authorized HTTP resynchronization and refresh the inbox/badge. Chat reconciliation runs every 60 seconds while subscribed, returning to 10 seconds on disconnect. Reconnect uses backoff; hidden/offline tabs and logout disconnect the socket. Inbox/badge polling remains available outside the open conversation. These mechanisms reduce repeated requests to the server without changing the visual design.
+The marketplace client shares identical public reads that are already in progress. The homepage also retains one public candidate snapshot for its mounted service and deferred tutor sections. Polling pauses when a tab is hidden or offline, prevents overlapping polls, and uses backoff. The message badge uses a dedicated unread-count endpoint every 15 seconds; the open conversation subscribes to its session-scoped Reverb channel. Events trigger authorized HTTP resynchronization and refresh the inbox/badge. Chat reconciliation runs every 60 seconds while subscribed, returning to 10 seconds on disconnect. Reconnect uses backoff; hidden/offline tabs and logout disconnect the socket. Inbox/badge polling remains available outside the open conversation. These mechanisms reduce repeated requests to the server without changing the visual design.
 
 **Source:** [marketplace client](frontend/src/lib/data/marketplace.ts), [use-polling](frontend/src/lib/hooks/use-polling.ts), [use-unread-messages](frontend/src/lib/hooks/use-unread-messages.ts).
 
@@ -214,7 +214,7 @@ The Progress tab reads task and completed-session counts from the Program Overvi
 
 ### 6.10. Refresh, Cancellation, and Read Timeouts
 
-When data is refreshed from the same source after an action, the frontend keeps the current content visible and shows an updating state. A changed data source or scope, logout, or authorization error clears the old result. Workspace reads pass an `AbortSignal` so requests can be cancelled when no longer needed. GET and HEAD requests have a 15-second default timeout; callers can override it, and write requests are not automatically retried.
+When data is refreshed from the same source after an action, the frontend keeps the current content visible and shows an updating state. A changed data source/scope or authorization error clears the old result. Session-scoped reads also clear on logout; public reads explicitly remain independent of the guest `/me` probe. Workspace reads pass an `AbortSignal` so requests can be cancelled when no longer needed. GET and HEAD requests have a 15-second default timeout; callers can override it, and write requests are not automatically retried.
 
 **Source:** [use-async-data](frontend/src/lib/hooks/use-async-data.ts), [API client](frontend/src/lib/api/client.ts), [API state component](frontend/src/components/shared/api-state.tsx).
 
@@ -325,7 +325,19 @@ public function sendEmailVerificationNotification(): void
 }
 ~~~
 
+### 6.13. Deployment Preparation and Measured Browser Behavior
+
+Public reads now survive an unauthenticated session-probe event, fixing a production-browser race that left guest tutor profiles loading indefinitely. Private reads retain logout clearing. Homepage hero images declare responsive sizes, marketplace links prefetch, and the below-fold tutor section loads near the viewport while reusing the homepage candidate snapshot.
+
+**Source:** [public/private loading scope](frontend/src/lib/hooks/use-async-data.ts), [deferred tutors](frontend/src/components/marketing/deferred-featured-tutors.tsx), [homepage snapshot provider](frontend/src/components/marketing/featured-listing-provider.tsx), [production journey runner](frontend/scripts/production-journey.mjs).
+
+Local production-browser checks completed 18/18 ready pages after the fix; baseline tutor readiness was 0/6. Hero encoded image bytes fell from 50,826 to 44,256 (about 12.9%). Browser timing changes were mixed; no general page-speed improvement is claimed. Search p95 was measured at the same 20 offered RPS/30 seconds and 5,000-listing dataset: 51 ms before and 86 ms after, with 120/120 successful searches each; this phase does not establish a search-speed gain.
+
+**Deployment target:** Vercel frontend + Docker Compose backend on a VPS. Environment templates, cookie/domain validation, independent coverage gates, a local CPU/RAM/disk/network dashboard, alert-delivery proof, 404/500 recovery and structured server logging are prepared. See the [deployment preparation and evidence report](docs/handover/TutorLink-deploy-readiness-2026-11-19.md) for configuration, reproduction steps and pending VPS checks.
+
 ## 7. Measurements and Limitations
+
+**Deployment-preparation checks:** frontend line coverage **71.03%** (baseline 40.60%); backend line coverage **90.39%** from 857 guarded tests / 7,585 assertions. The unchanged frontend source glob includes the new runtime files; branch/function coverage is reported separately. Local lint, typecheck, coverage gate and production build passed. Cloud CI and actual VPS deployment remain pending.
 
 **Realtime/email/cache checks on November 19, 2026:** 73 targeted backend tests / 396 assertions and 89 frontend tests passed. Frontend typecheck, changed-file lint and production build passed. WebSocket tests simulate the transport; live browser/Reverb deployment, external SMTP and new cache/load benchmarks remain unverified. See the [phase 2 report](docs/handover/TutorLink-server-optimization-2026-11-19.md#8-realtime-email-queue-and-cache-implementation).
 

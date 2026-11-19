@@ -411,3 +411,7 @@ textarea { min-height: 96px; resize: vertical; }
 .checkbox-field input { min-height: 0; width: auto; }
 .notifications-page { gap: 16px; margin-inline: auto; max-width: 1160px; }
 .app-layout:has(.notifications-page) { display: block; }
+
+.error-page { max-width: 760px; margin: 12vh auto; padding: 40px 24px; }
+.error-page h1 { margin: 12px 0; font-size: clamp(2rem, 5vw, 3.5rem); }
+.error-page > p { margin-bottom: 24px; }

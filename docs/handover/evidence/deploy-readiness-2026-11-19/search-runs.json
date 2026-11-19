@@ -1,0 +1,80 @@
+[
+  {
+    "run": "before-read",
+    "fixture_listings": 5000,
+    "mix": "read",
+    "offered_rps": 20,
+    "duration_seconds": 30,
+    "search": {
+      "completed": 120,
+      "successful": 120,
+      "successful_rps": 4.00430469789252,
+      "errors": 0,
+      "invalid_success_responses": 0,
+      "statuses": {
+        "200": 120
+      },
+      "p50_ms": 18,
+      "p95_ms": 51,
+      "p99_ms": 109,
+      "cache_hits": 105,
+      "cache_misses": 15,
+      "decoded_body_bytes": 563872
+    },
+    "all": {
+      "completed": 600,
+      "successful": 600,
+      "successful_rps": 20.021523489462602,
+      "errors": 0,
+      "invalid_success_responses": 0,
+      "statuses": {
+        "200": 600
+      },
+      "p50_ms": 20,
+      "p95_ms": 55,
+      "p99_ms": 94,
+      "cache_hits": 417,
+      "cache_misses": 33,
+      "decoded_body_bytes": 3550750
+    }
+  },
+  {
+    "run": "after-read-verified",
+    "fixture_listings": 5000,
+    "mix": "read",
+    "offered_rps": 20,
+    "duration_seconds": 30,
+    "search": {
+      "completed": 120,
+      "successful": 120,
+      "successful_rps": 3.9879568613292076,
+      "errors": 0,
+      "invalid_success_responses": 0,
+      "statuses": {
+        "200": 120
+      },
+      "p50_ms": 21,
+      "p95_ms": 86,
+      "p99_ms": 330,
+      "cache_hits": 105,
+      "cache_misses": 15,
+      "decoded_body_bytes": 563872
+    },
+    "all": {
+      "completed": 600,
+      "successful": 600,
+      "successful_rps": 19.939784306646036,
+      "errors": 0,
+      "invalid_success_responses": 0,
+      "statuses": {
+        "200": 600
+      },
+      "p50_ms": 23,
+      "p95_ms": 86,
+      "p99_ms": 198,
+      "cache_hits": 417,
+      "cache_misses": 33,
+      "decoded_body_bytes": 3550750
+    }
+  }
+]

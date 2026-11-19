@@ -22,6 +22,10 @@ Implementation evidence and limitations: [optimization report, phase 2](handover
 
 **Realtime 30/10/2026:** [K03.13](https://github.com/khanhlebao26-star/TutorLink/blob/8e7cdaf674f7c2a8927a243eac86a5ce1bf0f004/docs/handover/BE-K03-K03.13-test-report.md) kiểm backend bằng session/CSRF và WebSocket thật, gồm channel theo phiên, logout/suspend/restore, reconnect/resync và outage Reverb/worker. Bản OpenAPI thời điểm K03.13 có 70 thao tác. Các mốc sau đó có 89 thao tác trước D04, 105 sau D04, 122 sau H04 và 123 sau khi thêm dashboard H05. [Bàn giao BE-D04](handover/BE-D04-handover.md) tổng hợp kết quả đối chiếu và kiểm thử trên môi trường test và local.
 
+## Deployment preparation
+
+- [Vercel frontend + Docker VPS readiness, November 19, 2026](handover/TutorLink-deploy-readiness-2026-11-19.md): frontend/backend coverage, production-browser before/after evidence, guest public-read race fix, resource dashboard, local webhook delivery, 404/500 handling and deployment environment validation. Local results do not certify an actual VPS deployment.
+
 ## Folder map
 
 - **Workflow** — 6 Google Docs — [Open folder](<Workflow>)

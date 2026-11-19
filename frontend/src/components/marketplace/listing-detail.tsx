@@ -108,7 +108,7 @@ function SimilarServices({ services, loading, error }: { services: RelatedListin
 
 export function ListingDetail({ slug }: { slug: string }) {
   const load = useCallback(() => getPublicListing(slug), [slug]);
-  const { data, error, loading, reload } = useAsyncData(load);
+  const { data, error, loading, reload } = useAsyncData(load, false);
   const tutorSlug = data?.tutor_slug;
   const tutorLoad = useCallback(async (): Promise<DetailExtra | null> => {
     if (!tutorSlug) return null;
@@ -121,7 +121,7 @@ export function ListingDetail({ slug }: { slug: string }) {
       reviews: reviewResult.status === "fulfilled" ? reviewResult.value : null,
     };
   }, [tutorSlug]);
-  const extra = useAsyncData(tutorLoad);
+  const extra = useAsyncData(tutorLoad, false);
   const relatedLoad = useCallback(async (): Promise<RelatedListing[]> => {
     if (!data) return [];
     const response = await searchListings({ sort: "newest", per_page: 50 });
@@ -146,7 +146,7 @@ export function ListingDetail({ slug }: { slug: string }) {
       }
     }));
   }, [data]);
-  const related = useAsyncData(relatedLoad);
+  const related = useAsyncData(relatedLoad, false);
 
   if (loading) return <ListingDetailLoading />;
   if (error) {

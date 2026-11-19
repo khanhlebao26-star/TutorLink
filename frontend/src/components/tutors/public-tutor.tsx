@@ -119,11 +119,11 @@ export function PublicTutor({ slug, initialTab = "overview" }: { slug: string; i
   const [reviewPage, setReviewPage] = useState(1);
   const [listingSlide, setListingSlide] = useState(0);
   const load = useCallback(() => getPublicTutor(slug, page), [slug, page]);
-  const { data, error, loading, reload } = useAsyncData(load);
+  const { data, error, loading, reload } = useAsyncData(load, false);
   const loadReviews = useCallback(() => getTutorReviews(slug, reviewPage), [slug, reviewPage]);
-  const reviews = useAsyncData<TutorReviewCollection>(loadReviews);
+  const reviews = useAsyncData<TutorReviewCollection>(loadReviews, false);
   const loadRelated = useCallback(() => loadRelatedTutors(slug), [slug]);
-  const relatedTutors = useAsyncData<RelatedTutor[]>(loadRelated);
+  const relatedTutors = useAsyncData<RelatedTutor[]>(loadRelated, false);
   const selectTab = useCallback((tab: TutorProfileTab) => {
     setActiveTab(tab);
     const url = new URL(window.location.href);

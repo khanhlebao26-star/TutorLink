@@ -48,3 +48,14 @@ it("discards private content on logout even when the loader identity is unchange
   expect(result.current.data).toBeNull();
   expect(loader).toHaveBeenCalledTimes(1);
 });
+
+it('keeps a public read alive when a guest session probe returns unauthenticated', async () => {
+  let resolve!: (value: string) => void;
+  let signal!: AbortSignal;
+  const loader = (active: AbortSignal) => { signal = active; return new Promise<string>(done => { resolve = done; }); };
+  const { result } = renderHook(() => useAsyncData(loader, false));
+  act(() => window.dispatchEvent(new CustomEvent('tutorlink-session-hint', {detail: false})));
+  expect(signal.aborted).toBe(false);
+  await act(async () => resolve('public tutor'));
+  expect(result.current.data).toBe('public tutor');
+});

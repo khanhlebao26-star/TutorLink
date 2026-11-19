@@ -77,3 +77,9 @@ Chạy `node scripts/marketplace-query-check.mjs`, `node scripts/availability-ch
 ## Realtime configuration
 
 Set `NEXT_PUBLIC_REVERB_APP_KEY` to the public Reverb key and `NEXT_PUBLIC_REVERB_URL` to the browser-reachable WebSocket origin before building (local: `ws://localhost:8080`, HTTPS deployment: `wss://your-host`). Keep the app secret on the backend. Docker local supplies these variables. Missing settings use polling. The client authenticates a private session-scoped conversation channel using Sanctum/CSRF, reconnects with backoff, resynchronizes from HTTP, and disconnects while hidden/offline or on logout. Events refresh the inbox and unread badge for the open conversation; this is not a global user channel.
+
+## Vercel production preparation
+
+Use `frontend` as the Vercel project root, Node.js 22, `npm ci`, and `npm run build`. Configure [the production environment example](.env.production.example) before building. The backend is deployed separately on the VPS. Use a frontend/API pair under the same custom parent domain with the matching backend `SESSION_DOMAIN`, Sanctum stateful host, HTTPS and Reverb allowed origin. See [the deployment runbook](../docs/handover/TutorLink-deploy-readiness-2026-11-19.md).
+
+`npm run test:coverage` enforces frontend line coverage above 70%; the shared CI gate independently verifies backend coverage. The public/private option in `useAsyncData` prevents a guest `/me` response from cancelling public requests. The homepage defers the below-fold tutor section but retains a single candidate snapshot for both featured sections. `not-found`, route/global error boundaries and `instrumentation.ts` provide user recovery and structured server-error logs.
