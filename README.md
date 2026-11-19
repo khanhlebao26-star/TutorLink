@@ -154,9 +154,9 @@ Marketplace queries eager-load tutor, user, and catalog relationships and select
 
 ### 6.2. Conditional Caching for Public Marketplace Responses
 
-Middleware caches successful JSON responses for allow-listed public routes for 60 seconds. Requests containing cookies or authorization headers, or associated with a user, follow a `private, no-store` path.
+Middleware caches successful JSON responses for allow-listed public routes for 300 seconds for catalog routes and 60 seconds for marketplace routes. Requests containing cookies or authorization headers, or associated with a user, follow a `private, no-store` path.
 
-The cache key includes the path, filters, a generation number, and the expiry time of approved verification documents. PostgreSQL triggers update the generation in the same transaction as relevant writes, invalidating older cache keys. The generation and expiry are read in one SQL statement.
+The cache key includes the path, filters, a generation number, and the expiry time of approved verification documents. PostgreSQL triggers update the generation in the same transaction as relevant writes, invalidating older cache keys. The generation and expiry are read in one SQL statement for marketplace routes. Catalog routes only read the generation because catalog entries do not depend on tutor-document expiry. Rebuilds use a 15-second lock with at most a one-second wait and a second cache lookup; lock/cache failure falls back to the normal controller. Explicit public catalog/listing reads use the Fetch adapter with credentials omitted, allowing browser requests to reach the anonymous cache path even on the same origin. Private reads continue using session cookies.
 
 **Limitation:** A cache hit still queries PostgreSQL for the current generation. Redis was tested for cache payloads in a benchmark, but it is not the default cache-payload store in the production Compose configuration.
 
@@ -180,9 +180,9 @@ The administrator dashboard uses SQL `GROUP BY` and `COUNT` to summarize records
 
 The outbox stores events within the business transaction. Workers process bounded batches using `FOR UPDATE SKIP LOCKED`, retry failed work, and prevent duplicate notifications. Broadcast and Slack jobs use separate workers; the scheduler runs separately from HTTP requests.
 
-**Limitation:** Email verification and password-reset messages are still sent synchronously; not all email delivery is queued.
+Email verification and password-reset delivery now use an encrypted `SendAccountEmail` job on the `emails` queue after the transaction commits. The worker retries up to three times, checks account/email eligibility and expiry again, and drops reset tokens that are no longer valid. Both local workers and production Compose include an email worker. Set `QUEUE_CONNECTION=database`; choosing `sync` intentionally executes jobs inline. SMTP delivery has at-least-once retry semantics and can be duplicated if a provider accepts a message before a worker failure.
 
-**Source:** [ProcessNotificationOutbox](backend/app/Console/Commands/ProcessNotificationOutbox.php), [WorkNotificationOutbox](backend/app/Console/Commands/WorkNotificationOutbox.php), [production Compose configuration](compose.production.yml).
+**Source:** [ProcessNotificationOutbox](backend/app/Console/Commands/ProcessNotificationOutbox.php), [WorkNotificationOutbox](backend/app/Console/Commands/WorkNotificationOutbox.php), [SendAccountEmail](backend/app/Jobs/SendAccountEmail.php), [local workers](compose.workers.yml), [production Compose configuration](compose.production.yml).
 
 ### 6.6. Production Runtime Configuration
 
@@ -192,7 +192,7 @@ The production backend image installs dependencies with `--no-dev`, generates an
 
 ### 6.7. Avoiding Duplicate API Requests
 
-The marketplace client shares identical public reads that are already in progress. Polling pauses when a tab is hidden or offline, prevents overlapping polls, and uses backoff. The message badge uses a dedicated unread-count endpoint every 15 seconds; chat polling uses a 10-second default interval. These mechanisms reduce repeated requests to the server without changing the visual design.
+The marketplace client shares identical public reads that are already in progress. Polling pauses when a tab is hidden or offline, prevents overlapping polls, and uses backoff. The message badge uses a dedicated unread-count endpoint every 15 seconds; the open conversation subscribes to its session-scoped Reverb channel. Events trigger authorized HTTP resynchronization and refresh the inbox/badge. Chat reconciliation runs every 60 seconds while subscribed, returning to 10 seconds on disconnect. Reconnect uses backoff; hidden/offline tabs and logout disconnect the socket. Inbox/badge polling remains available outside the open conversation. These mechanisms reduce repeated requests to the server without changing the visual design.
 
 **Source:** [marketplace client](frontend/src/lib/data/marketplace.ts), [use-polling](frontend/src/lib/hooks/use-polling.ts), [use-unread-messages](frontend/src/lib/hooks/use-unread-messages.ts).
 
@@ -290,9 +290,46 @@ export async function request<T>(config: AxiosRequestConfig, requiresCsrf = fals
 
 The timeout applies to reads by default. Explicit caller configuration can override it, while this code does not automatically retry mutations.
 
+### 6.12. Realtime and Email Setup
+
+Local Docker frontend configuration supplies `NEXT_PUBLIC_REVERB_APP_KEY` and `NEXT_PUBLIC_REVERB_URL` (default `ws://localhost:8080`). For a separately deployed frontend, set these before building; use `wss://` with HTTPS. Only the public app key belongs in frontend configuration. The Reverb secret remains on the backend, and the backend origin allow-list must match the frontend host.
+
+Start the backend stack and the workers:
+
+~~~sh
+docker compose up -d --build
+docker compose -f docker-compose.yml -f compose.workers.yml up -d
+~~~
+
+Keep `SESSION_DRIVER=database` and `QUEUE_CONNECTION=database`. Start Reverb, the broadcasts worker, and the emails worker in the deployment environment. Without frontend realtime settings, chat uses polling. Session channel authorization still uses Laravel CSRF and the session cookie; no message content is trusted directly from the WebSocket event.
+
+**Source:** [realtime hook](frontend/src/lib/hooks/use-conversation-realtime.ts), [polling hook](frontend/src/lib/hooks/use-polling.ts), [session-channel authorization](backend/app/Support/RealtimeSessionChannels.php). The client implements the relevant [Pusher WebSocket protocol](https://pusher.com/docs/channels/library_auth_reference/pusher-websockets-protocol/) used by Reverb without adding dependencies.
+
+The main chat integration keeps polling as a reconciliation path:
+
+**Files:** [messaging.tsx](frontend/src/components/messaging/messaging.tsx), [use-conversation-realtime.ts](frontend/src/lib/hooks/use-conversation-realtime.ts).
+
+~~~ts
+const realtime = useConversationRealtime(id);
+const pollingError = usePolling(poll, realtime ? 60_000 : 10_000, true, CHAT_CHANGED);
+~~~
+
+Account email dispatch uses the same job for verification and reset delivery:
+
+**Files:** [User.php](backend/app/Models/User.php), [SendAccountEmail.php](backend/app/Jobs/SendAccountEmail.php).
+
+~~~php
+public function sendEmailVerificationNotification(): void
+{
+    SendAccountEmail::dispatch((int) $this->id, $this->email);
+}
+~~~
+
 ## 7. Measurements and Limitations
 
-**Implementation checks on November 19, 2026 (local working tree):** backend suites passed **852 tests / 7,568 assertions** against an isolated PostgreSQL test database; the frontend passed **85/85 tests**, typecheck, lint for changed files, and a production build. OpenAPI was regenerated from the source code and retained 139 operations. These checks cover request fan-out, pagination, aggregation, and data-loading lifecycle behavior; they are not new latency/RPS measurements or a production deployment acceptance.
+**Realtime/email/cache checks on November 19, 2026:** 73 targeted backend tests / 396 assertions and 89 frontend tests passed. Frontend typecheck, changed-file lint and production build passed. WebSocket tests simulate the transport; live browser/Reverb deployment, external SMTP and new cache/load benchmarks remain unverified. See the [phase 2 report](docs/handover/TutorLink-server-optimization-2026-11-19.md#8-realtime-email-queue-and-cache-implementation).
+
+**Earlier workspace/homepage checks on November 19, 2026 (local working tree):** backend suites passed **852 tests / 7,568 assertions** against an isolated PostgreSQL test database; the frontend passed **85/85 tests**, typecheck, lint for changed files, and a production build. OpenAPI was regenerated from the source code and retained 139 operations. These checks cover request fan-out, pagination, aggregation, and data-loading lifecycle behavior; they are not new latency/RPS measurements or a production deployment acceptance.
 
 The [November 14–15, 2026 performance report](docs/handover/TutorLink-performance-audit-2026-11-14.md) contains earlier local synthetic-load experiments. A mixed workload offered at **100 RPS for 600 seconds** completed 60,000 requests, with **99.99 successful RPS**, p95 **55 ms**, p99 **199 ms**, no errors, and no dropped requests. Reconciliation of 3,001 Sessions, including a smoke fixture, matched receipts and audit records.
 
@@ -304,12 +341,12 @@ See [docker/performance](docker/performance/README.md) for the benchmark tools a
 
 The following items are proposals and are not reported as completed work:
 
-1. Queue email verification and password-reset delivery; ensure the producer and worker use the same queue, with retries and token-expiry checks.
-2. Separate cache policies for slowly changing catalog data and frequently changing marketplace data; consider protection against many requests rebuilding an expired key at once.
+1. Measure queue delivery lag and alert on failed email jobs in staging.
+2. Measure cache-hit rates and lock contention with real browser traffic.
 3. Measure cache-generation lookup and invalidation costs. Preserve immediate effects for hidden listings, suspended tutors, and expired verification documents.
 4. Combine the two outbox-count queries if profiling shows a meaningful cost; cache dashboard metrics only after defining acceptable data freshness and permission scope.
 5. Measure query plans, resource usage, and PHP-FPM queues on representative staging with an independent load generator before tuning process sizing.
-6. Integrate Reverb into the frontend for chat and unread badges, with reconnect/resynchronization and polling fallback.
+6. Extend realtime subscriptions to unopened conversations if measurements justify a user-level channel; the current subscription covers the open conversation.
 
 Do not switch sessions to Redis by changing an environment variable alone: realtime session-channel checks currently depend on database sessions. Do not remove version checks, audit records, or idempotency safeguards for speed.
 

@@ -1,9 +1,9 @@
 import { FeaturedServices } from "@/components/marketing/featured-services";
 import { FeaturedTutors } from "@/components/marketing/featured-tutors";
-import { request } from "@/lib/api/client";
+import { publicRequest as request } from "@/lib/api/client";
 import { render, screen } from "@testing-library/react";
 import { expect, it, vi } from "vitest";
-vi.mock("@/lib/api/client", () => ({ request: vi.fn() }));
+vi.mock("@/lib/api/client", () => ({ publicRequest: vi.fn() }));
 
 it("renders both homepage sections from one compact request without profile or review fetches", async () => {
   vi.mocked(request).mockResolvedValue({ data: { data: [{ id: 1, slug: "english", title: "English lessons", description: "Conversation",

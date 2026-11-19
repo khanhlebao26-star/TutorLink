@@ -80,6 +80,10 @@ services:
     <<: *runtime
     command: [php, artisan, 'queue:work', database, '--queue=broadcasts', '--sleep=1', '--tries=3', '--timeout=30', '--max-time=3600']
 
+  email-worker:
+    <<: *runtime
+    command: [php, artisan, 'queue:work', database, '--queue=emails', '--sleep=1', '--tries=3', '--timeout=30', '--max-time=3600']
+
   scheduler:
     <<: *runtime
     command: [php, artisan, 'schedule:work']

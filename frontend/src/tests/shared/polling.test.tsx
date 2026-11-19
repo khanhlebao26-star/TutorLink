@@ -132,3 +132,14 @@ it("backs off at 5, 10, 20, then at most 30 seconds for transient failures", asy
     expect(task).toHaveBeenCalledTimes(index + 2);
   }
 });
+
+it("resyncs once after an event arrives during an active request", async () => {
+  let complete!: () => void;
+  const task = vi.fn().mockImplementationOnce(() => new Promise<void>((resolve) => { complete = resolve; })).mockResolvedValue(undefined);
+  const { unmount } = renderHook(() => usePolling(task, 60000, true, "chat-test"));
+  await act(async () => { window.dispatchEvent(new Event("chat-test")); window.dispatchEvent(new Event("chat-test")); });
+  expect(task).toHaveBeenCalledTimes(1);
+  await act(async () => { complete(); });
+  expect(task).toHaveBeenCalledTimes(2);
+  unmount();
+});

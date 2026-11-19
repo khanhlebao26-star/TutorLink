@@ -3,7 +3,7 @@ import { getFeaturedListingCandidates, getMarketplaceCatalog, getTutorReviews } 
 import { AxiosHeaders } from "axios";
 import { beforeEach, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/api/client", () => ({ request: vi.fn() }));
+vi.mock("@/lib/api/client", () => (() => { const send = vi.fn(); return { request: send, publicRequest: send }; })());
 
 const send = vi.mocked(request);
 const headers = new AxiosHeaders();

@@ -37,25 +37,57 @@ class MarketplaceCacheControl
             $cache = null;
             $key = null;
         }
-        $response = $next($request);
-        if ($response->getStatusCode() === 200 && str_contains((string) $response->headers->get('Content-Type'), 'application/json')) {
-            if ($cache !== null && $key !== null) {
+        $lock = null;
+        if ($cache !== null && $key !== null) {
+            try {
+                $lock = $cache->lock($key.':build', 15);
+                if (! $lock->block(1)) {
+                    $lock = null;
+                    $key = null;
+                } else {
+                    $cached = $cache->get($key);
+                    if (is_array($cached) && isset($cached['body'])) {
+                        $lock->release();
+
+                        return response($cached['body'], 200, $this->headers('HIT'));
+                    }
+                }
+            } catch (Throwable) {
                 try {
-                    if (! $cache->put($key, ['body' => $response->getContent()], PublicCatalogCache::TTL_SECONDS)) {
+                    $lock?->release();
+                } catch (Throwable) {
+                }
+                $lock = null;
+                $key = null;
+            }
+        }
+        try {
+            $response = $next($request);
+            if ($response->getStatusCode() === 200 && str_contains((string) $response->headers->get('Content-Type'), 'application/json')) {
+                if ($cache !== null && $key !== null) {
+                    try {
+                        if (! $cache->put($key, ['body' => $response->getContent()], app(PublicCatalogCache::class)->ttl($request))) {
+                            $key = null;
+                        }
+                    } catch (Throwable) {
                         $key = null;
                     }
-                } catch (Throwable) {
-                    $key = null;
                 }
+                foreach ($this->headers($key === null ? 'BYPASS' : 'MISS') as $name => $value) {
+                    $response->headers->set($name, $value);
+                }
+            } else {
+                $response->headers->set('Cache-Control', 'private, no-store');
             }
-            foreach ($this->headers($key === null ? 'BYPASS' : 'MISS') as $name => $value) {
-                $response->headers->set($name, $value);
-            }
-        } else {
-            $response->headers->set('Cache-Control', 'private, no-store');
-        }
 
-        return $response;
+            return $response;
+        } finally {
+            try {
+                $lock?->release();
+            } catch (Throwable) {
+                // Cache failure must not replace an API response.
+            }
+        }
     }
 
     /** @return array<string,string> */

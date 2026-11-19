@@ -2,6 +2,14 @@
 
 The Markdown files are the local working documentation for TutorLink. Modules retains its M01–M10 subfolders, and embedded images are in local `assets/` folders. Read [AGENTS.md](AGENTS.md) for the maintenance workflow.
 
+## Realtime, email queue and cache — November 19, 2026
+
+The frontend now subscribes to the open conversation's session-scoped Reverb channel and resynchronizes messages through the authorized HTTP API. Reconnect, logout, hidden/offline handling and polling fallback are implemented; inbox and badge outside that conversation still poll. See the [frontend configuration](../frontend/README.md#realtime-configuration).
+
+Account verification/password-reset emails use encrypted jobs on `emails`, dispatched after commit, with eligibility/token checks at delivery. Local and production worker configurations include an email worker; use `QUEUE_CONNECTION=database`. Catalog cache TTL is 300 seconds, marketplace TTL remains 60 seconds. Explicit anonymous catalog/listing reads omit credentials via Fetch. A bounded rebuild lock reduces duplicate cache generation while preserving the database invalidation and document-expiry gates.
+
+Implementation evidence and limitations: [optimization report, phase 2](handover/TutorLink-server-optimization-2026-11-19.md#8-realtime-email-queue-and-cache-implementation).
+
 ## API documentation
 
 - [Trạng thái tích hợp frontend](../frontend/README.md#trạng-thái-tích-hợp) ghi rõ màn hình nào dùng API, dữ liệu nào được mô phỏng và nội dung nào được viết sẵn.

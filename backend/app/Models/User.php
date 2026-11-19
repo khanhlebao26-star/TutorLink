@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\SendAccountEmail;
 use App\Support\AdminAuthorization;
 use App\Support\AdminPermissions;
 use Database\Factories\UserFactory;
@@ -31,6 +32,16 @@ class User extends Authenticatable implements FilamentUser, HasName, MustVerifyE
 
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, MustVerifyEmailTrait, Notifiable, SoftDeletes;
+
+    public function sendEmailVerificationNotification(): void
+    {
+        SendAccountEmail::dispatch((int) $this->id, $this->email);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        SendAccountEmail::dispatch((int) $this->id, $this->email, $token);
+    }
 
     /**
      * Laravel authentication should read the renamed credential column.

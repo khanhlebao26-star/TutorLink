@@ -1,4 +1,4 @@
-import { api, request, toApiClientError } from "@/lib/api/client";
+import { api, publicRequest, request, toApiClientError } from "@/lib/api/client";
 import { expect, it, vi } from "vitest";
 
 it("bounds reads, preserves explicit timeout and leaves mutations unchanged", async () => {
@@ -15,4 +15,12 @@ it("bounds reads, preserves explicit timeout and leaves mutations unchanged", as
 it("describes a timeout in Vietnamese", () => {
   expect(toApiClientError({ code: "ECONNABORTED", message: "timeout" }).message)
     .toBe("Máy chủ phản hồi chậm. Vui lòng thử lại.");
+});
+
+it("omits browser credentials only for explicit public reads", async () => {
+  const send = vi.spyOn(api, "request").mockResolvedValue({ data: {} });
+  await publicRequest({ url: "/listings" });
+  expect(send).toHaveBeenLastCalledWith({ url: "/listings", timeout: 15000, adapter: "fetch", withCredentials: false, withXSRFToken: false });
+  await request({ url: "/me" });
+  expect(send).toHaveBeenLastCalledWith({ url: "/me", timeout: 15000 });
 });

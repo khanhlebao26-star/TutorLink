@@ -46,7 +46,7 @@ Bảng dưới mô tả nguồn dữ liệu trong mã hiện tại ở chế đ�
 | Hồ sơ gia sư và hồ sơ học tập | Đọc, lưu hồ sơ, gửi hồ sơ gia sư để duyệt, tải tài liệu xác minh. Học viên chỉnh hồ sơ tại `/learning-profile`. | `/tutor/profile`, `/files`, `/me/learning-profile` |
 | Marketplace, dịch vụ, lịch rảnh và yêu thích | Tìm dịch vụ, xem hồ sơ và đánh giá, quản lý dịch vụ của gia sư, lưu gia sư yêu thích. Lịch rảnh là khung giờ tham khảo. | `/listings`, `/tutors/{slug}/reviews`, `/me/listings`, `/me/availability-rules`, `/me/favorites` |
 | Chương trình và lời mời | Tạo chương trình, gửi và phản hồi lời mời, quản lý buổi học, bài tập, bài nộp, tiến độ, thông báo lớp và quiz. Trang học phí có route riêng nhưng menu tab workspace hiện ẩn mục này. | `/programs`, `/invitations`, `/programs/{id}/quizzes`, `/programs/{id}/fee-records` |
-| Tin nhắn và thông báo tài khoản | Mở hội thoại, gửi tin văn bản hoặc tệp, tải lịch sử, đánh dấu đã đọc. Màn hình chat cập nhật bằng cách hỏi lại API định kỳ. | `/conversations/{id}/messages`, `/files/{id}/complete`, `/notifications` |
+| Tin nhắn và thông báo tài khoản | Mở hội thoại, gửi tin văn bản hoặc tệp, tải lịch sử, đánh dấu đã đọc. Chat đang mở nhận sự kiện Reverb theo phiên và đồng bộ lại qua API; polling dự phòng 10 giây, đồng bộ 60 giây khi đã subscribe. Ngoài chat đang mở, inbox/badge tiếp tục polling. | `/conversations/{id}/messages`, `/files/{id}/complete`, `/notifications` |
 | Báo cáo và quản trị | Người dùng gửi và theo dõi báo cáo. Admin xem dashboard, duyệt hồ sơ và xử lý báo cáo theo quyền. | `/reports`, `/me/reports`, `/admin/dashboard`, `/admin/tutor-profiles`, `/admin/reports` |
 
 ### Nội dung tĩnh và dữ liệu minh họa
@@ -73,3 +73,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 Chạy `node scripts/marketplace-query-check.mjs`, `node scripts/availability-check.mjs` và `npx tsc --noEmit --incremental false` bên cạnh lint/build. Browser suite `scripts/issue-15-browser.mjs` cần Playwright và Chrome đã cài (có thể cấu hình `PLAYWRIGHT_MODULE`, `TUTORLINK_CHROME_PATH`, `TUTORLINK_URL`); dùng API fixture chỉ trong test, ghi rõ riêng với live API. Không thêm dependency production.
 
 Để kiểm tra song song với server đang chạy, đặt `TUTORLINK_NEXT_DIST_DIR=.next-issue15` và dùng port riêng; production build dùng `.next-issue15-build`. Build output đã được ignore khỏi Git/ESLint.
+
+## Realtime configuration
+
+Set `NEXT_PUBLIC_REVERB_APP_KEY` to the public Reverb key and `NEXT_PUBLIC_REVERB_URL` to the browser-reachable WebSocket origin before building (local: `ws://localhost:8080`, HTTPS deployment: `wss://your-host`). Keep the app secret on the backend. Docker local supplies these variables. Missing settings use polling. The client authenticates a private session-scoped conversation channel using Sanctum/CSRF, reconnects with backoff, resynchronizes from HTTP, and disconnects while hidden/offline or on logout. Events refresh the inbox and unread badge for the open conversation; this is not a global user channel.

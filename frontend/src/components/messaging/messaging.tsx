@@ -14,6 +14,7 @@ import {
 } from "@/lib/data/messaging";
 import { completeFile, uploadFile } from "@/lib/data/services";
 import type { FileRecord } from "@/lib/data/types";
+import { CHAT_CHANGED, useConversationRealtime } from "@/lib/hooks/use-conversation-realtime";
 import { usePolling } from "@/lib/hooks/use-polling";
 import "@/styles/messaging.css";
 import Link from "next/link";
@@ -104,7 +105,8 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
     },
     [id],
   );
-  const pollingError = usePolling(poll);
+  const realtime = useConversationRealtime(id);
+  const pollingError = usePolling(poll, realtime ? 60_000 : 10_000, true, CHAT_CHANGED);
   async function loadOlder() {
     if (!id || !older || olderBusy) return;
     setOlderBusy(true);

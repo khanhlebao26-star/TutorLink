@@ -172,3 +172,8 @@ export async function request<T>(
   const method = (config.method ?? "GET").toUpperCase();
   return api.request<T>({ ...(method === "GET" || method === "HEAD" ? { timeout: 15_000 } : {}), ...config });
 }
+
+/** Only call for endpoints whose response is public and independent of the session. */
+export function publicRequest<T>(config: AxiosRequestConfig) {
+  return request<T>({ ...config, adapter: "fetch", withCredentials: false, withXSRFToken: false });
+}

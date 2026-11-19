@@ -1,5 +1,6 @@
 "use client";
 import { conversations, type Conversation } from "@/lib/data/messaging";
+import { CHAT_CHANGED } from "@/lib/hooks/use-conversation-realtime";
 import { INBOX_POLL_INTERVAL_MS, usePolling } from "@/lib/hooks/use-polling";
 import { useCallback, useRef, useState } from "react";
 
@@ -18,7 +19,7 @@ export function useInboxData() {
     initialized.current = true;
     setListLoaded(true);
   }, []);
-  const listError = usePolling(poll, INBOX_POLL_INTERVAL_MS);
+  const listError = usePolling(poll, INBOX_POLL_INTERVAL_MS, true, CHAT_CHANGED);
   return { items, setItems, listCursor, setListCursor, listBusy, setListBusy, listLoaded, listError };
 }
 

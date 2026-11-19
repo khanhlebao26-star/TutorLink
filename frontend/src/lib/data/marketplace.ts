@@ -1,4 +1,4 @@
-import { ApiClientError, request } from "@/lib/api/client";
+import { ApiClientError, publicRequest, request } from "@/lib/api/client";
 import type { Availability, AvailabilityRule, CatalogCategory, ListingInput, ListingQuery, OwnerListing, OwnerListingAction, OwnerListingCollection, OwnerListingStatusFilter, PublicListing, PublicListingCollection, ReportableTutorCollection, TutorPublic, TutorReviewCollection } from "@/lib/data/marketplace-types";
 import type { ApiEnvelope } from "@/lib/data/types";
 
@@ -27,7 +27,7 @@ function sharePendingPublicRead<Args extends unknown[], Result>(
 
 // Marketplace always calls the backend; legacy auth preview mode cannot supply Listing data.
 async function loadMarketplaceCatalog(): Promise<CatalogCategory[]> {
-  const response = await request<ApiEnvelope<CatalogCategory[]>>({ method: "GET", url: "/catalog/categories" });
+  const response = await publicRequest<ApiEnvelope<CatalogCategory[]>>({ method: "GET", url: "/catalog/categories" });
   return response.data.data.filter((category) => category.status === "active").map((category) => ({ ...category,
     subcategories: category.subcategories.filter((subcategory) => subcategory.status === "active").map((subcategory) => ({ ...subcategory, specializations: subcategory.specializations.filter((item) => item.status === "active") })),
   }));
@@ -43,7 +43,7 @@ export async function searchListings(params: ListingQuery): Promise<PublicListin
   if ((params.min_price !== undefined || params.max_price !== undefined || params.sort?.startsWith("price_")) && !params.price_unit) {
     throw new ApiClientError("Chọn đơn vị phí trước khi lọc hoặc sắp xếp theo giá.", { status: 422, fieldErrors: { price_unit: ["Vui lòng chọn đơn vị phí."] } });
   }
-  const response = await request<PublicListingCollection>({ method: "GET", url: "/listings", params });
+  const response = await publicRequest<PublicListingCollection>({ method: "GET", url: "/listings", params });
   requirePagination(response.data);
   if (!Array.isArray(response.data.data)) throw new ApiClientError("Máy chủ chưa trả danh sách dịch vụ hợp lệ.");
   response.data.data.forEach(requirePublicListing);
@@ -63,7 +63,7 @@ function requirePagination(value: { meta?: { total?: number; current_page?: numb
   }
 }
 export async function getPublicListing(slug: string): Promise<PublicListing> {
-  const response = await request<ApiEnvelope<PublicListing>>({ method: "GET", url: `/listings/${encodeURIComponent(slug)}` });
+  const response = await publicRequest<ApiEnvelope<PublicListing>>({ method: "GET", url: `/listings/${encodeURIComponent(slug)}` });
   requirePublicListing(response.data.data);
   return response.data.data;
 }

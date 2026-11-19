@@ -2,6 +2,7 @@
 
 import { ApiClientError, request } from "@/lib/api/client";
 import type { ApiEnvelope } from "@/lib/data/types";
+import { CHAT_CHANGED } from "@/lib/hooks/use-conversation-realtime";
 import { INBOX_POLL_INTERVAL_MS, usePolling } from "@/lib/hooks/use-polling";
 import { useCallback, useState } from "react";
 
@@ -28,6 +29,6 @@ export function useUnreadMessages(actorId: number | null) {
     }
   }, [actorId]);
 
-  usePolling(refresh, INBOX_POLL_INTERVAL_MS, actorId !== null);
+  usePolling(refresh, INBOX_POLL_INTERVAL_MS, actorId !== null, CHAT_CHANGED);
   return actorId === badge.actorId ? badge.count : 0;
 }

@@ -11,6 +11,7 @@ export function usePolling(
   task: (signal: AbortSignal) => Promise<void>,
   interval = 10000,
   enabled = true,
+  refreshEvent?: string,
 ) {
   const [error, setError] = useState<unknown>(null);
   useEffect(() => {
@@ -21,7 +22,8 @@ export function usePolling(
       controller: AbortController | null = null,
       failures = 0,
       retryAt = 0,
-      halted = false;
+      halted = false,
+      refreshPending = false;
     const available = () =>
       document.visibilityState !== "hidden" && navigator.onLine;
     let wasAvailable = available();
@@ -64,7 +66,8 @@ export function usePolling(
       } finally {
         controller = null;
         if (!disposed && available() && !halted) {
-          if (active.signal.aborted) {
+          if (active.signal.aborted || refreshPending) {
+            refreshPending = false;
             void run();
           } else {
             timer = setTimeout(run, Math.min(delay, maxTimeout));
@@ -83,11 +86,14 @@ export function usePolling(
         controller?.abort();
       }
     };
+    const refresh = () => { clear(); if (controller) refreshPending = true; else void run(); };
+    if (refreshEvent) window.addEventListener(refreshEvent, refresh);
     document.addEventListener("visibilitychange", change);
     window.addEventListener("online", change);
     window.addEventListener("offline", change);
     void run();
     return () => {
+      if (refreshEvent) window.removeEventListener(refreshEvent, refresh);
       disposed = true;
       clear();
       controller?.abort();
@@ -95,6 +101,6 @@ export function usePolling(
       window.removeEventListener("online", change);
       window.removeEventListener("offline", change);
     };
-  }, [task, interval, enabled]);
+  }, [task, interval, enabled, refreshEvent]);
   return enabled ? error : null;
 }

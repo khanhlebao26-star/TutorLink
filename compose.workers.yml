@@ -53,6 +53,10 @@ services:
       - --timeout=20
       - --max-time=3600
 
+  email-worker:
+    <<: *backend-worker
+    command: [php, artisan, 'queue:work', database, '--queue=emails', '--sleep=1', '--tries=3', '--timeout=30', '--max-time=3600']
+
   scheduler:
     <<: *backend-worker
     command: ["php", "artisan", "schedule:work"]
