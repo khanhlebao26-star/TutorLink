@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Delivery, price sort and category filters",
+    "status": "PASS",
+    "detail": "online/session/price_asc/category updated URL; category key visible as 1"
+  },
+  {
+    "name": "Marketplace pagination",
+    "status": "BLOCKED",
+    "detail": "Only 1 listing in the fresh seed; no page 2 control."
+  },
+  {
+    "name": "Listing detail",
+    "status": "PASS",
+    "detail": "GET /listings/fe-demo-english=200 after 6074 ms; detail page rendered."
+  },
+  {
+    "name": "Tutor public profile and reviews",
+    "status": "PASS",
+    "detail": "Public Tutor page and review route rendered."
+  },
+  {
+    "name": "Customer contact and text chat",
+    "status": "PASS",
+    "detail": "Public Tutor CTA opened a conversation; unique Customer text appeared in history."
+  }
+]

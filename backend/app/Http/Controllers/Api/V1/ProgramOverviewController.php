@@ -31,7 +31,7 @@ class ProgramOverviewController extends Controller
     #[OpenApiResponse(
         status: 200,
         description: 'Program Workspace overview.',
-        type: 'array{data: array{next_session: SessionResource|null, task_counts: array{todo: int, in_progress: int, submitted: int, completed: int, cancelled: int}, latest_progress: '.self::PROGRESS_RECORD_TYPE.'|null, latest_announcement: '.self::ANNOUNCEMENT_TYPE.'|null, capabilities: array{can_create_session: bool, can_create_task: bool, can_record_progress: bool, can_create_fee_record: bool, can_create_announcement: bool, can_create_review: bool}}}',
+        type: 'array{data: array{next_session: SessionResource|null, completed_session_count: int, task_counts: array{todo: int, in_progress: int, submitted: int, completed: int, cancelled: int}, latest_progress: '.self::PROGRESS_RECORD_TYPE.'|null, latest_announcement: '.self::ANNOUNCEMENT_TYPE.'|null, capabilities: array{can_create_session: bool, can_create_task: bool, can_record_progress: bool, can_create_fee_record: bool, can_create_announcement: bool, can_create_review: bool}}}',
     )]
     #[OpenApiResponse(status: 401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(status: 403, description: 'The account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
@@ -101,6 +101,7 @@ class ProgramOverviewController extends Controller
                     ? null
                     : SessionResource::make($nextSession)->resolve($request),
                 'task_counts' => $taskCounts,
+                'completed_session_count' => DB::table('program_sessions')->where('program_id', $record->id)->where('status', 'completed')->count(),
                 'latest_progress' => $latestProgress === null
                     ? null
                     : ProgressRecordResource::make($latestProgress)->resolve($request),

@@ -1,0 +1,101 @@
+{
+  "customer": {
+    "loginLanding": "/marketplace",
+    "meStatus": 200,
+    "role": "customer",
+    "status": "active",
+    "emailVerified": true,
+    "profile": false,
+    "routes": {
+      "/admin": {
+        "heading": "Trang này dành cho Quản trị",
+        "denied": 1,
+        "adminNav": 0,
+        "monitorNav": 0
+      },
+      "/monitoring": {
+        "heading": "Trang này dành cho Quản trị",
+        "denied": 1,
+        "adminNav": 0,
+        "monitorNav": 0
+      },
+      "/api/v1/admin/tutor-profiles?status=submitted": 403,
+      "/api/v1/admin/reports?scope=mine": 403,
+      "/api/v1/admin/reviews": 403,
+      "/api/v1/admin/audit-logs": 403,
+      "/admin/operations": 403,
+      "/admin-business/assigned-profiles": 403,
+      "/admin/reports": 403,
+      "/admin/reviews": 403
+    },
+    "logoutMeStatus": 401,
+    "logoutUrl": "/auth/login",
+    "pageErrors": []
+  },
+  "tutor": {
+    "loginLanding": "/profile",
+    "meStatus": 200,
+    "role": "tutor",
+    "status": "active",
+    "emailVerified": true,
+    "profile": false,
+    "routes": {
+      "/admin": {
+        "heading": "Trang này dành cho Quản trị",
+        "denied": 1,
+        "adminNav": 0,
+        "monitorNav": 0
+      },
+      "/monitoring": {
+        "heading": "Trang này dành cho Quản trị",
+        "denied": 1,
+        "adminNav": 0,
+        "monitorNav": 0
+      },
+      "/api/v1/admin/tutor-profiles?status=submitted": 403,
+      "/api/v1/admin/reports?scope=mine": 403,
+      "/api/v1/admin/reviews": 403,
+      "/api/v1/admin/audit-logs": 403,
+      "/admin/operations": 403,
+      "/admin-business/assigned-profiles": 403,
+      "/admin/reports": 403,
+      "/admin/reviews": 403
+    },
+    "logoutMeStatus": 401,
+    "logoutUrl": "/auth/login",
+    "pageErrors": []
+  },
+  "admin": {
+    "loginLanding": "/admin",
+    "meStatus": 200,
+    "role": "admin",
+    "status": "active",
+    "emailVerified": true,
+    "profile": false,
+    "routes": {
+      "/admin": {
+        "heading": "Duyệt Tutor",
+        "denied": 0,
+        "adminNav": 1,
+        "monitorNav": 1
+      },
+      "/monitoring": {
+        "heading": "Giám sát hệ thống",
+        "denied": 0,
+        "adminNav": 1,
+        "monitorNav": 1
+      },
+      "/api/v1/admin/tutor-profiles?status=submitted": 200,
+      "/api/v1/admin/reports?scope=mine": 200,
+      "/api/v1/admin/reviews": 200,
+      "/api/v1/admin/audit-logs": 200,
+      "/admin/operations": 200,
+      "/admin-business/assigned-profiles": 200,
+      "/admin/reports": 200,
+      "/admin/reviews": 200
+    },
+    "logoutMeStatus": 401,
+    "logoutUrl": "/auth/login",
+    "pageErrors": []
+  }
+}

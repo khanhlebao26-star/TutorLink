@@ -1,7 +1,7 @@
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { AuthSupportForm } from "@/components/auth/auth-support-form";
+import { AppShell } from "@/components/layout/app-shell";
 import { Suspense } from "react";
-import { AppShell } from "@/components/app-shell";
-import { AuthLayout } from "@/components/auth-layout";
-import { AuthSupportForm } from "@/components/auth-support-form";
 
 export default function VerifyEmailPage() {
   return (

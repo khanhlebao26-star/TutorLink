@@ -1,9 +1,10 @@
+import "@/app/globals.css";
+import { MockRoleSwitcher } from "@/components/layout/mock-role-switcher";
+import { SessionHintProvider } from "@/components/layout/session-hint";
+import { AUTH_HINT_COOKIE } from "@/lib/auth-navigation";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import type { ReactNode } from "react";
-import { SessionHintProvider } from "@/components/session-hint";
-import { MockRoleSwitcher } from "@/components/mock-role-switcher";
-import "./globals.css";
 
 export const metadata: Metadata = {
   title: "TutorLink",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const authenticated = (await cookies()).get("tutorlink-auth")?.value === "1";
+  const authenticated = (await cookies()).get(AUTH_HINT_COOKIE)?.value === "1";
 
   return (
     <html lang="vi">

@@ -2,7 +2,7 @@ export type Role = "customer" | "tutor" | "admin";
 export type RegisterRole = Exclude<Role, "admin">;
 export type UserStatus = "active" | "suspended" | "deactivated";
 export type TutorProfileStatus = "draft" | "submitted" | "changes_requested" | "approved" | "rejected" | "suspended";
-export type FilePurpose = "avatar" | "verification_document" | "task_attachment" | "profile_document";
+export type FilePurpose = "avatar" | "verification_document" | "task_attachment" | "profile_document" | "message_attachment" | "report_evidence";
 export type ListingStatus = "draft" | "active" | "inactive" | "cancelled";
 export type DeliveryMode = "online" | "offline" | "hybrid";
 export type PriceUnit = "session" | "hour" | "course";
@@ -46,6 +46,9 @@ export interface TutorProfile {
   specialization_id: number | null;
   avatar_file_id: number | null;
   verification_document_file_id: number | null;
+  verification_documents?: VerificationDocument[];
+  qualification_claims?: Array<{type:"degree"|"certificate";name:string}>;
+  revision?: {id:number;revision_no:number;status:"draft"|"submitted"|"changes_requested"|"approved"|"rejected";version:number;payload:Partial<TutorProfile>;review_reason:string|null}|null;
   headline: string;
   bio?: string | null;
   experience_years: number;
@@ -65,7 +68,8 @@ export interface VerificationDocument {
   tutor_profile_id: number;
   file_id: number;
   document_type: string;
-  status: "pending" | "active" | "rejected" | "expired";
+  status: "pending" | "active" | "approved" | "rejected" | "expired";
+  expires_at?: string | null;
   reviewed_at?: string | null;
   original_name?: string | null;
   mime_type?: string;
@@ -75,10 +79,23 @@ export interface VerificationDocument {
 }
 
 export interface AdminTutorProfile {
+  assignment?: {assignment_version:number;assigned_admin_id:number|null};
+  revision?: TutorProfile["revision"];
   allowed_actions: Array<"approve" | "request-changes" | "reject" | "suspend" | "restore" | "account-suspend" | "account-restore">;
   user: User;
   profile: TutorProfile;
   verification_documents: VerificationDocument[] | null;
+}
+
+/** Metadata-only item returned for profiles waiting to be assigned to an admin. */
+export interface AdminTutorQueueItem {
+  id: number;
+  status: TutorProfileStatus;
+  submitted_at: string | null;
+  assigned_admin_id: number | null;
+  assigned_by: number | null;
+  assigned_at: string | null;
+  assignment_version: number;
 }
 
 export interface ProfileResponse {

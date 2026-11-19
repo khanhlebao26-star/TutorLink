@@ -2,7 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\MarketplaceCacheControl;
+use App\Support\PublicCatalogCache;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\PostgresConnections;
 use Tests\Support\ProgramApiFixtures;
@@ -37,5 +41,34 @@ class MarketplaceCacheTransactionTest extends TestCase
                 }
             }
         });
+    }
+
+    public function test_catalog_uses_longer_ttl_and_does_not_scan_document_expiry(): void
+    {
+        $cache = app(PublicCatalogCache::class);
+        $request = Request::create('/api/v1/catalog/categories');
+        $this->assertSame(300, $cache->ttl($request));
+        $this->assertSame(60, $cache->ttl(Request::create('/api/v1/listings')));
+        DB::enableQueryLog();
+        $cache->key($request);
+        $queries = DB::getQueryLog();
+        DB::disableQueryLog();
+        $this->assertCount(1, $queries);
+        $this->assertStringNotContainsString('verification_documents', $queries[0]['query']);
+    }
+
+    public function test_rebuild_lock_is_released_on_controller_error(): void
+    {
+        $request = Request::create('/api/v1/catalog/categories');
+        $key = app(PublicCatalogCache::class)->key($request);
+        Cache::forget($key);
+        try {
+            app(MarketplaceCacheControl::class)->handle($request, fn () => throw new \RuntimeException('controller failed'));
+        } catch (\RuntimeException $error) {
+            $this->assertSame('controller failed', $error->getMessage());
+        }
+        $lock = Cache::lock($key.':build', 15);
+        $this->assertTrue($lock->get());
+        $lock->release();
     }
 }

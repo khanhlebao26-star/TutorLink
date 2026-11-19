@@ -15,6 +15,7 @@ class ListingResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'tutor_card' => $this->when($this->resource->getAttribute('tutor_card') !== null, fn () => $this->compactTutorCard()),
             'tutor_profile_id' => $this->tutor_profile_id,
             'specialization_id' => $this->specialization_id,
             'slug' => $this->slug,
@@ -60,6 +61,19 @@ class ListingResource extends JsonResource
                     ?->category
                     ?->name,
             ),
+        ];
+    }
+
+    /** @return array{headline:string|null,experience_years:int,rating_count:int,rating_average:float|null} */
+    private function compactTutorCard(): array
+    {
+        $card = $this->resource->getAttribute('tutor_card');
+
+        return [
+            'headline' => $card['headline'] === null ? null : (string) $card['headline'],
+            'experience_years' => (int) $card['experience_years'],
+            'rating_count' => (int) $card['rating_count'],
+            'rating_average' => $card['rating_average'] === null ? null : (float) $card['rating_average'],
         ];
     }
 }

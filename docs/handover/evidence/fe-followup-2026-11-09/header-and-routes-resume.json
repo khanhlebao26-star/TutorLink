@@ -1,0 +1,262 @@
+[
+  {
+    "label": "Guest header and keyboard mobile navigation",
+    "status": "Pass",
+    "evidence": "/me 401"
+  },
+  {
+    "label": "Route shell / (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /marketplace (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /marketplace/fe-demo-english (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /tutors/hobart-wisoky-1 (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /tutors/hobart-wisoky-1/reviews (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /become-a-tutor (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /auth/login (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /auth/register (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /auth/forgot-password (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /auth/reset-password (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /auth/verify-email (guest)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "tutor sign-in and role from API",
+    "status": "Pass",
+    "evidence": "/me 200 tutor"
+  },
+  {
+    "label": "tutor desktop header links and sidebar permissions",
+    "status": "Pass",
+    "evidence": "Role sidebar and topbar links"
+  },
+  {
+    "label": "tutor logo → home → reload → menu and Escape",
+    "status": "Pass",
+    "evidence": "/me 200 tutor"
+  },
+  {
+    "label": "tutor mobile header, sidebar and avatar panel in viewport",
+    "status": "Pass",
+    "evidence": "390×844, role sidebar and avatar open/close"
+  },
+  {
+    "label": "Route shell /profile (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /me/listings (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /me/listings/new (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /me/listings/1 (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /me/listings/1/edit (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /me/availability (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/new (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/2/edit (tutor)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "tutor logout from public header then denied protected route",
+    "status": "Pass",
+    "evidence": "Logout removes session, /me 401, protected page login prompt"
+  },
+  {
+    "label": "customer sign-in and role from API",
+    "status": "Pass",
+    "evidence": "/me 200 customer"
+  },
+  {
+    "label": "customer desktop header links and sidebar permissions",
+    "status": "Pass",
+    "evidence": "Role sidebar and topbar links"
+  },
+  {
+    "label": "customer logo → home → reload → menu and Escape",
+    "status": "Pass",
+    "evidence": "/me 200 customer"
+  },
+  {
+    "label": "customer mobile header, sidebar and avatar panel in viewport",
+    "status": "Pass",
+    "evidence": "390×844, role sidebar and avatar open/close"
+  },
+  {
+    "label": "Route shell /programs (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/1 (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/1/sessions (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/1/tasks (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/1/progress (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/1/announcements (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /programs/1/fees (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /invitations (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /invitations/1 (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /messages (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /messages/1 (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /notifications (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /reports (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /settings (customer)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "customer logout from public header then denied protected route",
+    "status": "Pass",
+    "evidence": "Logout removes session, /me 401, protected page login prompt"
+  },
+  {
+    "label": "admin sign-in and role from API",
+    "status": "Pass",
+    "evidence": "/me 200 admin"
+  },
+  {
+    "label": "admin desktop header links and sidebar permissions",
+    "status": "Pass",
+    "evidence": "Role sidebar and topbar links"
+  },
+  {
+    "label": "admin logo → home → reload → menu and Escape",
+    "status": "Pass",
+    "evidence": "/me 200 admin"
+  },
+  {
+    "label": "admin mobile header, sidebar and avatar panel in viewport",
+    "status": "Pass",
+    "evidence": "390×844, role sidebar and avatar open/close"
+  },
+  {
+    "label": "Route shell /admin (admin)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "Route shell /monitoring (admin)",
+    "status": "Pass",
+    "evidence": "HTTP 200, shell visible. Business actions covered separately."
+  },
+  {
+    "label": "admin logout from public header then denied protected route",
+    "status": "Pass",
+    "evidence": "Logout removes session, /me 401, protected page login prompt"
+  },
+  {
+    "label": "Same browser session: Customer → logout → Tutor",
+    "status": "Pass",
+    "evidence": "/me 200 tutor"
+  }
+]

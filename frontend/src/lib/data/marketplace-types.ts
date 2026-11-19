@@ -1,5 +1,5 @@
 // B3 integration proposal. A3 must confirm these additions before API acceptance.
-import type { CatalogCategory, DeliveryMode, Listing, ListingStatus, PaginationMeta } from "./types";
+import type { CatalogCategory, DeliveryMode, Listing, ListingStatus, PaginationMeta } from "@/lib/data/types";
 
 export type MarketplaceStatus = ListingStatus;
 export type PriceUnit = "hour" | "session" | "course";
@@ -7,6 +7,7 @@ export type OwnerListingAction = "edit" | "publish" | "pause" | "archive";
 export type OwnerListingStatusFilter = MarketplaceStatus | "all";
 export interface PublicListing extends Omit<Listing, "status"> {
   status: "active";
+  tutor_card?: { headline: string | null; experience_years: number; rating_count: number; rating_average: number | null };
   tutor_slug: string | null;
   tutor_name?: string | null;
   category_name?: string;
@@ -34,7 +35,7 @@ export interface OwnerListingCollection {
   };
 }
 export interface ListingQuery {
-  q?: string; category_id?: number; subcategory_id?: number; specialization_id?: number;
+  include?: "tutor_card"; q?: string; category_id?: number; subcategory_id?: number; specialization_id?: number;
   delivery_mode?: DeliveryMode; city?: string; min_price?: number; max_price?: number;
   price_unit?: PriceUnit; sort?: "newest" | "price_asc" | "price_desc"; page?: number; per_page?: number;
 }
@@ -48,15 +49,23 @@ export interface Availability { timezone: string; rules: AvailabilityRule[] }
 export interface PublicTutorSpecialization { id: number; name: string; slug: string; subcategory: string | null; category: string | null }
 export interface PublicTutorAvailabilityRule extends AvailabilityRule { timezone: string }
 export interface TutorPublic {
+  messaging_user_id: number;
   slug: string;
   name: string | null;
   headline: string;
   bio?: string | null;
   experience_years: number;
+  students_taught_count?: number | null;
+  response_time_minutes?: number | null;
+  social_links?: Partial<Record<"facebook" | "instagram" | "x", string>>;
   specializations: PublicTutorSpecialization[];
   availability_rules: PublicTutorAvailabilityRule[];
-  listings: PublicListing[];
+  listings: Pick<PublicListing, "slug" | "title" | "delivery_mode" | "city" | "district" | "price_from_minor" | "currency" | "price_unit" | "specialization_name">[];
+  avatar: null;
+  listings_meta: { page: number; per_page: 10; has_more: boolean; next_page: number | null };
 }
+export interface ReportableTutor { id: number; name: string; headline: string; specializations: string[] }
+export interface ReportableTutorCollection { data: ReportableTutor[]; meta: PaginationMeta }
 export interface VisibleReview {
   id: number;
   author_name: string;
@@ -74,4 +83,4 @@ export interface TutorReviewCollection {
   meta: PaginationMeta;
   aggregate: TutorReviewAggregate;
 }
-export type { CatalogCategory, DeliveryMode, PaginationMeta };
+export type { CatalogCategory,DeliveryMode,PaginationMeta };

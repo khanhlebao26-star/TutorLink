@@ -28,8 +28,8 @@ class ApiClientError extends Error {
   constructor(message, options) { super(message); Object.assign(this, options); }
 }
 const services = load("../src/lib/data/services.ts", {
-  "./mock": mock,
-  "../api/client": {
+  "@/lib/data/mock": mock,
+  "@/lib/api/client": {
     ApiClientError, dataMode: "mock", setAuthHint() {},
     request() { assert.fail("Mock mode must not call the API"); },
   },
@@ -41,15 +41,18 @@ for (const role of ["customer", "tutor", "admin"]) {
   assert.equal((await services.getCurrentUser()).role, role);
   assert.equal((await services.login("preview@example.test", "preview-password")).role, role);
 }
-for (const status of ["pending", "active", "changes_requested", "rejected"]) {
+for (const status of ["submitted", "approved", "changes_requested", "rejected"]) {
   const profiles = await services.getAdminTutorProfiles(status);
   assert.ok(profiles.length > 0);
-  assert.ok(profiles.every((entry) => entry.profile.approval_status === status));
+  assert.ok(profiles.every((entry) => entry.profile.status === status));
 }
-const [pending] = await services.getAdminTutorProfiles("pending");
-await services.performAdminTutorAction(pending.profile.id, "approve", "Đủ điều kiện");
-assert.equal((await services.getAdminTutorProfiles("pending")).length, 0);
-assert.equal((await services.getAdminTutorProfile(pending.profile.id)).profile.approval_status, "active");
+const [pending] = await services.getAdminTutorProfiles("submitted");
+await services.performAdminTutorAction(pending.profile.id, "approve", "Đủ điều kiện", pending);
+assert.equal((await services.getAdminTutorProfiles("submitted")).length, 0);
+assert.equal((await services.getAdminTutorProfile(pending.profile.id)).profile.status, "approved");
 await services.performAdminAccountAction(pending.user.id, "suspend", "Tạm khóa xem thử");
-assert.deepEqual((await services.getAdminTutorProfile(pending.profile.id)).allowed_actions, ["account-restore"]);
+assert.deepEqual(
+  [...(await services.getAdminTutorProfile(pending.profile.id)).allowed_actions].sort(),
+  ["account-restore", "suspend"],
+);
 console.log("Mock roles: customer, tutor, admin; filters and decisions passed without API calls.");

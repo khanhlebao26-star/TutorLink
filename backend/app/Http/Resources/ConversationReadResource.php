@@ -9,14 +9,20 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /** @mixin \stdClass */
 class ConversationReadResource extends JsonResource
 {
-    /** @return array{id:int,status:string,context_listing_id:int|null,peer:array{id:int,display_name:string},unread_count:int,last_read_message_id:int|null,preview:array{id:int,message_type:string,text:string,created_at:string}|null} */
+    /** @return array{id:int,status:string,context_listing_id:int|null,peer:array{id:int,display_name:string,tutor_slug:?string,tutor_headline:?string,tutor_specializations:?string},unread_count:int,last_read_message_id:int|null,preview:array{id:int,message_type:string,text:string,created_at:string}|null} */
     public function toArray(Request $request): array
     {
         return [
             'id' => (int) $this->id,
             'status' => $this->status,
             'context_listing_id' => $this->context_listing_id === null ? null : (int) $this->context_listing_id,
-            'peer' => ['id' => (int) $this->peer_id, 'display_name' => $this->peer_name],
+            'peer' => [
+                'id' => (int) $this->peer_id,
+                'display_name' => $this->peer_name,
+                'tutor_slug' => $this->peer_tutor_slug,
+                'tutor_headline' => $this->peer_tutor_headline,
+                'tutor_specializations' => $this->peer_tutor_specializations,
+            ],
             'unread_count' => (int) $this->unread_count,
             'last_read_message_id' => $this->last_read_message_id === null ? null : (int) $this->last_read_message_id,
             'preview' => $this->latest_message_id === null ? null : [

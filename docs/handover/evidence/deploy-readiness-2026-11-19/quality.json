@@ -1,0 +1,45 @@
+{
+  "starting_commit": "b3814fd",
+  "state": "local working tree, not pushed",
+  "frontend_tests": 145,
+  "frontend_baseline_lines_pct": 40.6,
+  "frontend_coverage": {
+    "lines": {
+      "total": 3508,
+      "covered": 2492,
+      "skipped": 0,
+      "pct": 71.03
+    },
+    "statements": {
+      "total": 4347,
+      "covered": 2856,
+      "skipped": 0,
+      "pct": 65.7
+    },
+    "functions": {
+      "total": 1292,
+      "covered": 763,
+      "skipped": 0,
+      "pct": 59.05
+    },
+    "branches": {
+      "total": 5166,
+      "covered": 3007,
+      "skipped": 0,
+      "pct": 58.2
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "backend_tests": 857,
+  "backend_assertions": 7585,
+  "backend_covered_statements": 8821,
+  "backend_statements": 9759,
+  "backend_statements_pct": 90.38835946305974,
+  "cloud_ci": "not run",
+  "github_scope": "Issue/PR work cancelled by user"
+}

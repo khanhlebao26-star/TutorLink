@@ -1,0 +1,100 @@
+/* Public tutor review page */
+.public-reviews-page { gap: 24px; max-width: 1440px; }
+.public-reviews-heading { margin: 0 0 2px; }
+.public-reviews-heading h1 { color: #0b1b4b; font-size: clamp(2rem, 3.3vw, 2.85rem); letter-spacing: -.045em; line-height: 1.12; margin: 0 0 7px; }
+.public-reviews-heading p { color: #7784ae; font-size: 1rem; margin: 0; }
+.public-reviews-layout { align-items: start; display: grid; gap: 26px; grid-template-columns: minmax(280px, .36fr) minmax(0, 1fr); }
+.public-rating-summary { background: #fff; border: 1px solid #dce2f4; border-radius: 16px; box-shadow: 0 8px 26px #14234c08; min-width: 0; padding: 26px; }
+.public-rating-value { margin: 0 0 2px; }
+.public-rating-value strong { color: #0b1b4b; font-size: clamp(3.8rem, 6vw, 5rem); font-weight: 750; letter-spacing: -.06em; line-height: 1; }
+.public-rating-stars { color: #ff0a99; display: block; font-size: 1.75rem; letter-spacing: .08em; line-height: 1.3; }
+.public-rating-summary > .muted { color: #7784ae; font-size: .96rem; margin: 2px 0 16px; }
+.rating-histogram { border-top: 1px solid #e6e9f2; gap: 12px; margin: 16px 0 0; padding: 18px 0 0; }
+.rating-histogram li { font-size: .83rem; gap: 10px; grid-template-columns: 42px minmax(0, 1fr) 24px; }
+.rating-bar { background: #eeedf7; height: 9px; }
+.rating-bar > span { background: linear-gradient(90deg, #ff168f, #ee239f); }
+.review-verification-note { align-items: flex-start; border-top: 1px solid #e6e9f2; color: #7784ae; display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; }
+.review-verification-note > span { align-items: center; background: #e8fbf6; border-radius: 50%; color: #0ba987; display: inline-flex; flex: 0 0 21px; font-size: .75rem; font-weight: 800; height: 21px; justify-content: center; margin-top: 1px; }
+.review-verification-note p { font-size: .78rem; line-height: 1.55; margin: 0; }
+.public-review-list { display: grid; gap: 12px; min-width: 0; }
+.review-list { display: grid; gap: 12px; }
+.public-review { background: #fff; border: 1px solid #dce2f4; border-radius: 15px; box-shadow: 0 7px 22px #14234c06; padding: 18px 20px; }
+.review-heading { align-items: flex-start; display: grid; gap: 0 12px; grid-template-columns: 48px minmax(0, 1fr) auto; }
+.reviewer-avatar { align-items: center; background: linear-gradient(140deg, #f124a3, #8052f2); border-radius: 50%; color: white; display: inline-flex; font-size: .82rem; font-weight: 800; grid-row: span 2; height: 44px; justify-content: center; width: 44px; }
+.reviewer-content { min-width: 0; }
+.reviewer-name-row { align-items: center; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 3px; }
+.reviewer-name-row h3 { color: #0b1b4b; font-size: .92rem; line-height: 1.35; margin: 0; }
+.review-verified { align-items: center; background: #fff0f8; border-radius: 999px; color: #e50085; display: inline-flex; font-size: .68rem; font-weight: 700; gap: 5px; padding: 3px 9px; white-space: nowrap; }
+.review-verified > span { align-items: center; background: #ed168f; border-radius: 50%; color: white; display: inline-flex; font-size: .55rem; height: 14px; justify-content: center; width: 14px; }
+.review-heading time { color: #8290ad; font-size: .72rem; white-space: nowrap; }
+.review-stars { color: #ff0a99; display: block; font-size: .95rem; letter-spacing: .08em; line-height: 1.4; }
+.public-review > p { color: #596989; font-size: .84rem; line-height: 1.6; margin: 10px 0 0 60px; }
+.review-pagination { border-top: 0; gap: 8px; justify-content: center; padding-top: 10px; }
+.review-pagination .button { border-color: #dce2f4; border-radius: 9px; color: #4e5c7d; min-height: 38px; }
+.review-pagination .button:hover:not(:disabled) { background: #fff0f8; border-color: #ff8cc8; color: #e50085; }
+.review-pagination span { border: 1px solid #ff0a99; border-radius: 9px; color: #e50085; font-size: .82rem; font-weight: 700; padding: 8px 12px; }
+.review-loading-layout { grid-template-columns: minmax(280px, .36fr) minmax(0, 1fr); }
+.review-loading-summary { min-height: 420px; }
+.review-loading-list { gap: 12px; }
+.review-loading-card { background: #fff; border: 1px solid #e1e6f0; border-radius: 15px; padding: 18px 20px; }
+.visually-hidden { clip: rect(0, 0, 0, 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
+
+@media (max-width: 860px) {
+  .public-reviews-layout, .review-loading-layout { grid-template-columns: minmax(0, 1fr); }
+  .public-rating-summary { order: 1; }
+  .public-review-list { order: 2; }
+  .review-loading-summary { min-height: 0; }
+}
+@media (max-width: 560px) {
+  .public-reviews-heading h1 { font-size: 2rem; }
+  .public-reviews-heading p { font-size: .9rem; }
+  .public-rating-summary { padding: 20px; }
+  .public-review { padding: 15px; }
+  .review-heading { gap: 0 9px; grid-template-columns: 40px minmax(0, 1fr); }
+  .reviewer-avatar { height: 38px; width: 38px; }
+  .review-heading time { grid-column: 2; grid-row: 2; margin-top: 4px; }
+  .public-review > p { margin-left: 49px; }
+  .review-pagination { flex-wrap: wrap; }
+}
+
+.chat-compose-backdrop { align-items: center; animation: chat-compose-fade-in .18s ease-out; backdrop-filter: blur(5px); background: #101a3b80; display: flex; inset: 0; justify-content: center; overflow-y: auto; padding: 24px; position: fixed; z-index: 1200; }
+.chat-compose-dialog { animation: chat-compose-pop-in .2s ease-out; background: #fff; border: 1px solid #e2e7f1; border-radius: 10px; box-shadow: 0 24px 70px #08164140; color: #10234f; display: grid; gap: 15px; max-height: min(90vh, 720px); max-width: 440px; overflow-y: auto; padding: 22px; width: 100%; }
+.chat-compose-heading { align-items: center; display: flex; gap: 14px; justify-content: space-between; }
+.chat-compose-heading h2 { color: #10234f; font-size: 1.2rem; letter-spacing: -.025em; line-height: 1.3; margin: 0; }
+.chat-compose-close { align-items: center; background: transparent; border: 0; border-radius: 50%; color: #53617e; cursor: pointer; display: inline-flex; flex: 0 0 30px; font: inherit; font-size: 1.5rem; height: 30px; justify-content: center; line-height: 1; padding: 0; width: 30px; }
+.chat-compose-close:hover:not(:disabled) { background: #f3f4fa; color: #10234f; }
+.chat-compose-close:disabled { cursor: wait; opacity: .55; }
+.chat-compose-listing { border: 1px solid #e2e7f1; border-radius: 10px; display: grid; gap: 14px; grid-template-columns: 118px minmax(0, 1fr); min-height: 112px; overflow: hidden; padding: 10px; }
+.chat-compose-listing-image { background: linear-gradient(140deg, #f5eafe, #ffe8f4 65%, #f4f2ff); border-radius: 6px; min-height: 92px; overflow: hidden; position: relative; }
+.chat-compose-listing-image img { object-fit: cover; }
+.chat-compose-listing-copy { align-content: center; display: grid; gap: 7px; min-width: 0; }
+.chat-compose-listing-copy strong { color: #10234f; font-size: .78rem; line-height: 1.4; }
+.chat-compose-listing-copy > span { color: #7784a3; font-size: .68rem; line-height: 1.35; }
+.chat-compose-listing-copy i { color: #f41498; font-style: normal; }
+.chat-compose-field { display: grid; gap: 7px; position: relative; }
+.chat-compose-field > span { color: #10234f; font-size: .72rem; font-weight: 700; }
+.chat-compose-field textarea { background: #fff; border: 1px solid #d8dfed; border-radius: 8px; color: #26375f; font: inherit; font-size: .72rem; line-height: 1.5; min-height: 112px; outline: none; padding: 12px 12px 25px; resize: vertical; width: 100%; }
+.chat-compose-field textarea:focus { border-color: #ed1595; box-shadow: 0 0 0 3px #f414981a; }
+.chat-compose-field > small { bottom: 8px; color: #8591ab; font-size: .57rem; pointer-events: none; position: absolute; right: 10px; }
+.chat-compose-send { background: linear-gradient(100deg, #f41498, #e51cac); border: 0; box-shadow: 0 8px 20px #f4149826; font-size: .76rem; min-height: 44px; width: 100%; }
+.chat-compose-send:hover:not(:disabled) { box-shadow: 0 11px 24px #f4149838; transform: translateY(-1px); }
+.chat-compose-send:disabled { cursor: not-allowed; opacity: .65; }
+@keyframes chat-compose-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes chat-compose-pop-in { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-compose-backdrop, .chat-compose-dialog { animation: none; }
+}
+
+@media (max-width: 560px) {
+  .chat-compose-backdrop { padding: 16px; }
+  .chat-compose-dialog { border-radius: 12px; gap: 13px; padding: 18px; }
+  .chat-compose-listing { gap: 10px; grid-template-columns: 96px minmax(0, 1fr); }
+  .chat-compose-listing-image { min-height: 92px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-loading-spinner, .detail-loading-progress i, .detail-skeleton, .open-chat-alert, .tutor-loading-spinner, .tutor-loading-skeleton, .tutor-loading-layout { animation: none; }
+  .detail-loading-progress i { margin-left: 22%; width: 56%; }
+}
+

@@ -1,0 +1,51 @@
+/* Tutor profile weekly schedule tab */
+.tutor-profile-schedule-panel { gap: 24px; }
+.tutor-profile-schedule-heading { align-items: end; display: flex; flex-wrap: wrap; gap: 18px 24px; justify-content: space-between; }
+.tutor-profile-schedule-heading > div:first-child { display: grid; gap: 7px; }
+.tutor-profile-schedule-heading h2 { font-size: clamp(1.55rem, 2.6vw, 2rem); }
+.tutor-profile-schedule-heading > div:first-child > p:last-child { font-size: .9rem; }
+.tutor-profile-schedule-contact { flex: 0 0 auto; min-height: 42px; }
+.tutor-profile-schedule-panel .tutor-profile-availability { max-width: none; width: 100%; }
+.tutor-profile-schedule-panel .tutor-schedule-card { background: linear-gradient(145deg, #fff 0%, #fcfaff 58%, #fff7fb 100%); border: 1px solid #e9e3f3; border-radius: 18px; box-shadow: 0 12px 34px #26366b0b; padding: clamp(20px, 2.5vw, 32px); }
+.tutor-schedule-card-heading { align-items: center; display: flex; gap: 20px; justify-content: space-between; }
+.tutor-schedule-card-heading > div:first-child { display: grid; gap: 6px; }
+.tutor-schedule-card-eyebrow { color: #e70b8d; font-size: .64rem; font-weight: 800; letter-spacing: .1em; }
+.tutor-profile-schedule-panel .tutor-schedule-card-heading h2 { font-size: 1.15rem; margin: 0; }
+.tutor-profile-schedule-panel .tutor-schedule-card-heading h2 small { color: #8994ad; font-size: .72rem; font-weight: 500; }
+.tutor-profile-schedule-panel .tutor-schedule-card-heading .public-timezone { color: #7885a1; font-size: .72rem; margin-top: 0; }
+.tutor-schedule-availability-count { align-items: baseline; background: #fff0f8; border: 1px solid #f9d6eb; border-radius: 12px; color: #6b7693; display: flex; gap: 6px; padding: 10px 14px; white-space: nowrap; }
+.tutor-schedule-availability-count strong { color: #e70b8d; font-size: 1.1rem; }
+.tutor-schedule-availability-count span { font-size: .68rem; }
+.tutor-schedule-legend { align-items: center; display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; }
+.tutor-schedule-legend > span { align-items: center; color: #7784a3; display: inline-flex; font-size: .68rem; gap: 7px; }
+.tutor-schedule-legend i { background: #f41498; border-radius: 50%; height: 8px; width: 8px; }
+.tutor-schedule-legend i.is-unavailable { background: #c8cedd; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list { display: grid; gap: 10px; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 14px 0 0; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li { align-content: start; background: #fff; border: 1px solid #e8eaf2; border-radius: 12px; display: grid; gap: 18px; justify-content: stretch; min-height: 142px; padding: 14px 12px; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li.has-availability { background: linear-gradient(155deg, #fff 0%, #fff8fc 100%); border-color: #f1d5e7; }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li.has-availability:hover { border-color: #f5a4cf; box-shadow: 0 8px 20px #e2178d12; transform: translateY(-2px); }
+.tutor-profile-schedule-panel .tutor-profile-availability .availability-list li.no-availability { background: #f8f9fc; }
+.tutor-schedule-day-heading { display: grid; gap: 6px; }
+.tutor-profile-schedule-panel .tutor-schedule-day-heading strong { color: #17254c; font-size: .75rem; }
+.tutor-schedule-day-heading > span { color: #8994ad; font-size: .58rem; }
+.tutor-profile-schedule-panel .has-availability .tutor-schedule-day-heading > span { color: #c30b78; }
+.tutor-schedule-slots { align-content: start; display: flex; flex-wrap: wrap; gap: 6px; }
+.tutor-profile-schedule-panel .tutor-schedule-slots > span { background: #fff0f8; border: 1px solid #f9d9eb; border-radius: 7px; color: #a80e6b; font-size: .61rem; font-variant-numeric: tabular-nums; line-height: 1.3; padding: 6px 7px; text-align: left; white-space: nowrap; }
+.tutor-profile-schedule-panel .tutor-schedule-slots > .tutor-schedule-empty-slot { background: transparent; border: 0; color: #a0a8b9; padding: 0; white-space: normal; }
+.tutor-schedule-reference-note { align-items: flex-start; color: #7784a3; display: flex; font-size: .7rem; gap: 8px; line-height: 1.55; margin: 20px 0 0; }
+.tutor-schedule-reference-note > span { color: #8052e8; font-size: .85rem; }
+
+@media (max-width: 1180px) {
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list li { min-height: 124px; }
+  .tutor-profile-schedule-heading { align-items: start; }
+}
+@media (max-width: 420px) {
+  .tutor-schedule-card-heading { align-items: flex-start; flex-direction: column; }
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list { grid-template-columns: minmax(0, 1fr); }
+  .tutor-profile-schedule-panel .tutor-profile-availability .availability-list li { min-height: auto; }
+}
+

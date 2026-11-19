@@ -1,0 +1,39 @@
+{
+  "email": "fe1-tutor-1794214927195@example.test",
+  "tests": [
+    {
+      "name": "Tutor CTA preselects tutor registration",
+      "status": "PASS",
+      "url": "http://localhost:3001/auth/register?role=tutor"
+    },
+    {
+      "name": "Register Tutor through UI",
+      "status": "PASS",
+      "message": "registration success message displayed"
+    },
+    {
+      "name": "Verification email in isolated Mailpit",
+      "status": "PASS",
+      "detail": "message contains signed link for fe1-tutor-1794214927195@example.test"
+    },
+    {
+      "name": "Signed verification link works",
+      "status": "PASS"
+    },
+    {
+      "name": "Login through UI",
+      "status": "PASS",
+      "url": "http://localhost:3001/profile",
+      "detail": ""
+    },
+    {
+      "name": "Authenticated /me role after registration",
+      "status": "PASS",
+      "detail": "role=tutor; email_verified_at=2026-11-09T09:02:23.000000Z"
+    }
+  ],
+  "error": {
+    "message": "TimeoutError: locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('heading', { name: 'Hoàn thiện hồ sơ Tutor / Coach' }) to be visible\u001b[22m\n",
+    "stack": "locator.waitFor: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('heading', { name: 'Hoàn thiện hồ sơ Tutor / Coach' }) to be visible\u001b[22m\n\n    at /private/tmp/tutorlink-role-qa-20261109/FE1/api-auth-workspace/tutor-register.cjs:62:75"
+  }
+}

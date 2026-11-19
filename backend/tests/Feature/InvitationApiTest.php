@@ -11,6 +11,37 @@ use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
+it('creates sends and accepts a program without documents when demo mode disables their requirement', function () {
+    config(['tutor.verification_documents_required' => false]);
+    $tutor = TestActors::tutor();
+    $tutor->tutorProfile->update(['status' => 'approved', 'qualification_claims' => [['type' => 'certificate']]]);
+    $customer = TestActors::customer();
+
+    $program = $this->actingAs($tutor)->postJson('/api/v1/programs', [
+        'customer_id' => $customer->id,
+        'title' => 'Demo lessons',
+        'delivery_mode' => 'online',
+        'agreed_fee_minor' => 200000,
+        'fee_unit' => 'session',
+    ])->assertCreated();
+    $programId = $program->json('data.id');
+
+    $invitation = sendInvitationRequest($this, $tutor, $programId, ['expected_version' => 1], (string) Str::uuid())
+        ->assertCreated()->assertJsonPath('data.status', 'pending');
+    $invitationId = $invitation->json('data.id');
+    $this->assertDatabaseHas('notification_outbox', ['user_id' => $customer->id, 'type' => 'invitation_received']);
+
+    $this->actingAs($customer)->post("/api/v1/invitations/{$invitationId}/accept", [], [
+        'Accept' => 'application/json',
+        'Idempotency-Key' => (string) Str::uuid(),
+    ])->assertOk()->assertJsonPath('data.program.status', 'active');
+
+    $this->assertDatabaseHas('program_invitations', ['id' => $invitationId, 'status' => 'accepted']);
+    $this->assertDatabaseHas('programs', ['id' => $programId, 'status' => 'active']);
+    $this->assertDatabaseHas('program_members', ['program_id' => $programId, 'user_id' => $customer->id, 'member_role' => 'customer']);
+    $this->assertDatabaseHas('program_members', ['program_id' => $programId, 'user_id' => $tutor->id, 'member_role' => 'tutor']);
+});
+
 function sendInvitationRequest(TestCase $testCase, User $actor, int $programId, array $payload, string $key): TestResponse
 {
     $testCase->actingAs($actor, 'web');

@@ -42,6 +42,7 @@ test('text send preserves spaces and only normalizes newlines with the session s
         'client_message_id',
         'message_type',
         'body',
+        'attachments',
         'created_at',
     ]);
 });

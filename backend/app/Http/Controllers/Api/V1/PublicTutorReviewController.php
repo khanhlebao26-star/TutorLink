@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\TutorProfile;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -23,23 +24,7 @@ class PublicTutorReviewController extends Controller
             ->visiblePublic()
             ->firstOrFail();
 
-        // Historical membership remains valid after a customer leaves the Program.
-        $visible = DB::table('reviews')
-            ->join('programs', 'programs.id', '=', 'reviews.program_id')
-            ->join('users as authors', 'authors.id', '=', 'reviews.customer_id')
-            ->where('reviews.visibility', 'visible')
-            ->where('reviews.tutor_profile_id', $profile->id)
-            ->whereColumn('programs.owner_tutor_profile_id', 'reviews.tutor_profile_id')
-            ->where('programs.status', 'completed')
-            ->whereBetween('reviews.rating', [1, 5])
-            ->where('authors.role', 'customer')
-            ->whereNull('authors.deleted_at')
-            ->whereExists(function ($members): void {
-                $members->selectRaw('1')->from('program_members')
-                    ->whereColumn('program_members.program_id', 'reviews.program_id')
-                    ->whereColumn('program_members.user_id', 'reviews.customer_id')
-                    ->where('program_members.member_role', 'customer');
-            });
+        $visible = self::visibleReviews([$profile->id]);
 
         $ratings = (clone $visible)->selectRaw('reviews.rating, COUNT(*) AS total')
             ->groupBy('reviews.rating')->pluck('total', 'rating');
@@ -80,5 +65,28 @@ class PublicTutorReviewController extends Controller
                 'histogram' => (object) $histogram,
             ],
         ]);
+    }
+
+    /** @param list<int> $profileIds */
+    public static function visibleReviews(array $profileIds): Builder
+    {
+        // Historical membership remains valid after a customer leaves the Program.
+        return DB::table('reviews')
+            ->join('programs', 'programs.id', '=', 'reviews.program_id')
+            ->join('users as authors', 'authors.id', '=', 'reviews.customer_id')
+            ->where('reviews.visibility', 'visible')
+            ->whereIn('reviews.tutor_profile_id', $profileIds)
+            ->whereColumn('programs.owner_tutor_profile_id', 'reviews.tutor_profile_id')
+            ->where('programs.status', 'completed')
+            ->whereBetween('reviews.rating', [1, 5])
+            ->where('authors.role', 'customer')
+            ->whereNull('authors.deleted_at')
+            ->whereExists(function ($members): void {
+                $members->selectRaw('1')->from('program_members')
+                    ->whereColumn('program_members.program_id', 'reviews.program_id')
+                    ->whereColumn('program_members.user_id', 'reviews.customer_id')
+                    ->where('program_members.member_role', 'customer');
+            });
+
     }
 }

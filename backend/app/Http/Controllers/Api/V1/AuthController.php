@@ -135,14 +135,13 @@ class AuthController extends Controller
 
     public function resendVerification(Request $request): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->user();
-
-        if (! $user->hasVerifiedEmail()) {
+        $data = $request->validate(['email' => [$request->user() ? 'sometimes' : 'required', 'email', 'max:255']]);
+        $user = $request->user() ?? User::where('email', $data['email'])->first();
+        if ($user && $user->status === 'active' && $user->suspended_at === null && ! $user->hasVerifiedEmail()) {
             $user->sendEmailVerificationNotification();
         }
 
-        return response()->json(['message' => 'Verification notification sent.']);
+        return response()->json(['message' => 'If the account is eligible, a verification link has been sent.']);
     }
 
     public function updatePassword(

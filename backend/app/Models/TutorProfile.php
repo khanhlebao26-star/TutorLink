@@ -48,9 +48,15 @@ class TutorProfile extends Model
     {
         $document = "SELECT 1 FROM verification_documents d JOIN files f ON f.id = d.file_id WHERE d.tutor_profile_id = tutor_profiles.id AND d.status = 'approved' AND (d.expires_at IS NULL OR d.expires_at > ?) AND f.owner_id = tutor_profiles.user_id AND f.purpose = 'verification_document' AND f.scan_status = 'clean' AND f.visibility = 'private'";
 
-        return $query->where('tutor_profiles.status', 'approved')
+        $query->where('tutor_profiles.status', 'approved')
             ->whereNull('tutor_profiles.suspended_at')
-            ->whereHas('user', fn (Builder $user) => $user->where('role', 'tutor')->where('status', 'active')->whereNull('suspended_at')->whereNotNull('email_verified_at'))
+            ->whereHas('user', fn (Builder $user) => $user->where('role', 'tutor')->where('status', 'active')->whereNull('suspended_at')->whereNotNull('email_verified_at'));
+
+        if (! config('tutor.verification_documents_required', true)) {
+            return $query;
+        }
+
+        return $query
             ->whereRaw("EXISTS ({$document} AND d.document_type IN ('identity_card', 'passport'))", [now('UTC')])
             ->whereRaw("NOT EXISTS (SELECT 1 FROM jsonb_array_elements(COALESCE(tutor_profiles.qualification_claims, '[]'::jsonb)) claim WHERE COALESCE(claim->>'type', '') NOT IN ('degree', 'certificate') OR NOT EXISTS ({$document} AND d.document_type = claim->>'type'))", [now('UTC')]);
     }

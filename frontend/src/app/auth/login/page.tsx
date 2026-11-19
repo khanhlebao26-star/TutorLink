@@ -1,9 +1,16 @@
+import { AuthForm } from "@/components/auth/auth-form";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { AppShell } from "@/components/layout/app-shell";
+import { safeLoginReturnTo } from "@/lib/auth-navigation";
 import Link from "next/link";
-import { AppShell } from "@/components/app-shell";
-import { AuthForm } from "@/components/auth-form";
-import { AuthLayout } from "@/components/auth-layout";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  const returnTo = safeLoginReturnTo((await searchParams).next);
+
   return (
     <AppShell title="Đăng nhập" mode="auth">
       <AuthLayout
@@ -12,10 +19,17 @@ export default function LoginPage() {
         illustration="student-man"
         tagline={"Cùng bạn\nphát triển\nmỗi ngày"}
       >
-        <AuthForm mode="login" />
+        <AuthForm mode="login" returnTo={returnTo} />
         <p className="auth-signup-prompt">
           Chưa có tài khoản? <Link href="/auth/register">Đăng ký ngay</Link>
         </p>
+        <aside className="auth-login-verification-note" aria-label="Hướng dẫn xác thực email">
+          <span className="auth-login-verification-icon" aria-hidden="true" />
+          <div>
+            <strong>Vui lòng xác thực email</strong>
+            <p>Sau khi đăng ký, chúng tôi sẽ gửi một email xác thực đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư và làm theo hướng dẫn để hoàn tất tài khoản.</p>
+          </div>
+        </aside>
       </AuthLayout>
     </AppShell>
   );

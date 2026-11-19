@@ -15,6 +15,7 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing" force="true"/>
+        <env name="ADMIN_PANEL_ENABLED" value="false" force="true"/>
         <env name="APP_DEBUG" value="false" force="true"/>
         <env name="APP_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" force="true"/>
         <env name="FRONTEND_URL" value="http://localhost:3000" force="true"/>

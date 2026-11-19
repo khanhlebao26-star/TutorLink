@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "Two-way chat in independent conversation",
+      "status": "PASS",
+      "detail": "conversation #2 contains both messages; conversation #1 untouched"
+    }
+  ],
+  "conversation_id": 2,
+  "senders": [
+    8,
+    1
+  ]
+}

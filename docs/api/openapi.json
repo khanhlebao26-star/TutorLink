@@ -23,51 +23,6 @@
                 "tags": [
                     "Admin"
                 ],
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 50
-                        }
-                    },
-                    {
-                        "name": "sort",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "submitted_desc",
-                                "id_desc"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "status",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "default": "submitted"
-                        }
-                    },
-                    {
-                        "name": "scope",
-                        "in": "query",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "List assigned profiles, or minimal assignment queue metadata for coordinators.",
@@ -110,9 +65,6 @@
                                 }
                             }
                         }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
@@ -3548,37 +3500,6 @@
                 "tags": [
                     "AuditLog"
                 ],
-                "parameters": [
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 50
-                        }
-                    },
-                    {
-                        "name": "resource_type",
-                        "in": "query",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "report",
-                                "tutor_profile",
-                                "review"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "resource_id",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Authorized result.",
@@ -3685,36 +3606,6 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Authorization, scope, state or validation failure.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "request_id": {
-                                            "type": "string"
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "required": [
-                                        "code",
-                                        "message",
-                                        "request_id",
-                                        "errors"
-                                    ]
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Authorization, scope, state or validation failure.",
                         "content": {
@@ -3806,6 +3697,36 @@
                         }
                     },
                     "409": {
+                        "description": "Authorization, scope, state or validation failure.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
                         "description": "Authorization, scope, state or validation failure.",
                         "content": {
                             "application/json": {
@@ -4387,6 +4308,59 @@
                 "security": []
             }
         },
+        "/auth/email/verification-notification": {
+            "post": {
+                "operationId": "verification.send",
+                "tags": [
+                    "Auth"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "required": [
+                                    "email"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "const": "If the account is eligible, a verification link has been sent."
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
         "/auth/logout": {
             "post": {
                 "operationId": "auth.logout",
@@ -4401,38 +4375,6 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {}
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    }
-                }
-            }
-        },
-        "/auth/email/verification-notification": {
-            "post": {
-                "operationId": "verification.send",
-                "tags": [
-                    "Auth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "const": "Verification notification sent."
-                                        }
-                                    },
-                                    "required": [
-                                        "message"
-                                    ]
                                 }
                             }
                         }
@@ -5165,6 +5107,74 @@
                 }
             }
         },
+        "/conversations/unread-count": {
+            "get": {
+                "operationId": "conversation.unreadCount",
+                "tags": [
+                    "Conversation"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "count": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "count"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "data"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "count": {
+                                                            "type": "integer",
+                                                            "const": 0
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "count"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "data"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/conversations/{conversation}": {
             "get": {
                 "operationId": "conversations.show",
@@ -5611,7 +5621,7 @@
             },
             "post": {
                 "operationId": "conversations.messages.store",
-                "summary": "Send a new text message or replay the current sender's idempotency key",
+                "summary": "Send a text or file attachment message, or replay the sender's idempotency key",
                 "tags": [
                     "Conversation"
                 ],
@@ -5707,7 +5717,7 @@
                         }
                     },
                     "201": {
-                        "description": "New text message persisted atomically.",
+                        "description": "New text or attachment message persisted atomically.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -6395,6 +6405,440 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/me/learning-profile": {
+            "get": {
+                "operationId": "customerLearningProfile.show",
+                "tags": [
+                    "CustomerLearningProfile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "subjects_of_interest": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "learning_level": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "learning_goals": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "preferred_schedule": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "preferred_mode": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "city": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "subjects_of_interest",
+                                                "learning_level",
+                                                "learning_goals",
+                                                "preferred_schedule",
+                                                "preferred_mode",
+                                                "city",
+                                                "district"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "operationId": "customerLearningProfile.update",
+                "tags": [
+                    "CustomerLearningProfile"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "subjects_of_interest": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 500
+                                    },
+                                    "learning_level": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 120
+                                    },
+                                    "learning_goals": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 2000
+                                    },
+                                    "preferred_schedule": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 500
+                                    },
+                                    "preferred_mode": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "enum": [
+                                            "online",
+                                            "offline",
+                                            "either",
+                                            null
+                                        ]
+                                    },
+                                    "city": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 120
+                                    },
+                                    "district": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 120
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "subjects_of_interest": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "learning_level": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "learning_goals": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "preferred_schedule": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "preferred_mode": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "city": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "district": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "subjects_of_interest",
+                                                "learning_level",
+                                                "learning_goals",
+                                                "preferred_schedule",
+                                                "preferred_mode",
+                                                "city",
+                                                "district"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/me/favorites": {
+            "get": {
+                "operationId": "favorites.index",
+                "tags": [
+                    "Favorite"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/TutorProfile"
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/me/favorites/{slug}": {
+            "post": {
+                "operationId": "favorites.store",
+                "tags": [
+                    "Favorite"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "is_favorite": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "slug",
+                                                "is_favorite"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "favorites.destroy",
+                "tags": [
+                    "Favorite"
+                ],
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "slug": {
+                                                    "type": "string"
+                                                },
+                                                "is_favorite": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "required": [
+                                                "slug",
+                                                "is_favorite"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -11081,6 +11525,14 @@
                             "minimum": 1,
                             "maximum": 50
                         }
+                    },
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "description": "Optional tutor_card: compact public headline, experience and visible review aggregate for each listing.",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -11635,6 +12087,315 @@
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
+                    }
+                }
+            }
+        },
+        "/notifications": {
+            "get": {
+                "operationId": "notification.index",
+                "tags": [
+                    "Notification"
+                ],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 50
+                        }
+                    },
+                    {
+                        "name": "unread",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "0",
+                                "1"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "type": {
+                                                        "type": "string"
+                                                    },
+                                                    "read_at": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "deep_link": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "type",
+                                                    "read_at",
+                                                    "created_at",
+                                                    "deep_link"
+                                                ]
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "last_page",
+                                                "total",
+                                                "per_page"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/notifications/unread-count": {
+            "get": {
+                "operationId": "notification.unreadCount",
+                "tags": [
+                    "Notification"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "count": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "count"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/notifications/{notification}/read": {
+            "patch": {
+                "operationId": "notification.read",
+                "tags": [
+                    "Notification"
+                ],
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "read_at": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "read_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            }
+        },
+        "/notifications/{notification}": {
+            "delete": {
+                "operationId": "notification.destroy",
+                "tags": [
+                    "Notification"
+                ],
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content",
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    }
+                }
+            }
+        },
+        "/notifications/read-all": {
+            "post": {
+                "operationId": "notification.readAll",
+                "tags": [
+                    "Notification"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "updated_count": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "updated_count"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "Cache-Control": {
+                                "schema": {
+                                    "type": "string",
+                                    "const": "private, no-store"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -13494,6 +14255,9 @@
                                                         }
                                                     ]
                                                 },
+                                                "completed_session_count": {
+                                                    "type": "integer"
+                                                },
                                                 "task_counts": {
                                                     "type": "object",
                                                     "properties": {
@@ -13716,6 +14480,7 @@
                                             },
                                             "required": [
                                                 "next_session",
+                                                "completed_session_count",
                                                 "task_counts",
                                                 "latest_progress",
                                                 "latest_announcement",
@@ -14874,6 +15639,112 @@
                 }
             }
         },
+        "/tutors": {
+            "get": {
+                "operationId": "publicTutor.index",
+                "summary": "Search visible public tutor profiles for report target selection",
+                "tags": [
+                    "PublicTutor"
+                ],
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 120
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "headline": {
+                                                        "type": "string"
+                                                    },
+                                                    "specializations": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "name",
+                                                    "headline",
+                                                    "specializations"
+                                                ]
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "per_page",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
         "/tutors/{slug}": {
             "get": {
                 "operationId": "publicTutor.show",
@@ -14915,6 +15786,9 @@
                                                         "string",
                                                         "null"
                                                     ]
+                                                },
+                                                "messaging_user_id": {
+                                                    "type": "integer"
                                                 },
                                                 "name": {
                                                     "type": "string"
@@ -15080,6 +15954,7 @@
                                             },
                                             "required": [
                                                 "slug",
+                                                "messaging_user_id",
                                                 "name",
                                                 "headline",
                                                 "bio",
@@ -15238,6 +16113,699 @@
                     }
                 },
                 "security": []
+            }
+        },
+        "/programs/{program}/quizzes": {
+            "get": {
+                "operationId": "quiz.index",
+                "tags": [
+                    "Quiz"
+                ],
+                "parameters": [
+                    {
+                        "name": "program",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 50
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "program_id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "due_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "question_count": {
+                                                        "type": "integer"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "attempt_count": {
+                                                        "type": "integer"
+                                                    },
+                                                    "attempt": {
+                                                        "type": [
+                                                            "object",
+                                                            "null"
+                                                        ],
+                                                        "properties": {
+                                                            "score": {
+                                                                "type": "integer"
+                                                            },
+                                                            "question_count": {
+                                                                "type": "integer"
+                                                            },
+                                                            "submitted_at": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "score",
+                                                            "question_count",
+                                                            "submitted_at"
+                                                        ]
+                                                    }
+                                                },
+                                                "required": [
+                                                    "id",
+                                                    "program_id",
+                                                    "title",
+                                                    "description",
+                                                    "due_at",
+                                                    "question_count",
+                                                    "created_at",
+                                                    "attempt_count",
+                                                    "attempt"
+                                                ]
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "last_page",
+                                                "per_page",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            },
+            "post": {
+                "operationId": "quiz.store",
+                "tags": [
+                    "Quiz"
+                ],
+                "parameters": [
+                    {
+                        "name": "program",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 180
+                                    },
+                                    "description": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "maxLength": 10000
+                                    },
+                                    "due_at": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ],
+                                        "format": "date-time"
+                                    },
+                                    "questions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "prompt": {
+                                                    "type": "string",
+                                                    "maxLength": 2000
+                                                },
+                                                "options": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "maxLength": 300
+                                                    },
+                                                    "minItems": 2,
+                                                    "maxItems": 5,
+                                                    "uniqueItems": true
+                                                },
+                                                "correct_option": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "maximum": 4
+                                                }
+                                            },
+                                            "required": [
+                                                "prompt",
+                                                "options",
+                                                "correct_option"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 50
+                                    }
+                                },
+                                "required": [
+                                    "title",
+                                    "questions"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "program_id": {
+                                                    "type": "integer"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string"
+                                                },
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "position": {
+                                                                "type": "integer"
+                                                            },
+                                                            "prompt": {
+                                                                "type": "string"
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            },
+                                                            "correct_option": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "position",
+                                                            "prompt",
+                                                            "options",
+                                                            "correct_option"
+                                                        ]
+                                                    }
+                                                },
+                                                "attempt": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "score": {
+                                                            "type": "integer"
+                                                        },
+                                                        "question_count": {
+                                                            "type": "integer"
+                                                        },
+                                                        "submitted_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "results": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "question_id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "selected_option": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "correct_option": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "is_correct": {
+                                                                        "type": "boolean"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "question_id",
+                                                                    "selected_option",
+                                                                    "correct_option",
+                                                                    "is_correct"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "score",
+                                                        "question_count",
+                                                        "submitted_at",
+                                                        "results"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "program_id",
+                                                "title",
+                                                "description",
+                                                "due_at",
+                                                "created_at",
+                                                "questions",
+                                                "attempt"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
+            }
+        },
+        "/quizzes/{quiz}": {
+            "get": {
+                "operationId": "quiz.show",
+                "tags": [
+                    "Quiz"
+                ],
+                "parameters": [
+                    {
+                        "name": "quiz",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "program_id": {
+                                                    "type": "integer"
+                                                },
+                                                "title": {
+                                                    "type": "string"
+                                                },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "due_at": {
+                                                    "type": "string"
+                                                },
+                                                "created_at": {
+                                                    "type": "string"
+                                                },
+                                                "questions": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "position": {
+                                                                "type": "integer"
+                                                            },
+                                                            "prompt": {
+                                                                "type": "string"
+                                                            },
+                                                            "options": {
+                                                                "type": "array",
+                                                                "items": {}
+                                                            },
+                                                            "correct_option": {
+                                                                "type": "integer"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "position",
+                                                            "prompt",
+                                                            "options",
+                                                            "correct_option"
+                                                        ]
+                                                    }
+                                                },
+                                                "attempt": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "score": {
+                                                            "type": "integer"
+                                                        },
+                                                        "question_count": {
+                                                            "type": "integer"
+                                                        },
+                                                        "submitted_at": {
+                                                            "type": "string"
+                                                        },
+                                                        "results": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "question_id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "selected_option": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "correct_option": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "is_correct": {
+                                                                        "type": "boolean"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "question_id",
+                                                                    "selected_option",
+                                                                    "correct_option",
+                                                                    "is_correct"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "score",
+                                                        "question_count",
+                                                        "submitted_at",
+                                                        "results"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "id",
+                                                "program_id",
+                                                "title",
+                                                "description",
+                                                "due_at",
+                                                "created_at",
+                                                "questions",
+                                                "attempt"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/quizzes/{quiz}/attempts": {
+            "post": {
+                "operationId": "quiz.submit",
+                "tags": [
+                    "Quiz"
+                ],
+                "parameters": [
+                    {
+                        "name": "quiz",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "answers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "question_id": {
+                                                    "type": "integer"
+                                                },
+                                                "option_index": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "maximum": 4
+                                                }
+                                            },
+                                            "required": [
+                                                "question_id",
+                                                "option_index"
+                                            ]
+                                        },
+                                        "minItems": 1,
+                                        "maxItems": 50,
+                                        "uniqueItems": true
+                                    }
+                                },
+                                "required": [
+                                    "answers"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "score": {
+                                                    "type": "integer",
+                                                    "const": 0
+                                                },
+                                                "question_count": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "results": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "question_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "selected_option": {
+                                                                "type": "integer"
+                                                            },
+                                                            "correct_option": {
+                                                                "type": "integer"
+                                                            },
+                                                            "is_correct": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "question_id",
+                                                            "selected_option",
+                                                            "correct_option",
+                                                            "is_correct"
+                                                        ]
+                                                    }
+                                                },
+                                                "submitted_at": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "score",
+                                                "question_count",
+                                                "results",
+                                                "submitted_at"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Error overview.",
+                                            "examples": [
+                                                ""
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "message"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "An error\n\nAn error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "description": "Error overview.",
+                                                    "examples": [
+                                                        "Ch\u01b0\u01a1ng tr\u00ecnh kh\u00f4ng c\u00f2n ho\u1ea1t \u0111\u1ed9ng."
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "message"
+                                            ]
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "description": "Error overview.",
+                                                    "examples": [
+                                                        "\u0110\u00e3 qu\u00e1 h\u1ea1n l\u00e0m b\u00e0i ki\u1ec3m tra."
+                                                    ]
+                                                }
+                                            },
+                                            "required": [
+                                                "message"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                }
             }
         },
         "/me/reports": {
@@ -15764,29 +17332,6 @@
                 "tags": [
                     "Report"
                 ],
-                "parameters": [
-                    {
-                        "name": "scope",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "unassigned",
-                                "all"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "per_page",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "minimum": 1,
-                            "maximum": 50
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Authorized result.",
@@ -15847,36 +17392,6 @@
                                     "required": [
                                         "data",
                                         "meta"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Authorization, scope, state or validation failure.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "request_id": {
-                                            "type": "string"
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "required": [
-                                        "code",
-                                        "message",
-                                        "request_id",
-                                        "errors"
                                     ]
                                 }
                             }
@@ -15973,6 +17488,36 @@
                         }
                     },
                     "409": {
+                        "description": "Authorization, scope, state or validation failure.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
                         "description": "Authorization, scope, state or validation failure.",
                         "content": {
                             "application/json": {
@@ -16331,14 +17876,6 @@
                                     ]
                                 }
                             }
-                        },
-                        "headers": {
-                            "Cache-Control": {
-                                "schema": {
-                                    "type": "string",
-                                    "const": "private, no-store"
-                                }
-                            }
                         }
                     },
                     "401": {
@@ -16525,6 +18062,7 @@
                                         "enum": [
                                             "tutor_profile",
                                             "listing",
+                                            "system",
                                             "message",
                                             "program",
                                             "review"
@@ -16544,6 +18082,10 @@
                                             "fraud_suspected",
                                             "misleading_information",
                                             "privacy_violation",
+                                            "bug_report",
+                                            "feature_request",
+                                            "performance_issue",
+                                            "usability_issue",
                                             "other"
                                         ]
                                     },
@@ -16554,11 +18096,19 @@
                                         ],
                                         "pattern": "\\S",
                                         "maxLength": 2000
+                                    },
+                                    "file_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "minimum": 1
+                                        },
+                                        "maxItems": 3,
+                                        "uniqueItems": true
                                     }
                                 },
                                 "required": [
                                     "resource_type",
-                                    "resource_id",
                                     "reason_code"
                                 ]
                             }
@@ -20549,11 +22099,27 @@
                             "type": "integer",
                             "default": 20
                         }
+                    },
+                    {
+                        "name": "filter",
+                        "in": "query",
+                        "description": "Optional workspace filter: all (non-cancelled), grading, not-submitted, completed.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Optional ordering: due (null deadlines last) or newest. Default ascending id.",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Tasks ordered by ascending id for the visible Program.",
+                        "description": "Paginated Tasks; default ascending id, optional workspace filters and sorting.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -20638,13 +22204,41 @@
                                                 },
                                                 "last_page": {
                                                     "type": "integer"
+                                                },
+                                                "status_counts": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "todo": {
+                                                            "type": "integer"
+                                                        },
+                                                        "in_progress": {
+                                                            "type": "integer"
+                                                        },
+                                                        "submitted": {
+                                                            "type": "integer"
+                                                        },
+                                                        "completed": {
+                                                            "type": "integer"
+                                                        },
+                                                        "cancelled": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "todo",
+                                                        "in_progress",
+                                                        "submitted",
+                                                        "completed",
+                                                        "cancelled"
+                                                    ]
                                                 }
                                             },
                                             "required": [
                                                 "current_page",
                                                 "per_page",
                                                 "total",
-                                                "last_page"
+                                                "last_page",
+                                                "status_counts"
                                             ]
                                         }
                                     },
@@ -20658,6 +22252,41 @@
                     },
                     "404": {
                         "description": "Program does not exist or is outside the actor scope.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Pagination query is invalid.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -20728,41 +22357,6 @@
                     },
                     "403": {
                         "description": "The actor account is inactive.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "code": {
-                                            "type": "string"
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "request_id": {
-                                            "type": "string"
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "required": [
-                                        "code",
-                                        "message",
-                                        "request_id"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Pagination query is invalid.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -24249,11 +25843,23 @@
                             },
                             "display_name": {
                                 "type": "string"
+                            },
+                            "tutor_slug": {
+                                "type": "string"
+                            },
+                            "tutor_headline": {
+                                "type": "string"
+                            },
+                            "tutor_specializations": {
+                                "type": "string"
                             }
                         },
                         "required": [
                             "id",
-                            "display_name"
+                            "display_name",
+                            "tutor_slug",
+                            "tutor_headline",
+                            "tutor_specializations"
                         ]
                     },
                     "unread_count": {
@@ -24633,6 +26239,36 @@
                             "null"
                         ],
                         "format": "date-time"
+                    },
+                    "subjects_of_interest": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "learning_level": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "learning_goals": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "preferred_schedule": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "preferred_mode": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
                     }
                 },
                 "required": [
@@ -24643,7 +26279,12 @@
                     "district",
                     "bio",
                     "created_at",
-                    "updated_at"
+                    "updated_at",
+                    "subjects_of_interest",
+                    "learning_level",
+                    "learning_goals",
+                    "preferred_schedule",
+                    "preferred_mode"
                 ],
                 "title": "CustomerProfile"
             },
@@ -24749,7 +26390,7 @@
                         "type": "string",
                         "format": "binary",
                         "contentMediaType": "application/octet-stream",
-                        "description": "Non-empty file, maximum 5,000,000 bytes (5 MB decimal), for every supported purpose.\nAvatar: JPG/JPEG/PNG; documents: PDF/JPG/JPEG/PNG/DOC/DOCX.\nUpload creates a pending file; complete performs technical validation, not an antivirus scan."
+                        "description": "Non-empty file, maximum 5,000,000 bytes (5 MB decimal), for every supported purpose.\nAvatar and report evidence: JPG/JPEG/PNG; documents: PDF/JPG/JPEG/PNG/DOC/DOCX.\nUpload creates a pending file; complete performs technical validation, not an antivirus scan."
                     },
                     "purpose": {
                         "type": "string",
@@ -24758,7 +26399,9 @@
                             "verification_document",
                             "task_attachment",
                             "profile_document",
-                            "announcement_attachment"
+                            "message_attachment",
+                            "announcement_attachment",
+                            "report_evidence"
                         ]
                     }
                 },
@@ -25083,6 +26726,35 @@
                     "id": {
                         "type": "integer"
                     },
+                    "tutor_card": {
+                        "type": "object",
+                        "properties": {
+                            "headline": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ]
+                            },
+                            "experience_years": {
+                                "type": "integer"
+                            },
+                            "rating_count": {
+                                "type": "integer"
+                            },
+                            "rating_average": {
+                                "type": [
+                                    "number",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "headline",
+                            "experience_years",
+                            "rating_count",
+                            "rating_average"
+                        ]
+                    },
                     "tutor_profile_id": {
                         "type": "integer"
                     },
@@ -25286,6 +26958,35 @@
                             "null"
                         ]
                     },
+                    "attachments": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "mime_type": {
+                                    "type": "string"
+                                },
+                                "size_bytes": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "mime_type",
+                                "size_bytes"
+                            ]
+                        }
+                    },
                     "created_at": {
                         "type": "string"
                     }
@@ -25297,6 +26998,7 @@
                     "client_message_id",
                     "message_type",
                     "body",
+                    "attachments",
                     "created_at"
                 ],
                 "title": "MessageResource"
@@ -25488,6 +27190,9 @@
                             "null"
                         ]
                     },
+                    "messaging_user_id": {
+                        "type": "integer"
+                    },
                     "name": {
                         "type": "string"
                     },
@@ -25506,13 +27211,57 @@
                     "specializations": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "slug": {
+                                    "type": "string"
+                                },
+                                "subcategory": {
+                                    "type": "string"
+                                },
+                                "category": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "name",
+                                "slug",
+                                "subcategory",
+                                "category"
+                            ]
                         }
                     },
                     "availability_rules": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                                "weekday": {
+                                    "type": "integer"
+                                },
+                                "start_time": {
+                                    "type": "string"
+                                },
+                                "end_time": {
+                                    "type": "string"
+                                },
+                                "timezone": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "weekday",
+                                "start_time",
+                                "end_time",
+                                "timezone"
+                            ]
                         }
                     },
                     "avatar": {
@@ -25521,7 +27270,53 @@
                     "listings": {
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "type": "object",
+                            "properties": {
+                                "slug": {
+                                    "type": "string"
+                                },
+                                "title": {
+                                    "type": "string"
+                                },
+                                "delivery_mode": {
+                                    "type": "string"
+                                },
+                                "city": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "district": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                },
+                                "price_from_minor": {
+                                    "type": "integer"
+                                },
+                                "currency": {
+                                    "type": "string"
+                                },
+                                "price_unit": {
+                                    "type": "string"
+                                },
+                                "specialization_name": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "slug",
+                                "title",
+                                "delivery_mode",
+                                "city",
+                                "district",
+                                "price_from_minor",
+                                "currency",
+                                "price_unit",
+                                "specialization_name"
+                            ]
                         }
                     },
                     "listings_meta": {
@@ -25530,6 +27325,7 @@
                 },
                 "required": [
                     "slug",
+                    "messaging_user_id",
                     "name",
                     "headline",
                     "bio",
@@ -25680,28 +27476,31 @@
                     "message_type": {
                         "type": "string",
                         "enum": [
-                            "text"
+                            "text",
+                            "file"
                         ]
                     },
                     "body": {
-                        "type": "string",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
                         "pattern": "[^\\s\\p{Z}]",
                         "maxLength": 4000
                     },
                     "file_ids": {
                         "type": "array",
-                        "description": "Optional empty JSON array only. Objects (including {}), null, scalar values and non-empty arrays are rejected. Chat attachments are disabled.",
                         "items": {
-                            "type": "string"
+                            "type": "integer",
+                            "minimum": 1
                         },
-                        "minItems": 0,
-                        "maxItems": 0
+                        "maxItems": 5,
+                        "uniqueItems": true
                     }
                 },
                 "required": [
                     "client_message_id",
-                    "message_type",
-                    "body"
+                    "message_type"
                 ],
                 "title": "SendTextMessageRequest"
             },
@@ -25951,6 +27750,158 @@
                 ],
                 "title": "StoreProgressRecordRequest"
             },
+            "TutorProfile": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "headline": {
+                        "type": "string"
+                    },
+                    "bio": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "experience_years": {
+                        "type": "integer"
+                    },
+                    "approval_status": {
+                        "type": "string"
+                    },
+                    "submitted_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "reviewed_by": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "reviewed_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "review_reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "suspended_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "suspension_reason": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "avatar_file_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "public_slug": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "assigned_admin_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "assigned_by": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "assigned_at": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "date-time"
+                    },
+                    "assignment_version": {
+                        "type": "integer"
+                    },
+                    "status_before_suspension": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "qualification_claims": {
+                        "type": "array",
+                        "items": {}
+                    }
+                },
+                "required": [
+                    "id",
+                    "user_id",
+                    "headline",
+                    "bio",
+                    "experience_years",
+                    "approval_status",
+                    "submitted_at",
+                    "reviewed_by",
+                    "reviewed_at",
+                    "created_at",
+                    "updated_at",
+                    "review_reason",
+                    "suspended_at",
+                    "suspension_reason",
+                    "avatar_file_id",
+                    "public_slug",
+                    "status",
+                    "assigned_admin_id",
+                    "assigned_by",
+                    "assigned_at",
+                    "assignment_version",
+                    "status_before_suspension",
+                    "qualification_claims"
+                ],
+                "title": "TutorProfile"
+            },
             "TutorProfileDecisionRequest": {
                 "type": "object",
                 "properties": {
@@ -26056,6 +28007,43 @@
                             "integer",
                             "null"
                         ]
+                    },
+                    "verification_documents": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "integer"
+                                },
+                                "file_id": {
+                                    "type": "integer"
+                                },
+                                "tutor_profile_id": {
+                                    "type": "integer"
+                                },
+                                "document_type": {
+                                    "type": "string"
+                                },
+                                "status": {
+                                    "type": "string"
+                                },
+                                "expires_at": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "id",
+                                "file_id",
+                                "tutor_profile_id",
+                                "document_type",
+                                "status",
+                                "expires_at"
+                            ]
+                        }
                     },
                     "qualification_claims": {
                         "type": "array",
@@ -26614,25 +28602,6 @@
             }
         },
         "responses": {
-            "ModelNotFoundException": {
-                "description": "Not found",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "description": "Error overview."
-                                }
-                            },
-                            "required": [
-                                "message"
-                            ]
-                        }
-                    }
-                }
-            },
             "ValidationException": {
                 "description": "Validation error",
                 "content": {
@@ -26658,6 +28627,25 @@
                             "required": [
                                 "message",
                                 "errors"
+                            ]
+                        }
+                    }
+                }
+            },
+            "ModelNotFoundException": {
+                "description": "Not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": [
+                                "message"
                             ]
                         }
                     }

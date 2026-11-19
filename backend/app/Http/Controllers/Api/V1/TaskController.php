@@ -27,23 +27,48 @@ class TaskController extends Controller
 
     private const FEEDBACK_TYPE = 'array{id:int,task_id:int,submission_version:int,version:int,status:string,feedback:string|null,reviewed_by:int|null,reviewed_at:string|null}';
 
-    #[OpenApiResponse(200, description: 'Tasks ordered by ascending id for the visible Program.', type: 'array{data:list<'.self::TASK_TYPE.'>,meta:array{current_page:int,per_page:int,total:int,last_page:int}}')]
+    #[OpenApiResponse(200, description: 'Paginated Tasks; default ascending id, optional workspace filters and sorting.', type: 'array{data:list<'.self::TASK_TYPE.'>,meta:array{current_page:int,per_page:int,total:int,last_page:int,status_counts:array{todo:int,in_progress:int,submitted:int,completed:int,cancelled:int}}}')]
     #[OpenApiResponse(401, description: 'Authentication is required.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(403, description: 'The actor account is inactive.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(404, description: 'Program does not exist or is outside the actor scope.', type: self::ERROR_RESPONSE_TYPE)]
     #[OpenApiResponse(422, description: 'Pagination query is invalid.', type: self::ERROR_RESPONSE_TYPE)]
     #[QueryParameter('page', 'One-based page number.', type: 'integer', default: 1)]
     #[QueryParameter('per_page', 'Page size: 1–50.', type: 'integer', default: 20)]
+    #[QueryParameter('filter', 'Optional workspace filter: all (non-cancelled), grading, not-submitted, completed.', type: 'string')]
+    #[QueryParameter('sort', 'Optional ordering: due (null deadlines last) or newest. Default ascending id.', type: 'string')]
     public function index(Request $request, int $program): JsonResponse
     {
         $page = $this->pagination($request);
         $record = DB::table('programs')->find($program);
         abort_unless($record && $this->role($record, $request), 404);
 
-        $tasks = DB::table('tasks')->where('program_id', $program)
-            ->orderBy('id')->paginate($page['per_page'], ['*'], 'page', $page['page']);
+        $filters = $request->validate([
+            'filter' => 'sometimes|in:all,grading,not-submitted,completed',
+            'sort' => 'sometimes|in:due,newest',
+        ]);
+        $query = DB::table('tasks')->where('program_id', $program);
+        $counts = (clone $query)->selectRaw('status, count(*) AS total')->groupBy('status')->pluck('total', 'status');
+        if (isset($filters['filter'])) {
+            $query->whereIn('status', match ($filters['filter']) {
+                'grading' => ['submitted'],
+                'not-submitted' => ['todo', 'in_progress'],
+                'completed' => ['completed'],
+                default => ['todo', 'in_progress', 'submitted', 'completed'],
+            });
+        }
+        match ($filters['sort'] ?? null) {
+            'due' => $query->orderByRaw('due_at ASC NULLS LAST')->orderBy('id'),
+            'newest' => $query->orderByDesc('created_at')->orderByDesc('id'),
+            default => $query->orderBy('id'),
+        };
+        $tasks = $query->paginate($page['per_page'], ['*'], 'page', $page['page']);
+        $fileIds = DB::table('file_links')->where('resource_type', 'task')
+            ->whereIn('resource_id', $tasks->getCollection()->pluck('id'))->get()->groupBy('resource_id');
+        $response = $this->paginated($tasks, fn ($task) => $this->taskData($task, ($fileIds->get($task->id) ?? collect())->pluck('file_id')->all()));
+        $response['meta']['status_counts'] = collect(['todo', 'in_progress', 'submitted', 'completed', 'cancelled'])
+            ->mapWithKeys(fn ($status) => [$status => (int) ($counts[$status] ?? 0)])->all();
 
-        return response()->json($this->paginated($tasks, fn ($task) => $this->taskData($task)));
+        return response()->json($response);
     }
 
     #[OpenApiResponse(201, description: 'Task created with version 1.', type: 'array{data:'.self::TASK_TYPE.'}')]
@@ -494,7 +519,7 @@ class TaskController extends Controller
         }
     }
 
-    private function taskData(stdClass $record): array
+    private function taskData(stdClass $record, ?array $fileIds = null): array
     {
         return [
             'id' => $record->id, 'program_id' => $record->program_id,
@@ -502,7 +527,7 @@ class TaskController extends Controller
             'due_at' => $this->rfc3339Utc($record->due_at), 'assigned_to' => $record->assigned_to,
             'status' => $record->status, 'version' => $record->version,
             'current_submission_id' => $record->current_submission_id,
-            'file_ids' => DB::table('file_links')->where('resource_type', 'task')->where('resource_id', $record->id)->pluck('file_id'),
+            'file_ids' => $fileIds ?? DB::table('file_links')->where('resource_type', 'task')->where('resource_id', $record->id)->pluck('file_id'),
         ];
     }
 

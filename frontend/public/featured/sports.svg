@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" fill="none">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="720" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#F4EDFF"/><stop offset="1" stop-color="#EBE8FF"/></linearGradient><linearGradient id="ball" x1="260" y1="75" x2="470" y2="280" gradientUnits="userSpaceOnUse"><stop stop-color="#9D72FF"/><stop offset="1" stop-color="#6538E8"/></linearGradient></defs>
+  <path fill="url(#bg)" d="M0 0h720v360H0z"/><circle cx="610" cy="68" r="112" fill="#fff" fill-opacity=".58"/><circle cx="105" cy="305" r="150" fill="#DAD0FF" fill-opacity=".62"/>
+  <circle cx="360" cy="177" r="103" fill="url(#ball)"/><path d="M360 74v206M257 177h206M287 104l146 146m0-146L287 250" stroke="#fff" stroke-opacity=".88" stroke-width="10"/><circle cx="360" cy="177" r="48" stroke="#071A4C" stroke-width="9"/><path d="M518 120c33 17 50 51 43 84-7 35-36 64-73 68l-15-24c28-10 44-31 45-53 1-23-11-42-32-55l32-20Z" fill="#fff" stroke="#071A4C" stroke-width="9" stroke-linejoin="round"/><path d="m531 93 31-26m-3 56 39-7" stroke="#FF0A99" stroke-width="10" stroke-linecap="round"/>
+</svg>

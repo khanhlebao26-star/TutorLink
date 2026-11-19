@@ -1,4 +1,4 @@
-import type { ListingQuery } from "./marketplace-types";
+import type { ListingQuery } from "@/lib/data/marketplace-types";
 
 export const listingQueryKeys = ["q", "category", "subcategory", "specialization", "delivery_mode", "city", "min_price", "max_price", "price_unit", "sort", "page", "per_page"] as const;
 export type ListingQueryKey = typeof listingQueryKeys[number];

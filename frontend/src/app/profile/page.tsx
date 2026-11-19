@@ -1,14 +1,14 @@
 "use client";
 
-import "../onboarding.css";
+import "@/styles/onboarding.css";
 
-import { useCallback } from "react";
-import { AppShell } from "@/components/app-shell";
-import { TutorOnboardingForm } from "@/components/tutor-onboarding-form";
+import { AppShell } from "@/components/layout/app-shell";
+import { ErrorActions, StatePanel } from "@/components/shared/ui";
+import { TutorOnboardingForm } from "@/components/tutors/tutor-onboarding-form";
 import { describeApiError } from "@/lib/api/client";
 import { getTutorOnboarding } from "@/lib/data/services";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import { ErrorActions, StatePanel } from "@/components/ui";
+import { useCallback } from "react";
 
 export default function ProfilePage() {
   const loadProfile = useCallback(() => getTutorOnboarding(), []);

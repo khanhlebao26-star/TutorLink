@@ -1,0 +1,1797 @@
+[
+  {
+    "name": "01 · Tutor",
+    "nodes": [
+      {
+        "id": "login",
+        "x": 80,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Đăng ký / Đăng nhập",
+        "sub": "/auth/register · /auth/login\nVai trò Tutor, đủ 18 tuổi",
+        "kind": "page"
+      },
+      {
+        "id": "email",
+        "x": 410,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Xác minh email",
+        "sub": "/auth/verify-email",
+        "kind": "page"
+      },
+      {
+        "id": "profile",
+        "x": 740,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Hoàn thiện hồ sơ Tutor",
+        "sub": "/profile · 5 bước\nCơ bản → Chuyên môn → Kinh nghiệm\n→ Tài liệu → Xem lại",
+        "kind": "page"
+      },
+      {
+        "id": "submit",
+        "x": 1070,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Gửi hồ sơ xét duyệt",
+        "sub": "Hồ sơ chuyển sang submitted",
+        "kind": "action"
+      },
+      {
+        "id": "review",
+        "x": 1400,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Admin phê duyệt?",
+        "sub": "Giao với sơ đồ Admin",
+        "kind": "decision"
+      },
+      {
+        "id": "approved",
+        "x": 1730,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Hồ sơ được duyệt",
+        "sub": "approved · không bị đình chỉ",
+        "kind": "success"
+      },
+      {
+        "id": "eligible",
+        "x": 2060,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Đủ điều kiện hoạt động",
+        "sub": "Tài khoản active + email xác minh\n+ hồ sơ approved\n+ giấy tờ nếu cấu hình yêu cầu",
+        "kind": "success"
+      },
+      {
+        "id": "changes",
+        "x": 1400,
+        "y": 425,
+        "w": 260,
+        "h": 82,
+        "title": "Yêu cầu chỉnh sửa",
+        "sub": "changes_requested\nĐọc lý do → sửa hồ sơ → gửi lại",
+        "kind": "muted"
+      },
+      {
+        "id": "rejected",
+        "x": 1730,
+        "y": 425,
+        "w": 260,
+        "h": 82,
+        "title": "Từ chối / đình chỉ hồ sơ",
+        "sub": "Theo trạng thái và quyền backend\nKhông mặc định cho sửa / gửi lại",
+        "kind": "muted"
+      },
+      {
+        "id": "manage",
+        "x": 80,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Quản lý giảng dạy",
+        "sub": "Một mục menu dùng chung",
+        "kind": "action"
+      },
+      {
+        "id": "listings",
+        "x": 410,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Tab Dịch vụ",
+        "sub": "/me/listings\nLọc nháp / active / paused / archived",
+        "kind": "page"
+      },
+      {
+        "id": "new-listing",
+        "x": 740,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Tạo / sửa dịch vụ",
+        "sub": "/me/listings/new\n/me/listings/{id}/edit",
+        "kind": "page"
+      },
+      {
+        "id": "listing-draft",
+        "x": 1070,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Lưu bản nháp dịch vụ",
+        "sub": "Chưa xuất hiện với học viên",
+        "kind": "muted"
+      },
+      {
+        "id": "publish",
+        "x": 1400,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Công khai dịch vụ",
+        "sub": "Theo allowed_actions\nKiểm tra điều kiện tutor / chuyên môn",
+        "kind": "action"
+      },
+      {
+        "id": "market",
+        "x": 1730,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Học viên thấy dịch vụ",
+        "sub": "/marketplace\n/marketplace/{slug}",
+        "kind": "external"
+      },
+      {
+        "id": "availability",
+        "x": 2060,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Lịch khả dụng tham khảo",
+        "sub": "/me/availability\nHiển thị trên hồ sơ công khai",
+        "kind": "page"
+      },
+      {
+        "id": "own-detail",
+        "x": 1070,
+        "y": 840,
+        "w": 260,
+        "h": 90,
+        "title": "Chi tiết dịch vụ của tôi",
+        "sub": "/me/listings/{id}\nXem, sửa, tạm dừng, lưu trữ",
+        "kind": "page"
+      },
+      {
+        "id": "messages",
+        "x": 80,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Trao đổi với học viên",
+        "sub": "/messages → /messages/{id}\nChọn người đã có cuộc trò chuyện",
+        "kind": "page"
+      },
+      {
+        "id": "new-program",
+        "x": 410,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Tạo chương trình riêng",
+        "sub": "/programs/new?customer_id=…\nChọn học viên, mục tiêu, lịch, học phí",
+        "kind": "page"
+      },
+      {
+        "id": "program-draft",
+        "x": 740,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Lưu & xem bản nháp",
+        "sub": "/programs/{id}\nChưa kích hoạt workspace học tập",
+        "kind": "muted"
+      },
+      {
+        "id": "send-invite",
+        "x": 1070,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Chỉnh sửa & gửi lời mời",
+        "sub": "/programs/{id}/edit\nGửi từ bản đã lưu, chưa bị sửa tiếp",
+        "kind": "action"
+      },
+      {
+        "id": "invite-detail",
+        "x": 1400,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Theo dõi lời mời",
+        "sub": "/invitations/{id}\nTutor có thể hủy khi đang chờ",
+        "kind": "page"
+      },
+      {
+        "id": "accepted",
+        "x": 1730,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Học viên chấp nhận?",
+        "sub": "Chấp nhận → kích hoạt chương trình",
+        "kind": "decision"
+      },
+      {
+        "id": "workspace",
+        "x": 2060,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Workspace chương trình",
+        "sub": "/programs/{id}\nTab Chương trình học: /programs",
+        "kind": "success"
+      },
+      {
+        "id": "invite-failure",
+        "x": 1730,
+        "y": 1260,
+        "w": 260,
+        "h": 90,
+        "title": "Từ chối / hết hạn / đã hủy",
+        "sub": "Không kích hoạt; trao đổi lại\nvà gửi lời mời mới khi phù hợp",
+        "kind": "muted"
+      },
+      {
+        "id": "overview",
+        "x": 80,
+        "y": 1510,
+        "w": 340,
+        "h": 88,
+        "title": "Tổng quan",
+        "sub": "/programs/{id}",
+        "kind": "page"
+      },
+      {
+        "id": "sessions",
+        "x": 460,
+        "y": 1510,
+        "w": 340,
+        "h": 88,
+        "title": "Buổi học",
+        "sub": "/programs/{id}/sessions\nTạo / hoàn thành / hủy",
+        "kind": "page"
+      },
+      {
+        "id": "tasks",
+        "x": 840,
+        "y": 1510,
+        "w": 340,
+        "h": 88,
+        "title": "Bài tập & phản hồi",
+        "sub": "/programs/{id}/tasks\nGiao bài, chấm / yêu cầu sửa",
+        "kind": "page"
+      },
+      {
+        "id": "progress",
+        "x": 1220,
+        "y": 1510,
+        "w": 340,
+        "h": 88,
+        "title": "Tiến độ",
+        "sub": "/programs/{id}/progress\nGhi nhận kết quả",
+        "kind": "page"
+      },
+      {
+        "id": "announcements",
+        "x": 1600,
+        "y": 1510,
+        "w": 340,
+        "h": 88,
+        "title": "Thông báo chương trình",
+        "sub": "/programs/{id}/announcements\nSoạn / đăng",
+        "kind": "page"
+      },
+      {
+        "id": "fees",
+        "x": 1980,
+        "y": 1510,
+        "w": 340,
+        "h": 88,
+        "title": "Học phí",
+        "sub": "/programs/{id}/fees\nGhi nhận, đánh dấu đã trả",
+        "kind": "page"
+      },
+      {
+        "id": "util-0",
+        "x": 80,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Tin nhắn",
+        "sub": "/messages",
+        "kind": "muted"
+      },
+      {
+        "id": "util-1",
+        "x": 535,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Thông báo tài khoản",
+        "sub": "/notifications · icon chuông",
+        "kind": "muted"
+      },
+      {
+        "id": "util-2",
+        "x": 990,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Báo cáo của tôi",
+        "sub": "/reports",
+        "kind": "muted"
+      },
+      {
+        "id": "util-3",
+        "x": 1445,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Cài đặt / đăng xuất",
+        "sub": "/settings · avatar",
+        "kind": "muted"
+      },
+      {
+        "id": "util-4",
+        "x": 1900,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Hỗ trợ",
+        "sub": "/support",
+        "kind": "muted"
+      },
+      {
+        "id": "note-0",
+        "x": 80,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "GIỮ: Dịch vụ ≠ Chương trình",
+        "sub": "Đã gộp dưới Quản lý giảng dạy. Không nên xóa chương trình: đó là nơi quản lý học viên và việc học thực tế.",
+        "kind": "proposal"
+      },
+      {
+        "id": "note-1",
+        "x": 835,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "CÂN NHẮC GỘP: chi tiết dịch vụ của tôi",
+        "sub": "/me/listings/{id} có thể thành drawer / preview trong danh sách; giữ trang chỉnh sửa. Hiện vẫn là một route riêng.",
+        "kind": "proposal"
+      },
+      {
+        "id": "note-2",
+        "x": 1590,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "GIỮ: khả dụng ≠ buổi học",
+        "sub": "/me/availability là lịch tham khảo. /programs/{id}/sessions là lịch buổi học cụ thể, có trạng thái thực hiện.",
+        "kind": "proposal"
+      }
+    ],
+    "edges": [
+      {
+        "a": "login",
+        "b": "email",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "email",
+        "b": "profile",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "profile",
+        "b": "submit",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "submit",
+        "b": "review",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "review",
+        "b": "approved",
+        "label": "Có",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "approved",
+        "b": "eligible",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "review",
+        "b": "changes",
+        "label": "Chưa duyệt",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "review",
+        "b": "rejected",
+        "label": "Từ chối / đình chỉ",
+        "start": "bottom",
+        "end": "top",
+        "points": [
+          [
+            1530,
+            400
+          ],
+          [
+            1860,
+            400
+          ]
+        ],
+        "dashed": false
+      },
+      {
+        "a": "changes",
+        "b": "profile",
+        "label": "Sửa & gửi lại",
+        "start": "left",
+        "end": "bottom",
+        "points": [
+          [
+            990,
+            466
+          ],
+          [
+            990,
+            400
+          ],
+          [
+            870,
+            400
+          ]
+        ],
+        "dashed": true
+      },
+      {
+        "a": "manage",
+        "b": "listings",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "listings",
+        "b": "new-listing",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "new-listing",
+        "b": "listing-draft",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "listing-draft",
+        "b": "publish",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "publish",
+        "b": "market",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "listing-draft",
+        "b": "own-detail",
+        "label": "",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "own-detail",
+        "b": "new-listing",
+        "label": "Chỉnh sửa",
+        "start": "left",
+        "end": "bottom",
+        "points": [
+          [
+            1000,
+            885
+          ],
+          [
+            1000,
+            815
+          ],
+          [
+            870,
+            815
+          ]
+        ],
+        "dashed": true
+      },
+      {
+        "a": "manage",
+        "b": "availability",
+        "label": "Nhánh quản lý thời gian",
+        "start": "bottom",
+        "end": "bottom",
+        "points": [
+          [
+            210,
+            965
+          ],
+          [
+            2190,
+            965
+          ]
+        ],
+        "dashed": true
+      },
+      {
+        "a": "messages",
+        "b": "new-program",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "new-program",
+        "b": "program-draft",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "program-draft",
+        "b": "send-invite",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "send-invite",
+        "b": "invite-detail",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "invite-detail",
+        "b": "accepted",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "accepted",
+        "b": "workspace",
+        "label": "Có",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "accepted",
+        "b": "invite-failure",
+        "label": "Không",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "manage",
+        "b": "new-program",
+        "label": "Tab Chương trình học /programs",
+        "start": "bottom",
+        "end": "top",
+        "points": [
+          [
+            210,
+            1005
+          ],
+          [
+            540,
+            1005
+          ]
+        ],
+        "dashed": true
+      },
+      {
+        "a": "workspace",
+        "b": "fees",
+        "label": "Các tab workspace",
+        "start": "bottom",
+        "end": "top",
+        "points": [
+          [
+            2190,
+            1420
+          ],
+          [
+            2150,
+            1420
+          ]
+        ],
+        "dashed": true
+      }
+    ]
+  },
+  {
+    "name": "02 · Học viên",
+    "nodes": [
+      {
+        "id": "home",
+        "x": 80,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Trang chủ",
+        "sub": "/ · danh mục / dịch vụ nổi bật",
+        "kind": "page"
+      },
+      {
+        "id": "market",
+        "x": 410,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Tìm & lọc dịch vụ",
+        "sub": "/marketplace\nDanh mục, chuyên môn, hình thức, giá",
+        "kind": "page"
+      },
+      {
+        "id": "detail",
+        "x": 740,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Chi tiết dịch vụ",
+        "sub": "/marketplace/{slug}\nNội dung, lịch tham khảo, review",
+        "kind": "page"
+      },
+      {
+        "id": "tutor",
+        "x": 1070,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Hồ sơ tutor công khai",
+        "sub": "/tutors/{slug}\n?tab=overview / services / reviews / schedule",
+        "kind": "page"
+      },
+      {
+        "id": "message-modal",
+        "x": 1400,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Popup liên hệ tutor",
+        "sub": "Viết tin nhắn → gửi\nHai bên phải khác vai trò",
+        "kind": "action"
+      },
+      {
+        "id": "message",
+        "x": 1730,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Trao đổi trực tiếp",
+        "sub": "/messages/{id}\nThống nhất nhu cầu, lịch và mức phí",
+        "kind": "page"
+      },
+      {
+        "id": "tutor-invite",
+        "x": 2060,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Tutor tạo & gửi chương trình",
+        "sub": "Giao với sơ đồ Tutor",
+        "kind": "external"
+      },
+      {
+        "id": "favorite",
+        "x": 1070,
+        "y": 425,
+        "w": 260,
+        "h": 85,
+        "title": "Lưu tutor yêu thích",
+        "sub": "/favorites → xem lại hồ sơ / dịch vụ",
+        "kind": "page"
+      },
+      {
+        "id": "login",
+        "x": 1400,
+        "y": 425,
+        "w": 260,
+        "h": 85,
+        "title": "Nếu chưa đăng nhập",
+        "sub": "/auth/login hoặc /auth/register\nVai trò học viên, từ 15 tuổi",
+        "kind": "page"
+      },
+      {
+        "id": "notify",
+        "x": 80,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Nhận thông báo lời mời",
+        "sub": "/notifications hoặc mở Lời mời học",
+        "kind": "page"
+      },
+      {
+        "id": "inbox",
+        "x": 410,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Danh sách / xem trước lời mời",
+        "sub": "/invitations\nChờ / chấp nhận / từ chối / hết hạn / hủy",
+        "kind": "page"
+      },
+      {
+        "id": "inv-detail",
+        "x": 740,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Chi tiết lời mời",
+        "sub": "/invitations/{id}\nĐọc mục tiêu, lịch, học phí",
+        "kind": "page"
+      },
+      {
+        "id": "accept",
+        "x": 1070,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Chấp nhận lời mời?",
+        "sub": "Còn hiệu lực, đúng người được mời",
+        "kind": "decision"
+      },
+      {
+        "id": "programs",
+        "x": 1400,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Program của tôi",
+        "sub": "/programs\nDanh sách chương trình đã tham gia",
+        "kind": "page"
+      },
+      {
+        "id": "workspace",
+        "x": 1730,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Mở workspace học tập",
+        "sub": "/programs/{id}",
+        "kind": "success"
+      },
+      {
+        "id": "states",
+        "x": 2060,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Theo dõi trạng thái",
+        "sub": "active / paused / completed / cancelled",
+        "kind": "muted"
+      },
+      {
+        "id": "not-accept",
+        "x": 1070,
+        "y": 840,
+        "w": 260,
+        "h": 85,
+        "title": "Từ chối / hết hạn / bị hủy",
+        "sub": "Chưa tham gia chương trình\nTrao đổi lại với tutor nếu cần",
+        "kind": "muted"
+      },
+      {
+        "id": "overview",
+        "x": 80,
+        "y": 1105,
+        "w": 340,
+        "h": 104,
+        "title": "Tổng quan",
+        "sub": "/programs/{id}\nMục tiêu, buổi sắp tới, tiến độ",
+        "kind": "page"
+      },
+      {
+        "id": "sessions",
+        "x": 460,
+        "y": 1105,
+        "w": 340,
+        "h": 104,
+        "title": "Buổi học",
+        "sub": "/programs/{id}/sessions\nXem lịch / nơi học / trạng thái",
+        "kind": "page"
+      },
+      {
+        "id": "tasks",
+        "x": 840,
+        "y": 1105,
+        "w": 340,
+        "h": 104,
+        "title": "Bài tập",
+        "sub": "/programs/{id}/tasks\nMở bài tập → nộp bài / nộp lại",
+        "kind": "page"
+      },
+      {
+        "id": "progress",
+        "x": 1220,
+        "y": 1105,
+        "w": 340,
+        "h": 104,
+        "title": "Tiến độ",
+        "sub": "/programs/{id}/progress\nXem kết quả do tutor cập nhật",
+        "kind": "page"
+      },
+      {
+        "id": "announce",
+        "x": 1600,
+        "y": 1105,
+        "w": 340,
+        "h": 104,
+        "title": "Thông báo chương trình",
+        "sub": "/programs/{id}/announcements\nChỉ xem nội dung đã đăng",
+        "kind": "page"
+      },
+      {
+        "id": "fees",
+        "x": 1980,
+        "y": 1105,
+        "w": 340,
+        "h": 104,
+        "title": "Học phí",
+        "sub": "/programs/{id}/fees\nXem khoản phí tutor ghi nhận",
+        "kind": "page"
+      },
+      {
+        "id": "task-detail",
+        "x": 840,
+        "y": 1260,
+        "w": 340,
+        "h": 90,
+        "title": "Bài nộp & phản hồi",
+        "sub": "/programs/{id}/tasks/{taskId}\nNộp → tutor phản hồi → sửa nếu cần",
+        "kind": "page"
+      },
+      {
+        "id": "complete",
+        "x": 80,
+        "y": 1510,
+        "w": 260,
+        "h": 88,
+        "title": "Chương trình hoàn thành",
+        "sub": "Tutor hoàn thành theo điều kiện hệ thống",
+        "kind": "success"
+      },
+      {
+        "id": "review",
+        "x": 410,
+        "y": 1510,
+        "w": 260,
+        "h": 88,
+        "title": "Gửi đánh giá chương trình",
+        "sub": "Trong /programs/{id}\nĐiểm 1–5 và nhận xét",
+        "kind": "action"
+      },
+      {
+        "id": "public-review",
+        "x": 740,
+        "y": 1510,
+        "w": 260,
+        "h": 88,
+        "title": "Hiển thị review công khai",
+        "sub": "/tutors/{slug}?tab=reviews\nPhụ thuộc trạng thái kiểm duyệt",
+        "kind": "external"
+      },
+      {
+        "id": "report",
+        "x": 1400,
+        "y": 1510,
+        "w": 590,
+        "h": 88,
+        "title": "Nếu có vấn đề: gửi báo cáo",
+        "sub": "/reports?program_id={id}\nTheo dõi trạng thái và kết quả",
+        "kind": "page"
+      },
+      {
+        "id": "util-0",
+        "x": 80,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Yêu thích",
+        "sub": "/favorites",
+        "kind": "muted"
+      },
+      {
+        "id": "util-1",
+        "x": 535,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Thông báo",
+        "sub": "/notifications",
+        "kind": "muted"
+      },
+      {
+        "id": "util-2",
+        "x": 990,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Tin nhắn",
+        "sub": "/messages",
+        "kind": "muted"
+      },
+      {
+        "id": "util-3",
+        "x": 1445,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Cài đặt / đăng xuất",
+        "sub": "/settings · avatar",
+        "kind": "muted"
+      },
+      {
+        "id": "util-4",
+        "x": 1900,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Hỗ trợ",
+        "sub": "/support",
+        "kind": "muted"
+      },
+      {
+        "id": "note-0",
+        "x": 80,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "CÂN NHẮC GỘP: xem trước / chi tiết lời mời",
+        "sub": "/invitations đã xem được thông tin và phản hồi. Có thể dùng một panel chi tiết; giữ deep link /invitations/{id}.",
+        "kind": "proposal"
+      },
+      {
+        "id": "note-1",
+        "x": 835,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "KHÔNG THIẾT KẾ LẠI: review route cũ",
+        "sub": "/tutors/{slug}/reviews hiện redirect về ?tab=reviews. Đây không còn là một màn hình độc lập.",
+        "kind": "proposal"
+      },
+      {
+        "id": "note-2",
+        "x": 1590,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "GIỮ: thông báo tài khoản ≠ thông báo lớp",
+        "sub": "/notifications là sự kiện toàn tài khoản. /programs/{id}/announcements là nội dung tutor đăng cho lớp. Học phí hiện không phải cổng thanh toán.",
+        "kind": "proposal"
+      }
+    ],
+    "edges": [
+      {
+        "a": "home",
+        "b": "market",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "market",
+        "b": "detail",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "detail",
+        "b": "tutor",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "tutor",
+        "b": "message-modal",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "message-modal",
+        "b": "message",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "message",
+        "b": "tutor-invite",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "tutor",
+        "b": "favorite",
+        "label": "Tùy chọn",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "message-modal",
+        "b": "login",
+        "label": "Cần đăng nhập",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "notify",
+        "b": "inbox",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "inbox",
+        "b": "inv-detail",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "inv-detail",
+        "b": "accept",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "accept",
+        "b": "programs",
+        "label": "Có",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "programs",
+        "b": "workspace",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "workspace",
+        "b": "states",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "accept",
+        "b": "not-accept",
+        "label": "Không",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "tasks",
+        "b": "task-detail",
+        "label": "",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "workspace",
+        "b": "announce",
+        "label": "Các tab workspace",
+        "start": "bottom",
+        "end": "top",
+        "points": [
+          [
+            1860,
+            1010
+          ],
+          [
+            1770,
+            1010
+          ]
+        ],
+        "dashed": true
+      },
+      {
+        "a": "complete",
+        "b": "review",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "review",
+        "b": "public-review",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      }
+    ]
+  },
+  {
+    "name": "03 · Admin",
+    "nodes": [
+      {
+        "id": "login",
+        "x": 80,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Đăng nhập tài khoản admin",
+        "sub": "/auth/login\nTài khoản được cấp sẵn",
+        "kind": "page"
+      },
+      {
+        "id": "permission",
+        "x": 410,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Có permission phù hợp?",
+        "sub": "Vai trò admin chưa đủ\nQuyền xem / nhận / duyệt hồ sơ",
+        "kind": "decision"
+      },
+      {
+        "id": "queue",
+        "x": 740,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Hàng đợi chưa phân công",
+        "sub": "FE :3000/admin\nLọc trạng thái hồ sơ",
+        "kind": "page"
+      },
+      {
+        "id": "claim",
+        "x": 1070,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Nhận / phân công hồ sơ",
+        "sub": "Chuyển sang “Hồ sơ của tôi”",
+        "kind": "action"
+      },
+      {
+        "id": "profile",
+        "x": 1400,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Xem chi tiết hồ sơ",
+        "sub": "Trong /admin\nCá nhân, chuyên môn, phiên bản",
+        "kind": "page"
+      },
+      {
+        "id": "docs",
+        "x": 1730,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Kiểm tra tài liệu",
+        "sub": "Duyệt / từ chối từng tài liệu\nChế độ demo có thể bỏ yêu cầu",
+        "kind": "action"
+      },
+      {
+        "id": "decision",
+        "x": 2060,
+        "y": 270,
+        "w": 260,
+        "h": 100,
+        "title": "Quyết định hồ sơ",
+        "sub": "Kiểm tra quyền + lý do + trạng thái",
+        "kind": "decision"
+      },
+      {
+        "id": "approve",
+        "x": 1400,
+        "y": 425,
+        "w": 260,
+        "h": 85,
+        "title": "Phê duyệt",
+        "sub": "Tutor đủ điều kiện công khai / giảng dạy",
+        "kind": "success"
+      },
+      {
+        "id": "change",
+        "x": 1730,
+        "y": 425,
+        "w": 260,
+        "h": 85,
+        "title": "Yêu cầu chỉnh sửa",
+        "sub": "Tutor nhận lý do → sửa → gửi lại",
+        "kind": "external"
+      },
+      {
+        "id": "reject",
+        "x": 2060,
+        "y": 425,
+        "w": 260,
+        "h": 85,
+        "title": "Từ chối / đình chỉ / khôi phục",
+        "sub": "Theo allowed_actions\nPhân biệt hồ sơ và tài khoản",
+        "kind": "muted"
+      },
+      {
+        "id": "be-admin",
+        "x": 80,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Vào admin backend",
+        "sub": "BE :8000/admin\nĐăng nhập + panel enabled + quyền",
+        "kind": "page"
+      },
+      {
+        "id": "reports",
+        "x": 410,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Danh sách báo cáo",
+        "sub": "Filament · Reports",
+        "kind": "page"
+      },
+      {
+        "id": "assign",
+        "x": 740,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Nhận / phân công xử lý",
+        "sub": "Chỉ xem phạm vi có quyền",
+        "kind": "action"
+      },
+      {
+        "id": "evidence",
+        "x": 1070,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Xem nội dung & bằng chứng",
+        "sub": "Operations · report / report-assignment",
+        "kind": "page"
+      },
+      {
+        "id": "resolve",
+        "x": 1400,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Giải quyết hay đóng?",
+        "sub": "Nhập resolution_note / lý do",
+        "kind": "decision"
+      },
+      {
+        "id": "report-result",
+        "x": 1730,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Cập nhật kết quả xử lý",
+        "sub": "resolve / dismiss\nGhi dấu vết quyết định",
+        "kind": "success"
+      },
+      {
+        "id": "user-result",
+        "x": 2060,
+        "y": 685,
+        "w": 260,
+        "h": 100,
+        "title": "Người gửi xem kết quả",
+        "sub": "FE :3000/reports\nGiao với tutor / học viên",
+        "kind": "external"
+      },
+      {
+        "id": "reviews",
+        "x": 80,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Danh sách đánh giá",
+        "sub": "Filament · Reviews",
+        "kind": "page"
+      },
+      {
+        "id": "review-detail",
+        "x": 410,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Xem ngữ cảnh đánh giá",
+        "sub": "Operations · review",
+        "kind": "page"
+      },
+      {
+        "id": "moderate",
+        "x": 740,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Ẩn / khôi phục đánh giá",
+        "sub": "Nhập lý do; kiểm tra quyền / phiên bản",
+        "kind": "action"
+      },
+      {
+        "id": "public",
+        "x": 1070,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Cập nhật hiển thị công khai",
+        "sub": "Tab review hồ sơ tutor",
+        "kind": "external"
+      },
+      {
+        "id": "ops",
+        "x": 1400,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Điều hành / audit / outbox",
+        "sub": "Backend · Operations\nTheo quyền và cấu hình",
+        "kind": "page"
+      },
+      {
+        "id": "monitor",
+        "x": 1730,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Giám sát hệ thống",
+        "sub": "FE :3000/monitoring",
+        "kind": "page"
+      },
+      {
+        "id": "tools",
+        "x": 2060,
+        "y": 1105,
+        "w": 260,
+        "h": 100,
+        "title": "Công cụ theo dõi",
+        "sub": "BE /telescope · /pulse\nDashboard máy chủ nếu cấu hình",
+        "kind": "external"
+      },
+      {
+        "id": "fe",
+        "x": 80,
+        "y": 1510,
+        "w": 570,
+        "h": 88,
+        "title": "Giao diện duyệt frontend",
+        "sub": "FE :3000/admin\nHàng đợi / nhận / quyết định hồ sơ",
+        "kind": "page"
+      },
+      {
+        "id": "be",
+        "x": 740,
+        "y": 1510,
+        "w": 570,
+        "h": 88,
+        "title": "Giao diện duyệt Filament",
+        "sub": "BE :8000/admin\nTutor Profiles + Operations",
+        "kind": "page"
+      },
+      {
+        "id": "assigned",
+        "x": 1400,
+        "y": 1510,
+        "w": 570,
+        "h": 88,
+        "title": "Trang nghiệp vụ server cũ",
+        "sub": "BE /admin-business/assigned-profiles\nDanh sách / chi tiết / quyết định",
+        "kind": "page"
+      },
+      {
+        "id": "util-0",
+        "x": 80,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Cài đặt admin",
+        "sub": "FE /settings",
+        "kind": "muted"
+      },
+      {
+        "id": "util-1",
+        "x": 535,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Quản lý permission",
+        "sub": "Cấu hình / cấp quyền backend",
+        "kind": "muted"
+      },
+      {
+        "id": "util-2",
+        "x": 990,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Đình chỉ / khôi phục",
+        "sub": "Trong chi tiết hồ sơ / account action",
+        "kind": "muted"
+      },
+      {
+        "id": "util-3",
+        "x": 1445,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Audit & outbox",
+        "sub": "Backend · Operations / API",
+        "kind": "muted"
+      },
+      {
+        "id": "util-4",
+        "x": 1900,
+        "y": 1735,
+        "w": 425,
+        "h": 88,
+        "title": "Đăng xuất",
+        "sub": "Avatar · FE hoặc panel backend",
+        "kind": "muted"
+      },
+      {
+        "id": "note-0",
+        "x": 80,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "ƯU TIÊN: chọn một admin UI chính",
+        "sub": "FE /admin và Filament trùng nghiệp vụ duyệt hồ sơ. Đề xuất chọn Filament cho giai đoạn demo; FE chỉ cần lối vào hoặc redirect nếu bạn duyệt phương án.",
+        "kind": "proposal"
+      },
+      {
+        "id": "note-1",
+        "x": 835,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "CÂN NHẮC NGỪNG: admin-business",
+        "sub": "Đã có thêm một giao diện assigned-profiles. Có thể ngừng làm mới UI này sau khi xác nhận không còn quy trình phụ thuộc.",
+        "kind": "proposal"
+      },
+      {
+        "id": "note-2",
+        "x": 1590,
+        "y": 1940,
+        "w": 725,
+        "h": 132,
+        "title": "KHÔNG XÓA QUYỀN / LUỒNG KIỂM DUYỆT",
+        "sub": "Gộp màn hình không đồng nghĩa bỏ kiểm tra permission, phân công, xét tài liệu, audit hay lý do quyết định. Đây là nghiệp vụ cần giữ.",
+        "kind": "proposal"
+      }
+    ],
+    "edges": [
+      {
+        "a": "login",
+        "b": "permission",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "permission",
+        "b": "queue",
+        "label": "Có",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "queue",
+        "b": "claim",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "claim",
+        "b": "profile",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "profile",
+        "b": "docs",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "docs",
+        "b": "decision",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "decision",
+        "b": "reject",
+        "label": "",
+        "start": "bottom",
+        "end": "top",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "decision",
+        "b": "change",
+        "label": "",
+        "start": "bottom",
+        "end": "top",
+        "points": [
+          [
+            2190,
+            400
+          ],
+          [
+            1860,
+            400
+          ]
+        ],
+        "dashed": false
+      },
+      {
+        "a": "decision",
+        "b": "approve",
+        "label": "",
+        "start": "bottom",
+        "end": "top",
+        "points": [
+          [
+            2190,
+            395
+          ],
+          [
+            1530,
+            395
+          ]
+        ],
+        "dashed": false
+      },
+      {
+        "a": "be-admin",
+        "b": "reports",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "reports",
+        "b": "assign",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "assign",
+        "b": "evidence",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "evidence",
+        "b": "resolve",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "resolve",
+        "b": "report-result",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "report-result",
+        "b": "user-result",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "reviews",
+        "b": "review-detail",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "review-detail",
+        "b": "moderate",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "moderate",
+        "b": "public",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "ops",
+        "b": "monitor",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      },
+      {
+        "a": "monitor",
+        "b": "tools",
+        "label": "",
+        "start": "right",
+        "end": "left",
+        "points": [],
+        "dashed": false
+      }
+    ]
+  }
+]

@@ -41,6 +41,10 @@ abstract class TestCase extends BaseTestCase
         }
 
         $app = require dirname(__DIR__).'/bootstrap/app.php';
+        // Laravel's default absolute cache prefixes do not include Windows drive roots.
+        if (PHP_OS_FAMILY === 'Windows' && preg_match('~^[A-Za-z]:[/\\\\]~', $environment['APP_CONFIG_CACHE'], $matches)) {
+            $app->addAbsoluteCachePathPrefix($matches[0]);
+        }
         $this->traitsUsedByTest = class_uses_recursive(static::class);
 
         $app->afterBootstrapping(LoadConfiguration::class, function ($app): void {

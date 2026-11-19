@@ -1,0 +1,115 @@
+{
+  "before": [
+    {
+      "width": 390,
+      "page": "home",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 815,
+      "median_lcp_ms": 112,
+      "hero_encoded_bytes": 50826
+    },
+    {
+      "width": 390,
+      "page": "marketplace",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 757,
+      "median_lcp_ms": 80,
+      "hero_encoded_bytes": null
+    },
+    {
+      "width": 390,
+      "page": "tutor",
+      "ready_count": 0,
+      "samples": 3,
+      "median_ready_ms": 5731,
+      "median_lcp_ms": 68,
+      "hero_encoded_bytes": null
+    },
+    {
+      "width": 1440,
+      "page": "home",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 884,
+      "median_lcp_ms": 180,
+      "hero_encoded_bytes": 50826
+    },
+    {
+      "width": 1440,
+      "page": "marketplace",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 1036,
+      "median_lcp_ms": 404,
+      "hero_encoded_bytes": null
+    },
+    {
+      "width": 1440,
+      "page": "tutor",
+      "ready_count": 0,
+      "samples": 3,
+      "median_ready_ms": 5817,
+      "median_lcp_ms": 68,
+      "hero_encoded_bytes": null
+    }
+  ],
+  "after": [
+    {
+      "width": 390,
+      "page": "home",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 860,
+      "median_lcp_ms": 124,
+      "hero_encoded_bytes": 44256
+    },
+    {
+      "width": 390,
+      "page": "marketplace",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 898,
+      "median_lcp_ms": 120,
+      "hero_encoded_bytes": null
+    },
+    {
+      "width": 390,
+      "page": "tutor",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 881,
+      "median_lcp_ms": 204,
+      "hero_encoded_bytes": null
+    },
+    {
+      "width": 1440,
+      "page": "home",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 850,
+      "median_lcp_ms": 112,
+      "hero_encoded_bytes": 44256
+    },
+    {
+      "width": 1440,
+      "page": "marketplace",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 703,
+      "median_lcp_ms": 80,
+      "hero_encoded_bytes": null
+    },
+    {
+      "width": 1440,
+      "page": "tutor",
+      "ready_count": 3,
+      "samples": 3,
+      "median_ready_ms": 750,
+      "median_lcp_ms": 272,
+      "hero_encoded_bytes": null
+    }
+  ],
+  "limits": "Three sequential cold browser samples per viewport. Readiness includes networkidle. Failed tutor readiness is reported separately, not treated as a successful load latency. Local machine shared resources; no production field-performance claim."
+}

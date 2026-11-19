@@ -1,0 +1,46 @@
+{
+    admin off
+    metrics
+    servers :8080 {
+        name benchmark_api
+    }
+}
+
+http://:8080 {
+    root * /var/www/html/public
+    encode zstd gzip
+    php_fastcgi {$PERF_FPM_UPSTREAMS:app:9000} {
+        lb_policy round_robin
+        lb_try_duration 500ms
+        lb_retry_match method GET HEAD
+        fail_duration 3s
+        max_fails 1
+        dial_timeout 250ms
+        header_down X-Benchmark-Upstream {http.reverse_proxy.upstream.hostport}
+    }
+    file_server
+}
+
+http://:8081 {
+    handle /fpm-status {
+        reverse_proxy app:9001 {
+            transport fastcgi {
+                env SCRIPT_NAME /fpm-status
+                env SCRIPT_FILENAME /fpm-status
+            }
+        }
+    }
+    handle /fpm-status/replica {
+        reverse_proxy app-replica:9001 {
+            transport fastcgi {
+                env SCRIPT_NAME /fpm-status
+                env SCRIPT_FILENAME /fpm-status
+            }
+        }
+    }
+    respond 404
+}
+
+http://:9080 {
+    metrics /metrics
+}

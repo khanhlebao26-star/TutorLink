@@ -19,6 +19,68 @@ class MarketplaceApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_compact_tutor_cards_preserve_public_visibility_and_bound_review_queries(): void
+    {
+        config(['tutor.verification_documents_required' => false]);
+        $specialization = $this->seedCatalog();
+        [, $profile] = $this->createTutor('approved');
+        $listing = $this->createListing($profile, $specialization, ['status' => 'active']);
+        DB::enableQueryLog();
+        $this->getJson('/api/v1/listings?include=tutor_card')->assertOk()
+            ->assertJsonPath('data.0.id', $listing->id)
+            ->assertJsonPath('data.0.tutor_card.rating_count', 0)
+            ->assertJsonPath('data.0.tutor_card.rating_average', null);
+        $queries = collect(DB::getQueryLog())->filter(fn ($query) => str_contains($query['query'], 'AVG(reviews.rating)'));
+        $this->assertCount(1, $queries);
+        DB::disableQueryLog();
+        $this->getJson('/api/v1/listings')->assertJsonMissingPath('data.0.tutor_card');
+        $this->getJson('/api/v1/listings?include=private')->assertUnprocessable();
+        $profile->update(['suspended_at' => now()]);
+        $this->getJson('/api/v1/listings?include=tutor_card')->assertOk()->assertJsonCount(0, 'data');
+    }
+
+    public function test_publication_without_documents_follows_the_configured_requirement(): void
+    {
+        $specialization = $this->seedCatalog();
+        [, $profile] = $this->createTutor('approved');
+        $profile->verificationDocuments()->delete();
+        $listing = $this->createListing($profile, $specialization, ['status' => 'active']);
+
+        config(['tutor.verification_documents_required' => false]);
+        $this->getJson('/api/v1/listings')->assertOk()->assertJsonPath('data.0.id', $listing->id);
+        $this->getJson("/api/v1/listings/{$listing->slug}")->assertOk();
+        $this->getJson("/api/v1/tutors/{$profile->public_slug}")->assertOk();
+
+        config(['tutor.verification_documents_required' => true]);
+        $this->getJson('/api/v1/listings')->assertOk()->assertJsonCount(0, 'data');
+        $this->getJson("/api/v1/listings/{$listing->slug}")->assertNotFound();
+        $this->getJson("/api/v1/tutors/{$profile->public_slug}")->assertNotFound();
+    }
+
+    public function test_optional_documents_do_not_bypass_other_publication_requirements(): void
+    {
+        config(['tutor.verification_documents_required' => false]);
+        $specialization = $this->seedCatalog();
+        [$tutor, $profile] = $this->createTutor('submitted');
+        $profile->verificationDocuments()->delete();
+        $listing = $this->createListing($profile, $specialization, ['status' => 'active']);
+
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $profile->update(['status' => 'approved', 'suspended_at' => now()]);
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $profile->update(['suspended_at' => null]);
+        $tutor->forceFill(['email_verified_at' => null])->save();
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $tutor->forceFill(['email_verified_at' => now(), 'status' => 'suspended'])->save();
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $tutor->update(['status' => 'active']);
+        $listing->update(['status' => 'draft']);
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+        $listing->update(['status' => 'active']);
+        $specialization->update(['status' => 'inactive']);
+        $this->getJson('/api/v1/listings')->assertJsonCount(0, 'data');
+    }
+
     public function test_pending_tutor_cannot_publish_listing(): void
     {
         $specialization = $this->seedCatalog();
@@ -496,6 +558,48 @@ class MarketplaceApiTest extends TestCase
             ->assertJsonPath('meta.current_page', 2)
             ->assertJsonPath('meta.per_page', 1)
             ->assertJsonPath('meta.total', 3);
+    }
+
+    public function test_deep_listing_page_preserves_exact_total_visibility_and_price_tie_breaking(): void
+    {
+        $specialization = $this->seedCatalog();
+        [, $profile] = $this->createTutor('approved');
+        $listing = $this->createListing($profile, $specialization, [
+            'status' => 'active',
+            'title' => 'Algebra',
+        ]);
+        $template = (array) DB::table('service_listings')->where('id', $listing->id)->first();
+        unset($template['id']);
+        for ($batch = 0; $batch < 20; $batch++) {
+            $rows = [];
+            for ($position = 0; $position < 1000; $position++) {
+                $rows[] = array_replace($template, ['slug' => "algebra-{$batch}-{$position}"]);
+            }
+
+            DB::table('service_listings')->insert($rows);
+        }
+        $last = ServiceListing::query()->where('slug', 'algebra-19-999')->firstOrFail();
+        $this->createListing($profile, $specialization, ['status' => 'draft', 'title' => 'Algebra']);
+        $this->createListing($profile, $specialization, ['status' => 'active', 'title' => 'Geometry']);
+        $url = '/api/v1/listings?q=algebra&price_unit=session&per_page=20';
+
+        $this->getJson($url.'&page=1001&sort=price_asc')
+            ->assertOk()->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $last->id)
+            ->assertJsonPath('data.0.tutor_slug', $profile->public_slug)
+            ->assertJsonPath('meta.current_page', 1001)
+            ->assertJsonPath('meta.per_page', 20)
+            ->assertJsonPath('meta.total', 20001);
+
+        $this->getJson($url.'&page=1001&sort=price_desc')
+            ->assertOk()->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $listing->id)
+            ->assertJsonPath('meta.total', 20001);
+
+        $this->getJson($url.'&page=1002')
+            ->assertOk()->assertJsonCount(0, 'data')
+            ->assertJsonPath('meta.current_page', 1002)
+            ->assertJsonPath('meta.total', 20001);
     }
 
     public function test_price_filter_does_not_mix_price_units(): void

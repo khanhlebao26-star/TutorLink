@@ -7,6 +7,7 @@ on:
     branches:
       - main
       - codex/2w-be-h01
+      - codex/**
 
 permissions:
   contents: read
@@ -150,7 +151,7 @@ jobs:
           if-no-files-found: warn
 
   frontend:
-    name: Frontend lint and build
+    name: Frontend tests, lint and build
     runs-on: ubuntu-latest
 
     defaults:
@@ -173,5 +174,44 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Frontend tests and coverage
+        run: npm run test:coverage -- --reporter=default --reporter=junit --outputFile.junit=coverage/junit.xml
+
+      - name: Record frontend source and runtime
+        if: always()
+        run: |
+          mkdir -p coverage
+          git rev-parse HEAD > coverage/commit.txt
+          node --version > coverage/runtime.txt
+
       - name: Build
         run: npm run build
+
+      - name: Upload frontend evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: frontend/coverage/
+          retention-days: 14
+          if-no-files-found: warn
+
+  coverage-gate:
+    name: Separate frontend and backend coverage above 70 percent
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v8
+        with:
+          name: backend-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: coverage-evidence/backend
+      - uses: actions/download-artifact@v8
+        with:
+          name: frontend-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: coverage-evidence/frontend
+      - name: Enforce separate codebase coverage
+        run: python3 frontend/scripts/check-codebase-coverage.py coverage-evidence/frontend/coverage-summary.json coverage-evidence/backend/clover.xml

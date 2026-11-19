@@ -61,7 +61,7 @@ test('inbox scopes before returning private data and returns only minimal peer f
         ->assertJsonPath('data.0.id', $this->chat)->assertJsonPath('data.0.preview', null)
         ->assertJsonPath('data.0.unread_count', 0)->assertJsonPath('data.0.peer.id', $this->tutor->id);
 
-    expect(array_keys($response->json('data.0.peer')))->toBe(['id', 'display_name']);
+    expect(array_keys($response->json('data.0.peer')))->toBe(['id', 'display_name', 'tutor_slug', 'tutor_headline', 'tutor_specializations']);
     expect($response->json('data.0'))->not->toHaveKeys(['direct_key', 'email', 'phone', 'permissions']);
 });
 
@@ -147,6 +147,7 @@ test('file preview is generic and history hides internal metadata', function ():
         'client_message_id',
         'message_type',
         'body',
+        'attachments',
         'created_at',
     ]);
     $history->assertDontSee('object_key')->assertDontSee('secret/object')->assertDontSee('payload_hash');

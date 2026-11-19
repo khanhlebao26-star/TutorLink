@@ -1,7 +1,8 @@
-import { ApiClientError, dataMode, request, setAuthHint } from "../api/client";
-import { mockAdminProfiles, mockCurrentUser, mockProfile, mockTutorOnboarding, setMockRole } from "./mock";
+import { ApiClientError, dataMode, request, setAuthHint } from "@/lib/api/client";
+import { mockAdminProfiles, mockCurrentUser, mockProfile, mockTutorOnboarding, setMockRole } from "@/lib/data/mock";
 import type {
   AdminTutorProfile,
+  AdminTutorQueueItem,
   ApiEnvelope,
   FilePurpose,
   FileRecord,
@@ -14,7 +15,7 @@ import type {
   TutorProfileStatus,
   User,
   VerificationDocument
-} from "./types";
+} from "@/lib/data/types";
 export const MAX_UPLOAD_BYTES = 5_000_000;
 
 const unwrap = <T>(value: ApiEnvelope<T> | T): T =>
@@ -22,6 +23,11 @@ const unwrap = <T>(value: ApiEnvelope<T> | T): T =>
     ? (value as ApiEnvelope<T>).data
     : value as T;
 const delay = () => new Promise((resolve) => setTimeout(resolve, 220));
+const notifyAccountUpdated = () => {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("tutorlink-account-updated"));
+  }
+};
 
 export async function getProfile(role: "customer" | "tutor"): Promise<ProfileResponse> {
   if (dataMode === "mock") {
@@ -68,8 +74,40 @@ export async function getTutorOnboarding(): Promise<TutorOnboardingData> {
 
 export async function getAdminTutorProfiles(status: TutorProfileStatus = "submitted",): Promise<AdminTutorProfile[]> {
   if (dataMode === "mock") { await delay(); return mockAdminProfiles(status); }
-  const response = await request<ApiEnvelope<AdminTutorProfile[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}` });
+  const response = await request<ApiEnvelope<AdminTutorProfile[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}&scope=mine` });
   return unwrap(response.data);
+}
+
+export async function getAdminTutorQueue(status: TutorProfileStatus = "submitted"): Promise<AdminTutorQueueItem[]> {
+  if (dataMode === "mock") { await delay(); return []; }
+  const response = await request<ApiEnvelope<AdminTutorQueueItem[]>>({ method: "GET", url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}&scope=unassigned` });
+  return unwrap(response.data);
+}
+
+export async function getAdminTutorReviewPage(scope: "unassigned" | "mine", status: TutorProfileStatus, page: number) {
+  const perPage = 10;
+  if (dataMode === "mock") {
+    const items = scope === "mine" ? await getAdminTutorProfiles(status) : await getAdminTutorQueue(status);
+    return { items: items.slice((page - 1) * perPage, page * perPage), total: items.length, page, perPage };
+  }
+  const response = await request<ApiEnvelope<Array<AdminTutorProfile | AdminTutorQueueItem>>>({
+    method: "GET",
+    url: `/admin/tutor-profiles?status=${encodeURIComponent(status)}&scope=${scope}&page=${page}&per_page=${perPage}`,
+  });
+  return { items: response.data.data, total: Number(response.data.meta?.total ?? 0), page, perPage };
+}
+
+export async function assignAdminTutorProfile(id: number, adminId: number, assignmentVersion: number): Promise<void> {
+  if (dataMode === "mock") { await delay(); throw new ApiClientError("Không có hồ sơ chờ phân công trong dữ liệu demo."); }
+  await request({
+    method: "PUT",
+    url: `/admin/tutor-profiles/${id}/assignment`,
+    data: {
+      assigned_admin_id: adminId,
+      assignment_version: assignmentVersion,
+      reason: "Admin nhận hồ sơ để xét duyệt.",
+    },
+  }, true);
 }
 
 export async function getAdminTutorProfile(id: number): Promise<AdminTutorProfile> {
@@ -80,7 +118,7 @@ export async function getAdminTutorProfile(id: number): Promise<AdminTutorProfil
 
 export type AdminAction = "approve" | "request-changes" | "reject" | "suspend" | "restore";
 
-export async function performAdminTutorAction(id: number, action: AdminAction, reason: string): Promise<AdminTutorProfile> {
+export async function performAdminTutorAction(id: number, action: AdminAction, reason: string, context: AdminTutorProfile): Promise<AdminTutorProfile> {
   if (dataMode === "mock") {
     await delay();
     const current = await getAdminTutorProfile(id);
@@ -108,8 +146,10 @@ if (action === "suspend") {
 }    current.profile = profile;
     return (await getAdminTutorProfile(id));
   }
-  const response = await request<ApiEnvelope<AdminTutorProfile>>({ method: "POST", url: `/admin/tutor-profiles/${id}/${action}`, data: { reason } }, true);
-  return unwrap(response.data);
+  const decision=!["suspend","restore"].includes(action);
+  if(decision && context.assignment?.assignment_version === undefined) throw new ApiClientError("Tải lại hồ sơ trước khi quyết định.");
+  await request({ method:"POST", url:`/admin/tutor-profiles/${id}/${action}`, data:{reason,...(decision?{assignment_version:context.assignment?.assignment_version,...(context.revision?{expected_version:context.revision.version}:{})}:{})} },true);
+  return getAdminTutorProfile(id);
 }
 
 export async function performAdminAccountAction(id: number, action: "suspend" | "restore", reason: string): Promise<User> {
@@ -129,11 +169,13 @@ export async function login(email: string, password: string, remember = false): 
     await delay();
     const user = mockCurrentUser();
     setAuthHint(true);
+    notifyAccountUpdated();
     return user;
   }
   const response = await request<ApiEnvelope<User>>({ method: "POST", url: "/auth/login", data: { email, password, remember } }, true);
   const user = unwrap(response.data);
   setAuthHint(true);
+  notifyAccountUpdated();
   return user;
 }
 
@@ -174,9 +216,9 @@ export async function verifyEmail(id: string, hash: string, signature?: { expire
   return unwrap(response.data);
 }
 
-export async function resendVerification(): Promise<string> {
+export async function resendVerification(email?: string): Promise<string> {
   if (dataMode === "mock") { await delay(); return "Verification notification sent."; }
-  const response = await request<{ message: string }>({ method: "POST", url: "/auth/email/verification-notification" }, true);
+  const response = await request<{ message: string }>({ method: "POST", url: "/auth/email/verification-notification", data: email ? {email} : undefined }, true);
   return response.data.message;
 }
 
@@ -210,6 +252,8 @@ export async function getTutorProfile(): Promise<TutorProfile> {
 }
 
 export async function saveTutorProfile(input: {
+  expected_version?: number;
+  qualification_claims?: Array<{type:"degree"|"certificate";name:string}>;
   headline: string;
   bio?: string | null;
   experience_years: number;
@@ -226,7 +270,7 @@ export async function submitTutorProfile(): Promise<TutorProfile> {
   return unwrap(response.data);
 }
 
-export async function uploadFile(file: File, purpose: FilePurpose): Promise<FileRecord> {
+export async function uploadFile(file: File, purpose: FilePurpose, onProgress?: (percent:number)=>void): Promise<FileRecord> {
   if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
     throw new Error(
       "File phải có dung lượng từ 1 đến 5.000.000 byte (5 MB).",
@@ -250,7 +294,7 @@ export async function uploadFile(file: File, purpose: FilePurpose): Promise<File
   const formData = new FormData();
   formData.append("file", file);
   formData.append("purpose", purpose);
-  const response = await request<ApiEnvelope<FileRecord>>({ method: "POST", url: "/files", data: formData }, true);
+  const response = await request<ApiEnvelope<FileRecord>>({ method: "POST", url: "/files", data: formData, onUploadProgress: event => {if(event.total)onProgress?.(Math.round(event.loaded/event.total*100));} }, true);
   return unwrap(response.data);
 }
 
@@ -273,7 +317,7 @@ export async function completeFile(fileId: number): Promise<FileRecord> {
   return unwrap(response.data);
 }
 
-export async function attachTutorAvatar(fileId: number): Promise<TutorProfile> {
+export async function attachTutorAvatar(fileId: number, expectedVersion?: number): Promise<TutorProfile> {
   if (dataMode === "mock") {
     await delay();
     return { ...mockTutorOnboarding().profile as TutorProfile, avatar_file_id: fileId };
@@ -281,7 +325,7 @@ export async function attachTutorAvatar(fileId: number): Promise<TutorProfile> {
   const response = await request<ApiEnvelope<TutorProfile>>({
     method: "PUT",
     url: "/tutor/profile/avatar",
-    data: { file_id: fileId },
+    data: { file_id: fileId, ...(expectedVersion!==undefined?{expected_version:expectedVersion}:{}) },
   }, true);
   return unwrap(response.data);
 }

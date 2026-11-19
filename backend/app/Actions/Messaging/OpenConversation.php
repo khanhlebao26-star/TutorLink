@@ -88,15 +88,16 @@ class OpenConversation
 
             $now = CarbonImmutable::now('UTC');
 
-            if (
-                $profile === null
-                || ! app(TutorEligibility::class)->canManagePrograms($tutor, $profile, $now)
-            ) {
-                $this->fail(
-                    403,
-                    'tutor_ineligible',
-                    'Tutor is not eligible for a new contact.',
-                    $requestId,
+            $eligibilityReasons = app(TutorEligibility::class)->ineligibilityReasons($tutor, $profile, $now);
+            if ($eligibilityReasons !== []) {
+                throw new HttpResponseException(
+                    ApiErrorResponse::make(
+                        403,
+                        'tutor_ineligible',
+                        'Gia sư chưa đủ điều kiện để bắt đầu cuộc trò chuyện mới.',
+                        $requestId,
+                        ['eligibility' => $eligibilityReasons],
+                    ),
                 );
             }
 

@@ -1,0 +1,10 @@
+FROM tutorlink-capacity-image:local
+
+USER root
+RUN curl --fail --show-error --silent --location --max-time 90 \
+        https://pecl.php.net/get/redis-6.3.0.tgz -o /tmp/redis.tgz \
+    && printf '\n\n\n\n\n\n' | pecl install /tmp/redis.tgz \
+    && docker-php-ext-enable redis \
+    && rm -f /tmp/redis.tgz \
+    && php --ri redis >/dev/null
+USER www-data

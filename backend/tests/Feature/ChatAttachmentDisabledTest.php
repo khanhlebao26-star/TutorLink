@@ -97,18 +97,18 @@ test('omitted file_ids and empty array replay the same text', function (): void 
     $this->assertDatabaseCount('file_links', 0);
 });
 
-test('client cannot send file or system messages', function (string $messageType): void {
+test('file messages require attachments and system messages are reserved', function (string $messageType, string $invalidField): void {
     $payload = Fixtures::payload();
     $payload['message_type'] = $messageType;
 
     $this->actingAs($this->customer)
         ->postJson($this->url, $payload)
         ->assertUnprocessable()
-        ->assertJsonValidationErrors('message_type');
+        ->assertJsonValidationErrors($invalidField);
 
     $this->assertDatabaseCount('messages', 0);
     $this->assertDatabaseCount('file_links', 0);
-})->with(['file', 'system']);
+})->with([['file', 'file_ids'], ['system', 'message_type']]);
 
 test('multipart cannot attach a binary file to a text message', function (): void {
     $filesBefore = DB::table('files')->count();
@@ -132,7 +132,7 @@ test('multipart cannot attach a binary file to a text message', function (): voi
     expect(Storage::disk('local')->allFiles())->toBeEmpty();
 });
 
-test('message attachment purpose cannot be uploaded', function (): void {
+test('uploading a message attachment creates a private pending file without linking it', function (): void {
     $filesBefore = DB::table('files')->count();
 
     $this->actingAs($this->customer)
@@ -145,12 +145,14 @@ test('message attachment purpose cannot be uploaded', function (): void {
         ], [
             'Accept' => 'application/json',
         ])
-        ->assertUnprocessable()
-        ->assertJsonValidationErrors('purpose');
+        ->assertCreated()
+        ->assertJsonPath('data.scan_status', 'pending')
+        ->assertJsonPath('data.complete', false);
 
-    $this->assertDatabaseCount('files', $filesBefore);
+    $this->assertDatabaseCount('files', $filesBefore + 1);
+    $this->assertDatabaseHas('files', ['owner_id' => $this->customer->id, 'purpose' => 'message_attachment', 'visibility' => 'private']);
     $this->assertDatabaseCount('file_links', 0);
-    expect(Storage::disk('local')->allFiles())->toBeEmpty();
+    expect(Storage::disk('local')->allFiles())->toHaveCount(1);
 });
 
 test('an owned complete file cannot be linked to a real message', function (): void {

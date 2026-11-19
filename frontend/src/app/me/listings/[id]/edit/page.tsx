@@ -1,5 +1,5 @@
+import { ListingForm } from "@/components/marketplace/listing-form";
 import { notFound } from "next/navigation";
-import { ListingForm } from "@/components/listing-form";
 
 export default async function EditListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

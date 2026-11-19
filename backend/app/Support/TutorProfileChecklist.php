@@ -29,17 +29,27 @@ class TutorProfileChecklist
                 && ($document->expires_at === null || $document->expires_at->isFuture());
         });
         $claims = $payload['qualification_claims'] ?? [];
+        // Local environments may disable document uploads for testing. Keep the
+        // same setting in force during approval; production config explicitly
+        // enables this requirement.
+        $documentsRequired = config('tutor.verification_documents_required', true);
         $requiredTypes = collect($claims)->pluck('type')->unique();
-        $qualificationsValid = $requiredTypes->every(fn (string $type): bool => $documents->contains('document_type', $type));
+        $qualificationsValid = ! $documentsRequired
+            || $requiredTypes->every(fn (string $type): bool => $documents->contains('document_type', $type));
         Validator::make([
             'headline' => trim($payload['headline'] ?? ''), 'bio' => trim($payload['bio'] ?? ''),
             'specialization_id' => Specialization::where('id', $specializationId)->where('status', 'active')->exists() ? $specializationId : null,
             'avatar_file_id' => $this->validFile(File::find($payload['avatar_file_id'] ?? null), $profile->user_id, 'avatar') ? $payload['avatar_file_id'] : null,
-            'verification_document_file_id' => $documents->whereIn('document_type', ['identity_card', 'passport'])->isNotEmpty() ? 1 : null,
+            'verification_document_file_id' => ! $documentsRequired || $documents->whereIn('document_type', ['identity_card', 'passport'])->isNotEmpty() ? 1 : null,
             'qualification_claims' => $qualificationsValid ? true : null,
         ], [
             'headline' => ['required'], 'bio' => ['required'], 'specialization_id' => ['required'],
-            'avatar_file_id' => ['required'], 'verification_document_file_id' => ['required'], 'qualification_claims' => ['required'],
+            'avatar_file_id' => ['required'], 'qualification_claims' => ['required'],
         ])->validate();
+        if ($documentsRequired) {
+            Validator::make([
+                'verification_document_file_id' => $documents->whereIn('document_type', ['identity_card', 'passport'])->isNotEmpty() ? 1 : null,
+            ], ['verification_document_file_id' => ['required']])->validate();
+        }
     }
 }

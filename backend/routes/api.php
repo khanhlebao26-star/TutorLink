@@ -9,11 +9,14 @@ use App\Http\Controllers\Api\V1\AvailabilityRuleController;
 use App\Http\Controllers\Api\V1\CatalogController;
 use App\Http\Controllers\Api\V1\ConversationController;
 use App\Http\Controllers\Api\V1\ConversationRealtimeController;
+use App\Http\Controllers\Api\V1\CustomerLearningProfileController;
+use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\FeeRecordController;
 use App\Http\Controllers\Api\V1\FileController;
 use App\Http\Controllers\Api\V1\InvitationAcceptController;
 use App\Http\Controllers\Api\V1\InvitationController;
 use App\Http\Controllers\Api\V1\ListingController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\NotificationOutboxController;
 use App\Http\Controllers\Api\V1\PersonalAccessTokenController;
 use App\Http\Controllers\Api\V1\ProgramController;
@@ -21,6 +24,7 @@ use App\Http\Controllers\Api\V1\ProgramOverviewController;
 use App\Http\Controllers\Api\V1\ProgressRecordController;
 use App\Http\Controllers\Api\V1\PublicTutorController;
 use App\Http\Controllers\Api\V1\PublicTutorReviewController;
+use App\Http\Controllers\Api\V1\QuizController;
 use App\Http\Controllers\Api\V1\ReportController;
 use App\Http\Controllers\Api\V1\ReviewController;
 use App\Http\Controllers\Api\V1\SessionController;
@@ -32,11 +36,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::middleware(EnsureActiveApiActor::class)->group(function () {
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read']);
+        Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy']);
+        Route::post('/notifications/read-all', [NotificationController::class, 'readAll']);
         Route::get('/programs/{program}/review', [ReviewController::class, 'show'])->whereNumber('program');
         Route::get('/admin/reviews', [ReviewController::class, 'index']);
         Route::get('/admin/reviews/{review}', [ReviewController::class, 'detail'])->whereNumber('review');
         Route::get('/me/reports', [ReportController::class, 'mine']);
         Route::get('/me/reports/{report}', [ReportController::class, 'ownDetail'])->whereNumber('report');
+        Route::get('/me/learning-profile', [CustomerLearningProfileController::class, 'show']);
+        Route::put('/me/learning-profile', [CustomerLearningProfileController::class, 'update']);
         Route::get('/admin/reports', [ReportController::class, 'index']);
         Route::get('/admin/reports/{report}', [ReportController::class, 'show'])->whereNumber('report');
         Route::get('/admin/reports/{report}/evidence', [ReportController::class, 'evidence'])->whereNumber('report');
@@ -138,6 +149,10 @@ Route::prefix('v1')->group(function () {
             ->name('invitations.cancel');
         Route::get('/programs/{program}/tasks', [TaskController::class, 'index'])->whereNumber('program');
         Route::post('/programs/{program}/tasks', [TaskController::class, 'store'])->whereNumber('program');
+        Route::get('/programs/{program}/quizzes', [QuizController::class, 'index'])->whereNumber('program');
+        Route::post('/programs/{program}/quizzes', [QuizController::class, 'store'])->whereNumber('program');
+        Route::get('/quizzes/{quiz}', [QuizController::class, 'show'])->whereNumber('quiz');
+        Route::post('/quizzes/{quiz}/attempts', [QuizController::class, 'submit'])->whereNumber('quiz');
         Route::get('/tasks/{task}', [TaskController::class, 'show'])->whereNumber('task');
         Route::patch('/tasks/{task}', [TaskController::class, 'update'])->whereNumber('task');
         Route::post('/tasks/{task}/start', [TaskController::class, 'start'])->whereNumber('task');
@@ -149,6 +164,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/tasks/{task}/submission/request-revision', [TaskController::class, 'requestRevision'])->whereNumber('task');
         Route::post('/conversations', [ConversationController::class, 'store'])
             ->name('conversations.store');
+        Route::get('/conversations/unread-count', [ConversationController::class, 'unreadCount']);
         Route::get('/conversations', [ConversationController::class, 'index'])
             ->name('conversations.index');
 
@@ -223,21 +239,23 @@ Route::prefix('v1')->group(function () {
             ->middleware(['signed', 'throttle:6,1'])
             ->name('verification.verify');
 
+        Route::post('/email/verification-notification', [
+            AuthController::class,
+            'resendVerification',
+        ])->middleware('throttle:6,1')
+            ->name('verification.send');
+
         Route::middleware('auth:web')->group(function () {
             Route::post('/logout', [AuthController::class, 'logout'])
                 ->name('auth.logout');
 
-            Route::post('/email/verification-notification', [
-                AuthController::class,
-                'resendVerification',
-            ])->middleware('throttle:6,1')
-                ->name('verification.send');
         });
     });
 
     Route::get('/listings', [ListingController::class, 'index']);
     Route::get('/listings/{slug}', [ListingController::class, 'show']);
 
+    Route::get('/tutors', [PublicTutorController::class, 'index']);
     Route::get('/tutors/{slug}', [
         PublicTutorController::class,
         'show',
@@ -247,6 +265,15 @@ Route::prefix('v1')->group(function () {
         ->where('slug', '[a-z0-9-]+');
 
     Route::middleware(['auth:web', EnsureActiveAccount::class])->group(function () {
+        Route::get('/me/favorites', [FavoriteController::class, 'index'])
+            ->name('favorites.index');
+        Route::post('/me/favorites/{slug}', [FavoriteController::class, 'store'])
+            ->where('slug', '[a-z0-9-]+')
+            ->name('favorites.store');
+        Route::delete('/me/favorites/{slug}', [FavoriteController::class, 'destroy'])
+            ->where('slug', '[a-z0-9-]+')
+            ->name('favorites.destroy');
+
         Route::get('/me/availability-rules', [
             AvailabilityRuleController::class,
             'index',

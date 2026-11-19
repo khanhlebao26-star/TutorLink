@@ -1,0 +1,7 @@
+[
+  {
+    "label": "Recipient notifications, deep link, mark one and mark all",
+    "status": "Pass",
+    "evidence": "Recipient-only list, permitted link opens, 15 → 14 → 0"
+  }
+]

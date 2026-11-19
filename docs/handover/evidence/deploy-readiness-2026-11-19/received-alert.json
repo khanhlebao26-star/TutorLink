@@ -1,0 +1,11 @@
+{
+  "test_configuration": "disk threshold deliberately set to 0% for local delivery proof; normal default 80%",
+  "receiver": "local HTTP POST /alerts",
+  "received": {
+    "metric": "disk_percent",
+    "resource": "collector-host-filesystem",
+    "value": 66.33149077535282,
+    "threshold": 0.0,
+    "received_at": "2026-11-19T05:08:58.668706+00:00"
+  }
+}

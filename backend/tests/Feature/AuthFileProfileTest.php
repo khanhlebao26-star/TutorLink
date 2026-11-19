@@ -73,7 +73,7 @@ class AuthFileProfileTest extends TestCase
         $user = User::query()->where('email', 'verification@example.com')->firstOrFail();
         Notification::assertSentTo($user, VerifyEmail::class);
 
-        $url = (new VerifyEmail)->toMail($user)->actionUrl;
+        $url = (new VerifyEmail)->toMail($user)->viewData['verificationUrl'];
         parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
 
         $this->assertStringStartsWith('http://localhost:3000/auth/verify-email?', $url);

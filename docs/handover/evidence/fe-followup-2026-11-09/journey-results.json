@@ -1,0 +1,52 @@
+[
+  {
+    "step": "Customer text messaging route",
+    "status": "PASS",
+    "detail": "HTTP route loaded; title=TutorLink"
+  },
+  {
+    "step": "Pending invitation preview",
+    "status": "PASS",
+    "detail": "Invitation #1, Program #2, pending"
+  },
+  {
+    "step": "Accept invitation and open workspace",
+    "status": "PASS",
+    "detail": "Customer opened Program #2"
+  },
+  {
+    "step": "Customer opens all six Program tabs",
+    "status": "PASS",
+    "detail": "overview, sessions, tasks, progress, announcements, fees rendered"
+  },
+  {
+    "step": "Tutor opens all six Program tabs",
+    "status": "PASS",
+    "detail": "overview, sessions, tasks, progress, announcements, fees rendered"
+  },
+  {
+    "step": "Tutor pauses then resumes Program",
+    "status": "PASS",
+    "detail": "paused → resumed → active"
+  },
+  {
+    "step": "Tutor creates and completes a session",
+    "status": "PASS",
+    "detail": "scheduled → completed actual session"
+  },
+  {
+    "step": "Tutor creates progress, announcement, fee records",
+    "status": "PASS",
+    "detail": "progress, announcement, fee record saved"
+  },
+  {
+    "step": "Tutor creates task; Customer submits; Tutor reviews",
+    "status": "PASS",
+    "detail": "task #2 submitted and review action sent"
+  },
+  {
+    "step": "Tutor completes Program; Customer reviews and checks notification page",
+    "status": "PASS",
+    "detail": "Program completed, Customer review saved, notification page loaded"
+  }
+]

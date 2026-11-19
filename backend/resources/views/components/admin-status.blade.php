@@ -1,0 +1,1 @@
+@props(['status'])<span class="status">{{ ['submitted'=>'Chờ duyệt','approved'=>'Đã duyệt','changes_requested'=>'Cần chỉnh sửa','rejected'=>'Từ chối','suspended'=>'Đình chỉ'][$status] ?? $status }}</span>
