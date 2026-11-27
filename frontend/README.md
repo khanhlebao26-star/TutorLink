@@ -55,6 +55,12 @@ Bảng dưới mô tả nguồn dữ liệu trong mã hiện tại. Đường d�
 - Hồ sơ gia sư chỉ hiển thị số học viên và thời gian phản hồi do API trả về; thiếu dữ liệu hiển thị “—” hoặc “chưa cập nhật”.
 - Trang `/about` chứa nội dung giới thiệu. Phần FAQ của `/support` chứa câu hỏi và liên kết soạn sẵn. Trang `/monitoring` dẫn quản trị viên sang Telescope, Pulse và dashboard máy chủ nếu đã cấu hình `NEXT_PUBLIC_HOST_DASHBOARD_URL`.
 
+### Prerender trang public
+
+Trang chủ, `/about`, `/become-a-tutor` và hồ sơ `/tutors/[slug]` dùng static rendering/ISR với chu kỳ revalidate 300 giây. Tutor profiles lấy tối đa sáu slug khác nhau từ 50 listing public mới nhất để prerender; slug khác render on-demand. Trang tutor lấy dữ liệu profile public ở server để HTML ban đầu có nội dung, còn review và các trang listing tiếp theo giữ cơ chế tải phía client. API lỗi khi build không chặn build: danh sách slug lỗi thì không prebuild tutor nào; dữ liệu profile lỗi thì để client tải lại khi có lượt truy cập.
+
+Đây là chu kỳ tái tạo, không phải cam kết độ mới tối đa: request đầu sau 300 giây có thể nhận trang cũ trong lúc ISR chạy; cache API public phía backend có thể cộng thêm tối đa 60 giây. Khi tái tạo lỗi, Next.js giữ bản prerender thành công gần nhất. Chỉ dữ liệu public được đưa vào HTML ISR; route tài khoản và quản trị không áp dụng.
+
 ### Kết nối backend
 
 Chạy frontend độc lập với cấu hình sau trong `frontend/.env.local`, rồi khởi động lại Next.js.
@@ -83,4 +89,4 @@ Use `frontend` as the Vercel project root, Node.js 22, `npm ci`, and `npm run bu
 
 [.vercelignore](.vercelignore) excludes local builds, browser scripts, tests and QA output from CLI uploads. Git integration builds from the repository checkout; only route dependencies and public assets belong in the deployed application. Backend production builds separately exclude test seeders, local storage, caches and development tooling through [Dockerfile.production.dockerignore](../backend/Dockerfile.production.dockerignore).
 
-`npm run test:coverage` enforces frontend line coverage above 70%; the shared CI gate independently verifies backend coverage. The public/private option in `useAsyncData` prevents a guest `/me` response from cancelling public requests. The homepage defers the below-fold tutor section but retains a single candidate snapshot for both featured sections. `not-found`, route/global error boundaries and `instrumentation.ts` provide user recovery and structured server-error logs.
+`npm run test:coverage` enforces frontend line and statement coverage above 80%. Latest local result on November 27, 2026: 209 tests in 40 files passed, with **80.52% statements** and **85.66% lines**. See the [coverage and prerender evidence report](../docs/handover/FE-prerender-benchmark-coverage-2026-11-27.md). The shared CI gate independently verifies backend coverage. Public page ISR is documented in the [project performance strategy](../README.md#614-public-page-prerendering-and-tutor-isr). The public/private option in `useAsyncData` prevents a guest `/me` response from cancelling public requests. The homepage defers the below-fold tutor section but retains a single candidate snapshot for both featured sections. `not-found`, route/global error boundaries and `instrumentation.ts` provide user recovery and structured server-error logs.

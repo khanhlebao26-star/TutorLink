@@ -27,6 +27,25 @@ it('renders a public tutor and switches between service, review and schedule vie
  for(const tab of ['Dịch vụ','Đánh giá','Lịch khả dụng']){const buttons=screen.queryAllByRole('button',{name:new RegExp(tab)});if(buttons.length)await userEvent.click(buttons[0]);}
  expect(api.getPublicTutor).toHaveBeenCalledWith('anna',1);expect(api.getTutorReviews).toHaveBeenCalledWith('anna',1);
 });
+it('renders a server-prerendered tutor profile immediately without a duplicate first-page API read',async()=>{
+ render(<PublicTutor slug="anna" initialTutor={tutor}/>);
+ expect(screen.getByRole('heading',{name:'Anna Tutor'})).toBeVisible();
+ await waitFor(()=>expect(api.getPublicTutor).not.toHaveBeenCalled());
+});
+it('keeps direct tutor tab links working with static profile output',async()=>{
+ window.history.replaceState(null,'','/tutors/anna?tab=reviews');
+ render(<PublicTutor slug="anna" initialTutor={tutor}/>);
+ expect(screen.getByRole('tab',{name:'Đánh giá'})).toHaveAttribute('aria-selected','true');
+ window.history.replaceState(null,'','/marketplace');
+});
+it('uses the optional initial tab only as a starting value',async()=>{
+ window.history.replaceState(null,'','/tutors/anna');
+ render(<PublicTutor slug="anna" initialTutor={tutor} initialTab="reviews"/>);
+ expect(screen.getByRole('tab',{name:'Đánh giá'})).toHaveAttribute('aria-selected','true');
+ await userEvent.click(screen.getByRole('tab',{name:'Dịch vụ'}));
+ expect(screen.getByRole('tab',{name:'Dịch vụ'})).toHaveAttribute('aria-selected','true');
+ window.history.replaceState(null,'','/marketplace');
+});
 it('does not invent profile statistics for a former demo listing',async()=>{
  vi.mocked(api.getPublicTutor).mockResolvedValue({...tutor,listings:[{...listing,slug:'demo-featured-math-online'}]});
  const view=render(<PublicTutor slug="anna"/>);await screen.findByRole('heading',{name:'Anna Tutor'});

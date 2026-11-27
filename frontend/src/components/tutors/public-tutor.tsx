@@ -4,11 +4,11 @@ import { OpenChatButton } from "@/components/messaging/open-chat-button";
 import { Badge, Button, ErrorActions, StatePanel } from "@/components/shared/ui";
 import { PublicAvailability } from "@/components/tutors/public-availability";
 import { deliveryLabels, formatListingPrice, getPublicTutor, getTutorReviews, searchListings } from "@/lib/data/marketplace";
-import type { PublicListing, TutorReviewAggregate, TutorReviewCollection } from "@/lib/data/marketplace-types";
+import type { PublicListing, TutorPublic, TutorReviewAggregate, TutorReviewCollection } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 function TutorSkeleton({ className = "" }: { className?: string }) {
   return <span className={`tutor-loading-skeleton ${className}`} />;
@@ -112,23 +112,44 @@ function PublicTutorLoading() {
   </section>;
 }
 
-export function PublicTutor({ slug, initialTab = "overview" }: { slug: string; initialTab?: TutorProfileTab }) {
-  const [activeTab, setActiveTab] = useState<TutorProfileTab>(initialTab);
+export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; initialTab?: TutorProfileTab; initialTutor?: TutorPublic }) {
+  const subscribeToTab = useCallback((notify: () => void) => {
+    window.addEventListener("popstate", notify);
+    window.addEventListener("tutorlink-public-tutor-tab", notify);
+    return () => {
+      window.removeEventListener("popstate", notify);
+      window.removeEventListener("tutorlink-public-tutor-tab", notify);
+    };
+  }, []);
+  const getTabSnapshot = useCallback((): TutorProfileTab => {
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    return requested === "services" || requested === "reviews" || requested === "schedule" ? requested : initialTab ?? "overview";
+  }, [initialTab]);
+  const getServerTabSnapshot = useCallback(() => initialTab ?? "overview", [initialTab]);
+  const activeTab = useSyncExternalStore(subscribeToTab, getTabSnapshot, getServerTabSnapshot);
   const [page, setPage] = useState(1);
   const [reviewPage, setReviewPage] = useState(1);
   const [listingSlide, setListingSlide] = useState(0);
-  const load = useCallback(() => getPublicTutor(slug, page), [slug, page]);
-  const { data, error, loading, reload } = useAsyncData(load, false);
+  const initialTutorRef = useRef(initialTutor);
+  const load = useCallback(() => {
+    if (page === 1 && initialTutorRef.current?.slug === slug) return Promise.resolve(initialTutorRef.current);
+    return getPublicTutor(slug, page);
+  }, [slug, page]);
+  const tutorResult = useAsyncData(load, false);
+  const data = tutorResult.data ?? (page === 1 && initialTutor?.slug === slug ? initialTutor : null);
+  const error = tutorResult.error;
+  const loading = tutorResult.loading && data === null;
+  const reload = tutorResult.reload;
   const loadReviews = useCallback(() => getTutorReviews(slug, reviewPage), [slug, reviewPage]);
   const reviews = useAsyncData<TutorReviewCollection>(loadReviews, false);
   const loadRelated = useCallback(() => loadRelatedTutors(slug), [slug]);
   const relatedTutors = useAsyncData<RelatedTutor[]>(loadRelated, false);
   const selectTab = useCallback((tab: TutorProfileTab) => {
-    setActiveTab(tab);
     const url = new URL(window.location.href);
     if (tab === "overview") url.searchParams.delete("tab");
     else url.searchParams.set("tab", tab);
     window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    window.dispatchEvent(new Event("tutorlink-public-tutor-tab"));
   }, []);
 
   if (loading) return <PublicTutorLoading />;
@@ -270,7 +291,7 @@ export function PublicTutor({ slug, initialTab = "overview" }: { slug: string; i
             <span className="tutor-profile-booking-icon"><TutorProfileIcon name="warmup" /></span>
             <h2>Bắt đầu học cùng {name}</h2>
             <p>Trao đổi mục tiêu và thống nhất lịch phù hợp với gia sư.</p>
-            <button className="button button-primary" onClick={() => setActiveTab("schedule")} type="button">Xem lịch học</button>
+            <button className="button button-primary" onClick={() => selectTab("schedule")} type="button">Xem lịch học</button>
             <OpenChatButton peerId={data.messaging_user_id} contact={chatContact} label="Nhắn tin tư vấn" />
           </section>
         </aside>

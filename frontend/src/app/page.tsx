@@ -13,6 +13,9 @@ import { SealCheckIcon } from "@phosphor-icons/react/dist/ssr/SealCheck";
 import Image from "next/image";
 import Link from "next/link";
 
+export const dynamic = "force-static";
+export const revalidate = 300;
+
 const learningSteps = [
   { number: "1", icon: "search", title: "Tìm dịch vụ", text: "Khám phá các dịch vụ phù hợp với mục tiêu của bạn." },
   { number: "2", icon: "chat", title: "Nhắn tin trao đổi", text: "Trao đổi trực tiếp để hiểu rõ nội dung và lộ trình." },

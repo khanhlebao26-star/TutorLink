@@ -12,6 +12,9 @@ import { GraduationCapIcon } from "@phosphor-icons/react/dist/ssr/GraduationCap"
 import { PathIcon } from "@phosphor-icons/react/dist/ssr/Path";
 import { TargetIcon } from "@phosphor-icons/react/dist/ssr/Target";
 
+export const dynamic = "force-static";
+export const revalidate = 300;
+
 export default function AboutPage() {
   return <AppShell mode="public" title="About TutorLink">
     <div className="about-page">

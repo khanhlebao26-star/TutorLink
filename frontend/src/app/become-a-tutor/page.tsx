@@ -2,6 +2,9 @@ import { AppShell } from "@/components/layout/app-shell";
 import Image from "next/image";
 import Link from "next/link";
 
+export const dynamic = "force-static";
+export const revalidate = 300;
+
 const tutorRegistration = "/auth/register?role=tutor";
 
 const tutorSteps = [
