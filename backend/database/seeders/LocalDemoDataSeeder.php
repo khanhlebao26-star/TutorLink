@@ -69,23 +69,20 @@ class LocalDemoDataSeeder extends Seeder
                 $now,
             );
 
-            $tutorProfile = TutorProfile::query()->updateOrCreate(
-                ['user_id' => $tutor->id],
-                [
-                    'headline' => 'Gia sư tiếng Anh giao tiếp và tiếng Anh công việc',
-                    'bio' => 'Mình đồng hành cùng người học muốn giao tiếp tiếng Anh tự tin hơn trong đời sống và công việc. Buổi học tập trung vào mục tiêu thực tế, luyện nói có hướng dẫn và phản hồi cụ thể để người học biết mình cần cải thiện điều gì.',
-                    'experience_years' => 6,
-                    'approval_status' => 'active',
-                    'status' => 'approved',
-                    'submitted_at' => $now->copy()->subDays(5),
-                    'reviewed_by' => $admin->id,
-                    'reviewed_at' => $now->copy()->subDays(4),
-                    'review_reason' => null,
-                    'suspended_at' => null,
-                    'avatar_file_id' => null,
-                    'qualification_claims' => [],
-                ],
-            );
+            $tutorProfile = TutorProfile::query()->updateOrCreate(['user_id' => $tutor->id], TutorProfile::factory()->raw(array_merge(['user_id' => $tutor->id], [
+                'headline' => 'Gia sư tiếng Anh giao tiếp và tiếng Anh công việc',
+                'bio' => 'Mình đồng hành cùng người học muốn giao tiếp tiếng Anh tự tin hơn trong đời sống và công việc. Buổi học tập trung vào mục tiêu thực tế, luyện nói có hướng dẫn và phản hồi cụ thể để người học biết mình cần cải thiện điều gì.',
+                'experience_years' => 6,
+                'approval_status' => 'active',
+                'status' => 'approved',
+                'submitted_at' => $now->copy()->subDays(5),
+                'reviewed_by' => $admin->id,
+                'reviewed_at' => $now->copy()->subDays(4),
+                'review_reason' => null,
+                'suspended_at' => null,
+                'avatar_file_id' => null,
+                'qualification_claims' => [],
+            ])));
 
             $studentProfile = [
                 'city' => 'Hồ Chí Minh',
@@ -103,10 +100,7 @@ class LocalDemoDataSeeder extends Seeder
                     $studentProfile[$column] = $value;
                 }
             }
-            CustomerProfile::query()->updateOrCreate(
-                ['user_id' => $student->id],
-                $studentProfile,
-            );
+            CustomerProfile::query()->updateOrCreate(['user_id' => $student->id], CustomerProfile::factory()->raw(array_merge(['user_id' => $student->id], $studentProfile)));
 
             $conversation = $this->activeSpecialization('conversation-english');
             $business = $this->activeSpecialization('business-english');
@@ -219,7 +213,7 @@ class LocalDemoDataSeeder extends Seeder
         }
 
         if (! $user) {
-            $user = new User;
+            $user = User::factory()->make();
             $user->email = $email;
         }
 
@@ -343,23 +337,20 @@ class LocalDemoDataSeeder extends Seeder
                 $data['name'],
                 $now,
             );
-            $profile = TutorProfile::query()->updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'headline' => $data['headline'],
-                    'bio' => $data['bio'],
-                    'experience_years' => $data['experience_years'],
-                    'approval_status' => 'active',
-                    'status' => 'approved',
-                    'submitted_at' => $now->copy()->subDays(5),
-                    'reviewed_by' => $adminId,
-                    'reviewed_at' => $now->copy()->subDays(4),
-                    'review_reason' => null,
-                    'suspended_at' => null,
-                    'avatar_file_id' => null,
-                    'qualification_claims' => [],
-                ],
-            );
+            $profile = TutorProfile::query()->updateOrCreate(['user_id' => $user->id], TutorProfile::factory()->raw(array_merge(['user_id' => $user->id], [
+                'headline' => $data['headline'],
+                'bio' => $data['bio'],
+                'experience_years' => $data['experience_years'],
+                'approval_status' => 'active',
+                'status' => 'approved',
+                'submitted_at' => $now->copy()->subDays(5),
+                'reviewed_by' => $adminId,
+                'reviewed_at' => $now->copy()->subDays(4),
+                'review_reason' => null,
+                'suspended_at' => null,
+                'avatar_file_id' => null,
+                'qualification_claims' => [],
+            ])));
             $specialization = $this->activeSpecialization($data['specialization']);
             $profile->specializations()->sync([$specialization->id]);
             $this->listing($profile, $specialization, $data['listing']);
@@ -381,7 +372,7 @@ class LocalDemoDataSeeder extends Seeder
         }
 
         if (! $user) {
-            $user = new User;
+            $user = User::factory()->make();
             $user->email = $email;
             $user->password_hash = Hash::make(Str::random(64));
         }
@@ -419,14 +410,11 @@ class LocalDemoDataSeeder extends Seeder
             );
         }
 
-        ServiceListing::query()->updateOrCreate(
-            ['slug' => $attributes['slug']],
-            [
-                ...$attributes,
-                'tutor_profile_id' => $profile->id,
-                'specialization_id' => $specialization->id,
-            ],
-        );
+        ServiceListing::query()->updateOrCreate(['slug' => $attributes['slug']], ServiceListing::factory()->raw(array_merge(['slug' => $attributes['slug']], [
+            ...$attributes,
+            'tutor_profile_id' => $profile->id,
+            'specialization_id' => $specialization->id,
+        ])));
     }
 
     /** @param list<array{0: int, 1: string, 2: string}> $rules */
@@ -437,7 +425,7 @@ class LocalDemoDataSeeder extends Seeder
             ->delete();
 
         foreach ($rules as [$weekday, $start, $end]) {
-            AvailabilityRule::query()->create([
+            AvailabilityRule::factory()->create([
                 'tutor_profile_id' => $profile->id,
                 'weekday' => $weekday,
                 'start_time' => $start,

@@ -47,6 +47,16 @@ class UserFactory extends Factory
         ]);
     }
 
+    public function tutor(): static
+    {
+        return $this->state(fn () => ['role' => 'tutor', 'permissions' => []]);
+    }
+
+    public function customer(): static
+    {
+        return $this->state(fn () => ['role' => 'customer', 'permissions' => []]);
+    }
+
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
