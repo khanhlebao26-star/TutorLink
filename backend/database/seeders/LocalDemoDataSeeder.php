@@ -23,7 +23,9 @@ use RuntimeException;
 class LocalDemoDataSeeder extends Seeder
 {
     private const TUTOR_EMAIL = 'tutor.demo@tutorlink.test';
+
     private const STUDENT_EMAIL = 'student.demo@tutorlink.test';
+
     private const PASSWORD = 'TutorLinkDemo2026!';
 
     public function run(): void
@@ -217,7 +219,7 @@ class LocalDemoDataSeeder extends Seeder
         }
 
         if (! $user) {
-            $user = new User();
+            $user = new User;
             $user->email = $email;
         }
 
@@ -379,7 +381,7 @@ class LocalDemoDataSeeder extends Seeder
         }
 
         if (! $user) {
-            $user = new User();
+            $user = new User;
             $user->email = $email;
             $user->password_hash = Hash::make(Str::random(64));
         }
