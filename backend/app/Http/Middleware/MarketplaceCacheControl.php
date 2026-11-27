@@ -29,7 +29,7 @@ class MarketplaceCacheControl
                 $cache = Cache::store(config('cache.marketplace_store'));
                 $cached = $cache->get($key);
                 if (is_array($cached) && isset($cached['body'])) {
-                    return response($cached['body'], 200, $this->headers('HIT'));
+                    return $this->conditional($request, response($cached['body'], 200, $this->headers('HIT')));
                 }
             }
         } catch (Throwable) {
@@ -49,7 +49,7 @@ class MarketplaceCacheControl
                     if (is_array($cached) && isset($cached['body'])) {
                         $lock->release();
 
-                        return response($cached['body'], 200, $this->headers('HIT'));
+                        return $this->conditional($request, response($cached['body'], 200, $this->headers('HIT')));
                     }
                 }
             } catch (Throwable) {
@@ -80,7 +80,7 @@ class MarketplaceCacheControl
                 $response->headers->set('Cache-Control', 'private, no-store');
             }
 
-            return $response;
+            return $this->conditional($request, $response);
         } finally {
             try {
                 $lock?->release();
@@ -88,6 +88,16 @@ class MarketplaceCacheControl
                 // Cache failure must not replace an API response.
             }
         }
+    }
+
+    private function conditional(Request $request, Response $response): Response
+    {
+        if ($response->getStatusCode() === 200 && str_contains((string) $response->headers->get('Content-Type'), 'application/json')) {
+            $response->setEtag(hash('sha256', $response->getContent()));
+            $response->isNotModified($request);
+        }
+
+        return $response;
     }
 
     /** @return array<string,string> */

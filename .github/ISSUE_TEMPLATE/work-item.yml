@@ -1,0 +1,23 @@
+name: Work item
+description: Track a concrete problem and its acceptance evidence.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and expected behavior
+      description: Describe the trigger, current behavior and desired result.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable outcomes, including relevant error cases.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Validation and evidence
+      description: Tests, CI run, screenshots or service responses. Distinguish planned from completed checks.

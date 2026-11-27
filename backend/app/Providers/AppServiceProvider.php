@@ -99,6 +99,12 @@ class AppServiceProvider extends ServiceProvider
             ];
         });
 
+        RateLimiter::for('password-recovery', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
+        RateLimiter::for('file-upload', fn (Request $request) => [
+            Limit::perMinute(30)->by('minute:'.$request->user()->id),
+            Limit::perDay(200)->by('day:'.$request->user()->id),
+        ]);
+
         RateLimiter::for('register', function (Request $request) {
             return Limit::perMinute(3)->by($request->ip());
         });

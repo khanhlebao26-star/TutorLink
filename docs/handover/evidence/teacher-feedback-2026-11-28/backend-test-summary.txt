@@ -1,0 +1,12 @@
+=== d04-preflight ===
+  Tests:    7 passed (27 assertions)
+  Duration: 2.43s
+=== regression ===
+  Tests:    791 passed (5746 assertions)
+  Duration: 155.77s
+=== d04 ===
+  Tests:    77 passed (1078 assertions)
+  Duration: 6.92s
+=== d04-race ===
+  Tests:    1 passed (893 assertions)
+  Duration: 23.61s

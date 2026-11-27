@@ -9496,6 +9496,9 @@
                             }
                         }
                     },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
                     "403": {
                         "description": "",
                         "content": {
@@ -9515,33 +9518,98 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "An error",
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
+                    },
+                    "429": {
+                        "description": "Upload request rate limit exceeded.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
                                         "message": {
-                                            "type": "string",
-                                            "description": "Error overview.",
-                                            "examples": [
-                                                "Unable to store uploaded file."
-                                            ]
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
                                         }
                                     },
                                     "required": [
-                                        "message"
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
                                     ]
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
+                    "503": {
+                        "description": "Configured storage is not an allowed private disk.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
+                    "500": {
+                        "description": "Unable to store the uploaded file.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "request_id": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "required": [
+                                        "code",
+                                        "message",
+                                        "request_id",
+                                        "errors"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -25961,7 +26029,8 @@
                     },
                     "description": {
                         "type": "string",
-                        "minLength": 1
+                        "minLength": 1,
+                        "maxLength": 10000
                     },
                     "delivery_mode": {
                         "type": "string",
@@ -25987,7 +26056,8 @@
                     },
                     "price_from_minor": {
                         "type": "integer",
-                        "minimum": 0
+                        "minimum": 0,
+                        "maximum": 1000000000
                     },
                     "currency": {
                         "type": "string",
@@ -26114,6 +26184,8 @@
                             "string",
                             "null"
                         ],
+                        "format": "uri",
+                        "description": "Optional HTTPS meeting URL without embedded credentials.",
                         "maxLength": 2048
                     },
                     "schedule_note": {
@@ -27964,7 +28036,8 @@
                         "type": [
                             "string",
                             "null"
-                        ]
+                        ],
+                        "maxLength": 10000
                     },
                     "experience_years": {
                         "type": "integer",
@@ -28211,7 +28284,8 @@
                     },
                     "description": {
                         "type": "string",
-                        "minLength": 1
+                        "minLength": 1,
+                        "maxLength": 10000
                     },
                     "delivery_mode": {
                         "type": "string",
@@ -28237,7 +28311,8 @@
                     },
                     "price_from_minor": {
                         "type": "integer",
-                        "minimum": 0
+                        "minimum": 0,
+                        "maximum": 1000000000
                     },
                     "currency": {
                         "type": "string",
@@ -28362,6 +28437,8 @@
                             "string",
                             "null"
                         ],
+                        "format": "uri",
+                        "description": "Optional HTTPS meeting URL without embedded credentials.",
                         "maxLength": 2048
                     },
                     "schedule_note": {

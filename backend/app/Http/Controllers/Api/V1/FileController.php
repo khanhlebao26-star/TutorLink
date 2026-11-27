@@ -45,6 +45,9 @@ class FileController extends Controller
     }
 
     /** Upload a private file for technical validation. */
+    #[OpenApiResponse(429, description: 'Upload request rate limit exceeded.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
+    #[OpenApiResponse(503, description: 'Configured storage is not an allowed private disk.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
+    #[OpenApiResponse(500, description: 'Unable to store the uploaded file.', type: 'array{code:string,message:string,request_id:string,errors:object}')]
     public function store(FileUploadRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -53,24 +56,39 @@ class FileController extends Controller
             return response()->json(['message' => 'Email verification is required.'], 403);
         }
 
-        $uploaded = $request->file('file');
-        $objectKey = 'uploads/'.$request->user()->id.'/'.Str::uuid().'.'.$uploaded->extension();
-        abort_unless(Storage::disk('local')->putFileAs(dirname($objectKey), $uploaded, basename($objectKey)), 500, 'Unable to store uploaded file.');
+        return DB::transaction(function () use ($request, $data): JsonResponse {
+            // Serialize quota reservations for this owner, including simultaneous uploads.
+            $actor = DB::table('users')->where('id', $request->user()->id)->lockForUpdate()->first();
+            abort_unless($actor && $actor->status === 'active' && $actor->suspended_at === null && $actor->deleted_at === null, 403);
+            $uploaded = $request->file('file');
+            $used = (int) File::where('owner_id', $request->user()->id)->sum('size_bytes');
+            if ($used + $uploaded->getSize() > (int) config('file-validation.user_quota_bytes')) {
+                return ApiErrorResponse::make(422, 'file_quota_exceeded', 'File storage quota exceeded.', (string) $request->attributes->get('request_id'), ['file' => ['File storage quota exceeded.']]);
+            }
+            $disk = (string) config('filesystems.default');
+            abort_unless(in_array($disk, config('file-validation.private_disks'), true), 503, 'Private storage is not configured.');
+            $objectKey = 'uploads/'.$request->user()->id.'/'.Str::uuid().'.'.$uploaded->extension();
+            abort_unless(Storage::disk($disk)->putFileAs(dirname($objectKey), $uploaded, basename($objectKey), ['visibility' => 'private']), 500, 'Unable to store uploaded file.');
+            try {
+                $file = File::create([
+                    'owner_id' => $request->user()->id,
+                    'disk' => $disk,
+                    'object_key' => $objectKey,
+                    'original_name' => $uploaded->getClientOriginalName(),
+                    'mime_type' => $uploaded->getMimeType(),
+                    'size_bytes' => $uploaded->getSize(),
+                    'visibility' => 'private',
+                    'checksum_sha256' => hash_file('sha256', $uploaded->getRealPath()),
+                    'scan_status' => 'pending',
+                    'purpose' => $data['purpose'],
+                ]);
+            } catch (\Throwable $exception) {
+                Storage::disk($disk)->delete($objectKey);
+                throw $exception;
+            }
 
-        $file = File::create([
-            'owner_id' => $request->user()->id,
-            'disk' => 'local',
-            'object_key' => $objectKey,
-            'original_name' => $uploaded->getClientOriginalName(),
-            'mime_type' => $uploaded->getMimeType(),
-            'size_bytes' => $uploaded->getSize(),
-            'visibility' => 'private',
-            'checksum_sha256' => hash_file('sha256', $uploaded->getRealPath()),
-            'scan_status' => 'pending',
-            'purpose' => $data['purpose'],
-        ]);
-
-        return (new FileResource($file))->response()->setStatusCode(201);
+            return (new FileResource($file))->response()->setStatusCode(201);
+        });
     }
 
     /** Complete a private file after technical validation; no antivirus scan is performed. */

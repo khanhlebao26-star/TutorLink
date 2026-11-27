@@ -20,7 +20,7 @@ class PublicCatalogCache
         $expired = DB::table('verification_documents')->where('status', 'approved')
             ->whereNotNull('expires_at')->where('expires_at', '<=', now('UTC'))
             ->orderByDesc('expires_at')->limit(1)->select('expires_at');
-        $version = DB::table('marketplace_cache_versions')->where('id', 1)->select('generation');
+        $version = DB::table('marketplace_cache_versions')->where('id', $request->is('api/v1/catalog/*') ? 2 : 1)->select('generation');
         if (! $request->is('api/v1/catalog/*')) {
             $version->selectSub($expired, 'expired_at');
         }

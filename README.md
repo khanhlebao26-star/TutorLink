@@ -401,3 +401,7 @@ Do not switch sessions to Redis by changing an environment variable alone: realt
 - [TutorLink server optimization report](docs/handover/TutorLink-server-optimization-2026-11-19.md)
 - [Previously recorded performance audit](docs/handover/TutorLink-performance-audit-2026-11-14.md)
 - [Daily Vocabulary reference repository](https://github.com/AkioCkist/daily_vocabulary/tree/3c0ea06ccaebda687c662fa14245afcb0829a5c6): consulted for README organization and the presentation of problems, solutions, code locations, and evidence. Optimization mechanisms and results in this README are based on TutorLink's own source and measurements.
+
+### Teacher feedback follow-up — 28/11/2026
+
+See the [implementation and verification report](docs/handover/Teacher-feedback-completion-2026-11-28.md) for issue #96: real Slack threshold delivery with original response/permalink, relational factories and repeatable guarded seed, configurable private uploads/quota, request limits/validation, security headers, scoped cache invalidation and ETag/304. The report distinguishes completed checks from teammate review, main merge and the team-owned demo video.

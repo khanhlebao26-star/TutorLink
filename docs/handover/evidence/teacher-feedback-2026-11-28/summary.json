@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-28",
+  "issue": 96,
+  "base_main": "9867472ae25d11e5188bc9076b194a4286db70e2",
+  "backend": {
+    "groups": {
+      "d04-junit": {
+        "tests": 77,
+        "assertions": 1078,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "d04-preflight-junit": {
+        "tests": 7,
+        "assertions": 27,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "regression-junit": {
+        "tests": 791,
+        "assertions": 5746,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "d04-race-junit": {
+        "tests": 1,
+        "assertions": 893,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      }
+    },
+    "tests": 876,
+    "assertions": 7744,
+    "statements_percent": 90.41879468845761
+  },
+  "frontend": {
+    "tests": 219,
+    "statements_percent": 80.59,
+    "lines_percent": 85.71,
+    "lint": "passed",
+    "typecheck": "passed",
+    "build": "passed"
+  },
+  "monitoring": {
+    "real_slack_delivery": true,
+    "test_type": "Explicitly labelled synthetic CPU 81/80 threshold; real chat.postMessage transport; no actual CPU incident claimed",
+    "original_response": "slack-response-d79eb3b0-8667-41d8-ab49-16aa6884c532.json",
+    "permalink": "https://laraveltelesc-cjr9660.slack.com/archives/C0C8BM660TB/p1795804912488469",
+    "unit_tests": 6
+  },
+  "seed": "Fresh separate local-identity PostgreSQL database; DatabaseSeeder then LocalDemoDataSeeder twice; original safety guards retained",
+  "browser": "Production Chrome login page; HTTP 200, headers present, no page errors/CSP violations in this smoke check",
+  "limitations": [
+    "Human review must be recorded by another member before merge; user owns merge.",
+    "Team owns demo video.",
+    "One synchronous PostgreSQL generation/expiry lookup remains per anonymous public request to preserve transaction-coupled visibility.",
+    "S3 disk selection is supported by application code; actual S3 deployment requires the Flysystem S3 adapter, private bucket credentials and its own integration check.",
+    "CSP allows inline bootstrap/style for static Next pages and eval for the existing Filament/Alpine runtime; it is a compatibility baseline, not a strict nonce policy.",
+    "No staging/production deployment or load-capacity claim."
+  ],
+  "source_sha256": {
+    "backend/app/Http/Controllers/Api/V1/FileController.php": "a54d640ab980f190d94b4feedacb4011f0433c7eef91632597787cdb46cc9f82",
+    "backend/app/Http/Middleware/MarketplaceCacheControl.php": "6e927e791ddd61a7fb4f3ba4754212711c9072d61aa9910caf493dc90229aecb",
+    "backend/database/migrations/2026_11_28_000001_scope_marketplace_cache_invalidation.php": "c4fc65125ec04e5890c10b2f833983c3f5c8bed65fa0e02fa48d298b2805ecab",
+    "docker/monitoring/dashboard.py": "b09e6c75674d337e6f9306c3fe37fa218eb5e19ce0b2176e35fbe3fb1ef77d84",
+    "frontend/next.config.ts": "afb31566d1ae14846cdcdd5679b2d0c0e017142e378e268693c1d7a0a7aeefac"
+  },
+  "final_targeted": {
+    "feedback_tests": 15,
+    "assertions": 91,
+    "cache_transaction_group_tests": 18,
+    "cache_transaction_group_assertions": 106,
+    "openapi_operations": 139
+  },
+  "laravel_live_slack": {
+    "ok": true,
+    "job": "SendSlackOperationalAlert",
+    "execution": "Direct handle() with the installed Laravel runtime, real HTTPS transport, environment feedback-test; no database or worker-delivery claim",
+    "original_response": "laravel-slack-original-response.json",
+    "permalink": "https://laraveltelesc-cjr9660.slack.com/archives/C0C8BM660TB/p1795806047854409"
+  }
+}

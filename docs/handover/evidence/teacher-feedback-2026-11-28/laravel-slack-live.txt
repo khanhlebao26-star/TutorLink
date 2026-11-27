@@ -1,0 +1,2 @@
+[2026-11-27 19:00:48] feedback-test.INFO: Slack operational alert {"monitoring_internal":true,"alert_id":"2e54503e-2aca-4bc4-912e-869eceb16c48","status":"sent","error_code":"slack_sent","attempt":1,"at":"2026-11-27T19:00:48.044652Z"} 
+{"kind":"controlled Laravel SendSlackOperationalAlert::handle live transport test","ok":true,"channel":"C0C8BM660TB","ts":"1795806047.854409"}

@@ -23,7 +23,7 @@ class TutorProfileRequest extends FormRequest
             'qualification_claims.*.type' => ['required', Rule::in(['degree', 'certificate'])],
             'qualification_claims.*.name' => ['required', 'string', 'max:160'],
             'headline' => ['required', 'string', 'max:160'],
-            'bio' => ['nullable', 'string'],
+            'bio' => ['nullable', 'string', 'max:10000'],
             'experience_years' => ['sometimes', 'integer', 'min:0', 'max:80'],
             'specialization_id' => [
                 'required',
