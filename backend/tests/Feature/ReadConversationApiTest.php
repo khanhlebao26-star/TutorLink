@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Conversation;
+use App\Models\File as FileRecord;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -151,6 +152,68 @@ test('file preview is generic and history hides internal metadata', function ():
         'created_at',
     ]);
     $history->assertDontSee('object_key')->assertDontSee('secret/object')->assertDontSee('payload_hash');
+});
+
+test('attachment reads stay bounded as a message page grows', function (int $messageCount): void {
+    for ($index = 0; $index < $messageCount; $index++) {
+        k034Message($this->chat, $this->tutor);
+    }
+    $this->actingAs($this->customer);
+    DB::enableQueryLog();
+
+    try {
+        $response = $this->getJson(k034Url($this->chat, ['per_page' => 50]));
+        $queries = collect(DB::getQueryLog())->filter(fn (array $query): bool => str_contains($query['query'], 'file_links'));
+    } finally {
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+    }
+
+    $response->assertOk()->assertJsonCount($messageCount, 'data');
+    expect($queries)->toHaveCount($messageCount === 0 ? 0 : 1);
+    foreach ($response->json('data') as $message) {
+        expect($message['attachments'])->toBe([]);
+    }
+})->with([0, 1, 50]);
+
+test('history groups legacy attachments by message and excludes another conversation', function (): void {
+    $older = k034Message($this->chat, $this->tutor);
+    $newer = k034Message($this->chat, $this->tutor);
+    $otherTutor = TestActors::tutor();
+    $otherChat = k034Chat(TestActors::customer(), $otherTutor);
+    $foreign = k034Message($otherChat, $otherTutor);
+    $fileIds = [];
+    foreach ([$newer, $older, $newer, $foreign] as $index => $messageId) {
+        $file = FileRecord::create([
+            'owner_id' => $this->tutor->id,
+            'disk' => 'local',
+            'object_key' => 'history/'.Str::uuid().'.pdf',
+            'original_name' => 'attachment-'.$index.'.pdf',
+            'mime_type' => 'application/pdf',
+            'size_bytes' => 123,
+            'visibility' => 'private',
+            'scan_status' => 'clean',
+            'purpose' => 'message_attachment',
+        ]);
+        $fileIds[] = (int) $file->id;
+        DB::table('file_links')->insert([
+            'file_id' => $file->id,
+            'resource_type' => 'message',
+            'resource_id' => $messageId,
+            'purpose' => 'message_attachment',
+        ]);
+    }
+
+    $response = $this->actingAs($this->customer)->getJson(k034Url($this->chat, ['per_page' => 1]))
+        ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $newer)
+        ->assertJsonPath('data.0.attachments', [
+            ['id' => $fileIds[0], 'name' => 'attachment-0.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 123],
+            ['id' => $fileIds[2], 'name' => 'attachment-2.pdf', 'mime_type' => 'application/pdf', 'size_bytes' => 123],
+        ])->assertDontSee('object_key')->assertDontSee('attachment-3.pdf');
+
+    $this->getJson(k034Url($this->chat, ['per_page' => 1, 'before' => $response->json('meta.next_cursor')]))
+        ->assertOk()->assertJsonPath('data.0.id', $older)->assertJsonPath('data.0.attachments.0.id', $fileIds[1])
+        ->assertJsonCount(1, 'data.0.attachments');
 });
 
 test('history visits every message with identical timestamps exactly once', function (): void {

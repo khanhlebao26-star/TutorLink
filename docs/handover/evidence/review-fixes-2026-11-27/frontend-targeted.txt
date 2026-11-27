@@ -1,0 +1,14 @@
+
+> frontend@0.1.0 test
+> vitest run src/tests/auth/auth-proxy.test.ts src/tests/marketplace/tutor-prerender.test.tsx src/tests/marketplace/marketplace-journeys.test.tsx --maxWorkers=2
+
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v5.1.0 /Users/ttcenter/TutorLink/frontend
+
+
+ Test Files  3 passed (3)
+      Tests  43 passed (43)
+   Start at  22:42:33
+   Duration  2.11s (environment 37%, tests 33%, setup 13%, import 13%, transform 4%)
+

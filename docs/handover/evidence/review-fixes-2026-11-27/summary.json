@@ -1,0 +1,145 @@
+{
+  "date": "2026-11-27",
+  "scope": "Local verification of implementation commit 3ba5f98e833676e1e91edc614e7ff969fd7a225e; issue #94; CI and merge results are tracked by the linked pull request.",
+  "frontend": {
+    "files": 40,
+    "tests_passed": 219,
+    "statements_percent": 80.59,
+    "lines_percent": 85.71,
+    "coverage_scope": "All frontend/src/**/*.{ts,tsx}, excluding tests",
+    "thresholds": {
+      "statements": 80.01,
+      "lines": 80.01
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "production_build": "passed; tutor shell generated with generateStaticParams and 300-second ISR"
+  },
+  "backend_targeted": {
+    "database": "isolated PostgreSQL 16, Docker project tutorlink-reviewfix",
+    "tests_passed": 62,
+    "assertions": 516,
+    "attachment_queries": {
+      "empty_page": 0,
+      "one_message": 1,
+      "fifty_messages": 1
+    },
+    "cases": [
+      "membership and authentication",
+      "cursor history and polling",
+      "attachment DTO and message grouping",
+      "attachments from another conversation excluded",
+      "text send and replay",
+      "legacy attachment handling"
+    ]
+  },
+  "production_browser": {
+    "initialStatus": 200,
+    "prerenderedHtmlContainsProfile": false,
+    "initialCacheControl": "private, no-store",
+    "clientProfileReads": 2,
+    "hiddenHtmlStatus": 404,
+    "hiddenProfileRemovedFromHtml": true,
+    "hiddenProfileRemovedAfterHydration": true,
+    "browserErrors": []
+  },
+  "browser_scope": "Chrome against a local production Next.js build and synthetic API; no production data or load test",
+  "rendering": {
+    "marketing": [
+      "/",
+      "/about",
+      "/become-a-tutor"
+    ],
+    "marketing_revalidate_seconds": 300,
+    "tutor": "Prerendered data-free loading shell; bounded generateStaticParams; dynamicParams=true; revalidate=300. Proxy checks current API visibility before serving the shell; profile content is loaded freshly in the browser."
+  },
+  "github_snapshot": {
+    "main": "3d4650a6a9c5fd94dbdf70289e478ca0d5e920fb",
+    "pr": 93,
+    "merged": true,
+    "author": "DungGiaIT",
+    "reviewer": "khanhlebao26-star",
+    "review_state": "APPROVED",
+    "pr_body": null,
+    "ci": "success",
+    "ci_run": "https://github.com/khanhlebao26-star/TutorLink/actions/runs/46015476492",
+    "scope": "Upstream pull before these local fixes; not CI validation of this worktree"
+  },
+  "submission_gaps": [
+    "Human review and protected-main merge are tracked in the pull request; no approval or grade is fabricated."
+  ],
+  "source_sha256": {
+    "frontend/src/app/tutors/[slug]/page.tsx": "52325676bef2ba00d4fa1ea9143e38e0b0803514207d81ee1c34ddef9e90f985",
+    "frontend/src/components/tutors/public-tutor.tsx": "ca56ffec09237e63f72e085b10c65eae342f99339d853c8d1f5185c6ca8f0692",
+    "frontend/src/proxy.ts": "a48b50d6dfb5c03672ba366761c040ed5d6169ef044bec8e66ff26841a513ef2",
+    "backend/app/Http/Controllers/Api/V1/ConversationController.php": "1b6040c61ffd839ee78fcc2b8a92080996d1ea54bce58f1cb5de539f4be1acac"
+  },
+  "backend_expanded_first_attempt": {
+    "result": "failed",
+    "groups_completed": {
+      "d04-preflight": {
+        "passed": 7
+      },
+      "regression": {
+        "passed": 775,
+        "failed": 1,
+        "assertions": 5644
+      }
+    },
+    "failure": "InvitationAcceptConcurrencyTest: Two completions close the chat only after both programs end",
+    "message": "Concurrent actions did not both wait on the held User row.",
+    "subprocess_readiness_deadline_seconds": 10,
+    "isolated_retry": {
+      "tests_passed": 12,
+      "assertions": 212
+    },
+    "notes": "Source and vendor were mounted from macOS. The concurrency case passed on isolated retry. The subsequent clean Docker-volume full run passed all 861 tests without changing the application or the test readiness deadline."
+  },
+  "backend_full": {
+    "result": "passed",
+    "tests_passed": 861,
+    "assertions": 7655,
+    "groups": {
+      "d04": {
+        "tests": 77,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "d04-preflight": {
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "d04-race": {
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "regression": {
+        "tests": 776,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "statements_percent": 90.4084348449176,
+    "covered_statements": 8832,
+    "total_statements": 9769,
+    "database": "Isolated PostgreSQL 16",
+    "execution": "Current backend source and vendor copied into a Docker volume; no macOS source bind mount in the PHP execution path; no change to tests or subprocess deadlines for the Invitation concurrency retry"
+  },
+  "separate_codebase_gate": {
+    "frontend_lines": 85.71,
+    "frontend_statements": 80.59,
+    "backend_statements": 90.4084348449176,
+    "result": "passed",
+    "required": "Each relevant metric above 70%; Vitest additionally enforces frontend lines and statements >=80.01%"
+  },
+  "team_owned_artifacts": {
+    "demo_video": "The team will create the video and add its link later, per the user. It is outside this implementation task."
+  },
+  "rubric_6b_note": "Marketing pages and tutor shells use explicit prerender/ISR. Profile details are excluded from generated HTML, and every tutor navigation is checked against the API before serving a cached shell. This implements generateStaticParams/revalidate for tutor routes while retaining immediate withdrawal visibility."
+}

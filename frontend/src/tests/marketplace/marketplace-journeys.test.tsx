@@ -27,10 +27,17 @@ it('renders a public tutor and switches between service, review and schedule vie
  for(const tab of ['Dịch vụ','Đánh giá','Lịch khả dụng']){const buttons=screen.queryAllByRole('button',{name:new RegExp(tab)});if(buttons.length)await userEvent.click(buttons[0]);}
  expect(api.getPublicTutor).toHaveBeenCalledWith('anna',1);expect(api.getTutorReviews).toHaveBeenCalledWith('anna',1);
 });
-it('renders a server-prerendered tutor profile immediately without a duplicate first-page API read',async()=>{
+it('renders the server profile immediately and refreshes it from the authoritative API',async()=>{
  render(<PublicTutor slug="anna" initialTutor={tutor}/>);
  expect(screen.getByRole('heading',{name:'Anna Tutor'})).toBeVisible();
- await waitFor(()=>expect(api.getPublicTutor).not.toHaveBeenCalled());
+ await waitFor(()=>expect(api.getPublicTutor).toHaveBeenCalledWith('anna',1));
+});
+it.each([403,404])('removes initial tutor content when the API now returns %s',async(status)=>{
+ vi.mocked(api.getPublicTutor).mockRejectedValue(new ApiClientError('Hidden',{status}));
+ render(<PublicTutor slug="anna" initialTutor={tutor}/>);
+ await screen.findByText('Không tìm thấy hồ sơ gia sư công khai.');
+ expect(screen.queryByRole('heading',{name:'Anna Tutor'})).not.toBeInTheDocument();
+ expect(screen.queryByRole('tablist',{name:'Nội dung hồ sơ gia sư'})).not.toBeInTheDocument();
 });
 it('keeps direct tutor tab links working with static profile output',async()=>{
  window.history.replaceState(null,'','/tutors/anna?tab=reviews');

@@ -170,6 +170,20 @@ class ConversationController extends Controller
             ], '_position', $cursor);
 
         $items = $page->getCollection();
+        if ($items->isNotEmpty()) {
+            $attachments = DB::table('file_links')
+                ->join('files', 'files.id', '=', 'file_links.file_id')
+                ->where('file_links.resource_type', 'message')
+                ->whereIn('file_links.resource_id', $items->pluck('id'))
+                ->where('file_links.purpose', 'message_attachment')
+                ->orderBy('files.id')
+                ->get(['file_links.resource_id', 'files.id', 'files.original_name', 'files.mime_type', 'files.size_bytes'])
+                ->groupBy('resource_id');
+
+            foreach ($items as $item) {
+                $item->attachments = $attachments->get($item->id, collect());
+            }
+        }
         $pollingCursor = null;
 
         if (! $before) {
