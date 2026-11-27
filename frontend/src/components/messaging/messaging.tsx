@@ -16,7 +16,6 @@ import { completeFile, uploadFile } from "@/lib/data/services";
 import type { FileRecord } from "@/lib/data/types";
 import { CHAT_CHANGED, useConversationRealtime } from "@/lib/hooks/use-conversation-realtime";
 import { usePolling } from "@/lib/hooks/use-polling";
-import "@/styles/messaging.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useRef, useState, type ChangeEvent, type ReactNode } from "react";
@@ -191,8 +190,8 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
     }
   }
   return (
-    <section className="messaging-page" aria-label="Hộp thư TutorLink">
-      <aside className="conversation-list">
+    <section className="messaging-page grid h-auto min-w-0 min-h-[calc(100vh-80px)] grid-cols-1 sm:min-h-[780px] sm:grid-cols-[minmax(230px,31%)_minmax(0,1fr)] lg:h-[calc(100vh-112px)] lg:min-h-[580px] lg:grid-cols-[minmax(260px,28%)_minmax(0,1fr)_minmax(190px,20%)]" aria-label="Hộp thư TutorLink">
+      <aside className="conversation-list border-b border-line lg:border-b-0 lg:border-r">
         <div className="conversation-list-heading">
           <h1>Tin nhắn</h1>
         </div>
@@ -206,7 +205,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
             />
           </Field>
         </div>
-        <div className="conversation-items" aria-busy={!listLoaded && !listError}>
+        <div className="conversation-items flex max-h-[118px] flex-row overflow-x-auto overflow-y-hidden sm:max-h-[calc(100vh-250px)] sm:flex-col sm:overflow-auto" aria-busy={!listLoaded && !listError}>
           {!listLoaded && !listError ? <div className="conversation-list-loading" role="status" aria-label="Đang tải danh sách cuộc trò chuyện">{[0, 1, 2].map((item) => <div key={item} aria-hidden="true"><i/><span><b/><small/></span></div>)}</div> : null}
           {items
             .filter((c) =>
@@ -218,7 +217,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
               <Link
                 key={c.id}
                 href={`/messages/${c.id}`}
-                className={`conversation-item${id === c.id ? " selected" : ""}`}
+                className={`conversation-item flex-[0_0_210px] sm:flex-none${id === c.id ? " selected" : ""}`}
                 aria-current={id === c.id ? "page" : undefined}
               >
                 <span className="chat-avatar" aria-hidden="true">
@@ -247,7 +246,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
           </Button>
         )}
       </aside>
-      <div className="message-thread">
+      <div className="message-thread min-h-[580px] sm:col-span-1">
         {current ? (
           <>
             <header className="thread-heading">
@@ -265,7 +264,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
               </div>
             </header>
             <div
-              className="message-history"
+              className="message-history min-h-[330px] sm:min-h-0"
               aria-label="Lịch sử tin nhắn"
               tabIndex={0}
             >
@@ -413,12 +412,12 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
           </div>
         )}
       </div>
-      <aside className="conversation-context">
+      <aside className="conversation-context col-span-full border-l-0 border-t border-line lg:col-span-1 lg:border-l lg:border-t-0">
         <h2>Thông tin liên hệ</h2>
         {current ? (
           <>
-            <div className="conversation-contact-card">
-              <span className="chat-avatar conversation-contact-avatar" aria-hidden="true">{current.peer.display_name[0]}</span>
+            <div className="conversation-contact-card grid justify-items-start max-[1050px]:flex max-[1050px]:items-center max-[1050px]:gap-2.5">
+              <span className="chat-avatar conversation-contact-avatar mb-2 max-[1050px]:mb-0" aria-hidden="true">{current.peer.display_name[0]}</span>
               <strong>{current.peer.display_name}</strong>
               <small>{actor?.role === "tutor" ? "Học viên TutorLink" : current.peer.tutor_headline || "Gia sư TutorLink"}</small>
             </div>
@@ -431,9 +430,9 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
                 )}
               </div>
             )}
-            {current.context_listing_id ? <div className="conversation-service-card">
-              <p className="conversation-context-eyebrow">DỊCH VỤ ĐANG TRAO ĐỔI</p>
-              <div className="conversation-service-art" aria-hidden="true"><span>✦</span></div>
+            {current.context_listing_id ? <div className="conversation-service-card grid-cols-1 max-[1050px]:grid-cols-[minmax(130px,190px)_minmax(0,1fr)] max-[680px]:grid-cols-[100px_minmax(0,1fr)]">
+              <p className="conversation-context-eyebrow max-[1050px]:col-span-full">DỊCH VỤ ĐANG TRAO ĐỔI</p>
+              <div className="conversation-service-art max-[1050px]:row-span-3 max-[680px]:h-[82px]" aria-hidden="true"><span>✦</span></div>
               <strong>Dịch vụ TutorLink</strong>
               <small>Mã dịch vụ #{current.context_listing_id}</small>
               <Link href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link>

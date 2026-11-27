@@ -7,7 +7,6 @@ import {
   localTimestamp,
   type WorkspaceRow
 } from "@/lib/data/workspace";
-import "@/styles/programs.css";
 
 export function SessionCreateDialog({
   id,

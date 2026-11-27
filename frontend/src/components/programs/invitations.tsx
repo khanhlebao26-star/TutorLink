@@ -14,7 +14,6 @@ import {
 import { deliveryLabels, formatListingPrice } from "@/lib/data/marketplace";
 import { getCurrentUser } from "@/lib/data/services";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "@/styles/programs.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";

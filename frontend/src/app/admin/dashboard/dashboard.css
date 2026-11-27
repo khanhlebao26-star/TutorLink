@@ -40,7 +40,4 @@
 .admin-dashboard-skeleton span { display: block; height: 130px; border-radius: 16px; background: linear-gradient(100deg, #f4f3f9 30%, #faf9fd 50%, #f4f3f9 70%); background-size: 200% 100%; animation: admin-dashboard-pulse 1.5s infinite; }
 .admin-dashboard-skeleton>span { height: 320px; }
 @keyframes admin-dashboard-pulse { to { background-position: -200% 0; } }
-@media (max-width: 1250px) { .admin-dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 850px) { .admin-dashboard-panels { grid-template-columns: 1fr; } }
-@media (max-width: 550px) { .admin-dashboard-heading,.admin-dashboard-monitoring { align-items: flex-start; flex-direction: column; } .admin-dashboard-metrics { gap: 10px; } .admin-dashboard-metric { align-items: flex-start; flex-direction: column; padding: 18px 14px; } .admin-dashboard-panel { padding: 18px; } .admin-dashboard-skeleton>div { grid-template-columns: repeat(2, 1fr); } }
 @media (prefers-reduced-motion: reduce) { .admin-dashboard-skeleton span { animation: none; } }

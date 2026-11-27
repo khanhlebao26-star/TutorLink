@@ -1,4 +1,45 @@
 @import "tailwindcss";
-@import "../styles/base.css";
-@import "../styles/notifications.css";
-@import "../styles/header.css";
+@import "../styles/base.css" layer(base);
+@import "../styles/notifications.css" layer(components);
+@import "../styles/header.css" layer(components);
+@import "../styles/landing.css" layer(components);
+@import "../components/auth/styles/auth-scene.css" layer(components);
+@import "../components/auth/styles/auth-fields.css" layer(components);
+@import "../components/auth/styles/auth-feedback.css" layer(components);
+@import "../components/auth/styles/auth-responsive.css" layer(components);
+@import "../styles/marketplace.css" layer(components);
+@import "../styles/public-detail.css" layer(components);
+@import "../components/admin/verification-document-preview.css" layer(components);
+@import "../app/settings/settings.css" layer(components);
+@import "../app/learning-profile/learning-profile.css" layer(components);
+@import "../app/monitoring/monitoring.css" layer(components);
+@import "../app/admin/dashboard/dashboard.css" layer(components);
+@import "../app/admin/reports/reports.css" layer(components);
+@import "../app/admin/admin.css" layer(components);
+@import "../styles/reports.css" layer(components);
+@import "../styles/messaging.css" layer(components);
+@import "../styles/programs.css" layer(components);
+@import "../styles/listings.css" layer(components);
+@import "../styles/onboarding.css" layer(components);
+@import "../styles/availability.css" layer(components);
+
+@theme {
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
+  --color-accent-soft: var(--accent-soft);
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --font-sans: Inter, Arial, Helvetica, sans-serif;
+  /* Match the existing 700 / 900 / 1180px desktop layout transitions. */
+  --breakpoint-sm: 43.75rem;
+  --breakpoint-md: 56.25rem;
+  --breakpoint-lg: 73.75rem;
+}

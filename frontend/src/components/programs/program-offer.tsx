@@ -4,8 +4,6 @@ import {
   type Program
 } from "@/lib/data/collaboration";
 import { deliveryLabels, formatListingPrice } from "@/lib/data/marketplace";
-import "@/styles/listings.css";
-import "@/styles/programs.css";
 
 export function Offer({
   program: p,

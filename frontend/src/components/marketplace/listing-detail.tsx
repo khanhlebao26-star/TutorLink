@@ -181,14 +181,14 @@ export function ListingDetail({ slug }: { slug: string }) {
   const availability = tutor?.availability_rules ?? [];
   const firstReview = review?.data[0];
 
-  return <section className="content-stack listing-detail-page">
+  return <section className="content-stack listing-detail-page mx-auto grid w-full max-w-[1180px]">
     <nav className="public-breadcrumb listing-breadcrumb" aria-label="Đường dẫn">
       <Link href="/">Trang chủ</Link><span aria-hidden="true">/</span>
       <Link href="/marketplace">Gia sư</Link><span aria-hidden="true">/</span>
       <span aria-current="page">{data.title}</span>
     </nav>
 
-    <div className="listing-detail-layout">
+    <div className="listing-detail-layout grid grid-cols-1 items-start gap-[18px] lg:grid-cols-[minmax(0,1.58fr)_minmax(300px,.92fr)]">
       <main className="listing-detail-main">
         <section className="listing-gallery" aria-label="Ảnh minh họa dịch vụ">
           <Image src={coverFor(data)} alt={`Ảnh minh họa cho ${data.title}`} fill priority sizes="(max-width: 900px) 100vw, 60vw" />

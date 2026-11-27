@@ -1,6 +1,5 @@
 "use client";
 
-import "@/app/settings/settings.css";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button, Field } from "@/components/shared/ui";
 import { ApiClientError, describeApiError, request } from "@/lib/api/client";

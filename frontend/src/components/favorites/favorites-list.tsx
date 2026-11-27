@@ -140,14 +140,14 @@ export function FavoritesList() {
     }
   }
 
-  return <section className="favorites-page" aria-labelledby="favorites-title">
+  return <section className="favorites-page mx-auto w-full max-w-[1220px]" aria-labelledby="favorites-title">
     <nav className="favorites-breadcrumb" aria-label="Đường dẫn"><Link href="/">Trang chủ</Link><span aria-hidden="true">/</span><span>Yêu thích</span></nav>
     <h1 id="favorites-title">Tutor yêu thích</h1>
     <p className="favorites-intro">Các tutor bạn đã lưu. Bạn có thể xem lại thông tin, dịch vụ hoặc bỏ yêu thích bất cứ lúc nào.</p>
     {error ? <p className="favorites-error" role="alert">{error}</p> : null}
     {loading ? <FavoritesLoadingState /> : items.length ? <>
       <p className="favorites-count"><strong>{items.length}</strong> {items.length === 1 ? "tutor" : "tutor"}</p>
-      <div className="favorites-grid">
+      <div className="favorites-grid grid gap-[10px]">
         {items.map((tutor) => <FavoriteTutorCard key={tutor.slug} tutor={tutor} removing={removing === tutor.slug} onRemove={() => void remove(tutor.slug)} />)}
       </div>
     </> : <div className="favorites-empty"><strong>Bạn chưa lưu tutor nào</strong><p>Nhấn “Yêu thích” trên hồ sơ tutor để lưu vào danh sách này.</p><Link className="button button-primary" href="/marketplace">Khám phá dịch vụ</Link></div>}

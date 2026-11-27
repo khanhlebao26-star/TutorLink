@@ -362,7 +362,7 @@ The tutor HTML grew because it now includes the public profile name, headline, a
 
 ## 7. Measurements and Limitations
 
-**Frontend quality checks on November 27, 2026:** 209 Vitest tests across 40 files passed; statements coverage was **80.52%** (3,390/4,210) and lines coverage **85.66%** (2,922/3,411), with both Vitest thresholds set to **80.01%**. Lint, typecheck, production build and the API-unavailable build check passed. A local production-server prerender benchmark and its limitations are recorded in the [prerender and coverage evidence report](docs/handover/FE-prerender-benchmark-coverage-2026-11-27.md).
+**Frontend quality checks on November 27, 2026:** after the Tailwind migration, 210 Vitest tests across 40 files passed; statements coverage was **80.57%** (3,405/4,226) and lines coverage **85.70%** (2,937/3,427), above the **80.01%** gates. Lint, typecheck, and production build passed. The local production-server prerender benchmark is recorded in the [prerender and coverage evidence report](docs/handover/FE-prerender-benchmark-coverage-2026-11-27.md), and the [Tailwind migration evidence](docs/handover/evidence/3a-tailwind-migration/README.md) records its own screenshots and regression checks.
 
 **Production cleanup checks on November 19, 2026:** all 148 frontend tests passed with **72.24% line coverage**; lint, typecheck and production build passed. Runtime mock branches, sample testimonials and fabricated statistics were removed. The backend app/proxy production images built successfully; config, route and Blade caches compiled with test seeders and development files excluded. These checks do not replace a live VPS deployment test.
 

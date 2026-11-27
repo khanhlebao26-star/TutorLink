@@ -1,6 +1,5 @@
 "use client";
 
-import "@/app/learning-profile/learning-profile.css";
 import { AppShell, useActor } from "@/components/layout/app-shell";
 import { PencilSimpleIcon } from "@phosphor-icons/react/dist/ssr/PencilSimple";
 import { Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui";
@@ -49,7 +48,7 @@ function LearningProfileForm({ initial, onSaved }: { initial: LearningProfile; o
     }
   }
 
-  return <form className="card form-stack learning-profile-form" onSubmit={submit} aria-busy={pending}>
+  return <form className="card form-stack learning-profile-form gap-5 p-5 sm:p-[clamp(20px,4vw,34px)]" onSubmit={submit} aria-busy={pending}>
     <header className="learning-profile-section-heading"><span aria-hidden="true">✦</span><div><h2>Nhu cầu học tập</h2><p>Thông tin này giúp bạn ghi lại mục tiêu và điều kiện học mong muốn.</p></div></header>
     <Field label="Môn học hoặc kỹ năng quan tâm" htmlFor="learning-subjects" hint="Ví dụ: Tiếng Anh giao tiếp, Toán lớp 9, Guitar.">
       <input id="learning-subjects" maxLength={500} value={values.subjects_of_interest ?? ""} onChange={(event) => update("subjects_of_interest", event.target.value)} placeholder="Bạn muốn học môn hoặc kỹ năng nào?" disabled={pending} />
@@ -70,7 +69,7 @@ function LearningProfileForm({ initial, onSaved }: { initial: LearningProfile; o
     <Field label="Thời gian học thuận tiện" htmlFor="learning-schedule" hint="Ví dụ: tối các ngày trong tuần hoặc sáng cuối tuần.">
       <input id="learning-schedule" maxLength={500} value={values.preferred_schedule ?? ""} onChange={(event) => update("preferred_schedule", event.target.value)} placeholder="Bạn thường rảnh vào thời gian nào?" disabled={pending} />
     </Field>
-    <div className="learning-profile-location">
+    <div className="grid grid-cols-1 gap-[18px] min-[641px]:grid-cols-2">
       <Field label="Tỉnh / thành phố" htmlFor="learning-city">
         <input id="learning-city" maxLength={120} value={values.city ?? ""} onChange={(event) => update("city", event.target.value)} placeholder="Ví dụ: TP. Hồ Chí Minh" disabled={pending} />
       </Field>
@@ -96,10 +95,10 @@ function LearningProfileContent() {
   const load = useCallback(async () => (await request<ApiEnvelope<LearningProfile>>({ method: "GET", url: "/me/learning-profile" })).data.data, []);
   const { data, error, loading, reload } = useAsyncData(load);
   const initials = actor?.full_name.trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi-VN") || "HV";
-  return <section className="content-stack learning-profile-page">
+  return <section className="content-stack mx-auto grid w-full max-w-[1240px] gap-6 max-[760px]:gap-[18px]">
       <section className="tutor-workspace-profile learning-profile-header" aria-label="Hồ sơ học tập">
         <div className="tutor-profile-cover" aria-hidden="true" />
-        <div className="tutor-profile-identity">
+        <div className="tutor-profile-identity max-[640px]:items-center">
           <div className="tutor-profile-avatar" aria-label={`Ảnh đại diện ${actor?.full_name ?? "học viên"}`}>{initials}</div>
           <div className="tutor-profile-name">
             <p>HỒ SƠ HỌC VIÊN</p>
@@ -108,7 +107,7 @@ function LearningProfileContent() {
           </div>
         </div>
       </section>
-      <header className="learning-profile-section-title"><div><h2>Thông tin học tập</h2><p>Ghi lại mục tiêu, môn học và điều kiện học phù hợp với bạn.</p></div></header>
+      <header className="learning-profile-section-title mb-4 mt-1 flex items-end justify-between"><div><h2>Thông tin học tập</h2><p>Ghi lại mục tiêu, môn học và điều kiện học phù hợp với bạn.</p></div></header>
       {loading ? <StatePanel kind="loading" message="Đang tải hồ sơ học tập…" /> : error ? <StatePanel kind="error" message={describeApiError(error)} action={<ErrorActions login={[401, 419].includes(error.status ?? 0)} onRetry={reload} />} /> : data ? <LearningProfileForm key="learning-profile" initial={data} onSaved={reload} /> : null}
   </section>;
 }

@@ -12,8 +12,6 @@ import {
   transitionProgram
 } from "@/lib/data/collaboration";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "@/styles/listings.css";
-import "@/styles/programs.css";
 import { useCallback, useRef, useState } from "react";
 
 export function ProgramDetail({ id }: { id: number }) {

@@ -1,6 +1,5 @@
 "use client";
 
-import "@/styles/landing.css";
 import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
 import { PaperPlaneTiltIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
 

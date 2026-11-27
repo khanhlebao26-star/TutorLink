@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Field } from "@/components/shared/ui";
+import { authSubmitButtonClasses } from "@/components/auth/auth-layout";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { getCurrentUser, login, register } from "@/lib/data/services";
 import type { RegisterRole } from "@/lib/data/types";
@@ -162,8 +163,8 @@ export function AuthForm({ mode, initialRole = "customer", returnTo }: {
   const confirmationError = fieldError("password_confirmation");
 
   return (
-    <form className="form-stack auth-form" onSubmit={submit} aria-busy={formBusy}>
-      <fieldset className="auth-fields" disabled={formBusy}>
+    <form className="form-stack auth-form flex flex-col gap-[14px]" onSubmit={submit} aria-busy={formBusy}>
+      <fieldset className="auth-fields m-0 grid min-w-0 gap-[14px] border-0 p-0" disabled={formBusy}>
         <legend className="auth-visually-hidden">{mode === "login" ? "Thông tin đăng nhập" : "Thông tin tài khoản"}</legend>
       {mode === "register" ? (
         <>
@@ -298,7 +299,7 @@ export function AuthForm({ mode, initialRole = "customer", returnTo }: {
           <span className="auth-verify-email-arrow" aria-hidden="true">→</span>
         </Link>
       </div> : null}
-      <Button type="submit" disabled={formBusy}>
+      <Button className={authSubmitButtonClasses} type="submit" disabled={formBusy}>
         {submitting ? "Đang xử lý…" : mode === "login" ? "Đăng nhập" : "Tạo tài khoản"}
       </Button>
     </form>

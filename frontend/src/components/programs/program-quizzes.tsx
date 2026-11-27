@@ -7,7 +7,6 @@ import { describeApiError } from "@/lib/api/client";
 import { getProgram } from "@/lib/data/collaboration";
 import { retryIdentity, workspaceRead, workspaceWrite, type Collection } from "@/lib/data/workspace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "@/styles/programs.css";
 import { useCurrentTime } from "@/lib/hooks/use-current-time";
 import Link from "next/link";
 import { useCallback, useRef, useState, type FormEvent } from "react";
@@ -55,8 +54,8 @@ export function ProgramQuizzesPage({ id }: { id: number }) {
   }, [id, page]);
   const result = useAsyncData(load);
   const owner = actor?.role === "tutor";
-  return <section className="content-stack workspace-page quiz-page">
-    <header className="quiz-page-heading"><div><p className="task-detail-eyebrow">WORKSPACE · {owner ? "GIA SƯ" : "HỌC VIÊN"}</p><h1>Bài kiểm tra</h1><p className="muted">Tạo bài trắc nghiệm, làm bài và xem kết quả ngay sau khi nộp.</p></div>{owner && result.data?.program.status === "active" ? <Button onClick={() => setCreateOpen(true)}>＋ Tạo bài kiểm tra</Button> : null}</header>
+  return <section className="content-stack workspace-page quiz-page mx-auto w-full max-w-[1280px]">
+    <header className="quiz-page-heading flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center"><div><p className="task-detail-eyebrow">WORKSPACE · {owner ? "GIA SƯ" : "HỌC VIÊN"}</p><h1>Bài kiểm tra</h1><p className="muted">Tạo bài trắc nghiệm, làm bài và xem kết quả ngay sau khi nộp.</p></div>{owner && result.data?.program.status === "active" ? <Button onClick={() => setCreateOpen(true)}>＋ Tạo bài kiểm tra</Button> : null}</header>
     <ApiState {...result} />
     {result.data ? <>
       <div className="quiz-program-context"><strong>{result.data.program.title}</strong><Badge tone={result.data.program.status === "active" ? "success" : "warning"}>{result.data.program.status === "active" ? "Đang hoạt động" : result.data.program.status === "paused" ? "Tạm dừng" : "Đã kết thúc"}</Badge></div>

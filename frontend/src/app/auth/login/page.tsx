@@ -20,10 +20,10 @@ export default async function LoginPage({
         tagline={"Cùng bạn\nphát triển\nmỗi ngày"}
       >
         <AuthForm mode="login" returnTo={returnTo} />
-        <p className="auth-signup-prompt">
+        <p className="auth-signup-prompt mb-4 mt-[18px] text-center text-[.82rem] text-[#7b89a8]">
           Chưa có tài khoản? <Link href="/auth/register">Đăng ký ngay</Link>
         </p>
-        <aside className="auth-login-verification-note" aria-label="Hướng dẫn xác thực email">
+        <aside className="auth-login-verification-note flex gap-3 rounded-[9px] border border-[#e0f2f6] p-3.5" aria-label="Hướng dẫn xác thực email">
           <span className="auth-login-verification-icon" aria-hidden="true" />
           <div>
             <strong>Vui lòng xác thực email</strong>

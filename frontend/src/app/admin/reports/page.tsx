@@ -1,7 +1,5 @@
 "use client";
 
-import "@/app/admin/admin.css";
-import "@/app/admin/reports/reports.css";
 import { AppShell, useActor } from "@/components/layout/app-shell";
 import { Badge, Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui";
 import { ApiClientError, describeApiError, request } from "@/lib/api/client";
@@ -97,19 +95,19 @@ function AdminReportsContent() {
   const rows = (result.data?.data ?? []).filter(item => status === "all" || item.status === status);
   const total = result.data?.meta?.total ?? 0;
 
-  return <section className="admin-reports-page">
+  return <section className="admin-reports-page grid w-full gap-6">
     <header className="admin-reports-heading"><h1>Quản lý báo cáo</h1><p>Xem xét phản ánh từ người dùng và cập nhật kết quả xử lý.</p></header>
-    <div className="tutor-review">
-      <aside className="tutor-review-queue" aria-label="Danh sách báo cáo">
+    <div className="tutor-review grid min-h-[calc(100vh-160px)] min-w-0 grid-cols-1 items-start gap-[18px] min-[901px]:grid-cols-[minmax(260px,.8fr)_minmax(0,1.6fr)] min-[901px]:gap-[18px] min-[1151px]:grid-cols-[minmax(290px,.85fr)_minmax(0,2fr)] min-[1151px]:gap-6">
+      <aside className="tutor-review-queue flex min-h-0 flex-col gap-[18px] p-[14px] min-[901px]:sticky min-[901px]:top-6 min-[901px]:min-h-[640px] min-[1151px]:p-[18px]" aria-label="Danh sách báo cáo">
         <div className="tutor-review-tabs" role="group" aria-label="Phạm vi báo cáo">{(["unassigned", "mine"] as const).map(value => <button key={value} type="button" aria-pressed={scope === value} disabled={pending} onClick={() => { if (value === scope) return; clearDetail(); setScope(value); setPage(1); setStatus("all"); }}>{value === "unassigned" ? "Chưa phân công" : "Báo cáo của tôi"}</button>)}</div>
         {scope === "mine" ? <label className="tutor-review-status"><span className="landing-sr-only">Lọc báo cáo trong trang</span><select value={status} onChange={event => setStatus(event.target.value)}><option value="all">Tất cả trạng thái</option><option value="open">Chờ xử lý</option><option value="resolved">Đã giải quyết</option><option value="dismissed">Đã đóng</option></select></label> : <p className="tutor-review-privacy">Nhận báo cáo để xem nội dung và bằng chứng từ người dùng.</p>}
         {error && !detail ? <p className="inline-error" role="alert">{error}</p> : null}
-        <div className="tutor-review-list" aria-busy={result.loading}>
+        <div className="tutor-review-list grid max-h-[350px] gap-2.5 overflow-y-auto min-[901px]:max-h-none min-[901px]:overflow-visible" aria-busy={result.loading}>
           {result.loading ? <ReportsSkeleton /> : result.error ? <StatePanel kind="error" message={describeApiError(result.error)} action={<ErrorActions login={result.error.status === 401} onRetry={result.reload} />} /> : !rows.length ? <div className="tutor-review-list-empty"><strong>Chưa có báo cáo</strong><p>Không có báo cáo phù hợp trong danh sách này.</p></div> : rows.map(item => "resource_type" in item ? <button key={item.id} className="tutor-review-person admin-report-item" type="button" disabled={pending} aria-pressed={selectedId === item.id} onClick={() => openReport(item.id)}><span className="tutor-review-person-copy"><strong>Báo cáo #{item.id}</strong><span>{reportResourceLabels[item.resource_type] ?? item.resource_type} · {reportReasonLabels[item.reason_code] ?? item.reason_code}</span></span><ReportStatus status={item.status} /></button> : <div key={item.id} className="tutor-review-unassigned"><div><strong>Báo cáo #{item.id}</strong><p><ReportStatus status={item.status} /></p></div><Button variant="outline" disabled={pending} onClick={() => claim(item)}>{pending ? "Đang xử lý…" : "Nhận báo cáo"}</Button></div>)}
         </div>
         {result.data ? <div className="tutor-review-pagination"><span>{total} báo cáo</span><div><Button variant="secondary" disabled={pending || result.loading || page <= 1} onClick={() => setPage(value => value - 1)}>Trước</Button><span>{page}</span><Button variant="secondary" disabled={pending || result.loading || page * 10 >= total} onClick={() => setPage(value => value + 1)}>Sau</Button></div></div> : null}
       </aside>
-      <section className="tutor-review-detail" aria-label="Chi tiết báo cáo" aria-busy={detailLoading}>
+      <section className="tutor-review-detail min-h-[400px] p-[24px_18px] min-[521px]:p-[26px_22px] min-[901px]:min-h-[640px] min-[1151px]:px-[clamp(22px,2.3vw,40px)] min-[1151px]:py-[30px]" aria-label="Chi tiết báo cáo" aria-busy={detailLoading}>
         {detailLoading ? <ReportsSkeleton /> : detailError ? <StatePanel kind="error" message={detailError} action={<ErrorActions onRetry={() => selectedId && openReport(selectedId)} />} /> : detail ? <>
           <div className="admin-report-detail-header"><div><span className="admin-report-eyebrow">Báo cáo #{detail.id}</span><h2>{reportReasonLabels[detail.reason_code] ?? detail.reason_code}</h2><p>Gửi ngày {formatDate(detail.created_at)}</p></div><ReportStatus status={detail.status} /></div>
           <section className="tutor-review-section"><h3>Đối tượng được báo cáo</h3><p>{reportResourceLabels[detail.resource_type] ?? detail.resource_type}{detail.resource_type !== "system" ? ` #${detail.resource_id}` : ""}</p></section>
@@ -121,7 +119,7 @@ function AdminReportsContent() {
           {detail.resolution_note ? <section className="tutor-review-section"><h3>Kết quả xử lý</h3><p className="tutor-review-bio">{detail.resolution_note}</p><p className="tutor-review-muted">Cập nhật: {formatDate(detail.handled_at)}</p></section> : null}
           {detail.status === "open" ? <form className="tutor-review-decision" onSubmit={event => event.preventDefault()}><Field htmlFor="report-resolution-note" label="Kết quả xử lý" hint="Nội dung này sẽ hiển thị cho người gửi báo cáo." error={error || undefined}><textarea id="report-resolution-note" rows={4} maxLength={2000} disabled={pending} value={note} onChange={event => { setNote(event.target.value); setError(""); }} placeholder="Ghi kết quả xem xét hoặc lý do đóng báo cáo…" /></Field><div className="tutor-review-action-row"><Button variant="secondary" disabled={pending || evidenceLoading} onClick={() => decide("dismiss")}>Đóng báo cáo</Button><Button disabled={pending || evidenceLoading} onClick={() => decide("resolve")}>{pending ? "Đang lưu…" : "Đánh dấu đã giải quyết"}</Button></div></form> : error ? <p className="inline-error" role="alert">{error}</p> : null}
           {message ? <p className="inline-success" role="status">{message}</p> : null}
-        </> : <div className="tutor-review-placeholder"><h2>Chọn báo cáo để xem chi tiết</h2><p>{scope === "unassigned" ? "Nhận báo cáo từ danh sách bên trái để bắt đầu xử lý." : "Nội dung phản ánh và kết quả xử lý sẽ hiển thị tại đây."}</p></div>}
+        </> : <div className="tutor-review-placeholder flex min-h-[320px] flex-col items-center justify-center p-8 text-center min-[901px]:min-h-[560px]"><h2>Chọn báo cáo để xem chi tiết</h2><p>{scope === "unassigned" ? "Nhận báo cáo từ danh sách bên trái để bắt đầu xử lý." : "Nội dung phản ánh và kết quả xử lý sẽ hiển thị tại đây."}</p></div>}
       </section>
     </div>
   </section>;
@@ -147,7 +145,7 @@ function EvidenceContent({ evidence }: { evidence: ReportEvidence }) {
   return <div className="admin-report-evidence">
     {resource ? <div className="admin-report-resource"><strong>{resource.title || resource.headline || resource.name || "Thông tin đối tượng"}</strong>{resource.description || resource.bio || resource.comment ? <p>{resource.description || resource.bio || resource.comment}</p> : null}{resource.rating !== undefined ? <p>Đánh giá: {resource.rating}/5</p> : null}</div> : null}
     {evidence.messages?.map(item => <blockquote key={item.id}><p>{item.body || "Tin nhắn không có nội dung văn bản."}</p><small>{formatDate(item.created_at)}</small></blockquote>)}
-    {evidence.attachments?.length ? <ul className="admin-report-files">{evidence.attachments.map(file => <li key={file.id}><span>{file.name || `Tệp #${file.id}`}</span><Button variant="outline" disabled={downloading !== null} onClick={() => download(file)}>{downloading === file.id ? "Đang tải…" : "Tải bằng chứng"}</Button></li>)}</ul> : <p className="tutor-review-muted">Không có ảnh hoặc tệp bằng chứng đính kèm.</p>}
+    {evidence.attachments?.length ? <ul className="admin-report-files grid gap-3">{evidence.attachments.map(file => <li className="flex flex-wrap items-center justify-between gap-3" key={file.id}><span className="min-w-0 break-words">{file.name || `Tệp #${file.id}`}</span><Button variant="outline" disabled={downloading !== null} onClick={() => download(file)}>{downloading === file.id ? "Đang tải…" : "Tải bằng chứng"}</Button></li>)}</ul> : <p className="tutor-review-muted">Không có ảnh hoặc tệp bằng chứng đính kèm.</p>}
     {error ? <p className="inline-error" role="alert">{error}</p> : null}
     {evidence.moderation_history?.length ? <details><summary>Lịch sử xử lý đối tượng</summary>{evidence.moderation_history.map(item => <p key={item.id}>{formatDate(item.created_at)} · {({ "review.hide": "Ẩn đánh giá", "review.restore": "Khôi phục đánh giá", "listing.hide": "Ẩn dịch vụ", "listing.restore": "Khôi phục dịch vụ" } as Record<string, string>)[item.action] || item.action}{item.reason ? ` · ${item.reason}` : ""}</p>)}</details> : null}
   </div>;

@@ -1,6 +1,5 @@
 "use client";
 
-import "@/components/admin/verification-document-preview.css";
 import { Button } from "@/components/shared/ui";
 import { describeApiError, request } from "@/lib/api/client";
 import type { VerificationDocument } from "@/lib/data/types";

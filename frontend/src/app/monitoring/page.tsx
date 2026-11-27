@@ -1,6 +1,5 @@
 "use client";
 
-import "@/app/monitoring/monitoring.css";
 import { AppShell } from "@/components/layout/app-shell";
 import { Card } from "@/components/shared/ui";
 
@@ -36,8 +35,8 @@ export default function Page() {
 
   return (
     <AppShell role="admin" title="Giám sát">
-      <section className="content-stack monitoring-page">
-        <header className="monitoring-hero">
+      <section className="content-stack monitoring-page gap-[22px]">
+        <header className="monitoring-hero grid grid-cols-1 gap-[18px] p-[22px_20px_0] sm:grid-cols-[minmax(0,1fr)_190px] sm:p-[28px_30px_0]">
           <div className="monitoring-hero-copy">
             <p className="monitoring-eyebrow">QUẢN TRỊ · GIÁM SÁT HỆ THỐNG</p>
             <h1>Giám sát hệ thống</h1>
@@ -54,7 +53,7 @@ export default function Page() {
           </div>
         </header>
 
-        <div className="monitoring-card-grid">
+        <div className="monitoring-card-grid grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3">
           <Card className="monitoring-tool-card monitoring-telescope-card">
             <div className="monitoring-tool-top"><span className="monitoring-tool-icon"><MonitorIcon kind="telescope" /></span><span className="monitoring-tool-source">LARAVEL TELESCOPE</span></div>
             <div className="monitoring-tool-copy"><h2>Request, lỗi & truy vấn</h2><p>Xem chi tiết request, lỗi ứng dụng và các truy vấn database được ghi nhận.</p></div>

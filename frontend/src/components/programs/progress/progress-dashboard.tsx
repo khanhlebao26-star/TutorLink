@@ -5,7 +5,6 @@ import { Card } from "@/components/shared/ui";
 import {
   type WorkspaceRow
 } from "@/lib/data/workspace";
-import "@/styles/programs.css";
 
 function ActivityProgress({ title, done, total, explanation }: { title: string; done: number; total: number | null; explanation: string }) {
   const percent = total && total > 0 ? Math.round(done / total * 100) : null;

@@ -88,6 +88,3 @@
 .tutor-review-skeleton span:first-child { height: 56px; width: 65%; }
 @keyframes tutor-review-pulse { to { opacity: .4; } }
 @media (prefers-reduced-motion: reduce) { .tutor-review-skeleton span { animation: none; } }
-@media (max-width: 1150px) { .tutor-review { gap: 18px; grid-template-columns: minmax(260px, .8fr) minmax(0, 1.6fr); } .tutor-review-queue { padding: 14px; } .tutor-review-detail { padding: 26px 22px; } .tutor-review-profile-header { flex-wrap: wrap; gap: 16px; } .tutor-review-fields { gap: 22px; } }
-@media (max-width: 900px) { .tutor-review { grid-template-columns: minmax(0, 1fr); } .tutor-review-queue { min-height: auto; position: static; } .tutor-review-filters { grid-template-columns: minmax(0, 1fr) minmax(130px, .5fr); } .tutor-review-list { max-height: 350px; overflow-y: auto; } .tutor-review-detail { min-height: 400px; } .tutor-review-placeholder { min-height: 320px; } }
-@media (max-width: 520px) { .tutor-review-detail { padding: 24px 18px; } .tutor-review-filters, .tutor-review-fields { grid-template-columns: minmax(0, 1fr); } .tutor-review-avatar-large { flex-basis: 60px; height: 60px; } .tutor-review-identity { flex-basis: 100%; } .tutor-review-action-row .button { flex: 1 1 120px; } .tutor-review-section { padding: 24px 0; } }

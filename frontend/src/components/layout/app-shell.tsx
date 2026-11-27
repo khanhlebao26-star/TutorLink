@@ -9,7 +9,6 @@ import { favoriteUpdateEvent, getFavoriteTutors } from "@/lib/data/favorites";
 import { getCurrentUser } from "@/lib/data/services";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
 import { useUnreadMessages } from "@/lib/hooks/use-unread-messages";
-import "@/styles/landing.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
@@ -213,8 +212,8 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
 
   if (showPublicFrame) {
     return (
-      <div className={`app-frame public-frame${authFrame ? " auth-frame" : ""}`}>
-        <header className="topbar public-topbar">
+      <div className={`app-frame public-frame min-h-screen${authFrame ? " auth-frame" : ""}`}>
+        <header className="topbar public-topbar sticky top-0 z-10 flex min-h-[66px] flex-wrap items-center justify-between gap-4 border-b border-line bg-white px-4 py-2.5 sm:px-5 md:gap-4 lg:min-h-[76px] lg:flex-nowrap lg:gap-[clamp(12px,2vw,30px)] lg:px-[clamp(18px,5vw,80px)] lg:py-3">
           <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
             <BrandMark />
             <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
@@ -230,7 +229,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
           >
             <MenuIcon />
           </button>
-          <nav id="public-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
+          <nav id="public-navigation" className={`public-nav hidden min-w-0 flex-1 flex-col items-stretch justify-center gap-0 lg:flex lg:flex-row lg:items-center lg:gap-[clamp(12px,1.45vw,23px)] ${menuOpen ? "is-open max-lg:!flex" : ""}`} aria-label="Điều hướng chính">
             {primaryNavItems ? primaryNavItems.map((item) => <Link key={item.href} href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} onClick={() => setMenuOpen(false)}>{item.label}</Link>) : <>
               <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
               <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
@@ -239,11 +238,11 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
               <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
             </>}
           </nav>
-          <div className="public-actions">
-            {!authFrame ? <form className="public-header-search" action="/marketplace" method="get" role="search">
+          <div className="public-actions order-3 flex flex-[1_0_100%] flex-wrap items-center gap-3 lg:order-none lg:flex-none lg:flex-nowrap lg:gap-[clamp(12px,1.5vw,22px)]">
+            {!authFrame ? <form className="public-header-search order-first flex h-[42px] min-w-full flex-[1_0_100%] items-center gap-[9px] rounded-full border border-[#d9d1ed] bg-white px-[13px] shadow-[0_2px_8px_#1a12400a] transition-[border-color,box-shadow] duration-150 focus-within:border-[#bc9beb] focus-within:shadow-[0_0_0_3px_#9a66ff18] sm:min-w-[190px] sm:flex-[0_1_300px] lg:order-none" action="/marketplace" method="get" role="search">
               <MagnifyingGlassIcon weight="regular" aria-hidden="true" />
               <label className="landing-sr-only" htmlFor="public-header-query">Tìm gia sư, môn học hoặc kỹ năng</label>
-              <input id="public-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
+              <input className="w-full min-w-0 border-0 bg-transparent p-0 text-[.76rem] text-brand outline-none placeholder:text-[#85819c]" id="public-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
             </form> : null}
             <LocaleDisplay />
             {user ? <>
@@ -268,7 +267,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
             ) : null}
           </div>
         </header>
-        <main className={`page-content${authFrame ? " auth-page-content" : ""}`}>
+        <main className={`page-content w-full px-[18px] pb-[52px] pt-7 sm:px-5 sm:pb-14 sm:pt-8 lg:px-[clamp(16px,2vw,32px)] ${authFrame ? "auth-page-content !p-0" : ""}`}>
           {accessContent}
         </main>
         {!authFrame ? <PublicFooter /> : null}
@@ -304,10 +303,11 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
     { href: "/settings", label: "Cài đặt tài khoản", Icon: GearSixIcon },
   ] : [];
   const sidebarLabel = activeRole === "customer" ? "Workspace học viên" : activeRole === "tutor" ? "Workspace gia sư" : activeRole ? roleLabels[activeRole] : "Tài khoản";
+  const singleColumnShell = hideSidebar || hideTutorSidebar || messagingRoute || pathname === "/notifications";
 
   return (
     <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}${messagingRoute ? " messaging-shell" : ""}${hideSidebar || hideTutorSidebar ? " sidebar-hidden-shell" : ""}${tutorWorkspace ? " tutor-workspace-shell" : ""}${learningProfileRoute ? " learning-profile-shell" : ""}`}>
-      <header className="topbar public-topbar authenticated-public-topbar">
+      <header className="topbar public-topbar authenticated-public-topbar sticky top-0 z-10 flex min-h-[66px] flex-wrap items-center justify-between gap-4 border-b border-line bg-white px-4 py-2.5 sm:px-5 md:gap-4 lg:min-h-[76px] lg:flex-nowrap lg:gap-[clamp(12px,2vw,30px)] lg:px-[clamp(18px,5vw,80px)] lg:py-3">
         <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
           <BrandMark />
           <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
@@ -323,7 +323,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
         >
           <MenuIcon />
         </button> : null}
-        <nav id="authenticated-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
+        <nav id="authenticated-navigation" className={`public-nav hidden min-w-0 flex-1 flex-col items-stretch justify-center gap-0 lg:flex lg:flex-row lg:items-center lg:gap-[clamp(12px,1.45vw,23px)] ${menuOpen ? "is-open max-lg:!flex" : ""}`} aria-label="Điều hướng chính">
           {primaryNavItems ? primaryNavItems.map((item) => <Link key={item.href} href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} onClick={() => setMenuOpen(false)}>{item.label}</Link>) : <>
             <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
             <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
@@ -332,11 +332,11 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
             <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
           </>}
         </nav>
-        <div className="public-actions">
-          {activeRole !== "admin" ? <form className="public-header-search" action="/marketplace" method="get" role="search">
+        <div className="public-actions order-3 flex flex-[1_0_100%] flex-wrap items-center gap-3 lg:order-none lg:flex-none lg:flex-nowrap lg:gap-[clamp(12px,1.5vw,22px)]">
+          {activeRole !== "admin" ? <form className="public-header-search order-first flex h-[42px] min-w-full flex-[1_0_100%] items-center gap-[9px] rounded-full border border-[#d9d1ed] bg-white px-[13px] shadow-[0_2px_8px_#1a12400a] transition-[border-color,box-shadow] duration-150 focus-within:border-[#bc9beb] focus-within:shadow-[0_0_0_3px_#9a66ff18] sm:min-w-[190px] sm:flex-[0_1_300px] lg:order-none" action="/marketplace" method="get" role="search">
             <MagnifyingGlassIcon weight="regular" aria-hidden="true" />
             <label className="landing-sr-only" htmlFor="authenticated-header-query">Tìm gia sư, môn học hoặc kỹ năng</label>
-            <input id="authenticated-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
+            <input className="w-full min-w-0 border-0 bg-transparent p-0 text-[.76rem] text-brand outline-none placeholder:text-[#85819c]" id="authenticated-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
           </form> : null}
           <LocaleDisplay />
           {user ? <>
@@ -358,7 +358,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
           </> : null}
         </div>
       </header>
-      <div className={`app-layout${messagingRoute ? " messaging-app-layout" : ""}`}>
+      <div className={`app-layout ${singleColumnShell ? "block" : "grid grid-cols-1 sm:grid-cols-[180px_minmax(0,1fr)]"} min-h-[calc(100vh-61px)] w-full${messagingRoute ? " messaging-app-layout" : ""}`}>
         {!messagingRoute && !hideSidebar && !hideTutorSidebar ? <aside id="app-sidebar" className={`app-sidebar${menuOpen ? " is-open" : ""}`} aria-label={sidebarLabel}>
           <p className="sidebar-label">{sidebarLabel}</p>
           {!activeRole && needsLoading ? <div className="sidebar-loading" role="status" aria-label="Đang tải menu tài khoản">

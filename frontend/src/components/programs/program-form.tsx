@@ -12,8 +12,6 @@ import {
   type ProgramInput
 } from "@/lib/data/collaboration";
 import { deliveryLabels, formatListingPrice } from "@/lib/data/marketplace";
-import "@/styles/listings.css";
-import "@/styles/programs.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
@@ -105,13 +103,13 @@ export function ProgramForm({
     }
   }
   return (
-    <div className="program-builder">
-      <header className="program-builder-heading">
+    <div className="program-builder mx-auto w-full max-w-[1500px]">
+      <header className="program-builder-heading flex flex-col items-start justify-between gap-3 sm:flex-row sm:gap-5 min-[1101px]:items-center">
         <div><span className="program-builder-kicker">THIẾT KẾ HÀNH TRÌNH HỌC TẬP</span><h1>{existing ? "Chỉnh sửa chương trình học" : "Tạo chương trình học mới"}</h1><p>Thống nhất mục tiêu, lịch học và học phí để bắt đầu đồng hành cùng học viên.</p></div>
         <span className="program-builder-state"><span aria-hidden="true">●</span> {saved ? dirty ? "Có thay đổi chưa lưu" : "Bản nháp đã lưu" : "Bản nháp mới"}</span>
       </header>
-      <ol className="program-builder-journey" aria-label="Quy trình tạo chương trình"><li aria-current="step"><span>1</span>Thiết lập chương trình</li><li><span>2</span>Lưu bản nháp</li><li><span>3</span>Gửi lời mời học</li></ol>
-      <div className="program-builder-layout">
+      <ol className="program-builder-journey flex flex-wrap items-center justify-between gap-2.5 p-3 sm:justify-start sm:gap-6 sm:p-[15px_20px]" aria-label="Quy trình tạo chương trình"><li className="flex items-center gap-[9px] text-[.8125rem] max-[700px]:flex-col max-[700px]:gap-[7px] max-[700px]:text-center max-[700px]:text-[.6875rem]" aria-current="step"><span>1</span>Thiết lập chương trình</li><li className="flex items-center gap-[9px] text-[.8125rem] max-[700px]:flex-col max-[700px]:gap-[7px] max-[700px]:text-center max-[700px]:text-[.6875rem]"><span>2</span>Lưu bản nháp</li><li className="flex items-center gap-[9px] text-[.8125rem] max-[700px]:flex-col max-[700px]:gap-[7px] max-[700px]:text-center max-[700px]:text-[.6875rem]"><span>3</span>Gửi lời mời học</li></ol>
+      <div className="program-builder-layout grid grid-cols-1 items-start gap-6 min-[1101px]:grid-cols-[minmax(0,1fr)_320px]">
         <form className="owner-form program-builder-form" onSubmit={submit}>
           {error && (
             <div role="alert" className="program-builder-error">
@@ -128,9 +126,9 @@ export function ProgramForm({
             </div>
           )}
           <fieldset className="owner-form-fields" disabled={busy}>
-            <section className="program-builder-section" aria-labelledby="program-info-heading">
+            <section className="program-builder-section p-[18px] sm:p-6" aria-labelledby="program-info-heading">
               <header><span aria-hidden="true">01</span><div><h2 id="program-info-heading">Thông tin chương trình</h2><p>Chọn học viên và xác định mục tiêu bạn sẽ cùng đạt được.</p></div></header>
-              <div className="owner-form-grid owner-form-grid-two">
+              <div className="owner-form-grid owner-form-grid-two grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field
                   htmlFor="program-customer"
                   label="Học viên"
@@ -156,7 +154,7 @@ export function ProgramForm({
                   />
                 </Field>
               </div>
-              <div className="program-builder-goals">
+              <div className="program-builder-goals mt-5 grid grid-cols-1 items-start gap-4 sm:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                 {(
                   [
                     ["goal", "Mục tiêu học"],
@@ -178,14 +176,14 @@ export function ProgramForm({
                 ))}
               </div>
             </section>
-            <section className="program-builder-section" aria-labelledby="program-schedule-heading">
+            <section className="program-builder-section p-[18px] sm:p-6" aria-labelledby="program-schedule-heading">
               <header><span aria-hidden="true">02</span><div><h2 id="program-schedule-heading">Hình thức & lịch học</h2><p>Đề xuất thời gian và cách thức học thuận tiện cho hai bên.</p></div></header>
-              <fieldset className="owner-delivery"><legend>Hình thức học</legend><div>
+              <fieldset className="owner-delivery"><legend>Hình thức học</legend><div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 {Object.entries(deliveryLabels).map(([value, label]) => <label key={value}>
                   <input type="radio" name="program-delivery" value={value} checked={input.delivery_mode === value} onChange={() => field("delivery_mode", value as Program["delivery_mode"])} />{label}
                 </label>)}
               </div></fieldset>
-              <div className="owner-form-grid owner-form-grid-two">
+              <div className="owner-form-grid owner-form-grid-two grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Field htmlFor="program-schedule_note" label="Lịch học dự kiến" hint="Có thể trao đổi và thống nhất thêm với học viên." error={error?.fieldErrors?.schedule_note?.[0]}>
                   <Input placeholder="Ví dụ: Thứ 2, 4, 6 · 19:00 – 20:00" value={input.schedule_note ?? ""} onChange={(e) => field("schedule_note", e.target.value)} />
                 </Field>
@@ -200,9 +198,9 @@ export function ProgramForm({
                 </Field>
               </div>
             </section>
-            <section className="program-builder-section" aria-labelledby="program-fees-heading">
+            <section className="program-builder-section p-[18px] sm:p-6" aria-labelledby="program-fees-heading">
               <header><span aria-hidden="true">03</span><div><h2 id="program-fees-heading">Học phí & thời lượng</h2><p>Học phí sẽ được gửi cùng lời mời để học viên xem xét.</p></div></header>
-              <div className="owner-form-grid">
+              <div className="owner-form-grid grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <Field
                   htmlFor="program-fee"
                   label="Học phí (VND)"
@@ -247,7 +245,7 @@ export function ProgramForm({
               </div>
             </section>
           </fieldset>
-          <footer className="owner-form-footer program-builder-footer">
+          <footer className="owner-form-footer program-builder-footer flex flex-wrap items-center gap-2.5 [&_small]:w-full [&_.button]:flex-1 sm:[&_small]:w-auto sm:[&_.button]:flex-none">
             <small>Lưu bản nháp trước khi gửi lời mời cho học viên.</small>
             {!busy ? <Link className="button button-outline" href="/programs">Hủy</Link> : null}
             <Button type="submit" disabled={busy}>
@@ -255,7 +253,7 @@ export function ProgramForm({
             </Button>
           </footer>
         </form>
-        <aside className="program-builder-sidebar" aria-label="Tóm tắt trước khi gửi">
+        <aside className="program-builder-sidebar sticky top-[112px] grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 min-[1101px]:grid-cols-1 max-[1100px]:static" aria-label="Tóm tắt trước khi gửi">
           <Card className="program-builder-summary">
             <header><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M8 4H5a2 2 0 0 0-2 2v14h18V6a2 2 0 0 0-2-2h-3M8 3h8v5H8V3ZM7 12h10M7 16h6" /></svg></span><div><h2>Tóm tắt chương trình</h2><small>Cập nhật theo thông tin bạn nhập</small></div></header>
             <h3>{input.title.trim() || "Chương trình học của bạn"}</h3>

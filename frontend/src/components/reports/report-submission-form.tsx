@@ -12,7 +12,6 @@ import { StorefrontIcon } from "@phosphor-icons/react/dist/ssr/Storefront";
 import { UserCircleIcon } from "@phosphor-icons/react/dist/ssr/UserCircle";
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
-import "@/styles/reports.css";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 

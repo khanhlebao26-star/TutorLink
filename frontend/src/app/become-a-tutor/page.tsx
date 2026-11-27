@@ -40,35 +40,35 @@ function JourneyIcon({ name }: { name: string }) {
 
 export default function BecomeATutorPage() {
   return <AppShell mode="public" title="Dành cho người dạy">
-    <div className="marketing-page tutor-marketing-page">
-      <section className="landing-hero tutor-hero">
-        <div className="landing-inner landing-hero-grid">
-          <div className="landing-hero-copy">
+    <div className="marketing-page tutor-marketing-page overflow-hidden">
+      <section className="landing-hero tutor-hero overflow-hidden bg-[radial-gradient(ellipse_at_0_0,#f0ecff_0_17%,transparent_17.2%),radial-gradient(ellipse_at_100%_12%,#ffeafa_0_19%,transparent_19.2%),linear-gradient(180deg,#fff_0%,#fff_72%,#fcfaff_100%)]">
+        <div className="landing-inner landing-hero-grid mx-auto grid min-h-0 max-w-[1250px] grid-cols-1 items-center gap-0 px-5 pb-[18px] sm:min-h-[465px] sm:grid-cols-[minmax(0,1fr)_minmax(260px,.85fr)] sm:gap-6 sm:px-[clamp(20px,5vw,64px)] md:grid-cols-[minmax(0,1fr)_minmax(300px,.95fr)] md:gap-[clamp(24px,5vw,68px)]">
+          <div className="landing-hero-copy relative z-[2] py-11 sm:pb-8 sm:pt-[54px]">
             <p className="landing-eyebrow">DÀNH CHO NGƯỜI DẠY</p>
             <h1>Chia sẻ kiến thức,<br /><span>lan tỏa giá trị.</span></h1>
             <p className="landing-lead">Đưa chuyên môn của bạn đến gần hơn với những người đang tìm kiếm sự hướng dẫn phù hợp.</p>
-            <div className="landing-actions">
+            <div className="landing-actions mt-[25px] flex flex-wrap items-center gap-3 max-[420px]:flex-col max-[420px]:items-stretch">
               <Link className="button button-primary" href={tutorRegistration}>Tạo tài khoản Tutor <span aria-hidden="true">→</span></Link>
               <Link className="button button-secondary" href="/profile">Mở hồ sơ của tôi</Link>
             </div>
-            <ul className="tutor-hero-benefits" aria-label="Lợi ích dành cho người dạy">
+            <ul className="tutor-hero-benefits mt-5 flex flex-wrap gap-x-5 gap-y-2 p-0" aria-label="Lợi ích dành cho người dạy">
               <li><span aria-hidden="true">✓</span>Chủ động thời gian</li>
               <li><span aria-hidden="true">✓</span>Xây dựng thương hiệu</li>
               <li><span aria-hidden="true">✓</span>Mở rộng thu nhập</li>
             </ul>
           </div>
-          <div className="landing-hero-art tutor-hero-art">
+          <div className="landing-hero-art tutor-hero-art relative mx-auto flex min-h-[410px] w-full max-w-[500px] items-end justify-center sm:min-h-[390px] md:min-h-[425px]">
             <div className="landing-art-halo" aria-hidden="true" />
-            <Image className="landing-hero-person" src="/figma/auth/student-man.png" alt="Người dạy đang làm việc bên máy tính" width={784} height={858} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 45vw, 500px" priority />
+            <Image className="landing-hero-person relative z-[1] h-auto w-[min(100%,470px)] max-w-full object-contain" src="/figma/auth/student-man.png" alt="Người dạy đang làm việc bên máy tính" width={784} height={858} sizes="(max-width: 700px) 100vw, (max-width: 1100px) 45vw, 500px" priority />
             <div className="landing-art-note"><span className="landing-note-icon" aria-hidden="true">✓</span><span><strong>Chủ động xây dựng hồ sơ</strong><small>Chuyên môn · dịch vụ · lịch dạy</small></span></div>
           </div>
         </div>
       </section>
 
-      <section className="landing-section landing-inner tutor-journey" aria-labelledby="tutor-journey-title">
-        <div className="tutor-journey-panel">
+      <section className="landing-section landing-inner tutor-journey mx-auto max-w-[1250px] px-5 py-[clamp(56px,8vw,88px)] sm:px-[clamp(20px,5vw,64px)]" aria-labelledby="tutor-journey-title">
+        <div className="tutor-journey-panel rounded-[22px] bg-[linear-gradient(115deg,#fff3f9,#f7f1ff)] p-5 sm:p-7">
           <h2 id="tutor-journey-title">Hành trình trở thành Tutor / Coach trên TutorLink</h2>
-          <ol className="tutor-journey-grid">
+          <ol className="tutor-journey-grid grid grid-cols-1 gap-y-5 p-0 sm:grid-cols-3 sm:gap-y-6">
             {tutorSteps.map((step, index) => <li className="tutor-journey-step" key={step.title}>
               <span className="tutor-journey-icon"><JourneyIcon name={step.icon} /></span>
               {index < tutorSteps.length - 1 ? <span className="tutor-journey-arrow" aria-hidden="true">›</span> : null}
@@ -79,13 +79,13 @@ export default function BecomeATutorPage() {
         </div>
       </section>
 
-      <section className="landing-section landing-inner tutor-tools-comprehensive" aria-labelledby="tutor-tools-title">
+      <section className="landing-section landing-inner tutor-tools-comprehensive mx-auto max-w-[1250px] px-5 py-[clamp(45px,7vw,86px)] sm:px-[clamp(20px,5vw,64px)]" aria-labelledby="tutor-tools-title">
         <div className="landing-section-intro landing-section-intro-left tutor-tools-intro">
           <p className="landing-eyebrow">BỘ CÔNG CỤ TOÀN DIỆN</p>
           <h2 id="tutor-tools-title">Những gì bạn có thể làm trên TutorLink</h2>
           <p>Các công cụ cần thiết để xây dựng, kết nối và quản lý hoạt động dạy của bạn.</p>
         </div>
-        <div className="tutor-tools-grid">
+        <div className="tutor-tools-grid grid grid-cols-1 gap-[14px] sm:grid-cols-2 md:grid-cols-4">
           {tutorTools.map((tool) => <article className={`tutor-tool-card tutor-tool-card-${tool.tone}`} key={tool.title}>
             <span className="tutor-tool-icon"><JourneyIcon name={tool.icon} /></span>
             <h3>{tool.title}</h3>
@@ -95,8 +95,8 @@ export default function BecomeATutorPage() {
         </div>
       </section>
 
-      <section className="tutor-career-section" aria-labelledby="tutor-career-title">
-        <div className="landing-inner tutor-career-grid">
+      <section className="tutor-career-section bg-[linear-gradient(110deg,#fbf8ff_0%,#fff5fa_100%)] py-[clamp(56px,7vw,86px)]" aria-labelledby="tutor-career-title">
+        <div className="landing-inner tutor-career-grid mx-auto grid max-w-[1250px] grid-cols-1 items-center gap-[30px] px-5 sm:grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)] sm:gap-[clamp(34px,6vw,76px)] sm:px-[clamp(20px,5vw,64px)]">
           <div className="tutor-career-art">
             <div className="tutor-career-halo" aria-hidden="true" />
             <div className="tutor-career-portrait tutor-career-portrait-woman">
@@ -121,7 +121,7 @@ export default function BecomeATutorPage() {
         </div>
       </section>
 
-      <section className="landing-section landing-inner landing-faq tutor-faq" id="faq" aria-labelledby="tutor-faq-title">
+      <section className="landing-section landing-inner landing-faq tutor-faq mx-auto grid max-w-[1250px] grid-cols-1 items-start gap-7 px-5 py-[clamp(56px,8vw,88px)] sm:grid-cols-[minmax(220px,.72fr)_minmax(0,1.28fr)] sm:gap-[clamp(28px,7vw,90px)] sm:px-[clamp(20px,5vw,64px)]" id="faq" aria-labelledby="tutor-faq-title">
         <div className="landing-faq-intro">
           <p className="landing-eyebrow">CÂU HỎI THƯỜNG GẶP</p>
           <h2 id="tutor-faq-title">Bạn còn băn khoăn?</h2>
@@ -148,13 +148,13 @@ export default function BecomeATutorPage() {
         </div>
       </section>
 
-      <section className="landing-final-cta landing-inner" aria-label="Bắt đầu hành trình Tutor">
+      <section className="landing-final-cta landing-inner mx-auto flex max-w-[1250px] flex-col items-stretch gap-6 px-5 pb-[52px] sm:flex-row sm:items-center sm:justify-between sm:px-[clamp(20px,5vw,64px)]" aria-label="Bắt đầu hành trình Tutor">
         <div>
           <p className="landing-eyebrow">BẮT ĐẦU NGAY HÔM NAY</p>
           <h2>Chuyên môn của bạn có thể mở ra hành trình mới.</h2>
           <p>Tạo hồ sơ và chia sẻ những dịch vụ bạn muốn cung cấp.</p>
         </div>
-        <div className="landing-cta-actions">
+        <div className="landing-cta-actions flex flex-1 flex-wrap gap-3 sm:flex-none">
           <Link className="button landing-cta-light" href={tutorRegistration}>Tạo tài khoản Tutor <span aria-hidden="true">→</span></Link>
           <Link className="button landing-cta-quiet" href="/profile">Mở hồ sơ của tôi</Link>
         </div>

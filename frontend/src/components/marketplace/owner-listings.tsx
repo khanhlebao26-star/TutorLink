@@ -44,15 +44,15 @@ function listingCategory(name?: string) {
 function OwnerListingsLoading() {
   return <div className="owner-service-loading" role="status" aria-label="Đang tải danh sách dịch vụ">
     <p><span className="owner-loading-spinner" aria-hidden="true" />Đang chuẩn bị dịch vụ của bạn…</p>
-    <div className="owner-service-grid" aria-hidden="true">{[0, 1, 2, 3].map((item) => <div className="owner-service-skeleton" key={item}><i/><div><b/><span/><span/><em/></div></div>)}</div>
+    <div className="owner-service-grid grid grid-cols-1 gap-4 lg:grid-cols-2" aria-hidden="true">{[0, 1, 2, 3].map((item) => <div className="owner-service-skeleton" key={item}><i/><div><b/><span/><span/><em/></div></div>)}</div>
   </div>;
 }
 
 function OwnerServiceCard({ listing, busy, onAction }: { listing: OwnerListing; busy: boolean; onAction: (action: OwnerMutationAction) => void }) {
   const category = listingCategory(listing.category_name);
   const location = [listing.district, listing.city].filter(Boolean).join(", ");
-  return <article className="owner-service-card">
-    <div className="owner-service-main">
+  return <article className="owner-service-card flex flex-col min-w-0 rounded-[18px] border border-line bg-white p-4 shadow-[0_6px_24px_#15265004] sm:p-5">
+    <div className="owner-service-main grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-[155px_minmax(0,1fr)] max-[600px]:gap-4 min-[1600px]:grid-cols-[185px_minmax(0,1fr)]">
       <Link href={`/me/listings/${listing.id}`} className={`owner-service-cover owner-service-cover-${category.tone}`} aria-label={`Quản lý ${listing.title}`}>
         <Image src={`/featured/${category.tone}.svg`} alt="Ảnh minh họa dịch vụ" fill sizes="(max-width: 600px) 100vw, 190px" />
         <span>Ảnh minh họa</span>
@@ -68,7 +68,7 @@ function OwnerServiceCard({ listing, busy, onAction }: { listing: OwnerListing; 
         </div>
       </div>
     </div>
-    <div className="owner-service-footer"><div className="owner-service-price"><small>Giá dịch vụ từ</small><strong>{formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit)}</strong></div><OwnerListingActions listing={listing} busy={busy} onAction={onAction}/></div>
+    <div className="owner-service-footer mt-[18px] flex flex-col items-start gap-3.5 border-t border-[#f0edf6] pt-[17px] sm:flex-row sm:items-center sm:justify-between [&_.owner-row-actions]:w-full sm:[&_.owner-row-actions]:w-auto [&_.owner-row-actions>.button]:flex-1 sm:[&_.owner-row-actions>.button]:flex-none"><div className="owner-service-price"><small>Giá dịch vụ từ</small><strong>{formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit)}</strong></div><OwnerListingActions listing={listing} busy={busy} onAction={onAction}/></div>
   </article>;
 }
 
@@ -171,8 +171,8 @@ export function OwnerListings() {
   }
 
   return (
-    <section className="owner-listings owner-service-dashboard">
-      <header className="owner-heading">
+    <section className="owner-listings owner-service-dashboard mx-auto w-full max-w-[1500px]">
+      <header className="owner-heading flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div>
           <h1>Dịch vụ của tôi</h1>
           <p className="muted">Quản lý nội dung, học phí và trạng thái hiển thị của các dịch vụ bạn cung cấp.</p>
@@ -182,10 +182,10 @@ export function OwnerListings() {
 
       {notice ? <p role="status" className="owner-notice">{notice}</p> : null}
       {collection ? <>
-        <div className="owner-service-summary" aria-label="Tổng quan dịch vụ">
+        <div className="owner-service-summary grid grid-cols-3 gap-2 sm:gap-4" aria-label="Tổng quan dịch vụ">
           {[{ key: "all", label: "Tổng dịch vụ", icon: "grid" }, { key: "active", label: "Đang hoạt động", icon: "check" }, { key: "draft", label: "Đang soạn thảo", icon: "edit" }].map((item) => <div key={item.key}><span className={`owner-summary-icon owner-summary-${item.icon}`} aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">{item.icon === "grid" ? <><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></> : item.icon === "check" ? <><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></> : <><path d="m15 4 5 5-10 10-6 1 1-6L15 4Zm-8 9 4 4"/></>}</svg></span><div><strong>{collection.meta.status_counts[item.key as OwnerListingStatusFilter]}</strong><span>{item.label}</span></div></div>)}
         </div>
-        <nav className="owner-tabs owner-service-filters" aria-label="Lọc dịch vụ theo trạng thái">
+        <nav className="owner-tabs owner-service-filters flex max-w-full gap-2 overflow-x-auto" aria-label="Lọc dịch vụ theo trạng thái">
           {ownerFilters.map((filter) => <Button key={filter.status} variant="ghost" aria-pressed={status === filter.status} disabled={busy} onClick={() => { if (status !== filter.status) { setLoading(true); setStatus(filter.status); } }}>{filter.label}<span className="owner-tab-count">{collection.meta.status_counts[filter.status]}</span></Button>)}
         </nav>
       </> : null}
@@ -208,9 +208,9 @@ export function OwnerListings() {
           {!collection.data.length ? (
             <StatePanel kind="empty" message={status === "all" ? "Bạn chưa có dịch vụ nào." : `Không có dịch vụ ở trạng thái “${ownerFilters.find((filter) => filter.status === status)?.label}”.`} />
           ) : (
-            <div className="owner-service-grid">{collection.data.map((listing) => <OwnerServiceCard key={listing.id} listing={listing} busy={busy} onAction={(action) => void act(listing, action)}/>)}</div>
+            <div className="owner-service-grid grid grid-cols-1 gap-4 lg:grid-cols-2">{collection.data.map((listing) => <OwnerServiceCard key={listing.id} listing={listing} busy={busy} onAction={(action) => void act(listing, action)}/>)}</div>
           )}
-          <div className="owner-pagination">
+          <div className="owner-pagination flex flex-wrap items-center justify-end gap-3 sm:flex-nowrap">
             <span>{collection.meta.total} dịch vụ · Trang {collection.meta.current_page} / {Math.max(1, Math.ceil(collection.meta.total / collection.meta.per_page))}</span>
             {collection.meta.total > collection.meta.per_page ? <><Button variant="outline" disabled={busy || collection.meta.current_page <= 1} onClick={() => { setLoading(true); setPage(Math.max(1, page - 1)); }}>← Trước</Button>
             <Button variant="outline" disabled={busy || collection.meta.current_page * collection.meta.per_page >= collection.meta.total} onClick={() => { setLoading(true); setPage(page + 1); }}>Sau →</Button></> : null}
@@ -286,10 +286,10 @@ export function OwnerListingDetail({ id }: { id: number }) {
           action={<ErrorActions login={error instanceof ApiClientError && [401, 419].includes(error.status ?? 0)} onRetry={() => { setLoading(true); setRetry((value) => value + 1); }} />}
         />
       ) : (
-        <article className="card">
-          <div className="owner-heading"><h1>{listing.title}</h1><OwnerStatus status={listing.status} /></div>
+        <article className="card p-[18px] sm:p-[26px]">
+          <div className="owner-heading flex flex-col items-start gap-4 sm:flex-row sm:justify-between sm:gap-6"><h1>{listing.title}</h1><OwnerStatus status={listing.status} /></div>
           <p className="owner-description">{listing.description}</p>
-          <dl className="owner-detail-grid">
+          <dl className="owner-detail-grid my-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div><dt>Chuyên ngành</dt><dd>{listing.specialization_name ?? `#${listing.specialization_id}`}</dd></div>
             <div><dt>Hình thức</dt><dd>{deliveryLabels[listing.delivery_mode]}</dd></div>
             <div><dt>Địa điểm</dt><dd>{[listing.district, listing.city].filter(Boolean).join(", ") || "—"}</dd></div>

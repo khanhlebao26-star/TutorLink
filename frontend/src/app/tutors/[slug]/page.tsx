@@ -2,7 +2,6 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PublicTutor } from "@/components/tutors/public-tutor";
 import { getFeaturedListingCandidates, getPublicTutor } from "@/lib/data/marketplace";
 import type { TutorPublic } from "@/lib/data/marketplace-types";
-import "@/styles/public-detail.css";
 
 export const dynamic = "force-static";
 export const dynamicParams = true;

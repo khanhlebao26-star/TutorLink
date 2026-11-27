@@ -85,7 +85,7 @@ function NotificationList() {
     setFilter(nextFilter);
   }
   return (
-    <section className="content-stack notifications-page">
+    <section className="content-stack notifications-page mx-auto w-full max-w-[1120px]">
       <header className="notification-heading">
         <nav className="notification-breadcrumb" aria-label="Đường dẫn"><Link href="/">Trang chủ</Link><span aria-hidden="true">/</span><strong>Thông báo</strong></nav>
         <h1>Thông báo</h1>
@@ -100,7 +100,7 @@ function NotificationList() {
           </div>
         )}
       </header>
-      <nav className="notification-filters" aria-label="Lọc thông báo">
+      <nav className="notification-filters flex max-w-full flex-nowrap gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible" aria-label="Lọc thông báo">
         {notificationFilters.map(({ key, label }) => <button aria-pressed={filter === key} className={filter === key ? "is-active" : ""} key={key} onClick={() => selectFilter(key)} type="button">
           {label}{key === "unread" && unreadCount > 0 ? <span>{unreadCount}</span> : null}
         </button>)}
@@ -161,7 +161,7 @@ function NotificationGroup({ title, items, onRead, onDelete }: { title: string; 
     <div className="notification-group-list">
       {items.map((notification) => {
         const validLink = Boolean(notification.deep_link && notification.deep_link.startsWith("/") && !notification.deep_link.startsWith("//"));
-        return <article className={`notification-row ${notification.read_at ? "is-read" : "is-unread"}`} key={`${notification.id}-${notification.read_at}`}>
+        return <article className={`notification-row grid min-w-0 grid-cols-[8px_36px_minmax(0,1fr)_16px] gap-[9px] py-3 min-[481px]:max-[760px]:grid-cols-[8px_40px_minmax(0,1fr)_auto] min-[761px]:grid-cols-[8px_48px_minmax(0,1fr)_auto_auto_18px] min-[761px]:gap-3 ${notification.read_at ? "is-read" : "is-unread"}`} key={`${notification.id}-${notification.read_at}`}>
           <span className={`notification-unread-dot ${notification.read_at ? "is-hidden" : ""}`} aria-hidden="true" />
           <NotificationIcon type={notification.type} />
           <div className="notification-row-copy">

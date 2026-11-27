@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Field } from "@/components/shared/ui";
+import { authSubmitButtonClasses } from "@/components/auth/auth-layout";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { requestPasswordReset, resendVerification, resetPassword, verifyEmail } from "@/lib/data/services";
 import Link from "next/link";
@@ -177,7 +178,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
         </div>
         <form className="form-stack auth-verify-resend" onSubmit={submit} aria-busy={isBusy}>
           <Field htmlFor="verify-email-address" label="Email đã đăng ký" error={fieldError("email")}><input className="input" type="email" required value={email} onChange={event=>setEmail(event.target.value)}/></Field>
-          <Button type="submit" disabled={isBusy}>{isBusy ? "Đang xử lý…" : "Gửi lại email xác minh"}</Button>
+          <Button className={authSubmitButtonClasses} type="submit" disabled={isBusy}>{isBusy ? "Đang xử lý…" : "Gửi lại email xác minh"}</Button>
         </form>
         <div className="auth-card-footer auth-verify-next">
           <Link className="button" href="/auth/login">Tiếp tục</Link>
@@ -247,7 +248,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
       </fieldset>
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
       {message ? <p className="inline-success" role="status">{message}</p> : null}
-      <Button type="submit" disabled={submitting}>
+      <Button className={authSubmitButtonClasses} type="submit" disabled={submitting}>
         {submitting ? "Đang xử lý…" : mode === "forgot" ? "Gửi liên kết đặt lại" : "Cập nhật mật khẩu"}
       </Button>
     </form>

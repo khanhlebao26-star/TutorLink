@@ -29,6 +29,10 @@ Frontend regression/coverage chạy bằng `npm run test:coverage -- --reporter=
 
 Coverage được tạo trên toàn bộ `frontend/src/**/*.{ts,tsx}` theo cấu hình Vitest, không chỉ các file mới thêm.
 
+### Kiểm tra lại sau refactor Tailwind ngày 2026-11-27
+
+Sau đợt thay đổi giao diện, coverage được chạy lại: **210 tests / 40 files** pass, statements **80.57%** (3,405/4,226), lines **85.70%** (2,937/3,427). Hai chỉ số tiếp tục vượt gate 80.01%. Bộ ảnh Before/After và chi tiết regression hiện tại nằm trong [handover evidence tiêu chí 3(a)](evidence/3a-tailwind-migration/README.md).
+
 ## Benchmark production trước và sau
 
 Đo trên Next.js production server local ở loopback, Node.js 26.7.0, 12 request tuần tự cho mỗi route. Mỗi mẫu tính thời gian từ lúc gửi request đến khi đọc đủ HTML response. Không phải phép đo browser/Core Web Vitals hay số liệu production. Baseline dùng production build ngay trước prerender; kết quả dùng build ISR.

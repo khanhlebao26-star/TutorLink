@@ -95,7 +95,7 @@ function formatReviewDate(value: string | null) {
 }
 
 function PublicTutorLoading() {
-  return <section className="content-stack public-tutor-page public-tutor-loading" role="status" aria-live="polite" aria-label="Đang tải hồ sơ gia sư">
+  return <section className="content-stack public-tutor-page public-tutor-loading mx-auto w-full max-[700px]:w-[calc(100%-80px)] max-[700px]:max-w-none max-[420px]:w-[calc(100%-48px)]" role="status" aria-live="polite" aria-label="Đang tải hồ sơ gia sư">
     <div className="tutor-profile-inner tutor-loading-inner">
     <div className="tutor-loading-status"><span className="tutor-loading-spinner" aria-hidden="true" /><span><strong>Đang chuẩn bị hồ sơ gia sư</strong><small>Đang tải thông tin, dịch vụ và lịch khả dụng…</small></span></div>
     <div className="tutor-loading-hero" aria-hidden="true"><div className="tutor-loading-photo"><TutorSkeleton className="tutor-loading-avatar" /></div><div className="tutor-loading-hero-copy"><TutorSkeleton className="tutor-loading-eyebrow" /><TutorSkeleton className="tutor-loading-name" /><TutorSkeleton className="tutor-loading-headline" /><TutorSkeleton className="tutor-loading-stats" /></div><div className="tutor-loading-hero-actions"><TutorSkeleton className="tutor-loading-action" /><TutorSkeleton className="tutor-loading-action" /></div></div>
@@ -208,22 +208,22 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
     : null;
 
   return (
-    <section className="content-stack public-tutor-page tutor-profile-redesign">
+    <section className="content-stack public-tutor-page tutor-profile-redesign mx-auto w-full max-[700px]:w-[calc(100%-80px)] max-[700px]:max-w-none max-[420px]:w-[calc(100%-48px)] max-[560px]:pt-[10px]">
       <div className="tutor-profile-inner">
       <nav className="public-breadcrumb tutor-profile-breadcrumb" aria-label="Đường dẫn">
         <Link href="/">Trang chủ</Link><span aria-hidden="true">/</span>
         <span aria-current="page">{name}</span>
       </nav>
 
-      <section className="tutor-profile-hero" aria-labelledby="tutor-profile-name">
-        <div className="tutor-profile-identity">
-          <div className="tutor-profile-media" role="img" aria-label={`Ảnh đại diện ${name}`}>
-            <span className="public-avatar public-avatar-large" aria-hidden="true">{initial}</span>
+      <section className="tutor-profile-hero grid min-w-0 grid-cols-1 gap-[clamp(18px,2.2vw,34px)] rounded-[17px] p-[18px] max-[560px]:justify-items-start min-[561px]:grid-cols-[minmax(170px,220px)_minmax(0,1fr)] min-[701px]:rounded-[22px] min-[701px]:p-[26px_clamp(18px,2.6vw,38px)] min-[861px]:grid-cols-[minmax(135px,166px)_minmax(0,1fr)] min-[1181px]:grid-cols-[150px_minmax(0,1fr)_300px] min-[1181px]:rounded-[22px]" aria-labelledby="tutor-profile-name">
+        <div className="tutor-profile-identity min-[701px]:row-span-2 min-[701px]:self-start min-[1181px]:row-auto min-[1181px]:self-auto max-[560px]:justify-self-center">
+          <div className="tutor-profile-media min-h-[150px] w-[150px] max-[560px]:min-h-[154px] max-[560px]:w-[154px]" role="img" aria-label={`Ảnh đại diện ${name}`}>
+            <span className="public-avatar public-avatar-large basis-[124px] size-[124px] min-[1181px]:basis-[134px] min-[1181px]:size-[134px]" aria-hidden="true">{initial}</span>
             <span className="tutor-profile-avatar-verified" aria-label="Hồ sơ đã xác minh"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" /></svg></span>
           </div>
           <TutorSocialLinks links={data.social_links} name={name} />
         </div>
-        <div className="tutor-profile-intro">
+        <div className="tutor-profile-intro min-w-0 max-[560px]:px-[3px]">
           <p className="eyebrow">HỒ SƠ GIA SƯ</p>
           <h1 id="tutor-profile-name">{name}</h1>
           <p className="tutor-profile-headline">{data.headline || "Gia sư / Huấn luyện viên"}</p>
@@ -234,7 +234,7 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
             <span className="tutor-profile-response"><TutorProfileIcon name="clock" /><small>Phản hồi <strong>{highlights.responseMinutes === null ? "chưa cập nhật" : `< ${highlights.responseMinutes} phút`}</strong></small></span>
           </div>
         </div>
-        <aside className="tutor-profile-trust" aria-labelledby="tutor-trust-title">
+        <aside className="tutor-profile-trust col-span-full min-w-0 min-[701px]:col-start-2 min-[701px]:col-span-1 min-[1181px]:col-start-auto" aria-labelledby="tutor-trust-title">
           <div className="tutor-profile-trust-top"><span><i aria-hidden="true" />Hồ sơ đã xác thực</span><small>TUTORLINK</small></div>
           <h2 id="tutor-trust-title"><TutorProfileIcon name="shield" />Bảo chứng TutorLink Trust</h2>
           <p>An tâm kết nối và học tập cùng gia sư đã được TutorLink xét duyệt.</p>
@@ -247,7 +247,7 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
         </aside>
       </section>
 
-      <nav className="tutor-profile-tabs" role="tablist" aria-label="Nội dung hồ sơ gia sư">
+      <nav className="tutor-profile-tabs flex max-w-full justify-between gap-2 overflow-x-auto overscroll-x-contain min-[701px]:justify-center min-[701px]:gap-[clamp(18px,3.4vw,54px)]" role="tablist" aria-label="Nội dung hồ sơ gia sư">
         {([
           ["overview", "Tổng quan"],
           ["services", "Dịch vụ"],
@@ -256,7 +256,7 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
         ] as const).map(([tab, label]) => <button
           aria-controls="tutor-profile-active-panel"
           aria-selected={activeTab === tab}
-          className={activeTab === tab ? "is-active" : ""}
+          className={`${activeTab === tab ? "is-active" : ""} flex-none px-[7px] text-[.72rem] min-[701px]:px-[10px] min-[701px]:text-[.82rem]`}
           id={`tutor-profile-tab-${tab}`}
           key={tab}
           onClick={() => selectTab(tab)}
@@ -267,15 +267,15 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
       </nav>
 
       {activeTab === "overview" ? <div className="tutor-profile-tab-panel tutor-profile-overview-panel" id="tutor-profile-active-panel" role="tabpanel" aria-labelledby="tutor-profile-tab-overview" tabIndex={0}>
-      <section className="tutor-profile-stats" aria-label="Thông tin nhanh">
+      <section className="tutor-profile-stats grid grid-cols-2 min-[561px]:grid-cols-4" aria-label="Thông tin nhanh">
         <div><span className="tutor-profile-stat-icon"><TutorProfileIcon name="experience" /></span><span><strong>{data.experience_years}+ năm</strong><small>Kinh nghiệm giảng dạy</small></span></div>
         <div><span className="tutor-profile-stat-icon"><TutorProfileIcon name="services" /></span><span><strong>{listingCount} dịch vụ</strong><small>Đang hoạt động</small></span></div>
         <div><span className="tutor-profile-stat-icon"><TutorProfileIcon name="specialty" /></span><span><strong>{primarySpecialization?.category || primarySpecialization?.name || "Chuyên môn"}</strong><small>Lĩnh vực giảng dạy</small></span></div>
         <div><span className="tutor-profile-stat-icon"><TutorProfileIcon name="location" /></span><span><strong>{city || "Linh hoạt"}</strong><small>Khu vực hoạt động</small></span></div>
       </section>
 
-      <div className="tutor-profile-body" id="overview">
-        <div className="tutor-profile-content">
+      <div className="tutor-profile-body grid grid-cols-1 items-start gap-[clamp(22px,2.4vw,36px)] min-[861px]:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]" id="overview">
+        <div className="tutor-profile-content min-w-0">
           {data.bio ? <section className="tutor-profile-about" aria-labelledby="tutor-bio-title"><h2 id="tutor-bio-title">Giới thiệu bản thân</h2><p>{data.bio}</p></section> : null}
 
           <section className="tutor-profile-expertise" aria-labelledby="tutor-expertise-title">
@@ -286,8 +286,8 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
 
         </div>
 
-        <aside className="tutor-profile-sidebar" aria-label="Liên hệ gia sư">
-          <section className="tutor-profile-booking-card">
+        <aside className="tutor-profile-sidebar max-[860px]:row-start-1" aria-label="Liên hệ gia sư">
+          <section className="tutor-profile-booking-card p-[15px] min-[561px]:p-[18px]">
             <span className="tutor-profile-booking-icon"><TutorProfileIcon name="warmup" /></span>
             <h2>Bắt đầu học cùng {name}</h2>
             <p>Trao đổi mục tiêu và thống nhất lịch phù hợp với gia sư.</p>
@@ -297,13 +297,13 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
         </aside>
       </div>
 
-      <section className="tutor-profile-journey" aria-labelledby="tutor-journey-title">
+      <section className="tutor-profile-journey mt-12 min-[561px]:mt-16 min-[861px]:mt-20" aria-labelledby="tutor-journey-title">
         <div className="tutor-profile-journey-heading">
           <p className="tutor-profile-services-eyebrow">ĐỒNG HÀNH CÙNG BẠN</p>
           <h2 id="tutor-journey-title">Một buổi học với {name} có gì?</h2>
           <p>Lộ trình rõ ràng, nội dung thực tế và phản hồi cá nhân sau mỗi buổi.</p>
         </div>
-        <div className="tutor-profile-journey-grid">
+        <div className="tutor-profile-journey-grid grid grid-cols-1 gap-4 min-[561px]:grid-cols-2 min-[861px]:grid-cols-4">
           <article><span className="tutor-profile-journey-icon"><TutorProfileIcon name="warmup" /></span><strong className="tutor-profile-journey-number">01</strong><h3>Khởi động tự nhiên</h3><p>Trò chuyện ngắn để khởi động vốn từ và tạo cảm giác thoải mái.</p></article>
           <article><span className="tutor-profile-journey-icon"><TutorProfileIcon name="practice" /></span><strong className="tutor-profile-journey-number">02</strong><h3>Học qua tình huống</h3><p>Thực hành nội dung sát với mục tiêu giao tiếp hoặc kỹ năng của bạn.</p></article>
           <article><span className="tutor-profile-journey-icon"><TutorProfileIcon name="feedback" /></span><strong className="tutor-profile-journey-number">03</strong><h3>Phản hồi tức thì</h3><p>Sửa phát âm, từ vựng và cách diễn đạt ngay khi thực hành.</p></article>
@@ -311,19 +311,19 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
         </div>
       </section>
 
-      <section className="tutor-profile-start-section" aria-labelledby="tutor-start-title">
+      <section className="tutor-profile-start-section mt-[60px] min-[561px]:mt-[88px] min-[861px]:mt-[120px]" aria-labelledby="tutor-start-title">
         <div className="tutor-profile-journey-heading">
           <p className="tutor-profile-services-eyebrow">BẮT ĐẦU THẬT ĐƠN GIẢN</p>
           <h2 id="tutor-start-title">Học cùng {name} chỉ trong 3 bước</h2>
         </div>
-        <ol className="tutor-profile-start-steps">
+        <ol className="tutor-profile-start-steps grid grid-cols-1 gap-4 min-[561px]:grid-cols-3 max-[560px]:gap-3 max-[560px]:p-4">
           <li><span>1</span><h3>Chọn dịch vụ</h3><p>Chọn nội dung phù hợp với mục tiêu học tập của bạn.</p></li>
           <li><span>2</span><h3>Nhắn tin trao đổi</h3><p>Thống nhất trình độ, nhu cầu và thời gian thuận tiện.</p></li>
           <li><span>3</span><h3>Bắt đầu học</h3><p>Tham gia buổi học và theo dõi tiến bộ trên TutorLink.</p></li>
         </ol>
       </section>
 
-      <section className="tutor-profile-faq-section" aria-labelledby="tutor-faq-title">
+      <section className="tutor-profile-faq-section mt-[60px] grid grid-cols-1 gap-6 min-[561px]:mt-[88px] min-[861px]:mt-[120px] min-[861px]:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)] min-[861px]:gap-10" aria-labelledby="tutor-faq-title">
         <div className="tutor-profile-faq-intro">
           <p className="tutor-profile-services-eyebrow">CÂU HỎI THƯỜNG GẶP</p>
           <h2 id="tutor-faq-title">Thông tin trước khi bắt đầu</h2>
@@ -338,12 +338,12 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
         </div>
       </section>
 
-      <section className="tutor-profile-explore-section" aria-labelledby="tutor-explore-title">
-        <div className="tutor-profile-explore-heading">
+      <section className="tutor-profile-explore-section mt-12 min-[561px]:mt-16 min-[861px]:mt-20" aria-labelledby="tutor-explore-title">
+        <div className="tutor-profile-explore-heading flex flex-col items-start min-[561px]:flex-row min-[561px]:items-end">
           <div><p className="tutor-profile-services-eyebrow">KHÁM PHÁ THÊM</p><h2 id="tutor-explore-title">Tutor bạn có thể quan tâm</h2></div>
           <Link className="tutor-profile-inline-link" href="/marketplace">Xem tất cả Tutor <span aria-hidden="true">→</span></Link>
         </div>
-        {relatedTutors.loading ? <div className="tutor-profile-related-empty" role="status">Đang tìm thêm tutor phù hợp…</div> : relatedTutors.data?.length ? <div className="tutor-profile-related-grid">
+        {relatedTutors.loading ? <div className="tutor-profile-related-empty" role="status">Đang tìm thêm tutor phù hợp…</div> : relatedTutors.data?.length ? <div className="tutor-profile-related-grid grid grid-cols-1 min-[561px]:grid-cols-2 min-[861px]:grid-cols-3">
           {relatedTutors.data.map(({ listing, rating }) => {
             const tutorName = listing.tutor_name || "TutorLink Tutor";
             const tutorHref = listing.tutor_slug ? `/tutors/${encodeURIComponent(listing.tutor_slug)}` : `/marketplace/${encodeURIComponent(listing.slug)}`;
@@ -355,19 +355,19 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
         </div> : <div className="tutor-profile-related-empty">Chưa có tutor khác để gợi ý. <Link href="/marketplace">Khám phá dịch vụ <span aria-hidden="true">→</span></Link></div>}
       </section>
 
-      <section className="tutor-profile-cta" aria-labelledby="tutor-profile-cta-title">
+      <section className="tutor-profile-cta mt-[54px] flex min-h-[190px] items-center justify-between gap-8 rounded-3xl p-[clamp(28px,4vw,54px)] min-[561px]:mt-[72px] min-[861px]:mt-[96px] max-[560px]:min-h-0 max-[560px]:flex-col max-[560px]:items-stretch max-[560px]:gap-6 max-[560px]:rounded-[18px] max-[560px]:p-[26px_22px]" aria-labelledby="tutor-profile-cta-title">
         <div className="tutor-profile-cta-copy">
           <p>SẴN SÀNG TIẾN BỘ?</p>
           <h2 id="tutor-profile-cta-title">Bắt đầu hành trình học tập cùng {name}.</h2>
           <span>Nhắn tin để trao đổi mục tiêu và tìm thời gian học phù hợp nhất với bạn.</span>
         </div>
-        <div className="tutor-profile-cta-action">
+        <div className="tutor-profile-cta-action max-[560px]:basis-auto max-[560px]:w-full">
           <OpenChatButton className="tutor-profile-cta-button" label={`Nhắn tin với ${name}`} peerId={data.messaging_user_id} contact={chatContact} />
         </div>
       </section>
       </div> : null}
 
-      {activeTab === "services" ? <section className="tutor-profile-tab-panel tutor-profile-services" id="tutor-profile-active-panel" role="tabpanel" aria-labelledby="tutor-profile-tab-services" tabIndex={0}>
+      {activeTab === "services" ? <section className="tutor-profile-tab-panel tutor-profile-services mt-9 min-[561px]:mt-11 min-[861px]:mt-[62px]" id="tutor-profile-active-panel" role="tabpanel" aria-labelledby="tutor-profile-tab-services" tabIndex={0}>
         <div className="tutor-profile-section-heading">
           <div><p className="tutor-profile-services-eyebrow">DỊCH VỤ CỦA {name.toLocaleUpperCase("vi")}</p><h2 id="tutor-listings-title">Dịch vụ đang cung cấp <span>({listingCount})</span></h2></div>
           <div className="tutor-profile-services-contact"><OpenChatButton className="tutor-profile-contact-button" label={`Trao đổi với ${name} →`} peerId={data.messaging_user_id} contact={chatContact} /></div>
@@ -377,7 +377,7 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
             if (listingSlide > 0) setListingSlide(listingSlide - 1);
             else if (page > 1) { setPage(page - 1); setListingSlide(2); }
           }}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="m15 18-6-6 6-6" /></svg></button> : null}
-          <div className="public-listings-grid">
+          <div className="public-listings-grid grid grid-cols-1 min-[561px]:grid-cols-2 min-[861px]:grid-cols-3">
           {visibleListings.map((listing) => {
             const formattedPrice = formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit);
             const [amount, ...unitParts] = formattedPrice.split(" / ");
@@ -403,7 +403,7 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
         </div> : <StatePanel kind="empty" message="Gia sư chưa có dịch vụ đang công khai." />}
       </section> : null}
 
-      {activeTab === "reviews" ? <section className="tutor-profile-tab-panel tutor-profile-reviews-section" id="tutor-profile-active-panel" aria-labelledby="tutor-profile-tab-reviews" role="tabpanel" tabIndex={0}>
+      {activeTab === "reviews" ? <section className="tutor-profile-tab-panel tutor-profile-reviews-section mt-14 grid grid-cols-1 items-start gap-[clamp(24px,5vw,64px)] min-[561px]:mt-[88px] min-[861px]:mt-6 min-[861px]:grid-cols-[minmax(230px,.68fr)_minmax(0,1.32fr)]" id="tutor-profile-active-panel" aria-labelledby="tutor-profile-tab-reviews" role="tabpanel" tabIndex={0}>
         <div className="tutor-profile-review-summary">
           <p className="tutor-profile-services-eyebrow">ĐÁNH GIÁ ĐÃ XÁC MINH</p>
           <h2 id="tutor-reviews-title">Học viên nói gì về {name}?</h2>
@@ -433,7 +433,7 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
       </section> : null}
 
       {activeTab === "schedule" ? <section className="tutor-profile-tab-panel tutor-profile-schedule-panel" id="tutor-profile-active-panel" aria-labelledby="tutor-profile-tab-schedule" role="tabpanel" tabIndex={0}>
-        <div className="tutor-profile-schedule-heading"><div><p className="tutor-profile-services-eyebrow">THỜI GIAN CỦA {name.toLocaleUpperCase("vi")}</p><h2>Lịch học khả dụng</h2><p>Tham khảo khung giờ gia sư thường sắp xếp và chọn thời gian phù hợp với bạn.</p></div>{availability ? <OpenChatButton className="tutor-profile-schedule-contact" peerId={data.messaging_user_id} contact={chatContact} label={`Trao đổi lịch với ${name}`} /> : null}</div>
+        <div className="tutor-profile-schedule-heading max-[700px]:items-start"><div><p className="tutor-profile-services-eyebrow">THỜI GIAN CỦA {name.toLocaleUpperCase("vi")}</p><h2>Lịch học khả dụng</h2><p>Tham khảo khung giờ gia sư thường sắp xếp và chọn thời gian phù hợp với bạn.</p></div>{availability ? <OpenChatButton className="tutor-profile-schedule-contact" peerId={data.messaging_user_id} contact={chatContact} label={`Trao đổi lịch với ${name}`} /> : null}</div>
         {availability ? <div className="tutor-profile-availability"><PublicAvailability availability={availability} /></div> : <section className="card tutor-profile-no-availability"><h2>Lịch trống</h2><p>Gia sư chưa công khai khung giờ. Hãy nhắn tin để trao đổi lịch phù hợp.</p><OpenChatButton peerId={data.messaging_user_id} contact={chatContact} label={`Nhắn tin với ${name}`} /></section>}
       </section> : null}
       </div>

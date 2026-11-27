@@ -46,6 +46,12 @@ it('uses the optional initial tab only as a starting value',async()=>{
  expect(screen.getByRole('tab',{name:'Dịch vụ'})).toHaveAttribute('aria-selected','true');
  window.history.replaceState(null,'','/marketplace');
 });
+it('renders user-provided tutor text as escaped React text rather than raw HTML',()=>{
+ const unsafeText='<img src=x onerror=alert(1)>';
+ const view=render(<PublicTutor slug="anna" initialTutor={{...tutor,bio:unsafeText}}/>);
+ expect(view.container.textContent).toContain(unsafeText);
+ expect(view.container.querySelector('img[src="x"]')).toBeNull();
+});
 it('does not invent profile statistics for a former demo listing',async()=>{
  vi.mocked(api.getPublicTutor).mockResolvedValue({...tutor,listings:[{...listing,slug:'demo-featured-math-online'}]});
  const view=render(<PublicTutor slug="anna"/>);await screen.findByRole('heading',{name:'Anna Tutor'});

@@ -25,7 +25,7 @@ export function PublicAvailability({ availability }: { availability?: Availabili
 
   return (
     <section className="card public-availability tutor-schedule-card" aria-labelledby="availability-title">
-      <div className="tutor-schedule-card-heading">
+      <div className="tutor-schedule-card-heading flex items-center gap-5 max-[420px]:flex-col max-[420px]:items-start">
         <div>
           <span className="tutor-schedule-card-eyebrow">KHUNG GIỜ HÀNG TUẦN</span>
           <h2 id="availability-title">Lịch trống <small>(tham khảo)</small></h2>
@@ -37,10 +37,10 @@ export function PublicAvailability({ availability }: { availability?: Availabili
         <span><i className="is-available" /> Có khung giờ tham khảo</span>
         <span><i className="is-unavailable" /> Chưa cập nhật</span>
       </div>
-      <ul className="availability-list">
+      <ul className="availability-list grid grid-cols-1 min-[421px]:grid-cols-2 min-[701px]:grid-cols-4 min-[1181px]:grid-cols-7">
         {Object.entries(weekdays).map(([weekday, label]) => {
           const slots = rulesByWeekday.get(Number(weekday)) ?? [];
-          return <li className={slots.length ? "has-availability" : "no-availability"} key={weekday}>
+          return <li className={`${slots.length ? "has-availability" : "no-availability"} min-h-[142px] min-[421px]:max-[700px]:min-h-[124px] max-[420px]:min-h-0`} key={weekday}>
             <div className="tutor-schedule-day-heading"><strong>{label}</strong><span>{slots.length ? "Có thể trao đổi" : "Chưa cập nhật"}</span></div>
             <div className="tutor-schedule-slots">{slots.length ? slots.map((slot) => <span key={slot}>{slot}</span>) : <span className="tutor-schedule-empty-slot">Chưa có khung giờ</span>}</div>
           </li>;

@@ -11,8 +11,6 @@ import {
 import { deliveryLabels } from "@/lib/data/marketplace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import { useListFilters } from "@/lib/hooks/use-list-filters";
-import "@/styles/listings.css";
-import "@/styles/programs.css";
 import Link from "next/link";
 import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
 import { TargetIcon } from "@phosphor-icons/react/dist/ssr/Target";
@@ -53,8 +51,8 @@ function ProgramsContent() {
   ];
   return (
     <>
-      <section className="content-stack workspace-page">
-        <header className="workspace-heading">
+      <section className="content-stack workspace-page mx-auto w-full max-w-[1280px]">
+        <header className="workspace-heading flex flex-col items-start gap-3 sm:flex-row sm:justify-between sm:gap-6">
           <div>
             <h1>{actor?.role === "tutor" ? "Chương trình học" : "Program của tôi"}</h1>
             <p className="muted">
@@ -63,7 +61,7 @@ function ProgramsContent() {
           </div>
           {actor?.role === "tutor" && <Link className="button button-primary" href="/programs/new">+ Tạo chương trình</Link>}
         </header>
-        <nav className="workspace-filters program-status-filters" aria-label="Trạng thái Program">
+        <nav className="workspace-filters program-status-filters grid grid-cols-2 gap-2 sm:flex sm:flex-wrap" aria-label="Trạng thái Program">
           {filters.map(({ value, label }) => (
             <Button
               key={value}
@@ -80,7 +78,7 @@ function ProgramsContent() {
         ) : <ApiState {...result} />}
         {result.data && !filterLoading && (
           <>
-            {visiblePrograms.length ? <div className="program-grid">
+            {visiblePrograms.length ? <div className="program-grid grid grid-cols-1 gap-3 min-[521px]:grid-cols-2">
               {visiblePrograms.map((p) => (
                 <Card key={p.id} className="program-card program-showcase-card">
                   <div className="program-art" aria-hidden="true">

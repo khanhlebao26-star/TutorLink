@@ -3,7 +3,6 @@
 import { WorkspaceForm } from "@/components/programs/workspace-form";
 import { taskFields } from "@/components/programs/workspace-form-fields";
 import { Button, Card } from "@/components/shared/ui";
-import "@/styles/programs.css";
 import { useState } from "react";
 
 export function TaskCreateDialog({ id, programTitle, customerId, onSaved }: { id: number; programTitle: string; customerId: number; onSaved: () => void }) {
