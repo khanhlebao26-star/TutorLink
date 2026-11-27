@@ -9,6 +9,7 @@ import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback } from "react";
+import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
 
 const weekdays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
 type DetailExtra = { tutor: TutorPublic | null; reviews: TutorReviewCollection | null };
@@ -220,7 +221,7 @@ export function ListingDetail({ slug }: { slug: string }) {
           </section>
 
           <section className="listing-schedule" aria-labelledby="listing-schedule-title">
-            <div className="listing-schedule-heading"><span aria-hidden="true">▦</span><div><h2 id="listing-schedule-title">Lịch học</h2><small>Chỉ để tham khảo</small></div></div>
+            <div className="listing-schedule-heading"><CalendarDotsIcon aria-hidden="true" weight="regular" /><div><h2 id="listing-schedule-title">Lịch học</h2><small>Chỉ để tham khảo</small></div></div>
             {tutor && !extra.loading ? <div className="listing-week-grid">{weekdays.map((day, index) => {
               const slots = availability.filter((rule) => rule.weekday === index);
               return <div className={`listing-week-day${slots.length ? " has-slots" : ""}`} key={day}><span>{day}</span>{slots.length ? slots.map((slot) => <strong key={`${slot.start_time}-${slot.end_time}`}>{slot.start_time}–{slot.end_time}</strong>) : <i aria-label="Chưa có lịch" />}</div>;

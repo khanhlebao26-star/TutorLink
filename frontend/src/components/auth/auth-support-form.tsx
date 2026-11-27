@@ -6,6 +6,7 @@ import { requestPasswordReset, resendVerification, resetPassword, verifyEmail } 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr/EnvelopeSimple";
 
 type SupportMode = "verify" | "forgot" | "reset";
 
@@ -168,7 +169,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
           Chúng tôi đã gửi email xác minh đến <strong>{email || "địa chỉ email của bạn"}</strong>. Vui lòng kiểm tra hộp thư (bao gồm cả thư mục Spam) và nhấp vào liên kết trong email để hoàn tất xác minh.
         </p>
         <div className="auth-verify-notice">
-          <span className="auth-verify-notice-icon" aria-hidden="true">✉</span>
+          <span className="auth-verify-notice-icon" aria-hidden="true"><EnvelopeSimpleIcon weight="regular" /></span>
           <div>
             <strong>Chưa nhận được email?</strong>
             <p>Email có thể mất vài phút để đến hộp thư. Bạn có thể gửi lại email xác minh.</p>

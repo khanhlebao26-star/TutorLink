@@ -7,6 +7,9 @@ import { deliveryLabels, formatListingPrice, getPublicTutor, getTutorReviews } f
 import type { TutorPublic, TutorReviewAggregate } from "@/lib/data/marketplace-types";
 import Image from "next/image";
 import Link from "next/link";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { HeartIcon } from "@phosphor-icons/react/dist/ssr/Heart";
+import { SealCheckIcon } from "@phosphor-icons/react/dist/ssr/SealCheck";
 import { useEffect, useState } from "react";
 
 type FavoriteCardData = FavoriteTutor & {
@@ -55,7 +58,7 @@ function FavoriteTutorCard({ tutor, removing, onRemove }: { tutor: FavoriteCardD
       <h2><Link href={profileHref}>{listing?.title ?? tutor.headline ?? `Gia sư ${specialization}`}</Link></h2>
       <Link className="favorite-tutor-owner" href={profileHref}>
         <span className="favorite-owner-avatar" aria-hidden="true">{initials(name)}</span>
-        <strong>{name}</strong><span className="favorite-verified" aria-label="Hồ sơ công khai">✓</span>
+        <strong>{name}</strong><span className="favorite-verified" aria-label="Hồ sơ công khai"><SealCheckIcon weight="regular" /></span>
       </Link>
       <div className="favorite-tutor-tags" aria-label="Lĩnh vực và hình thức">
         <span>{category}</span><span>{specialization}</span><span className="favorite-mode-tag">{mode}</span>
@@ -63,12 +66,12 @@ function FavoriteTutorCard({ tutor, removing, onRemove }: { tutor: FavoriteCardD
       <p className="favorite-tutor-rating"><span aria-label="Đánh giá">★</span> <strong>{rating?.average?.toFixed(1) ?? "—"}</strong> <small>({rating?.count ?? 0} đánh giá)</small></p>
       <div className="favorite-provided-service">
         <strong>Dịch vụ đang cung cấp{tutor.profile ? ` (${tutor.profile.listings.length})` : ""}</strong>
-        {listing ? <div className="favorite-service-detail"><span className="favorite-service-icon" aria-hidden="true">▤</span><span><b>{listing.title}</b><small>{formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit)} · {mode}</small></span></div> : <p>Liên hệ tutor để xem các dịch vụ hiện có.</p>}
+        {listing ? <div className="favorite-service-detail"><span className="favorite-service-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span><span><b>{listing.title}</b><small>{formatListingPrice(listing.price_from_minor, listing.currency, listing.price_unit)} · {mode}</small></span></div> : <p>Liên hệ tutor để xem các dịch vụ hiện có.</p>}
       </div>
     </div>
 
     <div className="favorite-tutor-actions">
-      <span className="favorite-saved-heart" aria-label="Đã lưu vào yêu thích">♥</span>
+      <span className="favorite-saved-heart" aria-label="Đã lưu vào yêu thích"><HeartIcon weight="fill" /></span>
       <Link className="favorite-profile-action" href={profileHref}>Xem hồ sơ</Link>
       {listing ? <Link className="favorite-service-action" href={`/marketplace/${encodeURIComponent(listing.slug)}`}>Xem dịch vụ <span aria-hidden="true">→</span></Link> : <Link className="favorite-service-action" href={profileHref}>Xem dịch vụ <span aria-hidden="true">→</span></Link>}
       <button className="favorite-remove-action" type="button" onClick={onRemove} disabled={removing}>

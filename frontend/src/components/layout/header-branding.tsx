@@ -1,7 +1,9 @@
 "use client";
 
+import { ListIcon } from "@phosphor-icons/react/dist/ssr/List";
+
 export function MenuIcon() {
-  return <span className="menu-icon" aria-hidden="true"><span /><span /><span /></span>;
+  return <ListIcon className="menu-icon" weight="regular" aria-hidden="true" />;
 }
 
 export function BrandMark() {

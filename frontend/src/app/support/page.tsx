@@ -1,5 +1,6 @@
 import "@/app/support/support.css";
 import { AppShell } from "@/components/layout/app-shell";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -10,7 +11,7 @@ const commonQuestions = [
   },
   {
     question: "Tôi không thấy tin nhắn hoặc lời mời của mình ở đâu?",
-    answer: <>Bạn có thể mở <Link href="/messages">Tin nhắn</Link> để xem cuộc trò chuyện, hoặc <Link href="/invitations">Lời mời học</Link> để kiểm tra lời mời tham gia chương trình. Hãy đăng nhập đúng tài khoản nếu các mục này chưa hiển thị.</>,
+    answer: <>Bạn có thể mở <Link href="/messages">Tin nhắn</Link> để xem cuộc trò chuyện, hoặc vào <Link href="/programs">Workspace chương trình</Link> để tiếp tục theo dõi Program. Hãy đăng nhập đúng tài khoản nếu các mục này chưa hiển thị.</>,
   },
   {
     question: "Thông báo được xem ở đâu?",
@@ -48,7 +49,7 @@ const tutorQuestions = [
   },
   {
     question: "Tôi xem lời mời và trao đổi với học viên ở đâu?",
-    answer: <>Bạn có thể theo dõi lời mời trong <Link href="/invitations">Lời mời học</Link> và tiếp tục trao đổi tại <Link href="/messages">Tin nhắn</Link>.</>,
+    answer: <>Bạn có thể theo dõi các chương trình và lời mời trong <Link href="/programs">Workspace gia sư</Link>, sau đó tiếp tục trao đổi tại <Link href="/messages">Tin nhắn</Link>.</>,
   },
   {
     question: "Tôi xem báo cáo của mình ở đâu?",
@@ -82,7 +83,7 @@ export default function SupportPage() {
       <div className="support-content">
         <nav className="support-shortcuts" aria-label="Chủ đề hỗ trợ">
           <a href="#chung"><span className="support-shortcut-icon" aria-hidden="true">?</span><span><strong>Tài khoản &amp; sử dụng</strong><small>Cài đặt, tin nhắn và thông báo</small></span><b aria-hidden="true">→</b></a>
-          <a href="#hoc-vien"><span className="support-shortcut-icon is-blue" aria-hidden="true">⌕</span><span><strong>Dành cho học viên</strong><small>Tìm dịch vụ và học cùng gia sư</small></span><b aria-hidden="true">→</b></a>
+          <a href="#hoc-vien"><span className="support-shortcut-icon is-blue" aria-hidden="true"><MagnifyingGlassIcon weight="regular" /></span><span><strong>Dành cho học viên</strong><small>Tìm dịch vụ và học cùng gia sư</small></span><b aria-hidden="true">→</b></a>
           <a href="#gia-su"><span className="support-shortcut-icon is-purple" aria-hidden="true">✦</span><span><strong>Dành cho gia sư</strong><small>Hồ sơ, dịch vụ và lịch dạy</small></span><b aria-hidden="true">→</b></a>
         </nav>
 

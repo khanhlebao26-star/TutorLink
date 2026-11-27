@@ -3,6 +3,13 @@ import { AppShell } from "@/components/layout/app-shell";
 import { FeaturedServices } from "@/components/marketing/featured-services";
 import { FeaturedListingProvider } from "@/components/marketing/featured-listing-provider";
 import { DeferredFeaturedTutors } from "@/components/marketing/deferred-featured-tutors";
+import { ChatTextIcon } from "@phosphor-icons/react/dist/ssr/ChatText";
+import { ClockIcon } from "@phosphor-icons/react/dist/ssr/Clock";
+import { GraduationCapIcon } from "@phosphor-icons/react/dist/ssr/GraduationCap";
+import { HeadsetIcon } from "@phosphor-icons/react/dist/ssr/Headset";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { PathIcon } from "@phosphor-icons/react/dist/ssr/Path";
+import { SealCheckIcon } from "@phosphor-icons/react/dist/ssr/SealCheck";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -28,16 +35,16 @@ function SectionIntro({ eyebrow, title, text, id }: { eyebrow: string; title: st
 }
 
 function StepIcon({ name }: { name: string }) {
-  if (name === "search") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2" /><path d="m15 15 4.5 4.5" /></svg>;
-  if (name === "chat") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 11h16M4 16h10" /><path d="m5 20 3-3h12V4H4v13" /></svg>;
-  return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 12c-1.7-1.1-4.7-5.9-2.2-7.5 2.1-1.3 3.2 1.2 2.2 3.4 1-2.2 3.2-4.7 5.1-3.2 2.1 1.7-1 5.9-3.1 7.3 2.3-1.3 7.1-1.9 7.4.8.3 2.6-4.4 3.1-7.3 1.8 2.2 1.9 3.7 6.3 1.1 7.2-2.5.9-4-3.4-3.2-6.2-.9 2.8-3.7 6.4-5.8 4.5-2-1.9.7-5.8 3.2-7.1-2.8.8-7.3.3-7-2.4.2-2.6 4.8-2.6 7.6-.6Z" /></svg>;
+  if (name === "search") return <MagnifyingGlassIcon weight="regular" aria-hidden="true" />;
+  if (name === "chat") return <ChatTextIcon weight="regular" aria-hidden="true" />;
+  return <GraduationCapIcon weight="regular" aria-hidden="true" />;
 }
 
 function WhyIcon({ name }: { name: string }) {
-  if (name === "verified") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 12 4 4 8-9" /></svg>;
-  if (name === "plan") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>;
-  if (name === "flexible") return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></svg>;
-  return <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.2 8.8c0 4.3-8.2 10-8.2 10s-8.2-5.7-8.2-10a4.1 4.1 0 0 1 8.2-1 4.1 4.1 0 0 1 8.2 1Z" /></svg>;
+  if (name === "verified") return <SealCheckIcon weight="regular" aria-hidden="true" />;
+  if (name === "plan") return <PathIcon weight="regular" aria-hidden="true" />;
+  if (name === "flexible") return <ClockIcon weight="regular" aria-hidden="true" />;
+  return <HeadsetIcon weight="regular" aria-hidden="true" />;
 }
 
 export default function Home() {

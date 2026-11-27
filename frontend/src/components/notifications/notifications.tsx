@@ -108,7 +108,7 @@ function NotificationList() {
       <ApiState {...result} />
       {result.data && (
         <>
-          {filteredNotifications.length === 0 && <StatePanel kind="empty" message="Bạn chưa có thông báo phù hợp." />}
+          {filteredNotifications.length === 0 && <StatePanel kind="empty" message={notifications.length === 0 ? "Bạn chưa có thông báo nào." : "Không có thông báo khớp với bộ lọc này. Hãy thử chọn mục khác."} />}
           {todayItems.length > 0 && <NotificationGroup title={`Hôm nay (${todayItems.length})`} items={todayItems} onRead={result.reload} onDelete={(id) => setDeletedIds((current) => [...current, id])} />}
           {olderItems.length > 0 && <NotificationGroup title="Trước đó" items={olderItems} onRead={result.reload} onDelete={(id) => setDeletedIds((current) => [...current, id])} />}
           {page < lastPage ? <div className="notification-load-more"><Button variant="outline" disabled={result.loading} onClick={() => { setOlderNotifications((current) => [...current, ...(currentNotifications ?? [])]); setPage((current) => current + 1); }}>Tải thêm thông báo cũ <span aria-hidden="true">⌄</span></Button></div> : null}

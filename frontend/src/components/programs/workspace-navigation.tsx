@@ -19,7 +19,7 @@ export function WorkspaceNavigation({
 }) {
   return (
     <nav className="program-workspace-links" aria-label="Các tab workspace">
-      {Object.entries(workspaceTabs).filter(([key]) => key !== "fees").map(([key, label]) => (
+      {Object.entries(workspaceTabs).map(([key, label]) => (
         <Link
           className={`program-workspace-link${active === key ? " is-active" : ""}`}
           aria-current={active === key ? "page" : undefined}

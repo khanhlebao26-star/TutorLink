@@ -4,6 +4,10 @@ import { Badge, Button, Card, Field, Input, Select } from "@/components/shared/u
 import { UploadPurpose, statusLabel, statusTone, steps, verificationDocumentsRequired } from "@/components/tutors/onboarding/onboarding-config";
 import { useTutorOnboarding } from "@/components/tutors/onboarding/use-tutor-onboarding";
 import type { TutorOnboardingData } from "@/lib/data/types";
+import { CertificateIcon } from "@phosphor-icons/react/dist/ssr/Certificate";
+import { ClockIcon } from "@phosphor-icons/react/dist/ssr/Clock";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 
 export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingData; onReload: () => void }) {
   const { profile, headline, setHeadline, bio, setBio, experienceYears, setExperienceYears, specializationId, setSpecializationId, documentType, setDocumentType, claims, setClaims, step, setStep, furthestStep, uploads, queuedAvatar, setFieldErrors, message, error, saving, locked, changesRequested, busy, verified, avatarFileId, attachedAvatar, attachedDocument, fieldError, clearFieldError, handleUpload, retryUpload, nextStep, submit, goToStep } = useTutorOnboarding({ data });
@@ -172,7 +176,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
               <div className="onboarding-experience-layout">
                 <section className="onboarding-experience-card onboarding-credentials-card" aria-labelledby="tutor-credentials-title">
                   <div className="onboarding-experience-card-heading">
-                    <span className="onboarding-experience-icon" aria-hidden="true">▤</span>
+                    <span className="onboarding-experience-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
                     <div>
                       <h3 id="tutor-credentials-title">Bằng cấp &amp; chứng chỉ</h3>
                       <p>Khai báo những văn bằng liên quan đến chuyên môn giảng dạy của bạn.</p>
@@ -183,7 +187,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                     const nameField = `qualification_claims.${index}.name`;
                     return (
                       <div className="onboarding-credential-row" key={index}>
-                        <span className="onboarding-credential-row-icon" aria-hidden="true">{claim.type === "certificate" ? "✧" : "▤"}</span>
+                        <span className="onboarding-credential-row-icon" aria-hidden="true">{claim.type === "certificate" ? <CertificateIcon weight="regular" /> : <FileTextIcon weight="regular" />}</span>
                         <div className="onboarding-credential-fields">
                           <Select aria-label={`Loại chứng nhận ${index + 1}`} disabled={locked || busy} value={claim.type}
                             onChange={(event) => setClaims(claims.map((item, i) => i === index
@@ -209,13 +213,13 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                     );
                   })}
                   <Button variant="outline" className="onboarding-add-credential" type="button" disabled={locked || busy || claims.length >= 20}
-                    onClick={() => setClaims([...claims, { type: "degree", name: "" }])}><span aria-hidden="true">＋</span> Thêm bằng cấp hoặc chứng chỉ</Button>
+                    onClick={() => setClaims([...claims, { type: "degree", name: "" }])}><PlusIcon aria-hidden="true" weight="regular" /> Thêm bằng cấp hoặc chứng chỉ</Button>
                   <p className="onboarding-credential-footnote">Bạn có thể bổ sung giấy tờ xác minh ở bước tiếp theo.</p>
                 </section>
 
                 <section className="onboarding-experience-card onboarding-years-card" aria-labelledby="tutor-experience-title">
                   <div className="onboarding-experience-card-heading">
-                    <span className="onboarding-experience-icon" aria-hidden="true">◷</span>
+                    <span className="onboarding-experience-icon" aria-hidden="true"><ClockIcon weight="regular" /></span>
                     <div>
                       <h3 id="tutor-experience-title">Thâm niên giảng dạy</h3>
                       <p>Số năm kinh nghiệm thực tế của bạn.</p>
@@ -264,7 +268,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
                 <div className="onboarding-document-guidance-grid">
                   <div className="onboarding-document-summary">
-                    <span className="onboarding-document-guidance-icon" aria-hidden="true">▤</span>
+                    <span className="onboarding-document-guidance-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
                     <div>
                       <strong>Định dạng được chấp nhận</strong>
                       <p>PDF, JPG, PNG, DOC hoặc DOCX. Kích thước tối đa 5 MB cho mỗi tệp.</p>
@@ -291,7 +295,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                     <ul>
                       {verificationDocuments.map((document) => (
                         <li className="onboarding-document-row" key={document.id}>
-                          <span className="onboarding-document-row-icon" aria-hidden="true">▤</span>
+                          <span className="onboarding-document-row-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
                           <div className="onboarding-document-row-copy">
                             <strong>{document.original_name || verificationDocumentTypes[document.document_type] || document.document_type}</strong>
                             <span>{verificationDocumentTypes[document.document_type] || document.document_type}</span>

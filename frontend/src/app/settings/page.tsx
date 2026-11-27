@@ -65,7 +65,7 @@ function AccountSettingsForm({ initialUser }: { initialUser: User }) {
       <div className="settings-avatar-row">
         <span className="settings-field-label">Ảnh đại diện</span>
         <div className="settings-avatar" aria-label={`Ảnh đại diện ${user.full_name}`}>{initials}</div>
-        <div className="settings-avatar-note"><span className="settings-info-icon" aria-hidden="true">i</span><span><strong>Ảnh đại diện giúp mọi người dễ nhận diện bạn hơn</strong><small>Ảnh đại diện có thể được cập nhật trong hồ sơ TutorLink.</small></span></div>
+        <div className="settings-avatar-note"><span className="settings-info-icon" aria-hidden="true">i</span><span><strong>Ảnh đại diện giúp mọi người dễ nhận diện bạn hơn</strong><small>{user.role === "tutor" ? <>Bạn có thể cập nhật ảnh trong <Link href="/profile">hồ sơ gia sư</Link>.</> : "Ảnh đại diện học viên hiện hiển thị chữ cái đầu trong tên của bạn."}</small></span></div>
       </div>
       <div className="settings-form-row">
         <span className="settings-field-label">Họ và tên</span>
@@ -95,6 +95,10 @@ function AccountSettingsForm({ initialUser }: { initialUser: User }) {
       {saved ? <p className="inline-success" role="status">Đã lưu thông tin tài khoản.</p> : null}
       <div className="settings-save"><Button type="submit" disabled={pending || name.trim() === user.full_name}>{pending ? "Đang lưu…" : "Lưu thay đổi"}</Button></div>
     </form>
+    <section className="card settings-admin-security" aria-labelledby="account-security-heading">
+      <div><h2 id="account-security-heading">Bảo mật tài khoản</h2><p className="muted">Đổi mật khẩu để bảo vệ tài khoản TutorLink của bạn.</p></div>
+      <Link className="button button-outline" href="/settings/password">Đổi mật khẩu</Link>
+    </section>
     <section className="card settings-logout" aria-label="Đăng xuất">
       <span className="settings-logout-icon" aria-hidden="true">↪</span>
       <div><h2>Đăng xuất</h2><p className="muted">Đăng xuất khỏi tài khoản của bạn trên thiết bị này.</p></div>

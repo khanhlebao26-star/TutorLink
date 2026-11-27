@@ -9,6 +9,16 @@ import "@/styles/reports.css";
 import { useCallback, useMemo, useState } from "react";
 
 import { ReportSubmissionForm } from "@/components/reports/report-submission-form";
+import { CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
+import { ChatTextIcon } from "@phosphor-icons/react/dist/ssr/ChatText";
+import { ClockIcon } from "@phosphor-icons/react/dist/ssr/Clock";
+import { CircleDashedIcon } from "@phosphor-icons/react/dist/ssr/CircleDashed";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { InfoIcon } from "@phosphor-icons/react/dist/ssr/Info";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
+import { StarIcon } from "@phosphor-icons/react/dist/ssr/Star";
+import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
 
 interface Report {
   id: number;
@@ -124,23 +134,23 @@ function ReportsContent() {
           <p className="reports-subtitle">Theo dõi các vấn đề bạn đã gửi và cập nhật kết quả xử lý.</p>
         </div>
         <Button className="reports-create-button" onClick={() => setFormOpen(true)}>
-          <span aria-hidden="true">＋</span> Tạo báo cáo
+          <PlusIcon aria-hidden="true" weight="regular" /> Tạo báo cáo
         </Button>
       </div>
 
       <div className="reports-summary" aria-label="Tổng quan báo cáo">
         <Card className="reports-summary-card reports-summary-total">
-          <span className="reports-summary-icon" aria-hidden="true">▤</span>
+          <span className="reports-summary-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
           <span className="reports-summary-copy"><small>Tổng báo cáo</small><strong>{result.loading ? "—" : total}</strong></span>
           <span className="reports-summary-note">Tất cả báo cáo đã gửi</span>
         </Card>
         <Card className="reports-summary-card reports-summary-open">
-          <span className="reports-summary-icon" aria-hidden="true">◷</span>
+          <span className="reports-summary-icon" aria-hidden="true"><ClockIcon weight="regular" /></span>
           <span className="reports-summary-copy"><small>Đang xử lý</small><strong>{result.loading ? "—" : openCount}</strong></span>
           <span className="reports-summary-note">Trong danh sách gần đây</span>
         </Card>
         <Card className="reports-summary-card reports-summary-closed">
-          <span className="reports-summary-icon" aria-hidden="true">✓</span>
+          <span className="reports-summary-icon" aria-hidden="true"><CheckCircleIcon weight="regular" /></span>
           <span className="reports-summary-copy"><small>Đã có kết quả</small><strong>{result.loading ? "—" : closedCount}</strong></span>
           <span className="reports-summary-note">Trong danh sách gần đây</span>
         </Card>
@@ -154,7 +164,7 @@ function ReportsContent() {
           </div>
           <div className="reports-filters">
             <label className="reports-search">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4.2 4.2" /></svg>
+              <MagnifyingGlassIcon aria-hidden="true" weight="regular" />
               <span className="reports-sr-only">Tìm báo cáo</span>
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm theo mã báo cáo, đối tượng hoặc lý do…" />
             </label>
@@ -174,7 +184,7 @@ function ReportsContent() {
 
         {result.data && filteredReports.length === 0 && (
           <div className="reports-empty">
-            <span className="reports-empty-icon" aria-hidden="true">◎</span>
+            <span className="reports-empty-icon" aria-hidden="true"><CircleDashedIcon weight="regular" /></span>
             <h3>{reports.length === 0 ? "Bạn chưa gửi báo cáo nào" : "Không tìm thấy báo cáo phù hợp"}</h3>
             <p>{reports.length === 0 ? "Nếu gặp nội dung hoặc hành vi cần được xem xét, bạn có thể gửi báo cáo để đội ngũ TutorLink hỗ trợ." : "Thử đổi từ khóa hoặc trạng thái lọc."}</p>
           </div>
@@ -184,7 +194,7 @@ function ReportsContent() {
           {filteredReports.map((report) => {
             const expanded = expandedId === report.id;
             return <article className={`report-row${expanded ? " is-expanded" : ""}`} key={report.id}>
-              <div className="report-row-icon" aria-hidden="true">{report.resource_type === "message" ? "✉" : report.resource_type === "review" ? "☆" : "▤"}</div>
+              <div className="report-row-icon" aria-hidden="true">{report.resource_type === "message" ? <ChatTextIcon weight="regular" /> : report.resource_type === "review" ? <StarIcon weight="regular" /> : <FileTextIcon weight="regular" />}</div>
               <div className="report-row-main">
                 <div className="report-row-title-line">
                   <h3>Báo cáo #{report.id}</h3>
@@ -215,7 +225,7 @@ function ReportsContent() {
       </Card>
 
       <aside className="reports-help-note">
-        <span aria-hidden="true">ⓘ</span>
+        <InfoIcon aria-hidden="true" weight="regular" />
         <p><strong>Báo cáo của bạn được bảo mật.</strong> Thông tin chỉ được chia sẻ với đội ngũ phụ trách để xem xét và hỗ trợ xử lý.</p>
       </aside>
 
@@ -223,7 +233,7 @@ function ReportsContent() {
         <section className="reports-dialog" role="dialog" aria-modal="true" aria-labelledby="reports-dialog-title">
           <div className="reports-dialog-heading">
             <div><p className="reports-eyebrow"><span /> Hỗ trợ cộng đồng</p><h2 id="reports-dialog-title">Gửi báo cáo</h2><p>Mô tả vấn đề để đội ngũ TutorLink có thể xem xét.</p></div>
-            <button className="reports-dialog-close" type="button" aria-label="Đóng" onClick={() => setFormOpen(false)}>×</button>
+            <button className="reports-dialog-close" type="button" aria-label="Đóng" onClick={() => setFormOpen(false)}><XIcon aria-hidden="true" weight="regular" /></button>
           </div>
           <ReportSubmissionForm onSaved={() => { setFormOpen(false); setPage(1); result.reload(); }} />
         </section>

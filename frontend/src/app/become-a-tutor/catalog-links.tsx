@@ -3,6 +3,9 @@
 import { getMarketplaceCatalog } from "@/lib/data/marketplace";
 import type { CatalogCategory } from "@/lib/data/marketplace-types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
+import { BarbellIcon } from "@phosphor-icons/react/dist/ssr/Barbell";
+import { BooksIcon } from "@phosphor-icons/react/dist/ssr/Books";
+import { SoccerBallIcon } from "@phosphor-icons/react/dist/ssr/SoccerBall";
 import Link from "next/link";
 import { useCallback } from "react";
 
@@ -15,16 +18,9 @@ const heroTopics: Array<{ name: string; tone: CatalogTone; description: string; 
 ];
 
 function CategoryIcon({ tone }: { tone: CatalogTone }) {
-  if (tone === "education") return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-    <path d="m5 11 18-2 2 25-18 2-2-25ZM16 14l18-2 2 25-18 2-2-25ZM27 17l14-1 2 21-14 1-2-21Z" />
-  </svg>;
-  if (tone === "fitness") return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-    <path d="M5 17v14M11 12v24M17 19v10M31 19v10M37 12v24M43 17v14M17 24h14" />
-  </svg>;
-  return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
-    <circle cx="24" cy="24" r="18" />
-    <path d="m19 7 5 7-4 7-8 1-6-5M37 13l-7 2-2 8 6 5 8-3M15 39l-1-9 7-5 8 4 1 9M18 21l7 3 5-2" />
-  </svg>;
+  if (tone === "education") return <BooksIcon weight="regular" aria-hidden="true" />;
+  if (tone === "fitness") return <BarbellIcon weight="regular" aria-hidden="true" />;
+  return <SoccerBallIcon weight="regular" aria-hidden="true" />;
 }
 
 export function CatalogLinks() {

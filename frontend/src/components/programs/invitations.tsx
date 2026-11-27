@@ -18,6 +18,15 @@ import "@/styles/programs.css";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
+import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
+import { ChalkboardTeacherIcon } from "@phosphor-icons/react/dist/ssr/ChalkboardTeacher";
+import { ClockIcon } from "@phosphor-icons/react/dist/ssr/Clock";
+import { CoinsIcon } from "@phosphor-icons/react/dist/ssr/Coins";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { MapPinIcon } from "@phosphor-icons/react/dist/ssr/MapPin";
+import { StarIcon } from "@phosphor-icons/react/dist/ssr/Star";
+import { TargetIcon } from "@phosphor-icons/react/dist/ssr/Target";
+import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
 const statuses: Record<string, string> = {
   pending: "Chờ phản hồi",
   accepted: "Đã chấp nhận",
@@ -36,7 +45,7 @@ function InvitationIcon({ name }: { name: "book" | "target" | "calendar" | "pin"
   };
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
-export function Invitations({ embedded = false, onAccepted }: { embedded?: boolean; onAccepted?: () => void } = {}) {
+export function Invitations({ embedded = false, onAccepted }: { embedded?: boolean; onAccepted?: (programId: number) => void } = {}) {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<string>("pending");
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -75,7 +84,7 @@ export function Invitations({ embedded = false, onAccepted }: { embedded?: boole
     try {
       await decideInvitation(invitation.id, action, actionKey.current);
       actionKey.current = null;
-      if (action === "accept" && embedded) { onAccepted?.(); result.reload(); }
+      if (action === "accept" && embedded) { onAccepted?.(invitation.program_id); result.reload(); }
       else if (action === "accept") router.push(`/programs/${invitation.program_id}`);
       else result.reload();
     } catch (error) {
@@ -165,29 +174,29 @@ function InvitationPreview({
       <header className="invitation-tutor-header">
         <div className="invitation-tutor-summary">
           <span className="invitation-tutor-avatar">{sourceListing?.title.slice(0, 1).toLocaleUpperCase() ?? "G"}</span>
-          <div><h2>Gia sư TutorLink <span aria-label="Hồ sơ đã xác minh">✓</span></h2><p>Gia sư · Đang đồng hành cùng bạn</p><div className="invitation-rating"><span>★</span> Hồ sơ gia sư</div></div>
+          <div><h2>Gia sư TutorLink <span aria-label="Hồ sơ đã xác minh">✓</span></h2><p>Gia sư · Đang đồng hành cùng bạn</p><div className="invitation-rating"><StarIcon aria-hidden="true" weight="fill" /> Hồ sơ gia sư</div></div>
         </div>
         <Link className="button button-outline invitation-profile-link" href={`/invitations/${invitation.id}`}>Chi tiết lời mời ↗</Link>
       </header>
       <Link className="invitation-service-banner" href={`/invitations/${invitation.id}`}>
-        <span className="invitation-service-icon" aria-hidden="true">▤</span>
+        <span className="invitation-service-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
         <span><small>DỊCH VỤ ĐỀ XUẤT</small><strong>{sourceListing?.title ?? offer.title}</strong><span>{offer.goal || "Lộ trình học được thiết kế theo mục tiêu của bạn."}</span></span>
         <span className="invitation-service-arrow" aria-hidden="true">›</span>
       </Link>
       <section className="invitation-program-details">
         <h3>Thông tin chương trình</h3>
         <dl>
-          <div><dt>▢ <span>Tên chương trình</span></dt><dd>{offer.title}</dd></div>
-          <div><dt>☆ <span>Mục tiêu</span></dt><dd>{offer.goal || "Chưa có thông tin"}</dd></div>
-          <div><dt>♙ <span>Hình thức học</span></dt><dd>{deliveryLabels[offer.delivery_mode]}</dd></div>
-          <div><dt>⌖ <span>Địa điểm / Đường dẫn tham gia</span></dt><dd>{offer.location_text || offer.meeting_url || "Trao đổi sau khi chấp nhận"}</dd></div>
-          <div><dt>▦ <span>Lịch học</span></dt><dd>{offer.schedule_note || "Hai bên sẽ thống nhất sau"}{offer.timezone ? ` (${offer.timezone})` : ""}</dd></div>
-          <div><dt>☆ <span>Học phí thỏa thuận</span></dt><dd>{formatListingPrice(offer.agreed_fee_minor, offer.currency, offer.fee_unit)}</dd></div>
-          <div><dt>◷ <span>Lời mời hết hạn</span></dt><dd>{new Date(invitation.expires_at).toLocaleString("vi-VN")}{pending ? <strong className="invitation-expiry">Còn thời hạn</strong> : null}</dd></div>
+          <div><dt><FileTextIcon aria-hidden="true" weight="regular" /> <span>Tên chương trình</span></dt><dd>{offer.title}</dd></div>
+          <div><dt><TargetIcon aria-hidden="true" weight="regular" /> <span>Mục tiêu</span></dt><dd>{offer.goal || "Chưa có thông tin"}</dd></div>
+          <div><dt><ChalkboardTeacherIcon aria-hidden="true" weight="regular" /> <span>Hình thức học</span></dt><dd>{deliveryLabels[offer.delivery_mode]}</dd></div>
+          <div><dt><MapPinIcon aria-hidden="true" weight="regular" /> <span>Địa điểm / Đường dẫn tham gia</span></dt><dd>{offer.location_text || offer.meeting_url || "Trao đổi sau khi chấp nhận"}</dd></div>
+          <div><dt><CalendarDotsIcon aria-hidden="true" weight="regular" /> <span>Lịch học</span></dt><dd>{offer.schedule_note || "Hai bên sẽ thống nhất sau"}{offer.timezone ? ` (${offer.timezone})` : ""}</dd></div>
+          <div><dt><CoinsIcon aria-hidden="true" weight="regular" /> <span>Học phí thỏa thuận</span></dt><dd>{formatListingPrice(offer.agreed_fee_minor, offer.currency, offer.fee_unit)}</dd></div>
+          <div><dt><ClockIcon aria-hidden="true" weight="regular" /> <span>Lời mời hết hạn</span></dt><dd>{new Date(invitation.expires_at).toLocaleString("vi-VN")}{pending ? <strong className="invitation-expiry">Còn thời hạn</strong> : null}</dd></div>
         </dl>
       </section>
       {error ? <p role="alert" className="field-error invitation-action-error">{error}</p> : null}
-      {pending ? <div className="invitation-actions"><Button disabled={busy} onClick={() => onRespond(invitation, "accept")}>✓ &nbsp; Chấp nhận lời mời</Button><Button variant="outline" disabled={busy} onClick={() => onRespond(invitation, "reject")}>× &nbsp; Từ chối</Button></div> : invitation.status === "accepted" ? <Link className="button button-primary invitation-workspace-link" href={`/programs/${invitation.program_id}`}>Mở workspace →</Link> : <div className="invitation-status-note"><Badge tone="brand">{statuses[invitation.status]}</Badge><span>Lời mời này không còn chờ phản hồi.</span></div>}
+      {pending ? <div className="invitation-actions"><Button disabled={busy} onClick={() => onRespond(invitation, "accept")}>✓ &nbsp; Chấp nhận lời mời</Button><Button variant="outline" disabled={busy} onClick={() => onRespond(invitation, "reject")}><XIcon aria-hidden="true" weight="regular" /> &nbsp; Từ chối</Button></div> : invitation.status === "accepted" ? <Link className="button button-primary invitation-workspace-link" href={`/programs/${invitation.program_id}`}>Mở workspace →</Link> : <div className="invitation-status-note"><Badge tone="brand">{statuses[invitation.status]}</Badge><span>Lời mời này không còn chờ phản hồi.</span></div>}
     </article>
   );
 }
@@ -246,7 +255,7 @@ export function InvitationDetail({ id }: { id: number }) {
   return (
     <AppShell title="Chi tiết lời mời" hideSidebar>
       <section className="content-stack workspace-page invitation-detail-page">
-        <Link className="invitation-detail-back" href="/learning-profile?tab=invitations">← Danh sách lời mời</Link>
+        <Link className="invitation-detail-back" href="/invitations">← Danh sách lời mời</Link>
         <ApiState {...result} />
         {i && offer && status && (
           <>

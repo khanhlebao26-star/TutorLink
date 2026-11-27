@@ -14,6 +14,9 @@ import { useListFilters } from "@/lib/hooks/use-list-filters";
 import "@/styles/listings.css";
 import "@/styles/programs.css";
 import Link from "next/link";
+import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
+import { TargetIcon } from "@phosphor-icons/react/dist/ssr/Target";
+import { UserCircleIcon } from "@phosphor-icons/react/dist/ssr/UserCircle";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
 export function Programs({ embedded = false }: { embedded?: boolean }) {
@@ -32,6 +35,7 @@ function ProgramsContent() {
     if (value === status) return;
     if (filterTimer.current) clearTimeout(filterTimer.current);
     setStatus(value);
+    setPage(1);
     setFilterLoading(true);
     filterTimer.current = setTimeout(() => {
       setFilterLoading(false);
@@ -42,15 +46,11 @@ function ProgramsContent() {
   const result = useAsyncData(load);
   const programs = result.data?.data ?? [];
   const visiblePrograms = programs.filter((program) => status === "all" || program.status === status);
-  const statusCounts = programs.reduce<Record<string, number>>((counts, program) => {
-    counts[program.status] = (counts[program.status] ?? 0) + 1;
-    return counts;
-  }, {});
   const filters = [
-    { value: "all", label: "Tất cả", count: programs.length },
+    { value: "all", label: "Tất cả" },
     ...Object.entries(programStatuses)
       .filter(([value]) => value !== "draft")
-      .map(([value, label]) => ({ value, label, count: statusCounts[value] ?? 0 })),
+      .map(([value, label]) => ({ value, label })),
   ];
   return (
     <>
@@ -65,14 +65,14 @@ function ProgramsContent() {
           {actor?.role === "tutor" && <Link className="button button-primary" href="/programs/new">+ Tạo chương trình</Link>}
         </header>
         <nav className="workspace-filters program-status-filters" aria-label="Trạng thái Program">
-          {filters.map(({ value, label, count }) => (
+          {filters.map(({ value, label }) => (
             <Button
               key={value}
               variant={status === value ? "primary" : "ghost"}
               aria-pressed={status === value}
               onClick={() => selectStatus(value)}
             >
-              <span>{label}</span><span className="program-filter-count">{count}</span>
+              <span>{label}</span>
             </Button>
           ))}
         </nav>
@@ -91,14 +91,14 @@ function ProgramsContent() {
                   </div>
                   <div className="program-card-content">
                     <h2>{p.title}</h2>
-                    <p className="program-participant"><span aria-hidden="true">♙</span> {actor?.role === "tutor" ? `Học viên #${p.customer_id}` : `Program #${p.id}`}</p>
+                    <p className="program-participant"><UserCircleIcon aria-hidden="true" weight="regular" /> {actor?.role === "tutor" ? `Học viên #${p.customer_id}` : `Program #${p.id}`}</p>
                     <div className="program-tags">
                       <span>{p.level || "Chương trình học"}</span>
                       <span>{deliveryLabels[p.delivery_mode]}</span>
                       {p.planned_session_count ? <span>{p.planned_session_count} buổi</span> : null}
                     </div>
-                    <p className="program-goal"><span aria-hidden="true">◉</span> {p.goal || "Theo dõi mục tiêu và tiến độ học tập cùng nhau."}</p>
-                    <p className="program-schedule"><span aria-hidden="true">▦</span> {p.schedule_note || (p.status === "completed" ? "Chương trình đã hoàn thành" : "Chưa có lịch học tiếp theo")}</p>
+                    <p className="program-goal"><TargetIcon aria-hidden="true" weight="regular" /> {p.goal || "Theo dõi mục tiêu và tiến độ học tập cùng nhau."}</p>
+                    <p className="program-schedule"><CalendarDotsIcon aria-hidden="true" weight="regular" /> {p.schedule_note || (p.status === "completed" ? "Chương trình đã hoàn thành" : "Chưa có lịch học tiếp theo")}</p>
                     <Link className="button button-outline program-open-link" href={`/programs/${p.id}`}>
                       {p.status === "completed" || p.status === "cancelled" ? "Xem lại chương trình" : "Mở workspace"} <span aria-hidden="true">→</span>
                     </Link>
@@ -108,10 +108,10 @@ function ProgramsContent() {
             </div> : <div className="program-empty-callout">
               <span className="program-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 6.2c-2.1-1.6-5.2-2.2-9-1.7v13c3.8-.5 6.9.1 9 1.7m0-13c2.1-1.6 5.2-2.2 9-1.7v13c-3.8-.5-6.9.1-9 1.7m0-13v13" /></svg></span>
               <div>
-                <h2>{programs.length ? `Chưa có chương trình ${status === "all" ? "nào" : `ở trạng thái “${programStatuses[status as Program["status"]]}”`}` : actor?.role === "tutor" ? "Bạn chưa tạo chương trình học nào" : "Bạn chưa đăng ký dịch vụ nào"}</h2>
-                <p>{actor?.role === "tutor" ? (programs.length ? "Thử chọn trạng thái khác để xem các chương trình bạn đang quản lý." : "Tạo chương trình cho học viên, thống nhất lịch học và gửi lời mời để bắt đầu.") : programs.length ? "Bạn chưa đăng ký dịch vụ nào trong mục này. Thử chọn trạng thái khác để xem Program của bạn." : "Hãy kiểm tra Lời mời học. Khi bạn chấp nhận lời mời, Program sẽ xuất hiện ở đây."}</p>
+                <h2>{programs.length ? `Chưa có chương trình ${status === "all" ? "nào" : `ở trạng thái “${programStatuses[status as Program["status"]]}”`}` : actor?.role === "tutor" ? "Bạn chưa tạo chương trình học nào" : "Bạn chưa có chương trình học nào"}</h2>
+                <p>{actor?.role === "tutor" ? (programs.length ? "Thử chọn trạng thái khác để xem các chương trình bạn đang quản lý." : "Tạo chương trình cho học viên, thống nhất lịch học và gửi lời mời để bắt đầu.") : programs.length ? "Không có Program ở trạng thái này trên trang hiện tại. Thử chọn trạng thái khác hoặc xem trang kế tiếp." : "Khi chấp nhận lời mời học, chương trình của bạn sẽ xuất hiện tại đây."}</p>
               </div>
-              {!programs.length ? <Link className="button button-primary" href={actor?.role === "tutor" ? "/programs/new" : "/invitations"}>{actor?.role === "tutor" ? "Tạo chương trình" : "Xem lời mời Program"} <span aria-hidden="true">→</span></Link> : null}
+              {!programs.length ? <Link className="button button-primary" href={actor?.role === "tutor" ? "/programs/new" : "/invitations"}>{actor?.role === "tutor" ? "Tạo chương trình" : "Xem lời mời học"} <span aria-hidden="true">→</span></Link> : null}
             </div>}
             <nav className="button-row" aria-label="Phân trang">
               <Button

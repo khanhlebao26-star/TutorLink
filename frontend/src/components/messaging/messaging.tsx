@@ -20,6 +20,9 @@ import "@/styles/messaging.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { PaperPlaneTiltIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
 
 import { MessageAttachment } from "@/components/messaging/message-attachment";
 import { useInboxData } from "@/components/messaging/use-inbox-data";
@@ -231,7 +234,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
                 )}
               </Link>
             ))}
-          {listLoaded && !items.filter((c) => c.peer.display_name.toLocaleLowerCase().includes(query.toLocaleLowerCase())).length && <div className="conversation-list-empty"><span aria-hidden="true">⌕</span><strong>{query ? "Không tìm thấy cuộc trò chuyện" : "Chưa có cuộc trò chuyện"}</strong><small>{query ? "Thử tìm bằng tên khác." : "Bắt đầu trò chuyện để kết nối với gia sư hoặc học viên."}</small></div>}
+          {listLoaded && !items.filter((c) => c.peer.display_name.toLocaleLowerCase().includes(query.toLocaleLowerCase())).length && <div className="conversation-list-empty"><MagnifyingGlassIcon aria-hidden="true" weight="regular" /><strong>{query ? "Không tìm thấy cuộc trò chuyện" : "Chưa có cuộc trò chuyện"}</strong><small>{query ? "Thử tìm bằng tên khác." : "Bắt đầu bằng cách khám phá dịch vụ phù hợp hoặc thiết lập hồ sơ gia sư."}</small>{!query && actor ? <Link className="button button-outline" href={actor.role === "tutor" ? "/me/listings" : "/marketplace"}>{actor.role === "tutor" ? "Quản lý dịch vụ" : "Khám phá dịch vụ"}<span aria-hidden="true"> →</span></Link> : null}</div>}
           {listError ? <p role="alert" className="field-error">{describeApiError(listError)}</p> : null}
         </div>
         {listCursor && (
@@ -338,7 +341,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
             >
               {attachments.length ? <div className="message-composer-attachments" aria-label="Tệp đính kèm">
                 {attachments.map((file) => <span className="message-composer-attachment" key={file.id}>
-                  <span aria-hidden="true">▤</span><strong title={file.original_name ?? undefined}>{file.original_name ?? "Tệp đính kèm"}</strong>
+                  <FileTextIcon aria-hidden="true" weight="regular" /><strong title={file.original_name ?? undefined}>{file.original_name ?? "Tệp đính kèm"}</strong>
                   <button type="button" aria-label={`Gỡ tệp ${file.original_name ?? "đính kèm"}`} disabled={sending || !!failed} onClick={() => void removeAttachment(file)}>×</button>
                 </span>)}
               </div> : null}
@@ -381,7 +384,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
                   }
                   aria-label="Gửi tin nhắn"
                 >
-                  <span aria-hidden="true">➤</span>
+                  <PaperPlaneTiltIcon aria-hidden="true" weight="regular" />
                 </Button>
               </div>
               {uploading ? <small className="message-upload-progress" role="status">Đang tải tệp lên… {uploadProgress}%</small> : null}
@@ -393,7 +396,7 @@ function MessagingContent({ id, inbox }: { id?: number; inbox: ReturnType<typeof
             <div className="message-thread-loading-heading"><span /><div><i /><i /></div></div>
             <div className="message-thread-loading-copy"><strong>Đang mở cuộc trò chuyện</strong><span>Tin nhắn sẽ xuất hiện tại đây trong giây lát.</span></div>
             <div className="message-thread-loading-bubble is-left" /><div className="message-thread-loading-bubble is-right" />
-            <div className="message-thread-loading-composer"><span /><b>➤</b></div>
+            <div className="message-thread-loading-composer"><span /><PaperPlaneTiltIcon aria-hidden="true" weight="regular" /> </div>
           </div> : <div className="message-unselected">
             <div className="message-unselected-art" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none"><path d="M20 23h60a9 9 0 0 1 9 9v33a9 9 0 0 1-9 9H52L34 88V74H20a9 9 0 0 1-9-9V32a9 9 0 0 1 9-9Z"/><path d="M32 43h36M32 55h23"/></svg><span>✦</span></div>
             <h2>Chưa chọn cuộc trò chuyện nào</h2>

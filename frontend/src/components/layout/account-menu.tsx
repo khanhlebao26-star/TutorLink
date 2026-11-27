@@ -48,11 +48,13 @@ export function AccountMenu({ user }: { user: User }) {
           {user.role === "customer" ? <nav className="account-menu-links" aria-label="Điều hướng tài khoản học viên">
             <Link href="/learning-profile" onClick={() => setOpen(false)}>Hồ sơ học tập</Link>
             <Link href="/reports" onClick={() => setOpen(false)}>Báo cáo của tôi</Link>
-            <Link href="/settings/password" onClick={() => setOpen(false)}>Cài đặt</Link>
+            <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
+            <Link href="/settings/password" onClick={() => setOpen(false)}>Đổi mật khẩu</Link>
+            <Link href="/support" onClick={() => setOpen(false)}>Hỗ trợ</Link>
           </nav> : user.role === "tutor" ? <nav className="account-menu-links" aria-label="Điều hướng tài khoản gia sư">
             <Link href="/profile" onClick={() => setOpen(false)}>Hồ sơ của tôi</Link>
+            <Link href="/me/listings" onClick={() => setOpen(false)}>Dịch vụ & Workspace</Link>
             <Link href="/reports" onClick={() => setOpen(false)}>Báo cáo của tôi</Link>
-            <Link href="/support" onClick={() => setOpen(false)}>Hỗ trợ</Link>
             <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
           </nav> : <nav className="account-menu-links" aria-label="Điều hướng tài khoản quản trị">
             <Link href="/settings" onClick={() => setOpen(false)}>Cài đặt tài khoản</Link>
