@@ -25,6 +25,15 @@ it('validates password confirmation, handles current-password errors and clears 
 it('loads account settings from the authorized API',async()=>{
  vi.mocked(request).mockResolvedValue({data:{data:{id:7,full_name:'Learner One',email:'learner@example.com',role:'customer',status:'active',date_of_birth:'2000-01-01',email_verified_at:'2026-01-01'}}} as never);render(<SettingsPage/>);expect(await screen.findByDisplayValue('Learner One')).toBeVisible();expect(request).toHaveBeenCalledWith({method:'GET',url:'/me'});
 });
+it('validates a short display name before sending a profile update',async()=>{
+ vi.mocked(request).mockResolvedValueOnce({data:{data:{id:7,full_name:'Learner One',email:'learner@example.com',role:'customer',status:'active'}}} as never);render(<SettingsPage/>);const name=await screen.findByLabelText('Họ và tên');fireEvent.change(name,{target:{value:'A'}});await userEvent.click(screen.getByRole('button',{name:'Lưu thay đổi'}));expect(await screen.findByText('Vui lòng nhập tên hiển thị có ít nhất 2 ký tự.')).toBeVisible();expect(request).toHaveBeenCalledTimes(1);
+});
+it('saves a valid display name and reports an API field error without losing the draft',async()=>{
+ vi.mocked(request).mockResolvedValueOnce({data:{data:{id:7,full_name:'Learner One',email:'learner@example.com',role:'customer',status:'active',email_verified_at:null}}} as never).mockRejectedValueOnce(new ApiClientError('Name rejected',{status:422,fieldErrors:{full_name:['This name is unavailable']}}));render(<SettingsPage/>);const name=await screen.findByLabelText('Họ và tên');fireEvent.change(name,{target:{value:'Learner Two'}});await userEvent.click(screen.getByRole('button',{name:'Lưu thay đổi'}));expect(await screen.findByText('Name rejected')).toBeVisible();expect(screen.getByLabelText('Họ và tên')).toHaveValue('Learner Two');expect(screen.getByText('This name is unavailable')).toBeVisible();
+});
+it('shows the read-only account summary for an administrator',async()=>{
+ vi.mocked(request).mockResolvedValue({data:{data:{id:1,full_name:'Admin User',email:'admin@example.com',role:'admin',status:'active',email_verified_at:'2026-01-01'}}} as never);render(<SettingsPage/>);expect(await screen.findByText('Thông tin tài khoản quản trị')).toBeVisible();expect(screen.getByText('Admin User')).toBeVisible();expect(screen.queryByLabelText('Họ và tên')).not.toBeInTheDocument();expect(screen.getByRole('link',{name:'Đổi mật khẩu'})).toHaveAttribute('href','/settings/password');
+});
 it('reports a logout failure and redirects after a successful retry',async()=>{
  vi.mocked(logout).mockRejectedValueOnce(new ApiClientError('Cannot logout')).mockResolvedValueOnce();render(<LogoutButton/>);await userEvent.click(screen.getByRole('button',{name:'Đăng xuất'}));expect(await screen.findByText('Cannot logout')).toBeVisible();await userEvent.click(screen.getByRole('button',{name:'Đăng xuất'}));expect(nav.push).toHaveBeenCalledWith('/auth/login');
 });

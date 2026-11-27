@@ -35,7 +35,6 @@ function ProgramsContent() {
     if (value === status) return;
     if (filterTimer.current) clearTimeout(filterTimer.current);
     setStatus(value);
-    setPage(1);
     setFilterLoading(true);
     filterTimer.current = setTimeout(() => {
       setFilterLoading(false);

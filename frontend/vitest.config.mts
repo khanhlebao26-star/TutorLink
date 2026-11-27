@@ -10,7 +10,7 @@ export default defineConfig({
     restoreMocks: true,
     coverage: {
       provider: "v8",
-      thresholds: { lines: 70.01 },
+      thresholds: { lines: 80.01, statements: 80.01 },
       include: ["src/**/*.{ts,tsx}"],
       exclude: ["src/tests/**", "src/**/*.test.*"],
       reporter: ["text", "json-summary", "lcov", "html"],
