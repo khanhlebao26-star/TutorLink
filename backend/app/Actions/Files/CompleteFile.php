@@ -61,7 +61,7 @@ class CompleteFile
             }
 
             if (
-                $file->disk !== 'local'
+                ! in_array($file->disk, config('file-validation.private_disks'), true)
                 || $file->visibility !== 'private'
             ) {
                 return $this->finish(

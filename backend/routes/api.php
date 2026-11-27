@@ -230,10 +230,10 @@ Route::prefix('v1')->group(function () {
             ->name('auth.login');
 
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
-            ->name('auth.forgot-password');
+            ->middleware('throttle:password-recovery')->name('auth.forgot-password');
 
         Route::post('/reset-password', [AuthController::class, 'resetPassword'])
-            ->name('auth.reset-password');
+            ->middleware('throttle:password-recovery')->name('auth.reset-password');
 
         Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
             ->middleware(['signed', 'throttle:6,1'])
@@ -330,7 +330,7 @@ Route::prefix('v1')->group(function () {
 
         Route::middleware(EnsureActiveApiActor::class)->group(function (): void {
             Route::post('/files', [FileController::class, 'store'])
-                ->name('files.store');
+                ->middleware('throttle:file-upload')->name('files.store');
             Route::get('/files/{file}', [FileController::class, 'show'])
                 ->name('files.show');
             Route::post('/files/{file}/complete', [FileController::class, 'complete'])

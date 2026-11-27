@@ -25,11 +25,11 @@ class UpdateListingRequest extends FormRequest
                     ->where(fn ($query) => $query->where('status', 'active')),
             ],
             'title' => ['sometimes', 'string', 'min:3', 'max:180'],
-            'description' => ['sometimes', 'string', 'min:1'],
+            'description' => ['sometimes', 'string', 'min:1', 'max:10000'],
             'delivery_mode' => ['sometimes', Rule::in(['online', 'offline', 'hybrid'])],
             'city' => ['sometimes', 'nullable', 'string', 'max:120'],
             'district' => ['sometimes', 'nullable', 'string', 'max:120'],
-            'price_from_minor' => ['sometimes', 'integer', 'min:0'],
+            'price_from_minor' => ['sometimes', 'integer', 'min:0', 'max:1000000000'],
             'currency' => [
                 'sometimes',
                 Rule::in(['VND']),

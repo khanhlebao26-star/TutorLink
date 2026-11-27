@@ -28,7 +28,14 @@ class CreateProgramRequest extends ProgramApiRequest
             'currency' => ['sometimes', Rule::in(['VND'])],
             'fee_unit' => ['required', Rule::in(['session', 'hour', 'course'])],
             'location_text' => ['sometimes', 'nullable', 'string'],
-            'meeting_url' => ['sometimes', 'nullable', 'string', 'max:2048'],
+            /** Optional HTTPS meeting URL without embedded credentials. */
+            'meeting_url' => ['sometimes', 'nullable', 'url:https', 'max:2048',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (is_string($value) && parse_url($value, PHP_URL_USER) !== null) {
+                        $fail('The meeting URL must not contain credentials.');
+                    }
+                },
+            ],
             'schedule_note' => ['sometimes', 'nullable', 'string'],
             'timezone' => ['sometimes', 'string', 'timezone', 'max:64'],
             'planned_session_count' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:4294967295'],

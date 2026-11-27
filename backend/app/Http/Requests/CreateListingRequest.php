@@ -29,11 +29,11 @@ class CreateListingRequest extends FormRequest
                     ->where(fn ($query) => $query->where('status', 'active')),
             ],
             'title' => ['required', 'string', 'min:3', 'max:180'],
-            'description' => ['required', 'string', 'min:1'],
+            'description' => ['required', 'string', 'min:1', 'max:10000'],
             'delivery_mode' => ['required', Rule::in(['online', 'offline', 'hybrid'])],
             'city' => ['nullable', 'string', 'max:120'],
             'district' => ['nullable', 'string', 'max:120'],
-            'price_from_minor' => ['required', 'integer', 'min:0'],
+            'price_from_minor' => ['required', 'integer', 'min:0', 'max:1000000000'],
             'currency' => [
                 'required',
                 Rule::in(['VND']),
