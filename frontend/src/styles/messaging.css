@@ -202,26 +202,7 @@
 .conversation-list summary {
   cursor: pointer;
 }
-@media (max-width: 1200px) {
-  .messaging-page {
-    grid-template-columns: 240px minmax(0, 1fr);
-  }
-  .conversation-context {
-    grid-column: 1/-1;
-    border-top: 1px solid var(--line);
-  }
-}
 @media (max-width: 700px) {
-  .messaging-page {
-    grid-template-columns: 1fr;
-  }
-  .conversation-items {
-    max-height: 200px;
-    overflow: auto;
-  }
-  .conversation-list {
-    border-bottom: 1px solid var(--line);
-  }
   .message-history {
     height: 400px;
   }
@@ -346,16 +327,6 @@
 .conversation-context-empty { align-items: center; color: #8490aa; display: grid; gap: 8px; justify-items: center; padding: 24px 8px; text-align: center; }
 .conversation-context-empty span { color: #ba91fa; font-size: 1.5rem; }
 .conversation-context-empty p { font-size: .7rem; line-height: 1.5; margin: 0; }
-@media (max-width: 1050px) {
-  .messaging-page { height: auto; min-height: 780px; grid-template-columns: minmax(230px, 31%) minmax(0, 1fr); }
-  .messaging-page .message-thread { min-height: 580px; }
-  .messaging-page .conversation-context { border-left: 0; border-top: 1px solid var(--line); grid-column: 1 / -1; }
-  .messaging-page .conversation-contact-card { align-items: center; display: flex; gap: 10px; }
-  .messaging-page .conversation-contact-avatar { margin: 0; }
-  .messaging-page .conversation-service-card { grid-template-columns: minmax(130px, 190px) minmax(0, 1fr); align-items: center; }
-  .messaging-page .conversation-service-card .conversation-context-eyebrow { grid-column: 1 / -1; }
-  .messaging-page .conversation-service-art { grid-row: span 3; }
-}
 @media (max-width: 680px) {
   .messaging-shell .app-topbar { min-height: 64px; padding-inline: 14px; }
   .messaging-shell .app-topbar-links { gap: 10px; margin-left: 0; }
@@ -364,17 +335,15 @@
   .messaging-shell .app-topbar-links .locale-display { display: none; }
   .messaging-shell .app-topbar .brand { font-size: 1.15rem; }
   .messaging-shell .app-main .page-content { min-height: calc(100vh - 64px); padding: 8px; }
-  .messaging-page { border-radius: 13px; grid-template-columns: minmax(0, 1fr); height: auto; min-height: calc(100vh - 80px); }
-  .messaging-page .conversation-list { border-bottom: 1px solid var(--line); border-right: 0; padding: 13px; }
-  .messaging-page .conversation-items { display: flex; flex-direction: row; margin-bottom: 0; max-height: 118px; overflow-x: auto; overflow-y: hidden; }
-  .messaging-page .conversation-item { border: 1px solid #eeeaf3; flex: 0 0 210px; min-height: 66px; }
+  .messaging-page { border-radius: 13px; }
+  .messaging-page .conversation-list { padding: 13px; }
+  .messaging-page .conversation-items { margin-bottom: 0; }
+  .messaging-page .conversation-item { border: 1px solid #eeeaf3; min-height: 66px; }
   .messaging-page .conversation-list-empty { min-width: 100%; padding: 16px; }
   .messaging-page .message-history { min-height: 330px; padding: 12px; }
   .messaging-page .thread-heading { min-height: 62px; padding: 10px 13px; }
   .messaging-page .message-bubble { max-width: 88%; }
-  .messaging-page .conversation-context { grid-column: auto; padding: 13px; }
-  .messaging-page .conversation-service-card { grid-template-columns: 100px minmax(0, 1fr); }
-  .messaging-page .conversation-service-art { grid-row: span 3; height: 82px; }
+  .messaging-page .conversation-context { padding: 13px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .conversation-item, .conversation-search-field .input, .message-composer .button { transition: none; }

@@ -1,0 +1,20 @@
+# Vercel project root: frontend. Keep the deploy source; omit local QA files.
+.env*
+.next*/
+node_modules/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.DS_Store
+.git/
+.codex/
+.claude/
+AGENTS.md
+CLAUDE.md
+README.md
+scripts/
+e2e/
+src/tests/
+playwright.config.ts
+vitest.config.mts

@@ -1,5 +1,6 @@
 import AdminReportsPage from "@/app/admin/reports/page";
 import { ApiClientError } from "@/lib/api/client";
+import { request } from "@/lib/api/client";
 import type { AdminReport } from "@/lib/data/admin-reports";
 import * as reports from "@/lib/data/admin-reports";
 import { render, screen, waitFor, within } from "@testing-library/react";
@@ -8,6 +9,7 @@ import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
 vi.mock("@/components/layout/app-shell", () => ({ AppShell: ({ children }: { children: ReactNode }) => <main>{children}</main>, useActor: () => ({ id: 1, role: "admin" }) }));
 vi.mock("@/lib/data/admin-reports", async original => ({ ...await original<typeof import("@/lib/data/admin-reports")>(), getAdminReports: vi.fn(), getAdminReport: vi.fn(), getReportEvidence: vi.fn(), claimReport: vi.fn(), decideReport: vi.fn() }));
+vi.mock("@/lib/api/client", async original => ({ ...await original<typeof import("@/lib/api/client")>(), request: vi.fn() }));
 const detail: AdminReport = { id: 23, resource_type: "system", resource_id: 1, reason_code: "bug_report", description: "Không mở được lịch học.", status: "open", assigned_admin_id: 1, assignment_version: 7, created_at: "2026-11-13", resolution_note: null, handled_at: null };
 beforeEach(() => {
   vi.clearAllMocks();
@@ -55,4 +57,36 @@ it("refreshes a stale report after a conflict without replaying the decision", a
   expect(await screen.findByRole("alert")).toHaveTextContent("Báo cáo đã thay đổi");
   expect(reports.decideReport).toHaveBeenCalledTimes(1);
   await waitFor(() => expect(reports.getAdminReport).toHaveBeenCalledTimes(2));
+});
+
+it("recovers from a failed report detail and evidence request", async () => {
+  vi.mocked(reports.getAdminReport).mockRejectedValueOnce(new ApiClientError("Detail unavailable"));
+  vi.mocked(reports.getReportEvidence)
+    .mockRejectedValueOnce(new ApiClientError("Evidence unavailable"))
+    .mockResolvedValueOnce({ code: "evidence_unavailable" });
+  render(<AdminReportsPage />);
+  await userEvent.click(screen.getByRole("button", { name: "Báo cáo của tôi" }));
+  await screen.findByText("Báo cáo #23");
+  await userEvent.click(screen.getByRole("button", { name: /Báo cáo #23/ }));
+  expect(await screen.findByText("Detail unavailable")).toBeVisible();
+  await userEvent.click(screen.getByRole("button", { name: "Thử lại" }));
+  await screen.findByText(detail.description!);
+  await userEvent.click(screen.getByRole("button", { name: "Xem bằng chứng" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Evidence unavailable");
+  await userEvent.click(screen.getByRole("button", { name: "Xem bằng chứng" }));
+  expect(await screen.findByText("Bằng chứng không còn khả dụng.")).toBeVisible();
+});
+
+it("downloads an evidence attachment from the selected report", async () => {
+  const createUrl = vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:report-evidence");
+  const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+  vi.mocked(request).mockResolvedValue({ data: new Blob(["evidence"]) } as never);
+  render(<AdminReportsPage />);
+  await openMine();
+  await userEvent.click(screen.getByRole("button", { name: "Xem bằng chứng" }));
+  await screen.findByText("anh-loi.png");
+  await userEvent.click(screen.getByRole("button", { name: "Tải bằng chứng" }));
+  await waitFor(() => expect(request).toHaveBeenCalledWith({ url: "/files/9/download", responseType: "blob" }));
+  expect(createUrl).toHaveBeenCalled();
+  expect(click).toHaveBeenCalledTimes(1);
 });

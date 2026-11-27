@@ -49,7 +49,6 @@ jobs:
       E2E_API_URL: http://localhost:8000
       E2E_PASSWORD: Demo-pass-2026
       NEXT_PUBLIC_API_URL: http://localhost:8000
-      NEXT_PUBLIC_DATA_MODE: api
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2

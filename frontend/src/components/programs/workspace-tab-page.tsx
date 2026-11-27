@@ -23,7 +23,6 @@ import {
   type WorkspaceRow,
 } from "@/lib/data/workspace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "@/styles/programs.css";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
@@ -94,7 +93,7 @@ function TabContent({
   const taskLastPage = serverRows?.meta?.last_page ?? 1;
   const visibleTasks = currentTasks;
   return (
-    <section className={`content-stack workspace-page${tab === "sessions" ? " session-workspace-page" : ""}`}>
+    <section className={`content-stack workspace-page mx-auto w-full max-w-[1280px]${tab === "sessions" ? " session-workspace-page" : ""}`}>
       <h1>{tab === "tasks" ? "Bài tập & Nhiệm vụ" : workspaceTabs[tab]}</h1>
       <ApiState {...result} />
       {result.data && (
@@ -104,8 +103,8 @@ function TabContent({
           </p>
           {owner && tab === "tasks" && active ? <TaskCreateDialog id={id} programTitle={result.data.program.title} customerId={result.data.program.customer_id} onSaved={result.reload} /> : null}
           {tab === "tasks" ? <>
-            <div className="workspace-task-toolbar">
-              <div className="workspace-task-filters" role="tablist" aria-label="Lọc bài tập">
+            <div className="workspace-task-toolbar flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="workspace-task-filters flex max-w-full flex-nowrap gap-1 overflow-x-auto sm:flex-wrap" role="tablist" aria-label="Lọc bài tập">
                 {[["all", "Tất cả", taskTotal], ["grading", "Chờ chấm điểm", submittedTasks], ["not-submitted", "Chưa nộp", ongoingTasks], ["completed", "Hoàn thành", completedTasks]].map(([key, label, count]) => <button key={key} type="button" role="tab" aria-selected={taskFilter === key} className={taskFilter === key ? "is-active" : ""} onClick={() => { setTaskFilter(String(key)); setPage(1); }}>{label}<span>{count}</span></button>)}
               </div>
               <label className="workspace-task-sort">Sắp xếp theo
@@ -142,7 +141,7 @@ function TabContent({
             <StatePanel kind="empty" message={tab === "tasks" ? owner ? "Chưa giao bài tập nào. Hãy tạo bài tập để học viên biết cần làm gì và khi nào cần nộp." : "Bạn chưa có bài tập nào cần làm. Bài tập gia sư giao sẽ xuất hiện tại đây." : tab === "announcements" ? actor?.role === "tutor" ? "Chưa có thông báo nào. Soạn bản nháp rồi đăng để học viên nhận được cập nhật." : "Chưa có thông báo từ gia sư. Các cập nhật của chương trình sẽ xuất hiện tại đây." : "Chưa có dữ liệu trong tab này."} />
           ) : tab === "tasks" && !visibleTasks.length ? <StatePanel kind="empty" message="Không có bài tập nào trong mục này." /> : (tab === "tasks" ? visibleTasks : result.data.rows.data).map((row) => (
             tab === "tasks" ? <Card key={`${row.id}-${row.version}`} className="workspace-task-list-card">
-              <div className="workspace-task-list-main">
+              <div className="workspace-task-list-main flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="workspace-task-list-copy">
                   <div className="workspace-task-list-meta"><Badge tone={taskListStatus(row.status).tone}>{taskListStatus(row.status).label.toUpperCase()}</Badge><span>{row.status === "completed" ? "Đã hoàn thành" : taskDueLabel(row.due_at)}</span></div>
                   <h2>{row.title ?? "Bài tập"}</h2>

@@ -23,7 +23,7 @@ export function ProgramOverview({ program: p, overview: o }: { program: Program;
   const taskProgress = totalTasks > 0 && o ? Math.round(o.task_counts.completed / totalTasks * 100) : null;
   const nextSession = o?.next_session;
   return (
-    <div className="program-overview">
+    <div className="program-overview min-w-0">
       <header className="program-overview-hero">
         <span className="program-overview-hero-icon"><OverviewIcon name="book" /></span>
         <div>
@@ -35,7 +35,7 @@ export function ProgramOverview({ program: p, overview: o }: { program: Program;
       </header>
 
       {!o && <div className="program-overview-draft"><OverviewIcon name="book" /><p>Workspace sẽ mở sau khi học viên chấp nhận lời mời.</p></div>}
-      <div className="program-overview-stats">
+      <div className="program-overview-stats grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-[17px]">
         <Link className="program-overview-stat" href={`/programs/${p.id}/tasks`}>
           <span className="program-overview-icon is-blue"><OverviewIcon name="task" /></span>
           <div><span>Bài tập hoàn thành</span><strong>{o ? o.task_counts.completed : "—"}<small>{o ? ` / ${totalTasks} bài tập` : "Chưa bắt đầu"}</small></strong></div><b aria-hidden="true">↗</b>
@@ -50,7 +50,7 @@ export function ProgramOverview({ program: p, overview: o }: { program: Program;
         </Link>
       </div>
 
-      <div className="program-overview-grid">
+      <div className="program-overview-grid grid grid-cols-1 items-start gap-[17px] sm:grid-cols-[minmax(0,1fr)_280px] min-[1101px]:grid-cols-[minmax(0,1fr)_340px] min-[1101px]:gap-[23px]">
         <div className="program-overview-main">
           <Card className="program-overview-card">
             <h2><span className="program-overview-icon is-pink"><OverviewIcon name="goal" /></span>Mục tiêu chương trình</h2>

@@ -77,15 +77,15 @@ function CompanionCard({ companion }: { companion: Companion }) {
   const title = profile?.headline || listing.specialization_name || categoryLabel(listing.category_name);
   const href = profile?.slug ? `/tutors/${encodeURIComponent(profile.slug)}` : `/marketplace/${encodeURIComponent(listing.slug)}`;
 
-  return <article className={`landing-companion-card landing-companion-card-${tone}`}>
-    <Link className="landing-companion-image" href={href} aria-label={`Xem hồ sơ ${tutorName}`}>
+  return <article className={`landing-companion-card landing-companion-card-${tone} min-w-0 overflow-hidden rounded-2xl border border-[#e3e8f2] bg-white shadow-[0_10px_28px_#13214b0a] transition-[box-shadow,transform] hover:-translate-y-[3px] hover:shadow-[0_16px_34px_#13214b16]`}>
+    <Link className="landing-companion-image relative block aspect-[1.8/1] overflow-hidden bg-[#f5f1fb] sm:aspect-[1.65/1]" href={href} aria-label={`Xem hồ sơ ${tutorName}`}>
       <Image src={imageByCategory[tone]} alt={`Ảnh minh họa mặc định cho người dạy lĩnh vực ${categoryLabel(listing.category_name)}`} fill sizes="(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 33vw" />
       <span>{categoryLabel(listing.category_name)}</span>
     </Link>
-    <div className="landing-companion-body">
-      <h3><Link href={href}>{tutorName}</Link><span aria-label="Hồ sơ đã được duyệt">✓</span></h3>
-      <p>{title}{profile ? ` · ${profile.experience_years} năm kinh nghiệm` : ""}</p>
-      <div className="landing-companion-rating">
+    <div className="landing-companion-body px-[15px] pb-[15px] pt-[13px]">
+      <h3 className="mb-1 flex items-center gap-[5px] text-[.89rem] leading-[1.35]"><Link className="overflow-hidden text-ellipsis whitespace-nowrap" href={href}>{tutorName}</Link><span className="flex-none text-[.75rem] text-[#3474ff]" aria-label="Hồ sơ đã được duyệt">✓</span></h3>
+      <p className="mb-[7px] text-[.7rem] leading-[1.45] text-[#7884a1]">{title}{profile ? ` · ${profile.experience_years} năm kinh nghiệm` : ""}</p>
+      <div className="landing-companion-rating min-h-4 text-[.63rem] text-[#d58a13]">
         {rating?.count ? <><span aria-hidden="true">★</span> {rating.average?.toFixed(1)} · {rating.count} đánh giá</> : "Chưa có đánh giá"}
       </div>
     </div>
@@ -103,13 +103,13 @@ export function FeaturedTutors() {
   const load = useCallback(() => loadCompanions(getCandidates), [getCandidates]);
   const result = useAsyncData(load, false);
 
-  return <section className="landing-companions landing-inner" aria-labelledby="landing-companions-title" aria-busy={result.loading}>
+  return <section className="landing-companions landing-inner mx-auto max-w-[1250px] px-5 pb-14 pt-24 sm:px-[clamp(20px,5vw,64px)] sm:pb-[82px] sm:pt-[clamp(96px,10vw,124px)]" aria-labelledby="landing-companions-title" aria-busy={result.loading}>
     <div className="landing-section-intro">
       <p className="landing-eyebrow">NGƯỜI ĐỒNG HÀNH PHÙ HỢP</p>
       <h2 id="landing-companions-title">Gặp gỡ Tutor &amp; Coach nổi bật</h2>
       <p>Kinh nghiệm thực tế, chuyên môn vững vàng và luôn tận tâm với hành trình của bạn.</p>
     </div>
-    {result.loading ? <CompanionSkeleton /> : result.error ? <StatePanel kind="error" message={result.error.message} action={<ErrorActions onRetry={result.reload} />} /> : result.data?.length ? <div className="landing-companion-grid">
+    {result.loading ? <CompanionSkeleton /> : result.error ? <StatePanel kind="error" message={result.error.message} action={<ErrorActions onRetry={result.reload} />} /> : result.data?.length ? <div className="landing-companion-grid grid grid-cols-1 gap-[14px] sm:grid-cols-2 sm:gap-[18px] lg:grid-cols-3">
       {result.data.map((companion) => <CompanionCard companion={companion} key={companion.listing.tutor_slug ?? companion.listing.id} />)}
     </div> : <StatePanel kind="empty" message="Chưa có hồ sơ người dạy công khai để giới thiệu." action={<Link className="button button-secondary" href="/marketplace">Khám phá dịch vụ</Link>} />}
     <div className="landing-companions-action"><Link href="/marketplace">Xem tất cả dịch vụ <span aria-hidden="true">→</span></Link></div>

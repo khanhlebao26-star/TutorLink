@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
 
 export type ChatContactContext = {
   tutorName: string;
@@ -121,7 +122,7 @@ export function OpenChatButton({
             <div className="chat-compose-listing-copy">
               <strong>{contact.listingTitle}</strong>
               {contact.category ? <span><i aria-hidden="true">★</i> {contact.category}</span> : null}
-              {contact.delivery ? <span>▦ {contact.delivery}</span> : null}
+              {contact.delivery ? <span><CalendarDotsIcon aria-hidden="true" weight="regular" /> {contact.delivery}</span> : null}
               {contact.price ? <span>◇ {contact.price}</span> : null}
             </div>
           </article> : null}

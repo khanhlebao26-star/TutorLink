@@ -7,7 +7,11 @@ import { searchListings, searchReportableTutors } from "@/lib/data/marketplace";
 import { completeFile, uploadFile } from "@/lib/data/services";
 import { retryIdentity, workspaceWrite } from "@/lib/data/workspace";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "@/styles/reports.css";
+import { CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
+import { StorefrontIcon } from "@phosphor-icons/react/dist/ssr/Storefront";
+import { UserCircleIcon } from "@phosphor-icons/react/dist/ssr/UserCircle";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
+import { XIcon } from "@phosphor-icons/react/dist/ssr/X";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 
@@ -176,7 +180,7 @@ export function ReportSubmissionForm({ onSaved }: { onSaved: () => void }) {
         {(targetType === "listing" ? listingsResult.error : tutorsResult.error) ? <p className="report-options-message is-error">{describeApiError(targetType === "listing" ? listingsResult.error : tutorsResult.error, "Không thể tải danh sách.")} <button type="button" onClick={targetType === "listing" ? listingsResult.reload : tutorsResult.reload}>Thử lại</button></p> : null}
         {!(targetType === "listing" ? listingsResult.loading : tutorsResult.loading) && !(targetType === "listing" ? listingsResult.error : tutorsResult.error) && visibleOptions.length === 0 ? <p className="report-options-message">Không tìm thấy mục phù hợp.</p> : null}
         {visibleOptions.map((option) => <button type="button" role="option" aria-selected={targetId === String(option.id)} className={`report-target-option${targetId === String(option.id) ? " is-selected" : ""}`} key={`${targetType}-${option.id}`} onClick={() => setTargetId(String(option.id))}>
-          <span className="report-target-option-mark" aria-hidden="true">{targetId === String(option.id) ? "✓" : targetType === "listing" ? "▤" : "♙"}</span>
+          <span className="report-target-option-mark" aria-hidden="true">{targetId === String(option.id) ? <CheckIcon weight="regular" /> : targetType === "listing" ? <StorefrontIcon weight="regular" /> : <UserCircleIcon weight="regular" />}</span>
           <span><strong>{option.label}</strong><small>{option.subtitle}</small></span>
         </button>)}
       </div>
@@ -195,12 +199,12 @@ export function ReportSubmissionForm({ onSaved }: { onSaved: () => void }) {
     <div className="report-form-field">
       <span className="report-form-label">Ảnh bằng chứng <small>(không bắt buộc)</small></span>
       <button type="button" className="report-evidence-picker" onClick={() => evidenceInput.current?.click()} disabled={busy || evidence.length >= 3 || !canUploadEvidence}>
-        <span aria-hidden="true">＋</span><strong>Tải ảnh lên</strong><small>JPG hoặc PNG · tối đa 5 MB/ảnh · tối đa 3 ảnh</small>
+        <PlusIcon aria-hidden="true" weight="regular" /><strong>Tải ảnh lên</strong><small>JPG hoặc PNG · tối đa 5 MB/ảnh · tối đa 3 ảnh</small>
       </button>
       <input ref={evidenceInput} className="reports-sr-only" type="file" accept="image/jpeg,image/png" multiple onChange={(event) => addEvidence(event.currentTarget.files)} />
       {!canUploadEvidence ? <p className="report-form-hint">Bạn cần xác minh email để tải ảnh bằng chứng. Bạn vẫn có thể gửi báo cáo bằng mô tả chi tiết.</p> : null}
       {evidence.length ? <div className="report-evidence-list">{evidence.map((item, index) => <div className="report-evidence-item" key={`${item.file.name}-${index}`}>
-        <Image unoptimized width={100} height={100} src={item.preview} alt={`Ảnh bằng chứng ${index + 1}`} /><span title={item.file.name}>{item.file.name}</span><button type="button" aria-label={`Xóa ${item.file.name}`} onClick={() => removeEvidence(index)} disabled={busy}>×</button>
+        <Image unoptimized width={100} height={100} src={item.preview} alt={`Ảnh bằng chứng ${index + 1}`} /><span title={item.file.name}>{item.file.name}</span><button type="button" aria-label={`Xóa ${item.file.name}`} onClick={() => removeEvidence(index)} disabled={busy}><XIcon aria-hidden="true" weight="regular" /></button>
       </div>)}</div> : null}
       {uploadProgress !== null ? <p className="report-form-hint">Đang tải và kiểm tra ảnh… {uploadProgress}%</p> : null}
     </div>

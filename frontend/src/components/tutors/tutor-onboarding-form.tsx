@@ -4,6 +4,10 @@ import { Badge, Button, Card, Field, Input, Select } from "@/components/shared/u
 import { UploadPurpose, statusLabel, statusTone, steps, verificationDocumentsRequired } from "@/components/tutors/onboarding/onboarding-config";
 import { useTutorOnboarding } from "@/components/tutors/onboarding/use-tutor-onboarding";
 import type { TutorOnboardingData } from "@/lib/data/types";
+import { CertificateIcon } from "@phosphor-icons/react/dist/ssr/Certificate";
+import { ClockIcon } from "@phosphor-icons/react/dist/ssr/Clock";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 
 export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingData; onReload: () => void }) {
   const { profile, headline, setHeadline, bio, setBio, experienceYears, setExperienceYears, specializationId, setSpecializationId, documentType, setDocumentType, claims, setClaims, step, setStep, furthestStep, uploads, queuedAvatar, setFieldErrors, message, error, saving, locked, changesRequested, busy, verified, avatarFileId, attachedAvatar, attachedDocument, fieldError, clearFieldError, handleUpload, retryUpload, nextStep, submit, goToStep } = useTutorOnboarding({ data });
@@ -17,7 +21,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
     const errorId = `tutor-${purpose}-error`;
     const disabled = locked || busy || (purpose === "verification_document" && (!verified || !profile));
     return (
-      <div className="onboarding-upload-card">
+      <div className={`onboarding-upload-card grid gap-[11px_16px] p-[14px] ${purpose === "verification_document" ? "grid-cols-1 md:grid-cols-[minmax(0,1fr)_260px]" : "grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(220px,.8fr)]"}`}>
         <div className="onboarding-upload-copy">
           <span className={`onboarding-upload-icon ${purpose === "avatar" ? "onboarding-avatar-mark" : ""}`} aria-hidden="true">
             {purpose === "avatar" ? (data.user.full_name.trim().charAt(0).toUpperCase() || "T") : "↥"}
@@ -96,7 +100,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
   };
 
   return (
-    <div className="onboarding-layout">
+    <div className="onboarding-layout grid gap-[18px]">
       {profile?.status === "suspended" ? <p className="onboarding-alert" role="alert">Hồ sơ đang tạm ngưng. {profile.suspension_reason}</p> : null}
       {changesRequested && profile?.review_reason ? (
         <div className="onboarding-review-reason" role="status">
@@ -109,29 +113,29 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         <p className="onboarding-verification-note">Xác minh email trước khi gửi hồ sơ hoặc tải tài liệu. <a href="/auth/verify-email">Xác minh email</a></p>
       ) : null}
 
-      <ol className="onboarding-stepper" aria-label="Các bước hoàn thiện hồ sơ">
+      <ol className="onboarding-stepper grid w-full grid-cols-5 px-0 sm:px-2" aria-label="Các bước hoàn thiện hồ sơ">
         {steps.map((label, index) => {
           const number = index + 1;
           return (
             <li className={`onboarding-step ${number === step ? "is-current" : number < step ? "is-complete" : ""}`} key={label}>
-              <Button variant="ghost" type="button" aria-current={number === step ? "step" : undefined} disabled={busy || (number > furthestStep && !locked)} onClick={() => goToStep(number)}>
-                <span className="onboarding-step-number">{number < step ? "✓" : number}</span>
-                <span className="onboarding-step-label">{label}</span>
+              <Button variant="ghost" className="gap-1.5 px-px sm:gap-[7px] sm:px-1" type="button" aria-current={number === step ? "step" : undefined} disabled={busy || (number > furthestStep && !locked)} onClick={() => goToStep(number)}>
+                <span className="onboarding-step-number h-7 w-7 text-[.72rem] sm:h-[30px] sm:w-[30px] sm:text-[.78rem]">{number < step ? "✓" : number}</span>
+                <span className="onboarding-step-label max-w-[68px] text-[.66rem] leading-[1.15] first:max-w-[75px] max-[380px]:text-[.6rem] nth-[4]:max-w-[75px] sm:max-w-[132px] sm:text-[.78rem] sm:leading-[1.25]">{label}</span>
               </Button>
             </li>
           );
         })}
       </ol>
 
-      <form className="onboarding-form" onSubmit={submit} noValidate>
-        <div className={`onboarding-editor-grid onboarding-editor-grid-${step}`}>
-          <Card className={`onboarding-step-main onboarding-step-main-${step}`}>
-            <div className="onboarding-panel-heading">
+      <form className="onboarding-form grid grid-cols-1 gap-3 sm:gap-4" onSubmit={submit} noValidate>
+        <div className={`onboarding-editor-grid onboarding-editor-grid-${step} grid min-w-0 gap-4 ${step === 5 ? "grid-cols-1 md:grid-cols-[minmax(0,1fr)_320px]" : "grid-cols-1"}`}>
+          <Card className={`onboarding-step-main onboarding-step-main-${step} grid min-w-0 gap-[15px] p-[14px] sm:p-[18px]`}>
+            <div className="onboarding-panel-heading flex-col gap-2 min-[381px]:flex-row min-[381px]:gap-4 sm:gap-4">
               <div>
                 <h2>{step === 1 ? "Thông tin cơ bản" : step === 2 ? "Chuyên môn giảng dạy" : step === 3 ? "Kinh nghiệm giảng dạy" : step === 4 ? "Tài liệu xác minh" : "Xem lại hồ sơ"}</h2>
                 <p>{step === 1 ? "Giúp học viên hiểu rõ hơn về bạn và cách bạn giảng dạy." : step === 2 ? "Chọn chuyên môn phù hợp nhất với dịch vụ giảng dạy của bạn." : step === 3 ? "Chia sẻ số năm kinh nghiệm giảng dạy." : step === 4 ? verificationDocumentsRequired ? "Tải giấy tờ định danh và tài liệu tương ứng với bằng cấp đã khai báo. File complete chỉ xác nhận kiểm tra kỹ thuật; nội dung được duyệt riêng." : "Bạn có thể bỏ qua bước tải tài liệu để thử nghiệm. Hồ sơ vẫn cần các thông tin cơ bản, chuyên môn và ảnh đại diện." : "Kiểm tra thông tin trước khi gửi xét duyệt."}</p>
               </div>
-              <div className="onboarding-heading-status">
+              <div className="onboarding-heading-status self-start min-[381px]:self-auto">
                 <Badge tone={statusTone(profile)} className={`onboarding-status-pill ${changesRequested ? "is-warning" : profile?.status === "approved" ? "is-success" : ""}`}>
                   {statusLabel(profile)}
                 </Badge>
@@ -169,10 +173,10 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
             ) : null}
 
             {step === 3 ? (
-              <div className="onboarding-experience-layout">
+                <div className="onboarding-experience-layout mx-auto grid w-full grid-cols-1 gap-4 md:max-w-[1180px] md:grid-cols-[minmax(0,1.35fr)_minmax(300px,.9fr)]">
                 <section className="onboarding-experience-card onboarding-credentials-card" aria-labelledby="tutor-credentials-title">
                   <div className="onboarding-experience-card-heading">
-                    <span className="onboarding-experience-icon" aria-hidden="true">▤</span>
+                    <span className="onboarding-experience-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
                     <div>
                       <h3 id="tutor-credentials-title">Bằng cấp &amp; chứng chỉ</h3>
                       <p>Khai báo những văn bằng liên quan đến chuyên môn giảng dạy của bạn.</p>
@@ -182,9 +186,9 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                   {claims.map((claim, index) => {
                     const nameField = `qualification_claims.${index}.name`;
                     return (
-                      <div className="onboarding-credential-row" key={index}>
-                        <span className="onboarding-credential-row-icon" aria-hidden="true">{claim.type === "certificate" ? "✧" : "▤"}</span>
-                        <div className="onboarding-credential-fields">
+                      <div className="onboarding-credential-row grid grid-cols-[30px_minmax(0,1fr)] gap-3 p-3 sm:grid-cols-[34px_minmax(0,1fr)_auto]" key={index}>
+                        <span className="onboarding-credential-row-icon h-[30px] w-[30px] sm:h-[34px] sm:w-[34px]" aria-hidden="true">{claim.type === "certificate" ? <CertificateIcon weight="regular" /> : <FileTextIcon weight="regular" />}</span>
+                        <div className="onboarding-credential-fields grid min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-[minmax(125px,.55fr)_minmax(0,1fr)]">
                           <Select aria-label={`Loại chứng nhận ${index + 1}`} disabled={locked || busy} value={claim.type}
                             onChange={(event) => setClaims(claims.map((item, i) => i === index
                               ? { ...item, type: event.target.value === "certificate" ? "certificate" : "degree" }
@@ -201,7 +205,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                               }} />
                           </Field>
                         </div>
-                        <Button variant="ghost" className="onboarding-remove-credential" type="button" aria-label={`Xóa chứng nhận ${index + 1}`} disabled={locked || busy} onClick={() => {
+                        <Button variant="ghost" className="onboarding-remove-credential col-start-2 justify-self-start p-0 sm:col-start-auto sm:justify-self-auto sm:p-2" type="button" aria-label={`Xóa chứng nhận ${index + 1}`} disabled={locked || busy} onClick={() => {
                           setClaims(claims.filter((_, i) => i !== index));
                           setFieldErrors((current) => Object.fromEntries(Object.entries(current).filter(([key]) => !key.startsWith("qualification_claims."))));
                         }}>Xóa</Button>
@@ -209,13 +213,13 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                     );
                   })}
                   <Button variant="outline" className="onboarding-add-credential" type="button" disabled={locked || busy || claims.length >= 20}
-                    onClick={() => setClaims([...claims, { type: "degree", name: "" }])}><span aria-hidden="true">＋</span> Thêm bằng cấp hoặc chứng chỉ</Button>
+                    onClick={() => setClaims([...claims, { type: "degree", name: "" }])}><PlusIcon aria-hidden="true" weight="regular" /> Thêm bằng cấp hoặc chứng chỉ</Button>
                   <p className="onboarding-credential-footnote">Bạn có thể bổ sung giấy tờ xác minh ở bước tiếp theo.</p>
                 </section>
 
                 <section className="onboarding-experience-card onboarding-years-card" aria-labelledby="tutor-experience-title">
                   <div className="onboarding-experience-card-heading">
-                    <span className="onboarding-experience-icon" aria-hidden="true">◷</span>
+                    <span className="onboarding-experience-icon" aria-hidden="true"><ClockIcon weight="regular" /></span>
                     <div>
                       <h3 id="tutor-experience-title">Thâm niên giảng dạy</h3>
                       <p>Số năm kinh nghiệm thực tế của bạn.</p>
@@ -236,7 +240,7 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
             {step === 4 ? (
               <div className="onboarding-fields onboarding-document-step">
-                <section className="onboarding-document-intro" aria-labelledby="tutor-document-intro-title">
+                <section className="onboarding-document-intro grid grid-cols-[44px_minmax(0,1fr)] md:grid-cols-[44px_minmax(0,1fr)_auto]" aria-labelledby="tutor-document-intro-title">
                   <span className="onboarding-document-intro-icon" aria-hidden="true">✓</span>
                   <div className="onboarding-document-intro-copy">
                     <p className="onboarding-eyebrow">XÁC MINH CHUYÊN MÔN</p>
@@ -245,14 +249,14 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                       ? "Tải giấy tờ định danh và tài liệu khớp với bằng cấp, chứng chỉ bạn đã khai báo. Bạn có thể xem trạng thái từng tài liệu ngay tại đây."
                       : "Bạn có thể tải giấy tờ định danh và bằng cấp để hồ sơ đáng tin cậy hơn, hoặc bỏ qua bước này trong khi kiểm thử."}</p>
                   </div>
-                  <div className={`onboarding-document-progress ${attachedDocument ? "is-complete" : ""}`}>
+                  <div className={`onboarding-document-progress col-start-2 justify-self-start md:col-start-auto ${attachedDocument ? "is-complete" : ""}`}>
                     <span aria-hidden="true">{attachedDocument ? "✓" : "1"}</span>
                     <div><strong>{attachedDocument ? "Đã nhận tài liệu" : "Bước xác minh"}</strong><small>{attachedDocument ? "Tài liệu đã được tải lên" : "Tải lên giấy tờ đầu tiên"}</small></div>
                   </div>
                 </section>
 
                 <section className="onboarding-document-upload-section" aria-labelledby="tutor-document-upload-title">
-                  <div className="onboarding-document-section-heading">
+                  <div className="onboarding-document-section-heading flex-col items-start sm:flex-row sm:items-end">
                     <div>
                       <span className="onboarding-eyebrow">GIẤY TỜ CỦA BẠN</span>
                       <h3 id="tutor-document-upload-title">Tải tài liệu xác minh</h3>
@@ -262,9 +266,9 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                   {renderUpload("verification_document", "Tài liệu xác minh")}
                 </section>
 
-                <div className="onboarding-document-guidance-grid">
+                <div className="onboarding-document-guidance-grid grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="onboarding-document-summary">
-                    <span className="onboarding-document-guidance-icon" aria-hidden="true">▤</span>
+                    <span className="onboarding-document-guidance-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
                     <div>
                       <strong>Định dạng được chấp nhận</strong>
                       <p>PDF, JPG, PNG, DOC hoặc DOCX. Kích thước tối đa 5 MB cho mỗi tệp.</p>
@@ -284,19 +288,19 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
 
                 {verificationDocuments.length ? (
                   <section className="onboarding-document-list" aria-labelledby="tutor-document-list-title">
-                    <div className="onboarding-document-section-heading">
+                    <div className="onboarding-document-section-heading flex-col items-start sm:flex-row sm:items-end">
                       <div><span className="onboarding-eyebrow">HỒ SƠ CỦA BẠN</span><h3 id="tutor-document-list-title">Tài liệu đã gửi</h3></div>
                       <span className="onboarding-document-count">{verificationDocuments.length} tài liệu</span>
                     </div>
                     <ul>
                       {verificationDocuments.map((document) => (
                         <li className="onboarding-document-row" key={document.id}>
-                          <span className="onboarding-document-row-icon" aria-hidden="true">▤</span>
+                          <span className="onboarding-document-row-icon" aria-hidden="true"><FileTextIcon weight="regular" /></span>
                           <div className="onboarding-document-row-copy">
                             <strong>{document.original_name || verificationDocumentTypes[document.document_type] || document.document_type}</strong>
                             <span>{verificationDocumentTypes[document.document_type] || document.document_type}</span>
                           </div>
-                          <span className={`onboarding-document-status is-${document.status}`} role="status">{verificationDocumentStatuses[document.status] || document.status}</span>
+                      <span className={`onboarding-document-status ml-[45px] is-${document.status} sm:ml-0`} role="status">{verificationDocumentStatuses[document.status] || document.status}</span>
                         </li>
                       ))}
                     </ul>
@@ -315,10 +319,10 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
                     <small>{experienceYears === "" ? "Chưa nhập kinh nghiệm" : `${experienceYears} năm kinh nghiệm`} · {selectedSpecialization}</small>
                   </div>
                 </div>
-                <dl className="onboarding-review-details">
-                  <div><dt>Giới thiệu</dt><dd className="onboarding-review-bio">{bio.trim() || "Chưa nhập"}</dd></div>
-                  <div><dt>Ảnh đại diện</dt><dd>{attachedAvatar ? "Đã tải lên" : "Chưa tải lên"}</dd></div>
-                  <div><dt>Tài liệu xác minh</dt><dd>{attachedDocument ? "Đã tải lên" : "Chưa tải lên"}</dd></div>
+                <dl className="onboarding-review-details grid gap-0">
+                  <div className="grid grid-cols-1 gap-1 min-[381px]:grid-cols-[110px_minmax(0,1fr)] min-[381px]:gap-[10px] sm:grid-cols-[135px_minmax(0,1fr)]"><dt>Giới thiệu</dt><dd className="onboarding-review-bio">{bio.trim() || "Chưa nhập"}</dd></div>
+                  <div className="grid grid-cols-1 gap-1 min-[381px]:grid-cols-[110px_minmax(0,1fr)] min-[381px]:gap-[10px] sm:grid-cols-[135px_minmax(0,1fr)]"><dt>Ảnh đại diện</dt><dd>{attachedAvatar ? "Đã tải lên" : "Chưa tải lên"}</dd></div>
+                  <div className="grid grid-cols-1 gap-1 min-[381px]:grid-cols-[110px_minmax(0,1fr)] min-[381px]:gap-[10px] sm:grid-cols-[135px_minmax(0,1fr)]"><dt>Tài liệu xác minh</dt><dd>{attachedDocument ? "Đã tải lên" : "Chưa tải lên"}</dd></div>
                 </dl>
                 <div className="onboarding-review-edit-links">
                   <Button variant="ghost" type="button" className="onboarding-link-button" disabled={busy} onClick={() => goToStep(1)}>{locked ? "Xem thông tin cơ bản" : "Chỉnh sửa thông tin"}</Button>
@@ -330,8 +334,8 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
           </Card>
 
           {step === 5 ? (
-            <aside className="onboarding-editor-aside" aria-label="Trạng thái hồ sơ">
-              <Card className="onboarding-review-status">
+            <aside className="onboarding-editor-aside col-start-1 min-w-0 md:col-start-2" aria-label="Trạng thái hồ sơ">
+              <Card className="onboarding-review-status p-[14px] sm:p-[18px]">
                 <h3>Trạng thái hồ sơ</h3>
                 <ol className="onboarding-status-list" aria-label="Các trạng thái xét duyệt">
                   {["Bản nháp", "Đã gửi xét duyệt", "Yêu cầu chỉnh sửa", "Đã phê duyệt", ...(statusLabel(profile) === "Đã từ chối" ? ["Đã từ chối"] : [])].map((label) => (
@@ -352,12 +356,12 @@ export function TutorOnboardingForm({ data, onReload }: { data: TutorOnboardingD
         {locked && !changesRequested ? <p className="onboarding-lock-note onboarding-form-notice">Hồ sơ đã gửi hoặc đã được xét duyệt nên hiện chỉ có thể xem lại.</p> : null}
         {step === 5 && !verified ? <p className="onboarding-verification-note onboarding-form-notice">Xác minh email trước khi gửi hồ sơ. <a href="/auth/verify-email">Xác minh email</a></p> : null}
 
-        <div className="onboarding-actions">
-          {step > 1 ? <Button variant="secondary" className="onboarding-button onboarding-button-secondary" type="button" disabled={busy} onClick={() => setStep((current) => Math.max(current - 1, 1))}>← Quay lại</Button> : <Button variant="ghost" className="onboarding-button onboarding-button-secondary onboarding-refresh" type="button" disabled={busy} onClick={onReload}>Tải lại dữ liệu</Button>}
+        <div className="onboarding-actions flex-col-reverse items-stretch min-[381px]:flex-row sm:items-center">
+          {step > 1 ? <Button variant="secondary" className="onboarding-button onboarding-button-secondary min-w-0 flex-1 sm:min-w-[170px]" type="button" disabled={busy} onClick={() => setStep((current) => Math.max(current - 1, 1))}>← Quay lại</Button> : <Button variant="ghost" className="onboarding-button onboarding-button-secondary onboarding-refresh min-w-0 flex-1 sm:min-w-[170px]" type="button" disabled={busy} onClick={onReload}>Tải lại dữ liệu</Button>}
           {step < steps.length ? (
-            <Button variant="primary" className="onboarding-button onboarding-button-primary" type="button" disabled={busy} onClick={(event) => { event.preventDefault(); void nextStep(); }}>{saving ? "Đang lưu…" : "Tiếp theo"}<span aria-hidden="true">→</span></Button>
+            <Button variant="primary" className="onboarding-button onboarding-button-primary min-w-0 w-full flex-1 min-[381px]:w-auto sm:min-w-[210px]" type="button" disabled={busy} onClick={(event) => { event.preventDefault(); void nextStep(); }}>{saving ? "Đang lưu…" : "Tiếp theo"}<span aria-hidden="true">→</span></Button>
           ) : (
-            <Button variant="primary" className="onboarding-button onboarding-button-primary" type="submit" disabled={busy || locked || !verified}>{saving ? "Đang gửi…" : changesRequested ? "Gửi lại xét duyệt" : "Gửi xét duyệt"}<span aria-hidden="true">→</span></Button>
+            <Button variant="primary" className="onboarding-button onboarding-button-primary min-w-0 w-full flex-1 min-[381px]:w-auto sm:min-w-[210px]" type="submit" disabled={busy || locked || !verified}>{saving ? "Đang gửi…" : changesRequested ? "Gửi lại xét duyệt" : "Gửi xét duyệt"}<span aria-hidden="true">→</span></Button>
           )}
         </div>
       </form>

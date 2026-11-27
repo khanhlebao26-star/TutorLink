@@ -1,11 +1,13 @@
 "use client";
 
 import { Button, Field } from "@/components/shared/ui";
+import { authSubmitButtonClasses } from "@/components/auth/auth-layout";
 import { ApiClientError, describeApiError } from "@/lib/api/client";
 import { requestPasswordReset, resendVerification, resetPassword, verifyEmail } from "@/lib/data/services";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr/EnvelopeSimple";
 
 type SupportMode = "verify" | "forgot" | "reset";
 
@@ -168,7 +170,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
           Chúng tôi đã gửi email xác minh đến <strong>{email || "địa chỉ email của bạn"}</strong>. Vui lòng kiểm tra hộp thư (bao gồm cả thư mục Spam) và nhấp vào liên kết trong email để hoàn tất xác minh.
         </p>
         <div className="auth-verify-notice">
-          <span className="auth-verify-notice-icon" aria-hidden="true">✉</span>
+          <span className="auth-verify-notice-icon" aria-hidden="true"><EnvelopeSimpleIcon weight="regular" /></span>
           <div>
             <strong>Chưa nhận được email?</strong>
             <p>Email có thể mất vài phút để đến hộp thư. Bạn có thể gửi lại email xác minh.</p>
@@ -176,7 +178,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
         </div>
         <form className="form-stack auth-verify-resend" onSubmit={submit} aria-busy={isBusy}>
           <Field htmlFor="verify-email-address" label="Email đã đăng ký" error={fieldError("email")}><input className="input" type="email" required value={email} onChange={event=>setEmail(event.target.value)}/></Field>
-          <Button type="submit" disabled={isBusy}>{isBusy ? "Đang xử lý…" : "Gửi lại email xác minh"}</Button>
+          <Button className={authSubmitButtonClasses} type="submit" disabled={isBusy}>{isBusy ? "Đang xử lý…" : "Gửi lại email xác minh"}</Button>
         </form>
         <div className="auth-card-footer auth-verify-next">
           <Link className="button" href="/auth/login">Tiếp tục</Link>
@@ -246,7 +248,7 @@ export function AuthSupportForm({ mode }: { mode: SupportMode }) {
       </fieldset>
       {error ? <p className="inline-error" role="alert">{error}</p> : null}
       {message ? <p className="inline-success" role="status">{message}</p> : null}
-      <Button type="submit" disabled={submitting}>
+      <Button className={authSubmitButtonClasses} type="submit" disabled={submitting}>
         {submitting ? "Đang xử lý…" : mode === "forgot" ? "Gửi liên kết đặt lại" : "Cập nhật mật khẩu"}
       </Button>
     </form>

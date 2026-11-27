@@ -1,63 +1,63 @@
 import Link from "next/link";
+import { FacebookLogoIcon } from "@phosphor-icons/react/dist/ssr/FacebookLogo";
+import { InstagramLogoIcon } from "@phosphor-icons/react/dist/ssr/InstagramLogo";
+import { XLogoIcon } from "@phosphor-icons/react/dist/ssr/XLogo";
+import { YoutubeLogoIcon } from "@phosphor-icons/react/dist/ssr/YoutubeLogo";
 
 function SocialIcon({ name }: { name: string }) {
-  if (name === "Facebook") return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.4 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.1H7.2V13H10v8h3.4Z" /></svg>;
-  if (name === "Instagram") return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" /><circle cx="12" cy="12" r="3.5" /><circle className="public-footer-social-dot" cx="17.5" cy="6.8" r=".9" /></svg>;
-  if (name === "YouTube") return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8.2a2.8 2.8 0 0 0-2-2C17.3 5.7 12 5.7 12 5.7s-5.3 0-7 .5a2.8 2.8 0 0 0-2 2A29 29 0 0 0 2.5 12a29 29 0 0 0 .5 3.8 2.8 2.8 0 0 0 2 2c1.7.5 7 .5 7 .5s5.3 0 7-.5a2.8 2.8 0 0 0 2-2 29 29 0 0 0 .5-3.8 29 29 0 0 0-.5-3.8Z" /><path className="public-footer-social-play" d="m10 15.2 5.2-3.2L10 8.8v6.4Z" /></svg>;
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 3h2.8l-6.1 7 7.2 11h-5.6l-4.4-6.7L6.9 21H4l6.5-7.5L3.6 3h5.8l4 6.1L18.9 3Zm-1 16h1.6L8.3 4.9H6.6L17.9 19Z" /></svg>;
+  if (name === "Facebook") return <FacebookLogoIcon weight="regular" aria-hidden="true" />;
+  if (name === "Instagram") return <InstagramLogoIcon weight="regular" aria-hidden="true" />;
+  if (name === "YouTube") return <YoutubeLogoIcon weight="regular" aria-hidden="true" />;
+  return <XLogoIcon weight="regular" aria-hidden="true" />;
 }
 
 const socialNetworks = ["Facebook", "Instagram", "YouTube", "X"];
 
 export function PublicFooter() {
-  return <footer className="public-footer">
-    <div className="public-footer-inner">
+  return <footer className="public-footer bg-[#07143b] px-[clamp(20px,7vw,92px)] pb-5 pt-12 text-white">
+    <div className="public-footer-inner mx-auto grid max-w-[1288px] grid-cols-1 gap-8 pb-[38px] sm:grid-cols-[minmax(250px,1.05fr)_minmax(0,3.3fr)] sm:gap-12">
       <div className="public-footer-brand">
-        <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
+        <Link className="brand text-white [&>small]:text-[#d4d9ef]" href="/" aria-label="TutorLink Việt Nam">
           <span>Tutor</span><strong>Link</strong><span className="brand-star" aria-hidden="true">✦</span>
           <small>Vietnam</small>
         </Link>
-        <p>Kết nối đúng người, phát triển đúng mục tiêu. Cùng bạn tiến bộ mỗi ngày.</p>
-        <div className="public-footer-socials" role="group" aria-label="Mạng xã hội TutorLink">
-          {socialNetworks.map((name) => <span className="public-footer-social" key={name} role="img" aria-label={name} title={name}><SocialIcon name={name} /></span>)}
+        <p className="mb-[18px] mt-5 max-w-80 text-[.8rem] leading-[1.65] text-[#adb8d8]">Kết nối đúng người, phát triển đúng mục tiêu. Cùng bạn tiến bộ mỗi ngày.</p>
+        <div className="public-footer-socials flex items-center gap-[9px]" role="group" aria-label="Mạng xã hội TutorLink">
+          {socialNetworks.map((name) => <span className="public-footer-social inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#1c2b51] text-white [&>svg]:h-4 [&>svg]:w-4" key={name} role="img" aria-label={name} title={name}><SocialIcon name={name} /></span>)}
         </div>
       </div>
-      <nav className="public-footer-nav" aria-label="Liên kết TutorLink">
-        <div>
-          <h2>Khám phá</h2>
+      <nav className="public-footer-nav grid grid-cols-2 gap-6 text-[.77rem] text-[#adb8d8] [&_a]:w-fit [&_a]:text-[#adb8d8] [&_a]:transition-colors [&_a:hover]:text-[#ff65b8] [&_div>span]:w-fit [&_div>span]:text-[#adb8d8] sm:grid-cols-[.85fr_1.1fr_.95fr_1.5fr] sm:gap-7" aria-label="Liên kết TutorLink">
+        <div className="grid content-start gap-3">
+          <h2 className="mb-1 mt-[3px] text-[.79rem] tracking-[.02em] text-white">Khám phá</h2>
           <Link href="/marketplace">Tất cả dịch vụ</Link>
           <Link href="/marketplace?category=education">Giáo dục</Link>
           <Link href="/marketplace?category=fitness">Fitness</Link>
           <Link href="/marketplace?category=sports">Thể thao</Link>
         </div>
-        <div>
-          <h2>Về TutorLink</h2>
+        <div className="grid content-start gap-3">
+          <h2 className="mb-1 mt-[3px] text-[.79rem] tracking-[.02em] text-white">Về TutorLink</h2>
           <Link href="/about">Về chúng tôi</Link>
           <Link href="/become-a-tutor">Trở thành Tutor</Link>
-          <span>Câu chuyện cộng đồng</span>
-          <span>Tuyển dụng</span>
+          <span>Câu chuyện cộng đồng · Sắp ra mắt</span>
+          <span>Tuyển dụng · Sắp ra mắt</span>
         </div>
-        <div id="support">
-          <h2>Hỗ trợ</h2>
+        <div className="grid content-start gap-3" id="support">
+          <h2 className="mb-1 mt-[3px] text-[.79rem] tracking-[.02em] text-white">Hỗ trợ</h2>
           <Link href="/support">Trung tâm hỗ trợ</Link>
-          <span>Điều khoản sử dụng</span>
-          <span>Chính sách bảo mật</span>
-          <span>Liên hệ</span>
+          <span>Điều khoản sử dụng · Sắp ra mắt</span>
+          <span>Chính sách bảo mật · Sắp ra mắt</span>
+          <span>Liên hệ · Sắp ra mắt</span>
         </div>
-        <div className="public-footer-newsletter">
-          <h2>Nhận tin mới</h2>
-          <p>Cập nhật dịch vụ và câu chuyện truyền cảm hứng từ cộng đồng.</p>
-          <div className="public-footer-newsletter-form">
-            <label className="landing-sr-only" htmlFor="footer-newsletter-email">Email của bạn</label>
-            <input id="footer-newsletter-email" type="email" placeholder="Email của bạn" />
-            <button type="button" aria-label="Đăng ký nhận tin"><span aria-hidden="true">→</span></button>
-          </div>
+        <div className="public-footer-newsletter grid content-start gap-3">
+          <h2 className="mb-1 mt-[3px] text-[.79rem] tracking-[.02em] text-white">Nhận tin mới</h2>
+          <p className="mb-2 mt-px text-[.77rem] leading-[1.65] text-[#adb8d8]">Cập nhật dịch vụ và câu chuyện truyền cảm hứng từ cộng đồng.</p>
+          <span className="inline-flex rounded-[10px] border border-white/10 bg-[#1c2b51] px-3.5 py-3 text-[.72rem] leading-[1.5] text-[#c4cce1]">Đăng ký nhận tin sẽ sớm khả dụng</span>
         </div>
       </nav>
     </div>
-    <div className="public-footer-bottom">
-      <p>© 2026 TutorLink Vietnam. All rights reserved.</p>
-      <p>Made with <span aria-label="love" role="img">♥</span> for lifelong learners.</p>
+    <div className="public-footer-bottom mx-auto flex max-w-[1288px] flex-col justify-between gap-[5px] border-t border-white/10 pt-4 text-[.7rem] text-[#8e9abb] sm:flex-row sm:items-center sm:gap-4">
+      <p className="m-0">© 2026 TutorLink Vietnam. All rights reserved.</p>
+      <p className="m-0">Made with <span className="text-[#ff269f]" aria-label="love" role="img">♥</span> for lifelong learners.</p>
     </div>
   </footer>;
 }

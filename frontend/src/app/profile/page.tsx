@@ -1,6 +1,5 @@
 "use client";
 
-import "@/styles/onboarding.css";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { ErrorActions, StatePanel } from "@/components/shared/ui";

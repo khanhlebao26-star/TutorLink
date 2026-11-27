@@ -18,9 +18,9 @@ TutorLink uses Laravel for its API and business logic, Next.js for its web appli
 | Course | Laravel |
 | Instructor | Nguyen Huu Quyen |
 | Class | 23CSE |
-| Team | To be added |
-| Members | Add each member's full name and student ID |
-| Web palette | Navy `#071A4C`, pink `#FF0A99`, and lavender `#F8F7FF` ([source tokens](frontend/src/styles/base.css)) |
+| Team | TutorLink |
+| Members | Dung, Khanh, Hoang |
+
 
 ## Table of Contents
 
@@ -64,7 +64,7 @@ Availability shown on a profile is for reference. Programs are activated through
 - Handle reports, moderate reviews, and inspect audit records within their access scope.
 - Monitor the outbox, background jobs, and configured operational tools.
 
-See the [frontend README](frontend/README.md) for API integration, static content, and demo data. A registered route alone does not mean that every workflow has been accepted or fully verified.
+See the [frontend README](frontend/README.md) for API integration, static content, and test fixtures. A registered route alone does not mean that every workflow has been accepted or fully verified.
 
 ## 3. Technology Stack and Architecture
 
@@ -111,6 +111,8 @@ docker compose -f docker-compose.yml -f compose.workers.yml up -d
 ~~~
 
 `DatabaseSeeder` loads catalog data and the configured local administrator account. It does not create a complete set of demo learning programs. `FrontendDemoSeeder` is intended for a protected test database and should not be used to seed a regular local database.
+
+The frontend uses the Laravel API exclusively. Preview role switching and hard-coded tutor statistics have been removed. Test fixtures remain available for automated checks and are excluded from the production image; deployment does not import a local database or local uploads.
 
 - Web application: [localhost:3000](http://localhost:3000)
 - API: [localhost:8000/api/v1](http://localhost:8000/api/v1)
@@ -335,7 +337,34 @@ Local production-browser checks completed 18/18 ready pages after the fix; basel
 
 **Deployment target:** Vercel frontend + Docker Compose backend on a VPS. Environment templates, cookie/domain validation, independent coverage gates, a local CPU/RAM/disk/network dashboard, alert-delivery proof, 404/500 recovery and structured server logging are prepared. See the [deployment preparation and evidence report](docs/handover/TutorLink-deploy-readiness-2026-11-19.md) for configuration, reproduction steps and pending VPS checks.
 
+### 6.14. Public Page Prerendering and Tutor ISR
+
+The homepage, `/about`, and `/become-a-tutor` opt into static rendering and Incremental Static Regeneration (ISR) with `dynamic = "force-static"` and `revalidate = 300`. This page-level opt-in is needed because the root layout reads the session-hint cookie. For these routes Next.js renders that cookie as empty; the existing browser-side `/me` session check still controls account content and protected routes. No authenticated response is included in the generated HTML.
+
+`/tutors/[slug]` uses the same 300-second revalidation window. `generateStaticParams` reads the current bounded public listing candidate set (`per_page=50`), deduplicates tutor slugs, and prebuilds at most six profiles. The server loads each initial profile from the existing public tutor endpoint and passes it to the client component, avoiding a blank profile shell and duplicate first-page request after hydration. Other slugs remain valid and render on demand (`dynamicParams = true`). Tutor review pagination and subsequent listing pages continue to load through the existing client API calls.
+
+Build-time API failures are contained: failure to list candidate slugs returns an empty static-param list; failure to fetch one profile leaves a client-load fallback so the production build can finish and the browser can retry. Only public listing and tutor endpoints feed these static pages. Account, admin, and other private routes are not opted into static generation.
+
+**Freshness limit:** 300 seconds is the ISR revalidation interval, not a hard maximum age. After the interval, a request can receive the last generated page while Next.js refreshes it in the background. The backend's public listing/tutor response cache can also add up to 60 seconds before a regenerated page sees a change. If regeneration fails during an API outage, Next.js retains the previous successful page until a later regeneration succeeds.
+
+**Criterion 6(b) evidence:** route-level `force-static`, `generateStaticParams`, and `revalidate = 300` are implemented in the [public pages](frontend/src/app/page.tsx), [tutor profile route](frontend/src/app/tutors/[slug]/page.tsx), [About page](frontend/src/app/about/page.tsx), and [Become a Tutor page](frontend/src/app/become-a-tutor/page.tsx). A production build listed `/`, `/about`, and `/become-a-tutor` as ISR routes and generated five tutor paths with SSG. A second build with the public API pointed at an unavailable local port also succeeded and generated no tutor slugs, confirming the on-demand fallback.
+
+Local production-server benchmark on November 27, 2026, used 12 sequential requests per route and measured request-to-complete-HTML latency over loopback. This is a controlled local comparison, not a production or browser Core Web Vitals claim. The baseline was the pre-prerender production build; the result is the ISR build. The reusable runner is [benchmark-prerender.py](frontend/scripts/benchmark-prerender.py).
+
+| Route | Baseline p50 / p95 | ISR p50 / p95 | Baseline HTML | ISR HTML |
+| --- | ---: | ---: | ---: | ---: |
+| `/` | 6.9 / 106.6 ms | 1.8 / 54.3 ms | 41,974 B | 41,983 B |
+| `/about` | 6.0 / 12.7 ms | 1.4 / 4.0 ms | 54,809 B | 54,827 B |
+| `/become-a-tutor` | 4.5 / 8.4 ms | 1.1 / 3.3 ms | 47,051 B | 47,069 B |
+| `/tutors/vo-minh-quan-24` | 4.3 / 9.2 ms | 1.0 / 5.0 ms | 19,311 B | 31,248 B |
+
+The tutor HTML grew because it now includes the public profile name, headline, and profile content in the initial response; the previous response was a client-loading shell. Requests with and without a session cookie returned byte-identical tutor HTML (31,248 B), confirming that the prerendered profile does not vary by session. See the [prerender and coverage evidence report](docs/handover/FE-prerender-benchmark-coverage-2026-11-27.md) for the complete commands, test counts, offline-build check, environment, and limitations.
+
 ## 7. Measurements and Limitations
+
+**Frontend quality checks on November 27, 2026:** after the Tailwind migration, 210 Vitest tests across 40 files passed; statements coverage was **80.57%** (3,405/4,226) and lines coverage **85.70%** (2,937/3,427), above the **80.01%** gates. Lint, typecheck, and production build passed. The local production-server prerender benchmark is recorded in the [prerender and coverage evidence report](docs/handover/FE-prerender-benchmark-coverage-2026-11-27.md), and the [Tailwind migration evidence](docs/handover/evidence/3a-tailwind-migration/README.md) records its own screenshots and regression checks.
+
+**Production cleanup checks on November 19, 2026:** all 148 frontend tests passed with **72.24% line coverage**; lint, typecheck and production build passed. Runtime mock branches, sample testimonials and fabricated statistics were removed. The backend app/proxy production images built successfully; config, route and Blade caches compiled with test seeders and development files excluded. These checks do not replace a live VPS deployment test.
 
 **Deployment-preparation checks:** frontend line coverage **71.03%** (baseline 40.60%); backend line coverage **90.39%** from 857 guarded tests / 7,585 assertions. The unchanged frontend source glob includes the new runtime files; branch/function coverage is reported separately. Local lint, typecheck, coverage gate and production build passed. Cloud CI and actual VPS deployment remain pending.
 

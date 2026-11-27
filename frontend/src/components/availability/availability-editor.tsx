@@ -13,9 +13,9 @@ export function AvailabilityEditor() {
   const load = useCallback(() => getOwnerAvailability(), []);
   const result = useAsyncData(load);
   const needsProfile = result.error?.status === 422;
-  return <section className="availability-page content-stack">
+  return <section className="availability-page content-stack gap-4 sm:gap-[18px]">
     <div><h1>Lịch khả dụng</h1><p className="muted">Thiết lập các khung giờ bạn có thể dạy, lặp lại mỗi tuần.</p></div>
-    <p className="availability-notice"><strong>Lịch chỉ để tham khảo, không giữ chỗ.</strong><br />Bạn và học viên cần trao đổi để thống nhất lịch học trực tiếp.</p>
+    <p className="availability-notice rounded-xl px-[15px] py-[13px] leading-[1.5] sm:px-[18px] sm:py-[14px]"><strong>Lịch chỉ để tham khảo, không giữ chỗ.</strong><br />Bạn và học viên cần trao đổi để thống nhất lịch học trực tiếp.</p>
     {result.loading ? <StatePanel kind="loading" message="Đang tải lịch khả dụng…" /> : needsProfile ? (
       <StatePanel kind="empty" message="Hãy tạo và lưu bản nháp hồ sơ gia sư để thiết lập lịch khả dụng."
         action={<Link className="button button-secondary" href="/profile">Mở Hồ sơ Tutor</Link>} />
@@ -48,22 +48,22 @@ function ScheduleForm({ initial }: { initial: Availability }) {
       }
     } finally { setPending(false); }
   }
-  return <form className="card availability-form" onSubmit={save} aria-busy={pending}>
-    <fieldset disabled={pending}>
+  return <form className="card availability-form grid gap-3 px-[14px] py-4 sm:gap-[14px] sm:px-[clamp(16px,1.8vw,26px)] sm:py-5 [&>.button-row>.button]:w-full sm:[&>.button-row>.button]:w-auto" onSubmit={save} aria-busy={pending}>
+    <fieldset className="grid min-w-0 gap-2.5 sm:gap-3 [&>.field]:w-full sm:[&>.field]:max-w-[360px]" disabled={pending}>
       <legend>Thiết lập lịch theo tuần</legend>
       <Field label="Múi giờ (IANA)" htmlFor="availability-timezone" error={fields.timezone?.[0]} hint="Khung giờ bên dưới theo múi giờ này. Ví dụ Asia/Ho_Chi_Minh."><input id="availability-timezone" value={value.timezone} required onChange={(event) => change({ ...value, timezone: event.target.value })} /></Field>
       {weekdayLabels.map((day, dayIndex) => {
         const weekday = dayIndex;
         const rules = value.rules.map((rule, index) => ({ ...rule, index })).filter((rule) => rule.weekday === weekday);
-        return <section className="availability-day" key={weekday} aria-labelledby={`weekday-${weekday}`}>
-          <h2 id={`weekday-${weekday}`}>{day}</h2>
-          <div className="availability-slots">
-            {!rules.length ? <p className="muted">Chưa có khung giờ</p> : rules.map((rule, slot) => <div className="availability-slot" key={rule.index}>
+        return <section className="availability-day grid grid-cols-1 items-start gap-x-3 gap-y-[9px] py-[13px] sm:grid-cols-[92px_minmax(0,1fr)] sm:py-[14px] md:grid-cols-[108px_minmax(0,1fr)]" key={weekday} aria-labelledby={`weekday-${weekday}`}>
+          <h2 className="m-0 text-[.9rem] leading-[1.35] sm:mt-2" id={`weekday-${weekday}`}>{day}</h2>
+          <div className="availability-slots grid min-w-0 gap-2 has-[>p.muted]:items-center has-[>p.muted]:grid-cols-1 sm:has-[>p.muted]:grid-cols-[minmax(0,1fr)_auto]">
+            {!rules.length ? <p className="muted">Chưa có khung giờ</p> : rules.map((rule, slot) => <div className="availability-slot grid min-w-0 grid-cols-2 items-end gap-2 sm:gap-x-3 md:grid-cols-[minmax(0,190px)_minmax(0,190px)_auto]" key={rule.index}>
               <Field label={`${day} — bắt đầu ${slot + 1}`} htmlFor={`start-${rule.index}`} error={fields[`rules.${rule.index}.start_time`]?.[0]}><input type="time" id={`start-${rule.index}`} required value={rule.start_time} onChange={(event) => change({ ...value, rules: value.rules.map((item, index) => index === rule.index ? { ...item, start_time: event.target.value } : item) })} /></Field>
               <Field label={`${day} — kết thúc ${slot + 1}`} htmlFor={`end-${rule.index}`} error={fields[`rules.${rule.index}.end_time`]?.[0]}><input type="time" id={`end-${rule.index}`} required value={rule.end_time} onChange={(event) => change({ ...value, rules: value.rules.map((item, index) => index === rule.index ? { ...item, end_time: event.target.value } : item) })} /></Field>
-              <Button variant="ghost" aria-label={`Bỏ khung giờ ${slot + 1} ${day}`} onClick={() => change({ ...value, rules: value.rules.filter((_, index) => index !== rule.index) })}>Bỏ khung giờ</Button>
+              <Button className="col-span-full !min-h-[34px] !px-[9px] !py-1.5 !text-[.78rem] !justify-self-start md:col-span-1 md:!min-h-[42px]" variant="ghost" aria-label={`Bỏ khung giờ ${slot + 1} ${day}`} onClick={() => change({ ...value, rules: value.rules.filter((_, index) => index !== rule.index) })}>Bỏ khung giờ</Button>
             </div>)}
-            <Button variant="ghost" onClick={() => change({ ...value, rules: [...value.rules, { weekday, start_time: "09:00", end_time: "12:00" }] })}>+ Thêm khung giờ {day}</Button>
+            <Button className="!text-accent-dark" variant="ghost" onClick={() => change({ ...value, rules: [...value.rules, { weekday, start_time: "09:00", end_time: "12:00" }] })}>+ Thêm khung giờ {day}</Button>
           </div>
         </section>;
       })}

@@ -8,8 +8,6 @@ import {
   getProgram
 } from "@/lib/data/collaboration";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import "@/styles/listings.css";
-import "@/styles/programs.css";
 import Link from "next/link";
 import { useCallback } from "react";
 

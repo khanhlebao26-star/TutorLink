@@ -1,14 +1,12 @@
 "use client";
 
-import "@/app/learning-profile/learning-profile.css";
 import { AppShell, useActor } from "@/components/layout/app-shell";
-import { Invitations } from "@/components/programs/invitations";
-import { Programs } from "@/components/programs/program-list";
+import { PencilSimpleIcon } from "@phosphor-icons/react/dist/ssr/PencilSimple";
 import { Button, ErrorActions, Field, StatePanel } from "@/components/shared/ui";
 import { describeApiError, request } from "@/lib/api/client";
 import type { ApiEnvelope } from "@/lib/data/types";
 import { useAsyncData } from "@/lib/hooks/use-async-data";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useCallback, useState, type FormEvent } from "react";
 
 interface LearningProfile {
@@ -50,7 +48,7 @@ function LearningProfileForm({ initial, onSaved }: { initial: LearningProfile; o
     }
   }
 
-  return <form className="card form-stack learning-profile-form" onSubmit={submit} aria-busy={pending}>
+  return <form className="card form-stack learning-profile-form gap-5 p-5 sm:p-[clamp(20px,4vw,34px)]" onSubmit={submit} aria-busy={pending}>
     <header className="learning-profile-section-heading"><span aria-hidden="true">✦</span><div><h2>Nhu cầu học tập</h2><p>Thông tin này giúp bạn ghi lại mục tiêu và điều kiện học mong muốn.</p></div></header>
     <Field label="Môn học hoặc kỹ năng quan tâm" htmlFor="learning-subjects" hint="Ví dụ: Tiếng Anh giao tiếp, Toán lớp 9, Guitar.">
       <input id="learning-subjects" maxLength={500} value={values.subjects_of_interest ?? ""} onChange={(event) => update("subjects_of_interest", event.target.value)} placeholder="Bạn muốn học môn hoặc kỹ năng nào?" disabled={pending} />
@@ -71,7 +69,7 @@ function LearningProfileForm({ initial, onSaved }: { initial: LearningProfile; o
     <Field label="Thời gian học thuận tiện" htmlFor="learning-schedule" hint="Ví dụ: tối các ngày trong tuần hoặc sáng cuối tuần.">
       <input id="learning-schedule" maxLength={500} value={values.preferred_schedule ?? ""} onChange={(event) => update("preferred_schedule", event.target.value)} placeholder="Bạn thường rảnh vào thời gian nào?" disabled={pending} />
     </Field>
-    <div className="learning-profile-location">
+    <div className="grid grid-cols-1 gap-[18px] min-[641px]:grid-cols-2">
       <Field label="Tỉnh / thành phố" htmlFor="learning-city">
         <input id="learning-city" maxLength={120} value={values.city ?? ""} onChange={(event) => update("city", event.target.value)} placeholder="Ví dụ: TP. Hồ Chí Minh" disabled={pending} />
       </Field>
@@ -87,45 +85,29 @@ function LearningProfileForm({ initial, onSaved }: { initial: LearningProfile; o
 }
 
 export default function LearningProfilePage() {
-  return <AppShell role="customer" title="Hồ sơ học tập" hideSidebar>
+  return <AppShell role="customer" title="Hồ sơ học tập">
     <LearningProfileContent />
   </AppShell>;
 }
 
 function LearningProfileContent() {
   const actor = useActor();
-  const tabParam = useSearchParams().get("tab");
-  const activeTab = tabParam === "programs" || tabParam === "invitations" ? tabParam : "profile";
-  function selectTab(tab: "profile" | "programs" | "invitations") {
-    const url = new URL(window.location.href);
-    if (tab === "profile") url.searchParams.delete("tab");
-    else url.searchParams.set("tab", tab);
-    window.history.replaceState(null, "", url);
-  }
   const load = useCallback(async () => (await request<ApiEnvelope<LearningProfile>>({ method: "GET", url: "/me/learning-profile" })).data.data, []);
   const { data, error, loading, reload } = useAsyncData(load);
   const initials = actor?.full_name.trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi-VN") || "HV";
-  const tabs = [
-    { id: "profile" as const, label: "Hồ sơ học tập" },
-    { id: "programs" as const, label: "Program của tôi" },
-    { id: "invitations" as const, label: "Lời mời học" },
-  ];
-  return <section className="content-stack learning-profile-page">
+  return <section className="content-stack mx-auto grid w-full max-w-[1240px] gap-6 max-[760px]:gap-[18px]">
       <section className="tutor-workspace-profile learning-profile-header" aria-label="Hồ sơ học tập">
         <div className="tutor-profile-cover" aria-hidden="true" />
-        <div className="tutor-profile-identity">
+        <div className="tutor-profile-identity max-[640px]:items-center">
           <div className="tutor-profile-avatar" aria-label={`Ảnh đại diện ${actor?.full_name ?? "học viên"}`}>{initials}</div>
-          <div className="tutor-profile-name"><p>HỒ SƠ HỌC VIÊN</p><h1>{actor?.full_name ?? "Học viên TutorLink"}</h1><span>Học viên · TutorLink</span></div>
+          <div className="tutor-profile-name">
+            <p>HỒ SƠ HỌC VIÊN</p>
+            <div className="tutor-profile-name-row"><h1>{actor?.full_name ?? "Học viên TutorLink"}</h1><Link className="profile-edit-link" href="/settings" aria-label="Chỉnh sửa tên và thông tin tài khoản"><PencilSimpleIcon weight="regular" aria-hidden="true" /><span>Chỉnh sửa</span></Link></div>
+            <span>Học viên · TutorLink</span>
+          </div>
         </div>
-        <nav className="tutor-profile-tabs learning-profile-tabs" role="tablist" aria-label="Nội dung hồ sơ học tập">
-        {tabs.map((tab) => <button key={tab.id} id={`learning-tab-${tab.id}`} type="button" role="tab" aria-selected={activeTab === tab.id} aria-controls={`learning-panel-${tab.id}`} className={activeTab === tab.id ? "is-active" : ""} onClick={() => selectTab(tab.id)}>{tab.label}</button>)}
-        </nav>
       </section>
-      <div id={`learning-panel-${activeTab}`} role="tabpanel" aria-labelledby={`learning-tab-${activeTab}`} className="learning-profile-tab-panel">
-        {activeTab === "profile" ? <>
-          <header className="learning-profile-section-title"><div><h2>Thông tin học tập</h2><p>Ghi lại mục tiêu, môn học và điều kiện học phù hợp với bạn.</p></div></header>
-          {loading ? <StatePanel kind="loading" message="Đang tải hồ sơ học tập…" /> : error ? <StatePanel kind="error" message={describeApiError(error)} action={<ErrorActions login={[401, 419].includes(error.status ?? 0)} onRetry={reload} />} /> : data ? <LearningProfileForm key="learning-profile" initial={data} onSaved={reload} /> : null}
-        </> : activeTab === "programs" ? <Programs embedded /> : <Invitations embedded onAccepted={() => selectTab("programs")} />}
-      </div>
+      <header className="learning-profile-section-title mb-4 mt-1 flex items-end justify-between"><div><h2>Thông tin học tập</h2><p>Ghi lại mục tiêu, môn học và điều kiện học phù hợp với bạn.</p></div></header>
+      {loading ? <StatePanel kind="loading" message="Đang tải hồ sơ học tập…" /> : error ? <StatePanel kind="error" message={describeApiError(error)} action={<ErrorActions login={[401, 419].includes(error.status ?? 0)} onRetry={reload} />} /> : data ? <LearningProfileForm key="learning-profile" initial={data} onSaved={reload} /> : null}
   </section>;
 }

@@ -246,12 +246,7 @@
 .onboarding-review-edit-links { display: flex; flex-wrap: wrap; gap: 9px 18px; }
 
 @media (max-width: 900px) {
-  .onboarding-editor-grid-5 { grid-template-columns: minmax(0, 1fr); }
-  .onboarding-editor-grid-5 .onboarding-editor-aside { grid-column: 1; }
-  .onboarding-experience-layout { grid-template-columns: minmax(0, 1fr); }
   .onboarding-step-main-4 .onboarding-upload-card { grid-template-areas: none; grid-template-columns: minmax(0, 1fr); }
-  .onboarding-document-intro { grid-template-columns: 44px minmax(0, 1fr); }
-  .onboarding-document-progress { grid-column: 2; justify-self: start; }
   .onboarding-step-main-4 .onboarding-upload-copy,
   .onboarding-step-main-4 .onboarding-document-type,
   .onboarding-step-main-4 .onboarding-file-picker { grid-area: auto; }
@@ -260,45 +255,20 @@
 @media (max-width: 700px) {
   .onboarding-page { gap: 15px; }
   .onboarding-page-title { font-size: 25px; }
-  .onboarding-stepper { padding: 0; }
   .onboarding-step:not(:last-child)::after { left: calc(50% + 14px); right: calc(-50% + 14px); top: 14px; }
-  .onboarding-step button { gap: 6px; padding: 0 1px; }
-  .onboarding-step-number { font-size: .72rem; height: 28px; width: 28px; }
-  .onboarding-step-label { font-size: .66rem; line-height: 1.15; max-width: 68px; overflow-wrap: anywhere; }
-  .onboarding-form { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .onboarding-panel-heading,
   .onboarding-step-main,
   .onboarding-form-notice,
   .onboarding-actions { grid-column: 1; }
-  .onboarding-editor-grid-5 { grid-template-columns: minmax(0, 1fr); }
-  .onboarding-editor-aside { grid-column: 1; }
-  .onboarding-step-main,
-  .onboarding-editor-aside > .card { padding: 14px; }
   .onboarding-upload-card,
   .onboarding-step-main-4 .onboarding-upload-card { grid-template-areas: none; grid-template-columns: minmax(0, 1fr); }
-  .onboarding-credential-fields { grid-template-columns: minmax(0, 1fr); }
-  .onboarding-credential-row { align-items: start; grid-template-columns: 30px minmax(0, 1fr); }
-  .onboarding-credential-row-icon { height: 30px; width: 30px; }
-  .onboarding-remove-credential { grid-column: 2; justify-self: start; padding: 0; }
   .onboarding-step-main-4 .onboarding-upload-copy,
   .onboarding-step-main-4 .onboarding-document-type,
   .onboarding-step-main-4 .onboarding-file-picker { grid-area: auto; }
-  .onboarding-document-guidance-grid { grid-template-columns: minmax(0, 1fr); }
-  .onboarding-document-section-heading { align-items: flex-start; flex-direction: column; }
   .onboarding-document-row { align-items: flex-start; flex-wrap: wrap; }
-  .onboarding-document-status { margin-left: 45px; }
-  .onboarding-review-details > div { grid-template-columns: 110px minmax(0, 1fr); }
-  .onboarding-actions { align-items: stretch; }
-  .onboarding-button { flex: 1; min-width: 0; }
   .onboarding-refresh { flex: 0 1 auto; }
 }
 
 @media (max-width: 380px) {
-  .onboarding-step-label { font-size: .6rem; }
   .onboarding-step:not(:last-child)::after { left: calc(50% + 13px); right: calc(-50% + 13px); }
-  .onboarding-panel-heading { flex-direction: column; gap: 8px; }
-  .onboarding-heading-status { align-self: flex-start; }
-  .onboarding-review-details > div { gap: 4px; grid-template-columns: minmax(0, 1fr); }
-  .onboarding-actions { flex-direction: column-reverse; }
-  .onboarding-button { width: 100%; }
 }

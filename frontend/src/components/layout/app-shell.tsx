@@ -4,18 +4,30 @@ import { FavoritesLoadingState } from "@/components/favorites/favorites-loading-
 import { PublicFooter } from "@/components/layout/public-footer";
 import { useSessionHint } from "@/components/layout/session-hint";
 import { Button, StatePanel } from "@/components/shared/ui";
-import { ApiClientError, dataMode, describeApiError, request, setAuthHint } from "@/lib/api/client";
+import { ApiClientError, describeApiError, request, setAuthHint } from "@/lib/api/client";
 import { favoriteUpdateEvent, getFavoriteTutors } from "@/lib/data/favorites";
 import { getCurrentUser } from "@/lib/data/services";
 import type { ApiEnvelope, Role, User } from "@/lib/data/types";
 import { useUnreadMessages } from "@/lib/hooks/use-unread-messages";
-import "@/styles/landing.css";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 import { AccountMenu } from "@/components/layout/account-menu";
 import { BrandMark, LocaleDisplay, MenuIcon } from "@/components/layout/header-branding";
+import { BellIcon } from "@phosphor-icons/react/dist/ssr/Bell";
+import { ChatCircleDotsIcon } from "@phosphor-icons/react/dist/ssr/ChatCircleDots";
+import { HeartIcon } from "@phosphor-icons/react/dist/ssr/Heart";
+import { MagnifyingGlassIcon } from "@phosphor-icons/react/dist/ssr/MagnifyingGlass";
+import { BookOpenTextIcon } from "@phosphor-icons/react/dist/ssr/BookOpenText";
+import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
+import { ChalkboardTeacherIcon } from "@phosphor-icons/react/dist/ssr/ChalkboardTeacher";
+import { ChartBarIcon } from "@phosphor-icons/react/dist/ssr/ChartBar";
+import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr/EnvelopeSimple";
+import { GearSixIcon } from "@phosphor-icons/react/dist/ssr/GearSix";
+import { QuestionIcon } from "@phosphor-icons/react/dist/ssr/Question";
+import { UserCircleIcon } from "@phosphor-icons/react/dist/ssr/UserCircle";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
 import { isActive, roleLabels } from "@/components/layout/navigation-utils";
 import { ServicesNavMenu } from "@/components/layout/services-nav-menu";
 import { MessagingLoadingState, ReportsLoadingState } from "@/components/layout/shell-loading-states";
@@ -45,7 +57,6 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   const authFrame = mode === "auth" || pathname.startsWith("/auth/");
   const publicMode = mode === "public" || authFrame;
   const sessionHint = useSessionHint();
-  const mockPublicGuest = publicMode && dataMode === "mock" && !sessionHint;
   const [session, setSession] = useState<Session>(() => cachedSession ?? { status: "loading" });
   const [notifications, setNotifications] = useState<{ userId: number; count: number } | null>(null);
   const [favoritesCount, setFavoritesCount] = useState<{ userId: number; count: number } | null>(null);
@@ -55,7 +66,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
 
   useEffect(() => {
     let current = true;
-    if (authFrame || mockPublicGuest) return;
+    if (authFrame) return;
 
     const sessionRequest = freshSessionRequest
       ? request<ApiEnvelope<User>>({ method: "GET", url: "/me" }).then((response) => response.data.data)
@@ -79,7 +90,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
     });
 
     return () => { current = false; };
-  }, [freshSessionRequest, authFrame, mockPublicGuest, retry]);
+  }, [freshSessionRequest, authFrame, retry]);
 
   useEffect(() => {
     const refreshAccount = () => {
@@ -98,7 +109,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
       : pathname === "/profile"
         ? role ?? "tutor"
         : role;
-  const user = !authFrame && !mockPublicGuest && session.status === "authenticated" ? session.user : null;
+  const user = !authFrame && session.status === "authenticated" ? session.user : null;
   const userId = user?.id;
   const favoritesUserId = user?.role === "admin" ? undefined : userId;
   const unreadNotifications = notifications && notifications.userId === userId ? notifications.count : 0;
@@ -138,11 +149,32 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
   const needsSessionError = protectedPage && session.status === "error";
   const needsRole = Boolean(protectedPage && user && roleMismatch);
   const needsLoading = protectedPage && session.status === "loading";
+  const activeRole = user?.role ?? requiredRole;
+  const primaryNavItems = activeRole === "admin"
+    ? [
+      { href: "/admin/dashboard", label: "Dashboard" },
+      { href: "/admin", label: "Duyệt hồ sơ" },
+      { href: "/admin/reports", label: "Báo cáo" },
+      { href: "/monitoring", label: "Giám sát" },
+    ]
+    : activeRole === "tutor"
+      ? [
+        { href: "/profile", label: "Workspace gia sư" },
+        { href: "/marketplace", label: "Khám phá" },
+        { href: "/support", label: "Hỗ trợ" },
+      ]
+      : activeRole === "customer"
+        ? [
+          { href: "/marketplace", label: "Khám phá dịch vụ" },
+          { href: "/learning-profile", label: "Workspace học viên" },
+          { href: "/support", label: "Hỗ trợ" },
+        ]
+        : null;
   // Protected routes must keep their account shell while /me is loading.
   // Rendering the public shell for this intermediate state causes a full
   // header/sidebar replacement as soon as the session request resolves.
   const showPublicFrame = publicMode || (!user && !protectedPage && !sessionHint);
-  const showGuestActions = !user && (authFrame || mockPublicGuest || session.status === "guest" ||
+  const showGuestActions = !user && (authFrame || session.status === "guest" ||
     (session.status === "error" && !sessionHint));
 
   const accessContent = needsLoading ? (
@@ -180,8 +212,8 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
 
   if (showPublicFrame) {
     return (
-      <div className={`app-frame public-frame${authFrame ? " auth-frame" : ""}`}>
-        <header className="topbar public-topbar">
+      <div className={`app-frame public-frame min-h-screen${authFrame ? " auth-frame" : ""}`}>
+        <header className="topbar public-topbar sticky top-0 z-10 flex min-h-[66px] flex-wrap items-center justify-between gap-4 border-b border-line bg-white px-4 py-2.5 sm:px-5 md:gap-4 lg:min-h-[76px] lg:flex-nowrap lg:gap-[clamp(12px,2vw,30px)] lg:px-[clamp(18px,5vw,80px)] lg:py-3">
           <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
             <BrandMark />
             <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
@@ -197,34 +229,33 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
           >
             <MenuIcon />
           </button>
-          <nav id="public-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
-            <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
-            <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
-            <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
-            <Link href="/about" aria-current={pathname === "/about" ? "page" : undefined} onClick={() => setMenuOpen(false)}>About</Link>
+          <nav id="public-navigation" className={`public-nav hidden min-w-0 flex-1 flex-col items-stretch justify-center gap-0 lg:flex lg:flex-row lg:items-center lg:gap-[clamp(12px,1.45vw,23px)] ${menuOpen ? "is-open max-lg:!flex" : ""}`} aria-label="Điều hướng chính">
+            {primaryNavItems ? primaryNavItems.map((item) => <Link key={item.href} href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} onClick={() => setMenuOpen(false)}>{item.label}</Link>) : <>
+              <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
+              <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
+              <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
+              <Link href="/about" aria-current={pathname === "/about" ? "page" : undefined} onClick={() => setMenuOpen(false)}>About</Link>
+              <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
+            </>}
           </nav>
-          <div className="public-actions">
-            {!authFrame ? <form className="public-header-search" action="/marketplace" method="get" role="search">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4.2 4.2" /></svg>
+          <div className="public-actions order-3 flex flex-[1_0_100%] flex-wrap items-center gap-3 lg:order-none lg:flex-none lg:flex-nowrap lg:gap-[clamp(12px,1.5vw,22px)]">
+            {!authFrame ? <form className="public-header-search order-first flex h-[42px] min-w-full flex-[1_0_100%] items-center gap-[9px] rounded-full border border-[#d9d1ed] bg-white px-[13px] shadow-[0_2px_8px_#1a12400a] transition-[border-color,box-shadow] duration-150 focus-within:border-[#bc9beb] focus-within:shadow-[0_0_0_3px_#9a66ff18] sm:min-w-[190px] sm:flex-[0_1_300px] lg:order-none" action="/marketplace" method="get" role="search">
+              <MagnifyingGlassIcon weight="regular" aria-hidden="true" />
               <label className="landing-sr-only" htmlFor="public-header-query">Tìm gia sư, môn học hoặc kỹ năng</label>
-              <input id="public-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
+              <input className="w-full min-w-0 border-0 bg-transparent p-0 text-[.76rem] text-brand outline-none placeholder:text-[#85819c]" id="public-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
             </form> : null}
             <LocaleDisplay />
             {user ? <>
               <Link className="public-header-messages" href="/messages" aria-label="Tin nhắn" title="Tin nhắn">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.8-3.3A7.5 7.5 0 1 1 20 11.5Z" /><path d="M8.5 11.5h7m-7 3h4" /></svg>
+                <ChatCircleDotsIcon weight="regular" aria-hidden="true" />
                 {unreadMessages > 0 ? <span className="public-favorite-count" aria-label={`${unreadMessages} tin nhắn chưa đọc`}>{unreadMessages > 50 ? "50+" : unreadMessages}</span> : null}
               </Link>
               <Link className="public-header-favorite" href="/favorites" aria-label={`Yêu thích${favoriteCount ? `, ${favoriteCount} hồ sơ đã lưu` : ""}`} title="Yêu thích">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z" />
-                </svg>
+                <HeartIcon weight="regular" aria-hidden="true" />
                 {favoriteCount > 0 ? <span className="public-favorite-count">{favoriteCount > 99 ? "99+" : favoriteCount}</span> : null}
               </Link>
               <Link className="public-header-notifications" href="/notifications" aria-label="Thông báo" title="Thông báo">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" />
-                </svg>
+                <BellIcon weight="regular" aria-hidden="true" />
                 {unreadNotifications > 0 ? <span className="public-notification-dot" aria-label={`${unreadNotifications} thông báo chưa đọc`} /> : null}
               </Link>
               <AccountMenu key={pathname} user={user} />
@@ -236,7 +267,7 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
             ) : null}
           </div>
         </header>
-        <main className={`page-content${authFrame ? " auth-page-content" : ""}`}>
+        <main className={`page-content w-full px-[18px] pb-[52px] pt-7 sm:px-5 sm:pb-14 sm:pt-8 lg:px-[clamp(16px,2vw,32px)] ${authFrame ? "auth-page-content !p-0" : ""}`}>
           {accessContent}
         </main>
         {!authFrame ? <PublicFooter /> : null}
@@ -244,36 +275,39 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
     );
   }
 
-  const activeRole = user?.role ?? requiredRole;
   const messagingRoute = pathname === "/messages" || pathname.startsWith("/messages/");
   const learningProfileRoute = activeRole === "customer" && pathname === "/learning-profile";
-  const tutorWorkspace = activeRole === "tutor" && (pathname === "/profile" || isActive(pathname, "/me/listings") || isActive(pathname, "/me/availability") || pathname === "/programs");
-  const tutorSidebarRoute = activeRole === "tutor" && (isActive(pathname, "/settings") || pathname === "/reports");
+  const tutorWorkspace = activeRole === "tutor" && (pathname === "/profile" || isActive(pathname, "/me/listings") || isActive(pathname, "/me/availability") || isActive(pathname, "/programs"));
+  const tutorProfileRoute = activeRole === "tutor" && pathname === "/profile";
+  const tutorSidebarRoute = activeRole === "tutor" && (tutorWorkspace || isActive(pathname, "/settings") || pathname === "/reports");
   const hideTutorSidebar = activeRole === "tutor" && !tutorSidebarRoute;
-  const roleNavItems = activeRole === "admin"
-    ? [{ href: "/admin/dashboard", label: "Dashboard quản trị" }, { href: "/admin", label: "Duyệt hồ sơ Tutor" }, { href: "/admin/reports", label: "Quản lý báo cáo" }, { href: "/monitoring", label: "Giám sát hệ thống" }]
-    : activeRole === "tutor"
-      ? [{ href: "/profile", label: "Hồ sơ Tutor" }, { href: "/me/listings", label: "Quản lý giảng dạy" }]
-      : activeRole === "customer" ? [{ href: "/learning-profile", label: "Hồ sơ học tập" }] : [];
-  const collaborationNav = !activeRole || activeRole === "admin" ? [] : activeRole === "tutor" ? [
-    { href: "/reports", label: "Báo cáo của tôi" },
-  ] : [
-    { href: "/reports", label: "Báo cáo của tôi" },
-  ];
-  const navItems = activeRole === "tutor" && tutorSidebarRoute ? [
-    { href: "/reports", label: "Báo cáo của tôi" },
-    { href: "/support", label: "Hỗ trợ" },
-    { href: "/settings/password", label: "Đổi mật khẩu" },
-  ] : [
-    ...roleNavItems,
-    ...collaborationNav,
-    ...(activeRole ? [{ href: "/settings", label: "Cài đặt tài khoản" }] : []),
-    ...(activeRole === "tutor" ? [{ href: "/support", label: "Hỗ trợ" }] : []),
-  ];
+  const navItems = activeRole === "admin" ? [
+    { href: "/admin/dashboard", label: "Dashboard quản trị", Icon: ChartBarIcon },
+    { href: "/admin", label: "Duyệt hồ sơ Tutor", Icon: UserCircleIcon },
+    { href: "/admin/reports", label: "Quản lý báo cáo", Icon: FileTextIcon },
+    { href: "/monitoring", label: "Giám sát hệ thống", Icon: ChartBarIcon },
+  ] : activeRole === "tutor" ? [
+    { href: "/profile", label: "Hồ sơ gia sư", Icon: UserCircleIcon },
+    { href: "/me/listings", label: "Dịch vụ", Icon: ChalkboardTeacherIcon },
+    { href: "/programs", label: "Chương trình học", Icon: BookOpenTextIcon },
+    { href: "/me/availability", label: "Lịch khả dụng", Icon: CalendarDotsIcon },
+    { href: "/reports", label: "Báo cáo của tôi", Icon: ChartBarIcon },
+    { href: "/support", label: "Hỗ trợ", Icon: QuestionIcon },
+    { href: "/settings", label: "Cài đặt tài khoản", Icon: GearSixIcon },
+  ] : activeRole === "customer" ? [
+    { href: "/learning-profile", label: "Hồ sơ học tập", Icon: UserCircleIcon },
+    { href: "/programs", label: "Program của tôi", Icon: BookOpenTextIcon },
+    { href: "/invitations", label: "Lời mời học", Icon: EnvelopeSimpleIcon },
+    { href: "/reports", label: "Báo cáo của tôi", Icon: ChartBarIcon },
+    { href: "/support", label: "Hỗ trợ", Icon: QuestionIcon },
+    { href: "/settings", label: "Cài đặt tài khoản", Icon: GearSixIcon },
+  ] : [];
+  const sidebarLabel = activeRole === "customer" ? "Workspace học viên" : activeRole === "tutor" ? "Workspace gia sư" : activeRole ? roleLabels[activeRole] : "Tài khoản";
+  const singleColumnShell = hideSidebar || hideTutorSidebar || messagingRoute || pathname === "/notifications";
 
   return (
     <div className={`app-frame authenticated-frame${pathname === "/profile" ? " profile-shell" : ""}${messagingRoute ? " messaging-shell" : ""}${hideSidebar || hideTutorSidebar ? " sidebar-hidden-shell" : ""}${tutorWorkspace ? " tutor-workspace-shell" : ""}${learningProfileRoute ? " learning-profile-shell" : ""}`}>
-      <header className="topbar public-topbar authenticated-public-topbar">
+      <header className="topbar public-topbar authenticated-public-topbar sticky top-0 z-10 flex min-h-[66px] flex-wrap items-center justify-between gap-4 border-b border-line bg-white px-4 py-2.5 sm:px-5 md:gap-4 lg:min-h-[76px] lg:flex-nowrap lg:gap-[clamp(12px,2vw,30px)] lg:px-[clamp(18px,5vw,80px)] lg:py-3">
         <Link className="brand" href="/" aria-label="TutorLink Việt Nam">
           <BrandMark />
           <span>Tutor</span><strong>Link</strong><span className="brand-star">✦</span>
@@ -289,41 +323,44 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
         >
           <MenuIcon />
         </button> : null}
-        <nav id="authenticated-navigation" className={`public-nav${menuOpen ? " is-open" : ""}`} aria-label="Điều hướng chính">
-          <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
-          <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
-          <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
-          <Link href="/about" aria-current={pathname === "/about" ? "page" : undefined} onClick={() => setMenuOpen(false)}>About</Link>
+        <nav id="authenticated-navigation" className={`public-nav hidden min-w-0 flex-1 flex-col items-stretch justify-center gap-0 lg:flex lg:flex-row lg:items-center lg:gap-[clamp(12px,1.45vw,23px)] ${menuOpen ? "is-open max-lg:!flex" : ""}`} aria-label="Điều hướng chính">
+          {primaryNavItems ? primaryNavItems.map((item) => <Link key={item.href} href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} onClick={() => setMenuOpen(false)}>{item.label}</Link>) : <>
+            <Link href="/marketplace" aria-current={isActive(pathname, "/marketplace") ? "page" : undefined} onClick={() => setMenuOpen(false)}>Tìm gia sư</Link>
+            <ServicesNavMenu onNavigate={() => setMenuOpen(false)} />
+            <Link href="/become-a-tutor" aria-current={pathname === "/become-a-tutor" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Trở thành gia sư</Link>
+            <Link href="/about" aria-current={pathname === "/about" ? "page" : undefined} onClick={() => setMenuOpen(false)}>About</Link>
+            <Link href="/support" aria-current={pathname === "/support" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Hỗ trợ</Link>
+          </>}
         </nav>
-        <div className="public-actions">
-          <form className="public-header-search" action="/marketplace" method="get" role="search">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" /><path d="m16 16 4.2 4.2" /></svg>
+        <div className="public-actions order-3 flex flex-[1_0_100%] flex-wrap items-center gap-3 lg:order-none lg:flex-none lg:flex-nowrap lg:gap-[clamp(12px,1.5vw,22px)]">
+          {activeRole !== "admin" ? <form className="public-header-search order-first flex h-[42px] min-w-full flex-[1_0_100%] items-center gap-[9px] rounded-full border border-[#d9d1ed] bg-white px-[13px] shadow-[0_2px_8px_#1a12400a] transition-[border-color,box-shadow] duration-150 focus-within:border-[#bc9beb] focus-within:shadow-[0_0_0_3px_#9a66ff18] sm:min-w-[190px] sm:flex-[0_1_300px] lg:order-none" action="/marketplace" method="get" role="search">
+            <MagnifyingGlassIcon weight="regular" aria-hidden="true" />
             <label className="landing-sr-only" htmlFor="authenticated-header-query">Tìm gia sư, môn học hoặc kỹ năng</label>
-            <input id="authenticated-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
-          </form>
+            <input className="w-full min-w-0 border-0 bg-transparent p-0 text-[.76rem] text-brand outline-none placeholder:text-[#85819c]" id="authenticated-header-query" name="q" type="search" placeholder="Tìm gia sư, môn học hoặc kỹ năng..." />
+          </form> : null}
           <LocaleDisplay />
           {user ? <>
             {user.role !== "admin" ? <>
               <Link className="public-header-messages" href="/messages" aria-label="Tin nhắn" title="Tin nhắn">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l1.8-3.3A7.5 7.5 0 1 1 20 11.5Z" /><path d="M8.5 11.5h7m-7 3h4" /></svg>
+                <ChatCircleDotsIcon weight="regular" aria-hidden="true" />
                 {unreadMessages > 0 ? <span className="public-favorite-count" aria-label={`${unreadMessages} tin nhắn chưa đọc`}>{unreadMessages > 50 ? "50+" : unreadMessages}</span> : null}
               </Link>
               <Link className="public-header-favorite" href="/favorites" aria-label={`Yêu thích${favoriteCount ? `, ${favoriteCount} hồ sơ đã lưu` : ""}`} title="Yêu thích">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.8 8.7c0 5.1-8.8 10.2-8.8 10.2S3.2 13.8 3.2 8.7A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 8.8 2.3Z" /></svg>
+                <HeartIcon weight="regular" aria-hidden="true" />
                 {favoriteCount > 0 ? <span className="public-favorite-count">{favoriteCount > 99 ? "99+" : favoriteCount}</span> : null}
               </Link>
             </> : null}
             <Link className="public-header-notifications" href="/notifications" aria-label="Thông báo" title="Thông báo">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" /></svg>
+              <BellIcon weight="regular" aria-hidden="true" />
               {unreadNotifications > 0 ? <span className="public-notification-dot" aria-label={`${unreadNotifications} thông báo chưa đọc`} /> : null}
             </Link>
             <AccountMenu key={pathname} user={user} />
           </> : null}
         </div>
       </header>
-      <div className={`app-layout${messagingRoute ? " messaging-app-layout" : ""}`}>
-        {!messagingRoute && !hideSidebar && (!hideTutorSidebar || tutorSidebarRoute) && !tutorWorkspace ? <aside id="app-sidebar" className={`app-sidebar${menuOpen ? " is-open" : ""}`} aria-label={tutorSidebarRoute ? "Menu tài khoản gia sư" : activeRole ? `Menu ${roleLabels[activeRole]}` : "Menu tài khoản"}>
-          <p className="sidebar-label">{activeRole ? roleLabels[activeRole] : "Tài khoản"}</p>
+      <div className={`app-layout ${singleColumnShell ? "block" : "grid grid-cols-1 sm:grid-cols-[180px_minmax(0,1fr)]"} min-h-[calc(100vh-61px)] w-full${messagingRoute ? " messaging-app-layout" : ""}`}>
+        {!messagingRoute && !hideSidebar && !hideTutorSidebar ? <aside id="app-sidebar" className={`app-sidebar${menuOpen ? " is-open" : ""}`} aria-label={sidebarLabel}>
+          <p className="sidebar-label">{sidebarLabel}</p>
           {!activeRole && needsLoading ? <div className="sidebar-loading" role="status" aria-label="Đang tải menu tài khoản">
             {[0, 1, 2, 3, 4].map((item) => <span key={item} aria-hidden="true" />)}
           </div> : null}
@@ -335,14 +372,15 @@ export function AppShell({ children, role, title = "TutorLink", mode, hideSideba
                 aria-current={(item.href === "/admin" ? pathname === "/admin" : isActive(pathname, item.href)) ? "page" : undefined}
                 onClick={() => setMenuOpen(false)}
               >
-                {item.label}
+                <item.Icon className="sidebar-nav-icon" weight="regular" aria-hidden="true" />
+                <span>{item.label}</span>
               </Link>
             ))}
           </nav>
         </aside> : null}
         <main className="app-main">
           <div className="page-content">
-            {tutorWorkspace && user && !needsRole ? <TutorWorkspaceProfile user={user} pathname={pathname} /> : null}
+            {tutorProfileRoute && user && !needsRole ? <TutorWorkspaceProfile user={user} /> : null}
             {pathname !== "/profile" && pathname !== "/learning-profile" && !messagingRoute && !tutorWorkspace && title ? <div className="eyebrow">{activeRole ? `${roleLabels[activeRole]} · ` : ""}{title}</div> : null}
             {protectedPage ? accessContent : children}
           </div>

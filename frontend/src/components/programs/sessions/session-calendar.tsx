@@ -4,7 +4,6 @@ import { SessionCreateDialog, SessionDetailDialog } from "@/components/programs/
 import {
   type WorkspaceRow
 } from "@/lib/data/workspace";
-import "@/styles/programs.css";
 import { useState, type MouseEvent } from "react";
 
 const calendarHours = Array.from({ length: 17 }, (_, index) => index + 6);

@@ -1,7 +1,7 @@
 import * as services from '@/lib/data/services';
 import { ApiClientError, request, setAuthHint } from '@/lib/api/client';
 import { beforeEach, expect, it, vi } from 'vitest';
-vi.mock('@/lib/api/client',async original=>({...await original<typeof import('@/lib/api/client')>(),dataMode:'api',request:vi.fn(),setAuthHint:vi.fn()}));
+vi.mock('@/lib/api/client',async original=>({...await original<typeof import('@/lib/api/client')>(),request:vi.fn(),setAuthHint:vi.fn()}));
 beforeEach(()=>vi.resetAllMocks());
 const respond=(data:unknown)=>vi.mocked(request).mockResolvedValueOnce({data:{data}} as never);
 it('loads customer and tutor profile contexts and denies a non-tutor onboarding',async()=>{

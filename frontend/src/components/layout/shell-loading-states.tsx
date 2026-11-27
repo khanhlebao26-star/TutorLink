@@ -1,6 +1,7 @@
 "use client";
 
-import "@/styles/landing.css";
+import { FileTextIcon } from "@phosphor-icons/react/dist/ssr/FileText";
+import { PaperPlaneTiltIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
 
 export function MessagingLoadingState() {
   return <section className="message-page-loading" role="status" aria-label="Đang tải hộp thư">
@@ -15,7 +16,7 @@ export function MessagingLoadingState() {
     <div className="message-loading-thread" aria-hidden="true">
       <div className="message-loading-thread-heading"><span className="message-loading-avatar" /><span><i /><i /></span></div>
       <div className="message-loading-messages"><i /><i /><i /><i /></div>
-      <div className="message-loading-composer"><i /><b>➤</b></div>
+      <div className="message-loading-composer"><i /><PaperPlaneTiltIcon aria-hidden="true" weight="regular" /></div>
     </div>
     <aside className="message-loading-context" aria-hidden="true"><i /><i /><i /><i /><i /></aside>
     <div className="message-loading-status"><span className="message-loading-spinner" aria-hidden="true" /><span><strong>Đang kết nối hộp thư</strong><small>Đang xác minh phiên đăng nhập và tải cuộc trò chuyện…</small></span></div>
@@ -27,7 +28,7 @@ export function ReportsLoadingState() {
     <div className="reports-loading-banner">
       <span className="reports-loading-spinner" aria-hidden="true" />
       <span><strong>Đang chuẩn bị báo cáo của bạn</strong><small>Đang xác minh phiên và tải thông tin an toàn…</small></span>
-      <span className="reports-loading-banner-mark" aria-hidden="true">▤</span>
+      <span className="reports-loading-banner-mark" aria-hidden="true"><FileTextIcon weight="regular" /></span>
     </div>
     <div className="reports-loading-heading" aria-hidden="true">
       <i className="reports-skeleton reports-skeleton-eyebrow" />

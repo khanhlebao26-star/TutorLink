@@ -9,6 +9,7 @@ import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback } from "react";
+import { CalendarDotsIcon } from "@phosphor-icons/react/dist/ssr/CalendarDots";
 
 const weekdays = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"];
 type DetailExtra = { tutor: TutorPublic | null; reviews: TutorReviewCollection | null };
@@ -180,14 +181,14 @@ export function ListingDetail({ slug }: { slug: string }) {
   const availability = tutor?.availability_rules ?? [];
   const firstReview = review?.data[0];
 
-  return <section className="content-stack listing-detail-page">
+  return <section className="content-stack listing-detail-page mx-auto grid w-full max-w-[1180px]">
     <nav className="public-breadcrumb listing-breadcrumb" aria-label="Đường dẫn">
       <Link href="/">Trang chủ</Link><span aria-hidden="true">/</span>
       <Link href="/marketplace">Gia sư</Link><span aria-hidden="true">/</span>
       <span aria-current="page">{data.title}</span>
     </nav>
 
-    <div className="listing-detail-layout">
+    <div className="listing-detail-layout grid grid-cols-1 items-start gap-[18px] lg:grid-cols-[minmax(0,1.58fr)_minmax(300px,.92fr)]">
       <main className="listing-detail-main">
         <section className="listing-gallery" aria-label="Ảnh minh họa dịch vụ">
           <Image src={coverFor(data)} alt={`Ảnh minh họa cho ${data.title}`} fill priority sizes="(max-width: 900px) 100vw, 60vw" />
@@ -220,7 +221,7 @@ export function ListingDetail({ slug }: { slug: string }) {
           </section>
 
           <section className="listing-schedule" aria-labelledby="listing-schedule-title">
-            <div className="listing-schedule-heading"><span aria-hidden="true">▦</span><div><h2 id="listing-schedule-title">Lịch học</h2><small>Chỉ để tham khảo</small></div></div>
+            <div className="listing-schedule-heading"><CalendarDotsIcon aria-hidden="true" weight="regular" /><div><h2 id="listing-schedule-title">Lịch học</h2><small>Chỉ để tham khảo</small></div></div>
             {tutor && !extra.loading ? <div className="listing-week-grid">{weekdays.map((day, index) => {
               const slots = availability.filter((rule) => rule.weekday === index);
               return <div className={`listing-week-day${slots.length ? " has-slots" : ""}`} key={day}><span>{day}</span>{slots.length ? slots.map((slot) => <strong key={`${slot.start_time}-${slot.end_time}`}>{slot.start_time}–{slot.end_time}</strong>) : <i aria-label="Chưa có lịch" />}</div>;

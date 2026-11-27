@@ -1,7 +1,6 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { MarketplaceSearch } from "@/components/marketplace/marketplace-search";
 import { StatePanel } from "@/components/shared/ui";
-import "@/styles/marketplace.css";
 import { Suspense } from "react";
 
 export default function MarketplacePage() {
