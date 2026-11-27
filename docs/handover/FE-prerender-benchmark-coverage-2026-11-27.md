@@ -1,5 +1,21 @@
 # Báo cáo prerender và coverage frontend - 2026-11-27
 
+## Cập nhật sau review: prerender khung tutor và kiểm tra hiển thị trực tiếp
+
+Trang chủ, `/about`, `/become-a-tutor` và khung `/tutors/[slug]` đều prerender/ISR 300 giây. Tutor dùng `generateStaticParams` lấy tối đa sáu slug khác nhau từ tối đa 50 listing; slug khác render on demand. Nếu API không khả dụng khi build, danh sách tham số là rỗng. Tên, bio, dịch vụ và lịch khả dụng không nằm trong HTML cache; trình duyệt lấy lại chúng từ Laravel.
+
+Trước mỗi lượt truy cập tutor, kể cả lượt dùng shell cache, proxy gọi API public bằng request không kèm thông tin đăng nhập, `cache: no-store` và timeout 5 giây. API trả 403/404 thì trang trả HTTP 404. Header `private, no-store` ngăn cache phía sau bỏ qua bước kiểm tra này. Khi mạng lỗi hoặc API tạm lỗi, shell không có dữ liệu hồ sơ vẫn an toàn và client cho phép thử lại. Luồng chuyển hướng đăng nhập cũ được giữ nguyên.
+
+Đây là chiến lược kết hợp cho mục 6(b): prerender trang tĩnh và khung tutor; lấy mới dữ liệu có thể bị thu hồi. Khác với bản ISR hồ sơ ban đầu, không có snapshot hồ sơ tồn tại trong HTML sau moderation. Đổi lại, nội dung riêng của tutor cần JavaScript; chưa đo hiệu quả SEO/Core Web Vitals.
+
+Frontend đạt **219/219 tests**, statements **80,59%** (3.409/4.230), lines **85,71%** (2.941/3.431); lint, typecheck và build đạt. Build production ghi nhận `/tutors/review-tutor` là SSG với ISR 5 phút. Chrome xác nhận HTML prerender không chứa tên hồ sơ; API rút hồ sơ thì lượt tải tiếp theo trả 404; client cũng loại hồ sơ khi API từ chối. Không có lỗi JavaScript. API trong lượt Chrome là giả lập.
+
+Backend đầy đủ đạt **861/861 tests**, 7.655 assertions và coverage statements **90,41%**. Nhóm tin nhắn riêng đạt 62/62. Lượt đầu dùng bind mount từ macOS gặp timeout khởi tạo tiến trình ở Invitation concurrency; chạy riêng đạt 12/12 và lượt đầy đủ dùng Docker volume đạt toàn bộ, không nới timeout. Code backend không đổi sau lượt kiểm tra đầy đủ này.
+
+Bằng chứng: [summary.json](evidence/review-fixes-2026-11-27/summary.json), [coverage frontend](evidence/review-fixes-2026-11-27/frontend-coverage.txt), [production build](evidence/review-fixes-2026-11-27/build.txt), [log backend đầy đủ](evidence/review-fixes-2026-11-27/backend-full.txt), [coverage backend](evidence/review-fixes-2026-11-27/backend-coverage.txt), [ảnh 404](evidence/review-fixes-2026-11-27/hidden-profile-after.png). Theo dõi commit, PR, CI và merge tại [issue #94](https://github.com/khanhlebao26-star/TutorLink/issues/94). Video demo do nhóm tự làm sau.
+
+## Bản ghi triển khai ban đầu
+
 ## Mục tiêu rubric 6(b)
 
 Tiêu chí 6(b) yêu cầu chiến lược prerender cho trang tĩnh và trang tutor, dùng `generateStaticParams`, `revalidate`, và ghi trong README. Báo cáo này tập hợp bằng chứng build, kiểm thử coverage và benchmark local cho thay đổi đó.
@@ -61,7 +77,7 @@ P95 với 12 mẫu nhạy với một request chậm, nên dùng để đối ch
 
 ## Tài liệu liên quan
 
-- [Chiến lược prerender và coverage trong README dự án](../../README.md#614-public-page-prerendering-and-tutor-isr)
+- [Chiến lược prerender và coverage trong README dự án](../../README.md#614-public-page-prerendering-and-fresh-tutor-profiles)
 - [Frontend README](../../frontend/README.md)
 - [Benchmark runner](../../frontend/scripts/benchmark-prerender.py)
 - [Vitest config](../../frontend/vitest.config.mts)

@@ -1,0 +1,14 @@
+
+> frontend@0.1.0 test
+> vitest run src/tests/marketplace/marketplace-journeys.test.tsx --maxWorkers=2
+
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v5.1.0 /Users/ttcenter/TutorLink/frontend
+
+
+ Test Files  1 passed (1)
+      Tests  28 passed (28)
+   Start at  21:43:58
+   Duration  3.35s (tests 48%, environment 26%, import 10%, setup 8%, transform 7%)
+

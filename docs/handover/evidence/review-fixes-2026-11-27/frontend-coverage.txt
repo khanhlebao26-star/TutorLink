@@ -1,0 +1,220 @@
+
+> frontend@0.1.0 test:coverage
+> vitest run --coverage --maxWorkers=2
+
+The plugin "vite-tsconfig-paths" is detected. Vite now supports tsconfig paths resolution natively via the resolve.tsconfigPaths option. You can remove the plugin and set resolve.tsconfigPaths: true in your Vite config instead.
+
+ RUN  v5.1.0 /Users/ttcenter/TutorLink/frontend
+      Coverage enabled with v8
+
+
+ Test Files  40 passed (40)
+      Tests  219 passed (219)
+   Start at  22:43:57
+   Duration  34.71s (environment 42%, tests 32%, setup 13%, import 9%, worker 3%, transform 2%)
+
+Environment  jsdom was created 40 times · 25.45s total, 42% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   80.59 |    69.15 |    72.2 |   85.71 |                   
+ src               |     100 |    95.65 |     100 |     100 |                   
+  ...umentation.ts |     100 |       80 |     100 |     100 | 11                
+ src/app           |   76.66 |     87.5 |   66.66 |      75 |                   
+  error.tsx        |     100 |       50 |     100 |     100 | 4                 
+  global-error.tsx |       0 |      100 |       0 |       0 | 2-4               
+  layout.tsx       |       0 |      100 |       0 |       0 | 8-16              
+  manifest.ts      |       0 |      100 |       0 |       0 | 4                 
+  page.tsx         |     100 |    92.85 |     100 |     100 | 36                
+ src/app/admin     |   81.57 |    65.62 |   78.37 |   86.17 |                   
+  page.tsx         |   81.57 |    65.62 |   78.37 |   86.17 | ...95,214-220,231 
+ ...dmin/dashboard |     100 |       80 |     100 |     100 |                   
+  page.tsx         |     100 |       80 |     100 |     100 | 40-42,48,55-56    
+ .../admin/reports |   88.74 |    74.07 |   75.75 |    93.4 |                   
+  page.tsx         |   88.74 |    74.07 |   75.75 |    93.4 | ...08,140,147,150 
+ ...orgot-password |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 8                 
+ ...app/auth/login |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 12-14             
+ .../auth/register |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 10-12             
+ ...reset-password |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 8                 
+ ...h/verify-email |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 7                 
+ ...become-a-tutor |   97.56 |       95 |    92.3 |     100 |                   
+  ...log-links.tsx |      95 |     87.5 |    87.5 |     100 | 47                
+ src/app/favorites |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 5                 
+ ...pp/invitations |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 1-9               
+ ...vitations/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ ...arning-profile |   83.33 |    68.42 |      60 |   81.81 |                   
+  page.tsx         |   83.33 |    68.42 |      60 |   81.81 | 57-77             
+ ...pp/marketplace |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 7                 
+ ...etplace/[slug] |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 5-6               
+ ...e/availability |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 5                 
+ ...pp/me/listings |       0 |      100 |       0 |       0 |                   
+  layout.tsx       |       0 |      100 |       0 |       0 | 5                 
+  page.tsx         |       0 |      100 |       0 |       0 | 5                 
+ .../listings/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 5-8               
+ ...ings/[id]/edit |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 5-8               
+ ...e/listings/new |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 3                 
+ src/app/messages  |       0 |      100 |       0 |       0 |                   
+  layout.tsx       |       0 |      100 |       0 |       0 | 5                 
+  page.tsx         |       0 |      100 |       0 |       0 | 1                 
+ .../messages/[id] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 2                 
+ ...app/monitoring |   88.88 |    81.81 |     100 |   92.85 |                   
+  page.tsx         |   88.88 |    81.81 |     100 |   92.85 | 19                
+ .../notifications |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 2                 
+ src/app/profile   |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 1-15              
+ src/app/programs  |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 2                 
+ .../programs/[id] |       0 |        0 |       0 |       0 |                   
+  layout.tsx       |       0 |        0 |       0 |       0 | 6-8               
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ .../announcements |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ ...rams/[id]/edit |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ ...rams/[id]/fees |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ .../[id]/progress |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ ...s/[id]/quizzes |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 5-7               
+ ...izzes/[quizId] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 5-7               
+ .../[id]/sessions |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ ...ams/[id]/tasks |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ ...tasks/[taskId] |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 3                 
+ ...p/programs/new |       0 |        0 |       0 |       0 |                   
+  page.tsx         |       0 |        0 |       0 |       0 | 2                 
+ src/app/reports   |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 2                 
+ src/app/settings  |   89.13 |     72.5 |     100 |      90 |                   
+  page.tsx         |   89.13 |     72.5 |     100 |      90 | 42-45             
+ ...tings/password |   97.05 |    83.33 |     100 |   96.87 |                   
+  page.tsx         |   97.05 |    83.33 |     100 |   96.87 | 49                
+ .../tutors/[slug] |     100 |       50 |     100 |     100 |                   
+  page.tsx         |     100 |       50 |     100 |     100 | 15                
+ ...[slug]/reviews |       0 |      100 |       0 |       0 |                   
+  page.tsx         |       0 |      100 |       0 |       0 | 4-5               
+ ...mponents/admin |   91.66 |    70.83 |   93.33 |    91.3 |                   
+  ...t-preview.tsx |   91.66 |    70.83 |   93.33 |    91.3 | 49,65-66,73       
+ ...omponents/auth |   84.18 |    66.66 |   66.66 |   88.34 |                   
+  auth-form.tsx    |   78.08 |    61.53 |   52.63 |   82.35 | ...47,180,225-285 
+  auth-layout.tsx  |      20 |        0 |       0 |      20 | 29-40             
+  ...port-form.tsx |   92.68 |    93.45 |   82.35 |   97.29 | 180,230           
+  ...ut-button.tsx |   88.23 |       80 |     100 |   93.75 | 25                
+ ...s/availability |    70.9 |    42.85 |   63.15 |   77.14 |                   
+  ...ty-editor.tsx |    70.9 |    42.85 |   63.15 |   77.14 | 43-46,54,62,64,73 
+ ...ents/favorites |   89.36 |    63.15 |   93.33 |   93.58 |                   
+  ...or-button.tsx |   93.75 |    83.33 |   88.88 |      96 | 36                
+  ...ites-list.tsx |   86.66 |    53.84 |   94.73 |   92.15 | 116-118,137       
+ ...ponents/layout |    68.6 |    75.37 |   44.32 |   70.58 |                   
+  account-menu.tsx |   45.45 |    33.33 |   26.31 |   42.85 | 18,26-30,48-60    
+  app-shell.tsx    |   81.06 |    79.79 |   55.31 |   85.45 | ...22,328-332,373 
+  ...-nav-menu.tsx |   38.09 |    31.25 |   18.18 |   41.17 | 16-43             
+  session-hint.tsx |   27.27 |      100 |      20 |      30 | 14-24             
+  ...ng-states.tsx |   16.66 |      100 |       0 |   16.66 | 7-46              
+  ...e-profile.tsx |      50 |      100 |       0 |      50 | 7                 
+ ...ents/marketing |   85.38 |    64.15 |   90.47 |   97.97 |                   
+  ...ed-tutors.tsx |    90.9 |       75 |   77.77 |     100 | 15-17             
+  ...-provider.tsx |   81.81 |      100 |      75 |     100 |                   
+  ...-services.tsx |   88.63 |    70.45 |     100 |     100 | 22-39,55-112      
+  ...ed-tutors.tsx |   81.13 |    55.76 |   92.85 |   95.12 | 49-50             
+ ...ts/marketplace |   77.01 |    64.66 |   76.81 |   86.86 |                   
+  ...ng-detail.tsx |   72.61 |    52.48 |    82.6 |   78.78 | ...41-146,154-165 
+  listing-form.tsx |    74.6 |     62.8 |   75.67 |    90.9 | 79-83,95,105      
+  ...ce-search.tsx |   74.32 |    73.58 |      60 |   83.92 | ...25-126,129,140 
+  ...-listings.tsx |      84 |    75.17 |   88.37 |   90.81 | ...15,263-265,298 
+ ...ents/messaging |    87.6 |    73.09 |   85.71 |   92.38 |                   
+  ...ttachment.tsx |      90 |       75 |      75 |     100 | 10-18             
+  messaging.tsx    |   90.19 |    81.05 |   94.59 |   92.48 | ...65-166,178,363 
+  ...at-button.tsx |   79.59 |    53.42 |      70 |   86.36 | ...,98-99,116-131 
+  ...inbox-data.ts |      85 |       50 |      60 |     100 | 16-18             
+ .../notifications |   93.18 |    86.13 |      90 |   97.01 |                   
+  ...fications.tsx |   93.18 |    86.13 |      90 |   97.01 | 113,149           
+ ...nents/programs |   76.14 |    59.67 |   61.32 |   81.76 |                   
+  invitations.tsx  |   82.29 |    71.53 |      68 |   90.24 | ...29-231,318-327 
+  ...am-detail.tsx |   38.46 |    22.85 |   42.85 |      40 | 32-49,71-77       
+  ...am-editor.tsx |     100 |    69.23 |     100 |     100 | 24,34-49          
+  program-form.tsx |   46.29 |    62.22 |   31.57 |   49.01 | ...70-173,183-238 
+  program-list.tsx |   86.11 |    51.42 |   85.71 |      90 | 38-39,117         
+  ...ram-offer.tsx |       0 |        0 |       0 |       0 | 1-27              
+  ...-overview.tsx |     100 |    57.69 |     100 |     100 | 22-30,41-81,87    
+  ...m-quizzes.tsx |   77.77 |     62.8 |      64 |   87.64 | ...17-118,121,124 
+  ...nt-picker.tsx |     100 |    90.62 |     100 |     100 | 37,40-43          
+  ...ace-shell.tsx |     100 |       70 |     100 |     100 | 15-16             
+  ...workspace.tsx |   80.39 |    55.35 |   71.42 |   82.97 | ...20,133,157-186 
+  ...workspace.tsx |      20 |        0 |       0 |      50 | 10                
+  ...ace-files.tsx |   90.47 |       75 |      80 |     100 | 9                 
+  ...pace-form.tsx |   65.95 |    60.81 |      25 |   72.09 | ...-78,86,128-176 
+  ...-tab-page.tsx |      75 |    56.27 |      50 |   82.92 | 40-41,111,172-261 
+  ...ce-upload.tsx |   96.77 |    81.81 |     100 |     100 | 23-57             
+ ...grams/progress |   76.19 |    59.37 |      50 |   92.85 |                   
+  ...dashboard.tsx |   76.19 |    59.37 |      50 |   92.85 | 38                
+ ...grams/sessions |   92.85 |    66.66 |    87.5 |   95.71 |                   
+  ...-calendar.tsx |   94.36 |    88.88 |   92.85 |   98.24 | 77                
+  ...n-dialogs.tsx |   84.61 |       50 |      50 |   84.61 | 24-25             
+ ...programs/tasks |   21.73 |    13.33 |   22.22 |      20 |                   
+  ...te-dialog.tsx |   11.11 |        0 |       0 |    12.5 | 9-27              
+  ...list-utils.ts |   28.57 |    15.38 |   66.66 |      25 | 5-6,11-14,20-22   
+ ...onents/reports |   78.33 |    73.83 |      70 |   81.87 |                   
+  ...sion-form.tsx |   82.11 |    80.45 |   77.77 |   83.49 | ...77,187,201,207 
+  reports-page.tsx |   70.17 |    62.96 |   58.33 |   78.26 | ...35-172,220-237 
+ ...ponents/shared |   84.61 |      100 |   71.42 |   83.33 |                   
+  ui.tsx           |      80 |      100 |   69.23 |   78.94 | 145-154           
+ ...ponents/tutors |   64.31 |    72.07 |   58.88 |   69.14 |                   
+  profile-form.tsx |       0 |        0 |       0 |       0 | 1-32              
+  ...ilability.tsx |    7.14 |        0 |       0 |    7.69 | 14-45             
+  public-tutor.tsx |   83.73 |    70.64 |   82.05 |   93.13 | ...74,396-397,424 
+  ...anagement.tsx |       0 |        0 |       0 |       0 | 1-45              
+  ...ding-form.tsx |      75 |    84.09 |   61.76 |   79.06 | ...84,328-330,360 
+ ...ors/onboarding |   86.75 |    78.13 |   96.55 |   93.24 |                   
+  ...ing-config.ts |   64.51 |    63.15 |     100 |   71.42 | 55-60             
+  ...onboarding.ts |   89.29 |    80.86 |   96.22 |   95.37 | ...85,319,326-329 
+ src/lib/api       |   78.33 |    76.71 |   72.72 |   83.92 |                   
+  client.ts        |   78.33 |    76.71 |   72.72 |   83.92 | 121,130,141-155   
+ src/lib/data      |   93.91 |    84.96 |   90.43 |   94.96 |                   
+  admin-reports.ts |    37.5 |      100 |       0 |    37.5 | 30-44             
+  ...validation.ts |    90.9 |       85 |     100 |     100 | 8-9,16            
+  favorites.ts     |     100 |       50 |     100 |     100 | 30                
+  listing-query.ts |   96.96 |    88.88 |     100 |     100 | 6,18,23,36-37,41  
+  marketplace.ts   |   97.95 |    89.81 |     100 |     100 | ...21,127,144-176 
+  messaging.ts     |      60 |       50 |   55.55 |      60 | 37-54,95          
+  services.ts      |   95.23 |    76.08 |    93.1 |   95.06 | 141-142,157-158   
+  workspace.ts     |     100 |    93.75 |     100 |     100 | 93                
+ src/lib/hooks     |    93.7 |    87.19 |   88.37 |   98.96 |                   
+  ...async-data.ts |     100 |    95.45 |     100 |     100 | 30                
+  ...n-realtime.ts |   86.79 |    77.96 |      75 |   97.18 | 65-66             
+  ...rrent-time.ts |    87.5 |      100 |      80 |     100 |                   
+  ...st-filters.ts |     100 |    81.25 |     100 |     100 | 11,13,18          
+  use-polling.ts   |   98.79 |    94.44 |     100 |     100 | 53,58,89          
+  ...d-messages.ts |     100 |     92.3 |     100 |     100 | 24                
+-------------------|---------|----------|---------|---------|-------------------
+
+=============================== Coverage summary ===============================
+Statements   : 80.59% ( 3409/4230 )
+Branches     : 69.15% ( 3532/5107 )
+Functions    : 72.2% ( 925/1281 )
+Lines        : 85.71% ( 2941/3431 )
+================================================================================
