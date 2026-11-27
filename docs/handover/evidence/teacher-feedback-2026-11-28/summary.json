@@ -75,5 +75,12 @@
     "cache_transaction_group_tests": 18,
     "cache_transaction_group_assertions": 106,
     "openapi_operations": 139
+  },
+  "laravel_live_slack": {
+    "ok": true,
+    "job": "SendSlackOperationalAlert",
+    "execution": "Direct handle() with the installed Laravel runtime, real HTTPS transport, environment feedback-test; no database or worker-delivery claim",
+    "original_response": "laravel-slack-original-response.json",
+    "permalink": "https://laraveltelesc-cjr9660.slack.com/archives/C0C8BM660TB/p1795806047854409"
   }
 }
