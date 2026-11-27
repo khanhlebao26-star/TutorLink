@@ -97,6 +97,9 @@ jobs:
           composer install --no-interaction --prefer-dist --no-progress
           composer show --locked > build/reports/dependencies.txt
 
+      - name: Monitoring delivery regression tests
+        run: python3 -m unittest discover -s ../docker/monitoring -v
+
       - name: Backend lint
         run: |
           vendor/bin/pint --test 2>&1 | tee build/reports/format.txt

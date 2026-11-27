@@ -3,6 +3,9 @@
 import argparse
 import datetime
 import json
+import os
+import uuid
+import urllib.error
 import shutil
 import subprocess
 import threading
@@ -47,12 +50,74 @@ def threshold_alerts(snapshot, limits):
     return alerts
 
 
+class NoSlackRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def slack_open(request):
+    # Never forward a bot token to a redirect destination.
+    return urllib.request.build_opener(NoSlackRedirect()).open(request, timeout=10)
+
+
+def slack_delivery(alert, token, channel, output, *, test=False):
+    """One bounded attempt; the poller retries failures on its next cycle."""
+    alert_id = str(uuid.uuid4())
+    label = 'TEST threshold alert' if test else 'Resource threshold alert'
+    text = (f'TutorLink {label} | alert={alert_id}\n'
+            f"{alert['resource']} {alert['metric']}={alert.get('value', 'unavailable')} "
+            f"threshold={alert.get('threshold', 'n/a')}")
+    request = urllib.request.Request('https://slack.com/api/chat.postMessage',
+        data=json.dumps({'channel': channel, 'text': text, 'mrkdwn': False,
+                         'unfurl_links': False, 'unfurl_media': False}).encode(),
+        headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'})
+    try:
+        with slack_open(request) as response:
+            raw = response.read(1048576)
+            status = response.status
+            request_id = response.headers.get('x-slack-req-id')
+    except urllib.error.HTTPError as error:
+        retry = error.headers.get('Retry-After', '60')
+        return {'status': 'failed', 'code': f'http_{error.code}',
+                'retry_after': min(3600, max(5, int(retry))) if retry.isdigit() else 60}
+    except (OSError, TimeoutError):
+        return {'status': 'failed', 'code': 'transport_error', 'retry_after': 30}
+    try:
+        body = json.loads(raw)
+    except (ValueError, UnicodeError):
+        return {'status': 'failed', 'code': 'invalid_response', 'retry_after': 30}
+    if not isinstance(body, dict) or body.get('ok') is not True:
+        return {'status': 'failed', 'code': 'slack_rejected', 'retry_after': 60}
+    output.mkdir(parents=True, exist_ok=True)
+    # Original response from Slack, never the request headers/token.
+    receipt = output / f'slack-response-{alert_id}.json'
+    try:
+        receipt.write_bytes(raw)
+    except OSError:
+        return {'status': 'sent', 'http_status': status, 'alert_id': alert_id,
+                'evidence_error': 'receipt_write_failed'}
+    return {'status': 'sent', 'http_status': status, 'alert_id': alert_id,
+            'slack_request_id': request_id, 'response_file': receipt.name,
+            'channel': body.get('channel'), 'ts': body.get('ts')}
+
+
+def slack_settings(env_file=None):
+    values = dict(os.environ)
+    if env_file:
+        for line in env_file.read_text().splitlines():
+            if '=' in line and not line.lstrip().startswith('#'):
+                key, value = line.split('=', 1)
+                values.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+    return values.get('SLACK_BOT_USER_OAUTH_TOKEN', ''), values.get('SLACK_BOT_USER_DEFAULT_CHANNEL', '')
+
+
 HTML = '''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>TutorLink resources</title><style>body{font:16px system-ui;background:#f8f7ff;color:#071a4c;max-width:1100px;margin:40px auto;padding:0 24px}h1{font-size:36px}small{color:#64748b}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}article,table{background:white;border-radius:16px;padding:24px;border:1px solid #dce2f4}strong{display:block;font-size:30px;color:#e50085}table{margin-top:24px;width:100%;text-align:left}td,th{padding:12px;border-bottom:1px solid #eee}pre{white-space:pre-wrap}.warn{color:#b42318}</style><h1>TutorLink · Resources</h1><p id="updated">Connecting…</p><p><small>Docker CPU/RAM and cumulative container network I/O. Disk refers to the filesystem on the machine running this collector. On macOS, container limits refer to the Docker VM.</small></p><div class="cards"><article>Container CPU sum<strong id="cpu">—</strong></article><article>Container memory sum<strong id="ram">—</strong></article><article>Host disk used<strong id="disk">—</strong></article><article>Network RX / TX<strong id="net">—</strong></article></div><table><thead><tr><th>Container</th><th>CPU</th><th>RAM</th><th>RX / TX</th></tr></thead><tbody id="rows"></tbody></table><h2>Threshold delivery</h2><p id="limits"></p><pre id="alerts"></pre><script>const mb=n=>(n/1048576).toFixed(1)+' MB';async function refresh(){try{let d=await(await fetch('/api/metrics')).json();document.querySelector('#updated').textContent=d.checked_at+(d.error?' · '+d.error:'');document.querySelector('#cpu').textContent=d.containers.reduce((s,c)=>s+c.cpu_percent,0).toFixed(1)+'%';document.querySelector('#ram').textContent=mb(d.containers.reduce((s,c)=>s+c.memory_bytes,0));document.querySelector('#disk').textContent=d.disk?d.disk.percent.toFixed(1)+'%':'—';document.querySelector('#net').textContent=mb(d.containers.reduce((s,c)=>s+c.network_rx_bytes,0))+' / '+mb(d.containers.reduce((s,c)=>s+c.network_tx_bytes,0));let root=document.querySelector('#rows');root.replaceChildren();for(let c of d.containers){let tr=document.createElement('tr');for(let text of [c.name,c.cpu_percent.toFixed(1)+'%',mb(c.memory_bytes),mb(c.network_rx_bytes)+' / '+mb(c.network_tx_bytes)]){let td=document.createElement('td');td.textContent=text;tr.append(td)}root.append(tr)}document.querySelector('#limits').textContent=JSON.stringify(d.limits);document.querySelector('#alerts').textContent=JSON.stringify(d.deliveries,null,2)}catch(e){document.querySelector('#updated').textContent='Collector unavailable'} }refresh();setInterval(refresh,5000)</script></html>'''
 
 
 def serve(args):
     state = {'checked_at': None, 'containers': [], 'disk': None, 'error': 'Starting collector', 'limits': {'cpu_percent': args.cpu, 'memory_percent': args.memory, 'disk_percent': args.disk}, 'deliveries': []}
     mutex = threading.Lock()
+    token, channel = slack_settings(args.slack_env_file)
     args.output.mkdir(parents=True, exist_ok=True)
 
     class Handler(BaseHTTPRequestHandler):
@@ -91,6 +156,7 @@ def serve(args):
 
     def poll():
         last_sent = {}
+        retry_at = {}
         while True:
             try:
                 snapshot = collect(args.prefix, args.disk_path)
@@ -103,12 +169,21 @@ def serve(args):
                 key = (alert['metric'], alert['resource'])
                 if time.monotonic() - last_sent.get(key, -1e9) < 60:
                     continue
-                try:
-                    req = urllib.request.Request(f'http://127.0.0.1:{args.port}/alerts', data=json.dumps(alert).encode(), headers={'Content-Type': 'application/json'})
-                    with urllib.request.urlopen(req, timeout=3):
-                        last_sent[key] = time.monotonic()
-                except OSError:
-                    pass
+                if time.monotonic() < retry_at.get(key, 0):
+                    continue
+                if not token or not channel:
+                    delivery = {'status': 'failed', 'code': 'slack_not_configured', 'retry_after': 60}
+                else:
+                    delivery = slack_delivery(alert, token, channel, args.output)
+                if delivery['status'] == 'sent':
+                    last_sent[key] = time.monotonic()
+                else:
+                    retry_at[key] = time.monotonic() + delivery.get('retry_after', 30)
+                with mutex:
+                    row = {**alert, **delivery, 'attempted_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}
+                    state['deliveries'] = (state['deliveries'] + [row])[-20:]
+                    with (args.output / 'deliveries.jsonl').open('a') as stream:
+                        stream.write(json.dumps(row)+'\n')
             time.sleep(5)
 
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
@@ -119,6 +194,8 @@ def serve(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--slack-env-file', type=Path, help='Private env file; never served by the dashboard')
+    parser.add_argument('--test-alert', action='store_true', help='Send a labelled synthetic 81/80 CPU threshold through the real delivery path and exit')
     parser.add_argument('--prefix', default='tutorlink-')
     parser.add_argument('--port', type=int, default=9070)
     parser.add_argument('--cpu', type=float, default=80)
@@ -126,4 +203,13 @@ if __name__ == '__main__':
     parser.add_argument('--disk', type=float, default=80)
     parser.add_argument('--disk-path', type=Path, default=Path.cwd())
     parser.add_argument('--output', type=Path, default=Path('outputs/deploy-readiness/monitoring'))
-    serve(parser.parse_args())
+    args = parser.parse_args()
+    if args.test_alert:
+        token, channel = slack_settings(args.slack_env_file)
+        if not token or not channel:
+            parser.error('Slack token and channel are required')
+        alert = threshold_alerts({'containers': [{'name': 'tutorlink-controlled-test', 'cpu_percent': 81, 'memory_percent': 0}], 'disk': {'path': '/', 'percent': 0}, 'error': None}, {'cpu_percent': 80, 'memory_percent': 80, 'disk_percent': 80})[0]
+        result = slack_delivery(alert, token, channel, args.output, test=True)
+        print(json.dumps(result))
+        raise SystemExit(0 if result['status'] == 'sent' else 1)
+    serve(args)
