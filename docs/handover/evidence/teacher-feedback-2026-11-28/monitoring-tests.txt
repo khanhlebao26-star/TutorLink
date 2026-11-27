@@ -1,0 +1,11 @@
+test_docker_binary_and_decimal_units (test_dashboard.DashboardTest.test_docker_binary_and_decimal_units) ... ok
+test_failed_collector_is_reported (test_dashboard.DashboardTest.test_failed_collector_is_reported) ... ok
+test_thresholds_identify_the_container_and_host_disk (test_dashboard.DashboardTest.test_thresholds_identify_the_container_and_host_disk) ... ok
+test_rate_limit_preserves_retry_after (test_dashboard.SlackDeliveryTest.test_rate_limit_preserves_retry_after) ... ok
+test_slack_ok_false_is_not_recorded_as_delivery (test_dashboard.SlackDeliveryTest.test_slack_ok_false_is_not_recorded_as_delivery) ... ok
+test_success_saves_original_slack_response_without_request_secrets (test_dashboard.SlackDeliveryTest.test_success_saves_original_slack_response_without_request_secrets) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.004s
+
+OK

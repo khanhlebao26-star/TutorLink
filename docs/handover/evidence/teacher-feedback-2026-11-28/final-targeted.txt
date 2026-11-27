@@ -1,0 +1,12 @@
+ Container tutorlink-feedback-test-db-1  Running
+
+  ..............................
+
+  Tests:    30 passed (163 assertions)
+  Duration: 4.25s
+
+
+   INFO  Nothing to migrate.  
+
+OpenAPI document exported to ../docs/api/openapi.json.
+OpenAPI route parity passed (139 operations).

@@ -1,0 +1,5 @@
+ users | tutors | customers | listings | availability 
+-------+--------+-----------+----------+--------------
+     6 |      4 |         1 |        5 |           12
+(1 row)
+

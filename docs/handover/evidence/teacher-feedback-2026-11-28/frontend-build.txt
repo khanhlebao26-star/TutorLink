@@ -1,0 +1,78 @@
+
+> frontend@0.1.0 build
+> next build --webpack
+
+▲ Next.js 16.4.5 (webpack)
+- Environments: .env.local
+✓ Running next.config.ts took 138ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 12.9s
+  Running TypeScript ...
+  Finished TypeScript in 10.1s ...
+  Collecting page data using 7 workers ...
+[prerender] Could not load tutor slugs; shells will render on demand. Network Error
+  Generating static pages using 7 workers (0/32) ...
+  Generating static pages using 7 workers (8/32) 
+  Generating static pages using 7 workers (16/32) 
+  Generating static pages using 7 workers (24/32) 
+✓ Generating static pages using 7 workers (32/32) in 563ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)                          Revalidate  Expire
+┌ ○ /                                        5m      1y
+├ ƒ /_not-found
+├ ○ /about                                   5m      1y
+├ ƒ /admin
+├ ƒ /admin/dashboard
+├ ƒ /admin/reports
+├ ƒ /auth/forgot-password
+├ ƒ /auth/login
+├ ƒ /auth/register
+├ ƒ /auth/reset-password
+├ ƒ /auth/verify-email
+├ ○ /become-a-tutor                          5m      1y
+├ ƒ /favorites
+├ ○ /icon.svg
+├ ƒ /invitations
+├ ƒ /invitations/[id]
+├ ƒ /learning-profile
+├ ○ /manifest.webmanifest
+├ ƒ /marketplace
+├ ƒ /marketplace/[slug]
+├ ƒ /me/availability
+├ ƒ /me/listings
+├ ƒ /me/listings/[id]
+├ ƒ /me/listings/[id]/edit
+├ ƒ /me/listings/new
+├ ƒ /messages
+├ ƒ /messages/[id]
+├ ƒ /monitoring
+├ ƒ /notifications
+├ ƒ /profile
+├ ƒ /programs
+├ ƒ /programs/[id]
+├ ƒ /programs/[id]/announcements
+├ ƒ /programs/[id]/edit
+├ ƒ /programs/[id]/fees
+├ ƒ /programs/[id]/progress
+├ ƒ /programs/[id]/quizzes
+├ ƒ /programs/[id]/quizzes/[quizId]
+├ ƒ /programs/[id]/sessions
+├ ƒ /programs/[id]/tasks
+├ ƒ /programs/[id]/tasks/[taskId]
+├ ƒ /programs/new
+├ ƒ /reports
+├ ƒ /settings
+├ ƒ /settings/password
+├ ƒ /support
+├ ○ /tutors/[slug]
+└ ƒ /tutors/[slug]/reviews
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
