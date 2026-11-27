@@ -5,38 +5,26 @@ import { beforeEach, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/data/marketplace", () => ({ getFeaturedListingCandidates: vi.fn(), getPublicTutor: vi.fn() }));
 vi.mock("@/components/layout/app-shell", () => ({ AppShell: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
-vi.mock("@/components/tutors/public-tutor", () => ({ PublicTutor: ({ slug, initialTutor }: { slug: string; initialTutor?: { name: string | null } }) => <div data-testid="tutor-profile">{slug}:{initialTutor?.name ?? "client-load"}</div> }));
+vi.mock("@/components/tutors/public-tutor", () => ({ PublicTutor: ({ slug, initialTutor }: { slug: string; initialTutor?: { name: string } }) => <div data-testid="tutor-profile">{slug}:{initialTutor?.name ?? "client-load"}</div> }));
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => vi.resetAllMocks());
 
-it("uses a bounded set of unique public tutor slugs for ISR prebuilds", async () => {
-  vi.mocked(getFeaturedListingCandidates).mockResolvedValue({ data: [
-    { tutor_slug: "tutor-a" }, { tutor_slug: "tutor-a" }, { tutor_slug: null },
-    { tutor_slug: "tutor-b" }, { tutor_slug: "tutor-c" }, { tutor_slug: "tutor-d" },
-    { tutor_slug: "tutor-e" }, { tutor_slug: "tutor-f" }, { tutor_slug: "tutor-g" },
-  ] } as never);
-
-  await expect(generateStaticParams()).resolves.toEqual([
-    { slug: "tutor-a" }, { slug: "tutor-b" }, { slug: "tutor-c" },
-    { slug: "tutor-d" }, { slug: "tutor-e" }, { slug: "tutor-f" },
-  ]);
+it("prebuilds at most six distinct tutor shells from public listing candidates", async () => {
+  vi.mocked(getFeaturedListingCandidates).mockResolvedValue({ data: ["a", "a", null, "b", "c", "d", "e", "f", "g"].map(tutor_slug => ({ tutor_slug })) } as never);
+  await expect(generateStaticParams()).resolves.toEqual(["a", "b", "c", "d", "e", "f"].map(slug => ({ slug })));
   expect(dynamic).toBe("force-static");
   expect(dynamicParams).toBe(true);
   expect(revalidate).toBe(300);
 });
 
-it("keeps the build working when the public listing API is unavailable", async () => {
-  const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-  vi.mocked(getFeaturedListingCandidates).mockRejectedValue(new Error("API offline"));
-  await expect(generateStaticParams()).resolves.toEqual([]);
-  expect(warning).toHaveBeenCalledWith(expect.stringContaining("profiles will render on demand"), "API offline");
+it("never puts a mutable tutor snapshot into generated HTML", async () => {
+  render(await PublicTutorPage({ params: Promise.resolve({ slug: "anna" }) }));
+  expect(screen.getByTestId("tutor-profile")).toHaveTextContent("anna:client-load");
+  expect(getPublicTutor).not.toHaveBeenCalled();
 });
 
-it("renders a client-retry shell when the tutor API is unavailable during prerender", async () => {
-  const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-  vi.mocked(getPublicTutor).mockRejectedValue(new Error("API offline"));
-  const page = await PublicTutorPage({ params: Promise.resolve({ slug: "new-tutor" }) });
-  render(page);
-  expect(screen.getByTestId("tutor-profile")).toHaveTextContent("new-tutor:client-load");
-  expect(warning).toHaveBeenCalledWith(expect.stringContaining("will load on visit"), "API offline");
+it("keeps offline builds working and renders unlisted slugs on demand", async () => {
+  vi.spyOn(console, "warn").mockImplementation(() => undefined);
+  vi.mocked(getFeaturedListingCandidates).mockRejectedValue(new Error("API offline"));
+  await expect(generateStaticParams()).resolves.toEqual([]);
 });

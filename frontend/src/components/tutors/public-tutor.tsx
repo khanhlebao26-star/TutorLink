@@ -8,7 +8,7 @@ import type { PublicListing, TutorPublic, TutorReviewAggregate, TutorReviewColle
 import { useAsyncData } from "@/lib/hooks/use-async-data";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useState, useSyncExternalStore, type ReactNode } from "react";
 
 function TutorSkeleton({ className = "" }: { className?: string }) {
   return <span className={`tutor-loading-skeleton ${className}`} />;
@@ -130,11 +130,7 @@ export function PublicTutor({ slug, initialTab, initialTutor }: { slug: string; 
   const [page, setPage] = useState(1);
   const [reviewPage, setReviewPage] = useState(1);
   const [listingSlide, setListingSlide] = useState(0);
-  const initialTutorRef = useRef(initialTutor);
-  const load = useCallback(() => {
-    if (page === 1 && initialTutorRef.current?.slug === slug) return Promise.resolve(initialTutorRef.current);
-    return getPublicTutor(slug, page);
-  }, [slug, page]);
+  const load = useCallback(() => getPublicTutor(slug, page), [slug, page]);
   const tutorResult = useAsyncData(load, false);
   const data = tutorResult.data ?? (page === 1 && initialTutor?.slug === slug ? initialTutor : null);
   const error = tutorResult.error;
